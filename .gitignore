@@ -1,0 +1,15 @@
+*.o
+*.cache
+*.elf
+*.h.gch
+
+projects/mtg/objs
+projects/mtg/deps
+projects/mtg/User
+
+EBOOT.PBP
+PARAM.SFO
+
+libjge300.a
+libhgetools.a
+wagic.prx
