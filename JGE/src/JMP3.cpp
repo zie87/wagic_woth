@@ -150,7 +150,7 @@ JLOG("Start JMP3::load");
 
      // Memorise the full path for reloading with decode thread.
       if ( getcwd(m_fileName, sizeof(m_fileName)) ){
-         int len = strnlen(m_fileName, sizeof(m_fileName));
+         int len = strlen(m_fileName);
          if (len + filename.size() <= sizeof(m_fileName) - 2){
             m_fileName[len++] = '/';
             strcpy(m_fileName + len, filename.c_str());
