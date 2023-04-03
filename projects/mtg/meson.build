@@ -116,6 +116,11 @@ wth_c_args = []
 wth_cpp_args = []
 wth_link_args = []
 
+if get_option('enable_testsuite')
+wth_cpp_args = wth_cpp_args + ['-DTESTSUITE=1']
+wth_srcs     = wth_srcs + ['src/TestSuiteAI.cpp']
+endif
+
 if host_machine.system() == 'psp'
     wth_cpp_args = (
         wth_cpp_args + [
