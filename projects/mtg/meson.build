@@ -169,7 +169,7 @@ wth = executable(
     # cpp_pch: 'include/PrecompiledHeader.h',
     include_directories: [wth_inc_dir],
     dependencies: [jge_dep, hge_dep],
-    override_options: ['cpp_std=c++03', 'warning_level=0'],
+    override_options: ['warning_level=0'],
     cpp_args: wth_cpp_args,
     link_args: wth_link_args,
 )

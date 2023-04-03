@@ -133,7 +133,7 @@ jgetools = static_library(
     'jge300',
     sources: jge_srcs,
     include_directories: jge_inc_dirs,
-    override_options: ['cpp_std=c++03', 'warning_level=0'],
+    override_options: ['warning_level=0'],
     c_args: jge_c_args,
     cpp_args: jge_cpp_args,
     dependencies: jge_dependencies,
