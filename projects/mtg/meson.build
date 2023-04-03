@@ -111,40 +111,46 @@ wth_srcs = [
 'src/WFont.cpp',
 ]
 
-wth_inc_dir = include_directories('./include')
-wth_cpp_args = ['-DPSPFW3XX', '-DDEVHOOK', '-DUSE_PRECOMPILED_HEADERS=0', '-DPSP']
+wth_inc_dir   = include_directories('./include')
+wth_c_args  = []
+wth_cpp_args  = []
+wth_link_args = []
+
+if host_machine.system() == 'psp'
+  wth_cpp_args = wth_cpp_args + ['-DPSPFW3XX', '-DDEVHOOK', '-DUSE_PRECOMPILED_HEADERS=0', '-DPSP']
+  wth_link_args = [
+    '-L' + meson.current_source_dir() + '/../../JGE/lib/psp',
+    '-lfreetype',
+    '-lm',
+    '-lmikmod',
+    '-lpsppower',
+    '-lpspmpeg',
+    '-lpspaudiocodec',
+    '-lpspaudiolib',
+    '-lpspaudio',
+    '-lpspmp3',
+    '-lpspgum',
+    '-lpspgu',
+    '-lpsprtc',
+    '-lstdc++',
+    '-lpspfpu',
+    '-lpspdebug',
+    '-lpspdisplay',
+    '-lpspge',
+    '-lpspctrl',
+    '-lpspnet',
+    '-lpspnet_apctl',
+    '-Wl,-zmax-page-size=128',
+  ]
+elif host_machine.system() == 'linux'
+  wth_cpp_args =  wth_cpp_args + ['-DSDL_CONFIG', '-DLINUX']
+endif
 
 if get_option('buildtype') == 'debug'
     wth_cpp_args = wth_cpp_args + ['-ggdb3', '-D_DEBUG', '-DDEBUG', '-DDEBUG_CACHE']
 endif
 
-wth_link_args = [
-  '-L' + meson.current_source_dir() + '/../../JGE/lib/psp',
-  '-lfreetype',
-  '-ljpeg',
-  '-lpng',
-  '-lz',
-  '-lm',
-  '-lmikmod',
-  '-lpsppower',
-  '-lpspmpeg',
-  '-lpspaudiocodec',
-  '-lpspaudiolib',
-  '-lpspaudio',
-  '-lpspmp3',
-  '-lpspgum',
-  '-lpspgu',
-  '-lpsprtc',
-  '-lstdc++',
-  '-lpspfpu',
-  '-lpspdebug',
-  '-lpspdisplay',
-  '-lpspge',
-  '-lpspctrl',
-  '-lpspnet',
-  '-lpspnet_apctl',
-  '-Wl,-zmax-page-size=128',
-]
+
 
 wth_name = 'wagic'
 #../../projects/mtg/include/PrecompiledHeader.h -o PrecompiledHeader.h.gch  
@@ -152,7 +158,7 @@ wth = executable(
     wth_name,
     sources: wth_srcs,
     # cpp_pch: 'include/PrecompiledHeader.h',
-    include_directories: [boost_inc_dir, wth_inc_dir],
+    include_directories: [wth_inc_dir],
     dependencies: [jge_dep, hge_dep],
     override_options: ['cpp_std=c++03', 'warning_level=0'],
     cpp_args: wth_cpp_args,
@@ -164,15 +170,17 @@ objdump = '@0@'.format(find_program('objdump').path())
 readelf = '@0@'.format(find_program('readelf').path())
 size = '@0@'.format(find_program('size').path())
 
-post_build = meson.get_external_property('post_build_script')
-post_build_script = '@0@'.format(
-    find_program(meson.source_root() + '/tools/' + post_build).path(),
-)
-custom_target(
-    'wth_post_build',
-    input: wth,
-    output: 'wth_post_build',
-    command: [post_build_script, '@INPUT@'],
-    build_by_default: true,
-    depends: [wth],
-)
+if host_machine.system() == 'psp'
+  post_build = meson.get_external_property('post_build_script')
+  post_build_script = '@0@'.format(
+      find_program(meson.source_root() + '/tools/' + post_build).path(),
+  )
+  custom_target(
+      'wth_post_build',
+      input: wth,
+      output: 'wth_post_build',
+      command: [post_build_script, '@INPUT@'],
+      build_by_default: true,
+      depends: [wth],
+  )
+endif
