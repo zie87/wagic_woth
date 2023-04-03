@@ -5,10 +5,6 @@
 #define snprintf sprintf_s
 #endif 
 
-#if (defined (WIN32) || defined (LINUX)) && defined (_DEBUG)
-#define TESTSUITE 1
-#endif
-
 #include "limits.h"
 
 #if defined (_DEBUG) && defined (WIN32)
