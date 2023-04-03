@@ -1277,8 +1277,6 @@ void ActionStack::Render()
     }
 }
 
-#if defined (WIN32) || defined (LINUX)  || defined (IOS)
-
 void Interruptible::Dump()
 {
     string stype, sstate, sdisplay = "";
@@ -1337,5 +1335,3 @@ void ActionStack::Dump()
         current->Dump();
     }
 }
-
-#endif
