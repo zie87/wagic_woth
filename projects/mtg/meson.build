@@ -122,7 +122,6 @@ wth_link_args = [
   '-L' + meson.current_source_dir() + '/../../JGE/lib/psp',
   '-lfreetype',
   '-ljpeg',
-  '-lgif',
   '-lpng',
   '-lz',
   '-lm',

@@ -11,7 +11,7 @@ LIBDIR = lib/psp
 
 CFLAGS = -O2 -G0 -Wall
 
-LIBS = -lgif -lfreetype -ljpeg -lpng -lz -lmikmod -lpsppower -lpspmpeg -lpspaudiocodec -lpspaudiolib -lpspaudio -lpspgum -lpspgu -lpsprtc -lm -lstdc++ -ljge300
+LIBS = -lfreetype -ljpeg -lpng -lz -lmikmod -lpsppower -lpspmpeg -lpspaudiocodec -lpspaudiolib -lpspaudio -lpspgum -lpspgu -lpsprtc -lm -lstdc++ -ljge300
 
 include $(PSPSDK)/lib/build.mak
 
