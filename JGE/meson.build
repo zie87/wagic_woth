@@ -15,18 +15,18 @@ hge_inc_dirs = [zipfs_inc_dir]
 hge_dependencies = []
 
 if host_machine.system() == 'psp'
-  psp_inc_dir = include_directories('include/psp')
-  freetype2_inc_dir = include_directories('include/psp/freetype2')
+    psp_inc_dir = include_directories('include/psp')
+    freetype2_inc_dir = include_directories('include/psp/freetype2')
 
-  hge_c_args    = ['-D_PSP_FW_VERSION=150']
-  hge_cpp_args  = hge_c_args
-  hge_inc_dirs  = hge_inc_dirs + [psp_inc_dir, freetype2_inc_dir]
+    hge_c_args = ['-D_PSP_FW_VERSION=150']
+    hge_cpp_args = hge_c_args
+    hge_inc_dirs = hge_inc_dirs + [psp_inc_dir, freetype2_inc_dir]
 elif host_machine.system() == 'linux'
-  sdl2_dep = dependency('sdl2')
-  
-  hge_c_args    = ['-DSDL_CONFIG', '-DLINUX']
-  hge_cpp_args  = hge_c_args
-  hge_dependencies = [sdl2_dep]
+    sdl2_dep = dependency('sdl2')
+
+    hge_c_args = ['-DSDL_CONFIG', '-DLINUX']
+    hge_cpp_args = hge_c_args
+    hge_dependencies = [sdl2_dep]
 endif
 
 hgetools = static_library(
@@ -75,8 +75,8 @@ jge_srcs = [
     'src/tinyxml/tinyxmlparser.cpp',
 ]
 
-jge_c_args    = []
-jge_cpp_args  = []
+jge_c_args = []
+jge_cpp_args = []
 jge_inc_dirs = [include_directories('./include'), zipfs_inc_dir]
 
 png_dep = dependency('libpng')
@@ -85,38 +85,44 @@ jpeg_dep = dependency('libjpeg')
 jge_dependencies = [hge_dep, png_dep, jpeg_dep]
 
 if host_machine.system() == 'psp'
-  boost_inc_dir = include_directories('../Boost')
-  jge_srcs = jge_srcs + [
-    'src/JGBKFont.cpp',
-    'src/JTTFont.cpp',
-    'src/JSocket.cpp',
-    'src/JGfx.cpp',
-    'src/JSfx.cpp',
-    'src/JAudio.cpp',
-    'src/JMP3.cpp',
-    'src/decoder_prx.c',
-    'src/main.cpp',
-    'src/vram.c',
-  ]
+    boost_inc_dir = include_directories('../Boost')
+    jge_srcs = (
+        jge_srcs + [
+            'src/JGBKFont.cpp',
+            'src/JTTFont.cpp',
+            'src/JSocket.cpp',
+            'src/JGfx.cpp',
+            'src/JSfx.cpp',
+            'src/JAudio.cpp',
+            'src/JMP3.cpp',
+            'src/decoder_prx.c',
+            'src/main.cpp',
+            'src/vram.c',
+        ]
+    )
 
-  jge_c_args    = jge_c_args + ['-D_PSP_FW_VERSION=371']
-  jge_cpp_args  = jge_cpp_args + ['-DDEVHOOK', '-DPSPFW3XX', '-DPSP']
-  jge_inc_dirs  = jge_inc_dirs + [psp_inc_dir, freetype2_inc_dir, boost_inc_dir]
+    jge_c_args = jge_c_args + ['-D_PSP_FW_VERSION=371']
+    jge_cpp_args = jge_cpp_args + ['-DDEVHOOK', '-DPSPFW3XX', '-DPSP']
+    jge_inc_dirs = (
+        jge_inc_dirs + [psp_inc_dir, freetype2_inc_dir, boost_inc_dir]
+    )
 elif host_machine.system() == 'linux'
-  jge_srcs = jge_srcs + [
-    'src/SDLmain.cpp',
-    'src/JDistortionMesh.cpp',
-    'src/pc/JSfx.cpp',
-    'src/pc/JGfx.cpp',
-    'src/pc/JSocket.cpp',
-  ]
-  sdl2_dep = dependency('sdl2')
-  opengl_dep = dependency('OpenGL')
-  boost_dep = dependency('boost', modules : ['system', 'date_time', 'thread'])
-  
-  jge_c_args    = ['-DSDL_CONFIG', '-DLINUX']
-  jge_cpp_args  = hge_c_args
-  jge_dependencies = jge_dependencies + [sdl2_dep, opengl_dep, boost_dep]
+    jge_srcs = (
+        jge_srcs + [
+            'src/SDLmain.cpp',
+            'src/JDistortionMesh.cpp',
+            'src/pc/JSfx.cpp',
+            'src/pc/JGfx.cpp',
+            'src/pc/JSocket.cpp',
+        ]
+    )
+    sdl2_dep = dependency('sdl2')
+    opengl_dep = dependency('OpenGL')
+    boost_dep = dependency('boost', modules: ['system', 'date_time', 'thread'])
+
+    jge_c_args = ['-DSDL_CONFIG', '-DLINUX']
+    jge_cpp_args = hge_c_args
+    jge_dependencies = jge_dependencies + [sdl2_dep, opengl_dep, boost_dep]
 endif
 
 if get_option('buildtype') == 'debug'
