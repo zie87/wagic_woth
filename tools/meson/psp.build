@@ -1,0 +1,43 @@
+[constants]
+arch = 'psp'
+
+[binaries]
+c       = arch + '-gcc'
+cpp     = arch + '-g++'
+ld      = arch + '-ld'
+ar      = arch + '-ar'
+as      = arch + '-as'
+size    = arch + '-size'
+objdump = arch + '-objdump'
+objcopy = arch + '-objcopy'
+readelf = arch + '-readelf'
+strip   = arch + '-strip'
+gdb     = arch + '-gdb'
+
+[built-in options]
+b_staticpic = 'false'
+default_library = 'static'
+c_args      = [
+                '-G0',
+                '-U_FILE_OFFSET_BITS',
+                '-I/usr/local/pspdev/psp/include',
+                '-I/usr/local/pspdev/psp/sdk/include',
+              ]
+c_link_args = [
+                '-L/usr/local/pspdev/psp/lib',
+                '-L/usr/local/pspdev/psp/sdk/lib',
+                '-specs=/usr/local/pspdev/psp/sdk/lib/prxspecs',
+                '-Wl,-q,-T/usr/local/pspdev/psp/sdk/lib/linkfile.prx',
+                '-Wl,--gc-sections',
+              ]
+cpp_args      = c_args + []
+cpp_link_args = c_link_args + []
+
+[host_machine]
+system      = 'psp'
+cpu_family  = 'mips'
+cpu         = 'mips'
+endian      = 'little'
+
+[properties]
+post_build_script = 'psp_post_build.sh'
