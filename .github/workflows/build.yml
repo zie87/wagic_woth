@@ -1,15 +1,13 @@
-name: Build, publish
+name: build
+
 on:
-  push: 
+  push:
     tags:
     - 'v*'
     branches:
-    - main
-  
+    - '**'
     pull_request:
-      paths:
-        - "**.cpp"
-        - "**.hpp"
+      types: [opened, synchronize, reopened]
 
 jobs:
   build-psp:
