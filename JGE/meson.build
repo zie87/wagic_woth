@@ -73,6 +73,11 @@ jge_inc_dir = include_directories('./include')
 jge_c_args    = ['-D_PSP_FW_VERSION=371']
 jge_cpp_args  = jge_c_args + ['-std=c++03', '-DDEVHOOK', '-DPSPFW3XX', '-DPSP']
 
+png_dep = dependency('libpng')
+jpeg_dep = dependency('libjpeg')
+
+jge_dependencies = [hge_dep, png_dep, jpeg_dep]
+
 if get_option('buildtype') == 'debug'
     jge_cpp_args = jge_cpp_args + ['-ggdb3']
 endif
@@ -84,10 +89,11 @@ jgetools = static_library(
     override_options: ['cpp_std=c++03', 'warning_level=0'],
     c_args: jge_c_args,
     cpp_args: jge_cpp_args,
+    dependencies: jge_dependencies,
 )
 
 jge_dep = declare_dependency(
     link_with: jgetools,
     include_directories: [psp_inc_dir, freetype2_inc_dir, boost_inc_dir, zipfs_inc_dir, jge_inc_dir],
-    dependencies: [hge_dep],
+    dependencies: jge_dependencies,
 )

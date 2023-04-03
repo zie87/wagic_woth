@@ -3,9 +3,9 @@
 *.elf
 *.h.gch
 
-projects/mtg/objs
-projects/mtg/deps
-projects/mtg/User
+/projects/mtg/objs
+/projects/mtg/deps
+/projects/mtg/User
 
 EBOOT.PBP
 PARAM.SFO
@@ -13,3 +13,12 @@ PARAM.SFO
 libjge300.a
 libhgetools.a
 wagic.prx
+
+/compile_commands.json
+/.cache
+
+/build
+/build_*
+
+/subprojects/*
+!/subprojects/*.wrap

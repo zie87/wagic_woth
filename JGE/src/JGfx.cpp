@@ -33,6 +33,10 @@ extern "C" {
 }
 #endif
 
+#define png_infopp_NULL (png_infopp) NULL
+#define png_bytep_NULL (png_bytep) NULL
+#define int_p_NULL (int*)NULL
+
 #include "../include/JGE.h"
 #include "../include/JRenderer.h"
 #include "../include/JFileSystem.h"
@@ -892,8 +896,7 @@ static void PNGCustomReadDataFn(png_structp png_ptr, png_bytep data, png_size_t 
 {
    png_size_t check;
 
-   JFileSystem *fileSystem = (JFileSystem*)png_ptr->io_ptr;
-
+   JFileSystem* fileSystem = static_cast<JFileSystem*>(png_get_io_ptr(png_ptr));
    check = fileSystem->ReadFile(data, length);
 
    if (check != length)
@@ -1382,7 +1385,7 @@ int JRenderer::LoadPNG(TextureInfo &textureInfo, const char* filename, int mode,
   png_set_strip_16(png_ptr);
   png_set_packing(png_ptr);
   if (color_type == PNG_COLOR_TYPE_PALETTE) png_set_palette_to_rgb(png_ptr);
-  if (color_type == PNG_COLOR_TYPE_GRAY && bit_depth < 8) png_set_gray_1_2_4_to_8(png_ptr);
+  if (color_type == PNG_COLOR_TYPE_GRAY && bit_depth < 8) png_set_expand_gray_1_2_4_to_8(png_ptr);
   if (png_get_valid(png_ptr, info_ptr, PNG_INFO_tRNS)) png_set_tRNS_to_alpha(png_ptr);
   png_set_filler(png_ptr, 0xff, PNG_FILLER_AFTER);
   line = (u32*) malloc(width * 4);
