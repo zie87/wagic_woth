@@ -41,4 +41,4 @@ cpu         = 'mips'
 endian      = 'little'
 
 [properties]
-post_build_script = 'psp_post_build.sh'
+post_build_script = 'psp/psp_post_build.sh'
