@@ -28,7 +28,7 @@ jobs:
         image: zie87/pspdev
         shell: bash
         run: | 
-          ./tools/psp_build_meson.sh ${{ matrix.build_type }}
+          ./tools/psp/psp_build_meson.sh ${{ matrix.build_type }}
 
   build-linux:
     name: Build Linux

@@ -1,7 +1,7 @@
 #!/bin/bash -e
 
 SCRIPT_RELATIVE_DIR=$(dirname "${BASH_SOURCE[0]}") 
-DATA_DIR="${SCRIPT_RELATIVE_DIR}/../projects/mtg"
+DATA_DIR="${SCRIPT_RELATIVE_DIR}/data"
 
 INPUT=$1
 
