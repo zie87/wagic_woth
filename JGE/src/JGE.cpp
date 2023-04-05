@@ -34,7 +34,6 @@
 
 //////////////////////////////////////////////////////////////////////////
 #if defined (WIN32)    // WIN32 specific code
-#include "../../Dependencies/include/fmod.h"
 
 u8 JGE::GetAnalogX()
 {
@@ -53,10 +52,6 @@ u8 JGE::GetAnalogY()
 
 #elif defined (LINUX)    // Unix specific code
 #include <sys/time.h>
-#ifdef WITH_FMOD
-#include "../Dependencies/include/fmod.h"
-#endif //WITH_FMOD
-
 
 u8 JGE::GetAnalogX()
 {

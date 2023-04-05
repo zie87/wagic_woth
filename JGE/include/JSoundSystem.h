@@ -28,7 +28,6 @@
 #else
 #ifdef WIN32
     #include <windows.h>
-#define WITH_FMOD
 #elif defined (PSP)
     #include <pspgu.h>
     #include <pspkernel.h>
@@ -42,9 +41,6 @@
 
     #include "JAudio.h"
     #include "JMP3.h"
-#endif
-#ifdef WITH_FMOD
-    #include "../Dependencies/include/fmod.h"
 #endif
 #endif
 
@@ -76,8 +72,6 @@ public:
     std::string filename;
     std::string key;
     std::string ext;
-#elif defined WITH_FMOD
-    FSOUND_SAMPLE* mTrack;		// MP3 needed to be of "sample" type for FMOD, FMUSIC_MODULE is for MODs
 #elif defined ANDROID
     SLObjectItf playerObject;
     SLPlayItf playInterface;
@@ -85,8 +79,7 @@ public:
     SLVolumeItf musicVolumeInterface;
 #else
     void* mTrack;
-#endif  //WITH_FMOD
-
+#endif  
 };
 
 
@@ -107,8 +100,6 @@ class JSample
     std::string ext;
     
     void* mSample;
-#elif defined  (WITH_FMOD)
-    FSOUND_SAMPLE *mSample;
 #elif defined (USE_PHONON)
     Phonon::AudioOutput* mOutput;
     Phonon::MediaObject* mMediaObject;

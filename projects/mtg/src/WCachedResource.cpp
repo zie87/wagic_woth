@@ -6,9 +6,6 @@
 #include "WCachedResource.h"
 #include <hge/hgeparticle.h>
 
-#ifdef WITH_FMOD
-#endif
-
 const std::string kPlaceholderID("placeholder");
 
 //WResource
