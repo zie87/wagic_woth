@@ -28,7 +28,7 @@
 #else
 #ifdef WIN32
     #include <windows.h>
-#define WITH_FMOD
+//#define WITH_FMOD
 #elif defined (PSP)
     #include <pspgu.h>
     #include <pspkernel.h>

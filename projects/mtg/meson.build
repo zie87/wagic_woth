@@ -117,8 +117,8 @@ wth_cpp_args = []
 wth_link_args = []
 
 if get_option('enable_testsuite')
-wth_cpp_args = wth_cpp_args + ['-DTESTSUITE=1']
-wth_srcs     = wth_srcs + ['src/TestSuiteAI.cpp']
+    wth_cpp_args = wth_cpp_args + ['-DTESTSUITE=1']
+    wth_srcs = wth_srcs + ['src/TestSuiteAI.cpp']
 endif
 
 if host_machine.system() == 'psp'
@@ -154,8 +154,21 @@ if host_machine.system() == 'psp'
         '-lpspnet_apctl',
         '-Wl,-zmax-page-size=128',
     ]
-elif host_machine.system() == 'linux'
-    wth_cpp_args = wth_cpp_args + ['-DSDL_CONFIG', '-DLINUX']
+else
+    wth_cpp_args = wth_cpp_args + ['-DSDL_CONFIG']
+
+    if host_machine.system() == 'linux'
+        wth_cpp_args = wth_cpp_args + ['-DLINUX']
+    elif host_machine.system() == 'windows'
+        wth_cpp_args = wth_cpp_args + ['-DWIN32']
+        wth_link_args = (
+            wth_link_args + [
+                '-lopengl32',
+                '-lglu32',
+                '-lssp',
+            ]
+        )
+    endif
 endif
 
 if get_option('buildtype') == 'debug'
@@ -178,11 +191,6 @@ wth = executable(
     cpp_args: wth_cpp_args,
     link_args: wth_link_args,
 )
-
-objcopy = '@0@'.format(find_program('objcopy').path())
-objdump = '@0@'.format(find_program('objdump').path())
-readelf = '@0@'.format(find_program('readelf').path())
-size = '@0@'.format(find_program('size').path())
 
 if host_machine.system() == 'psp'
     post_build = meson.get_external_property('post_build_script')

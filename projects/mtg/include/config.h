@@ -1,13 +1,13 @@
 #ifndef _DEBUG_H_
 #define _DEBUG_H_
 
-#if (defined WIN32) && (!defined QT_CONFIG)
+#if (defined WIN32)  && defined(_MSC_VER) && (!defined QT_CONFIG)
 #define snprintf sprintf_s
 #endif 
 
 #include "limits.h"
 
-#if defined (_DEBUG) && defined (WIN32)
+#if defined (_DEBUG) && defined (WIN32)  && defined(_MSC_VER) 
 #include "crtdbg.h"
 #define NEW new(_NORMAL_BLOCK, __FILE__, __LINE__)
 #else
@@ -28,7 +28,7 @@
 // Debug options - comment/uncomment as needed
 //#define DEBUG_CACHE
 #ifdef _DEBUG
-#ifdef WIN32
+#if defined(WIN32) && defined(_MSC_VER)
 #define AI_CHANGE_TESTING
 #endif
 //#define RENDER_AI_STATS
