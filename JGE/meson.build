@@ -21,10 +21,17 @@ if host_machine.system() == 'psp'
     hge_c_args = ['-D_PSP_FW_VERSION=150']
     hge_cpp_args = hge_c_args
     hge_inc_dirs = hge_inc_dirs + [psp_inc_dir, freetype2_inc_dir]
-elif host_machine.system() == 'linux'
+else
     sdl2_dep = dependency('sdl2')
 
-    hge_c_args = ['-DSDL_CONFIG', '-DLINUX']
+    hge_c_args = hge_c_args + ['-DSDL_CONFIG']
+
+    if host_machine.system() == 'linux'
+        hge_c_args = hge_c_args + ['-DLINUX']
+    elif host_machine.system() == 'windows'
+        hge_c_args = hge_c_args + ['-DWIN32']
+    endif
+
     hge_cpp_args = hge_c_args
     hge_dependencies = [sdl2_dep]
 endif
@@ -106,7 +113,7 @@ if host_machine.system() == 'psp'
     jge_inc_dirs = (
         jge_inc_dirs + [psp_inc_dir, freetype2_inc_dir, boost_inc_dir]
     )
-elif host_machine.system() == 'linux'
+else
     jge_srcs = (
         jge_srcs + [
             'src/SDLmain.cpp',
@@ -117,12 +124,20 @@ elif host_machine.system() == 'linux'
         ]
     )
     sdl2_dep = dependency('sdl2')
-    opengl_dep = dependency('OpenGL')
     boost_dep = dependency('boost', modules: ['system', 'date_time', 'thread'])
 
-    jge_c_args = ['-DSDL_CONFIG', '-DLINUX']
-    jge_cpp_args = hge_c_args
-    jge_dependencies = jge_dependencies + [sdl2_dep, opengl_dep, boost_dep]
+    jge_c_args = jge_c_args + ['-DSDL_CONFIG']
+
+    if host_machine.system() == 'linux'
+        opengl_dep = dependency('OpenGL')
+        jge_c_args = jge_c_args + ['-DLINUX']
+        jge_dependencies = jge_dependencies + [opengl_dep]
+    elif host_machine.system() == 'windows'
+        jge_c_args = jge_c_args + ['-DWIN32']
+    endif
+
+    jge_cpp_args = jge_c_args
+    jge_dependencies = jge_dependencies + [sdl2_dep, boost_dep]
 endif
 
 if get_option('buildtype') == 'debug'

@@ -1,0 +1,24 @@
+[constants]
+arch = 'i686-w64-mingw32'
+
+[binaries]
+c           = arch + '-gcc'
+cpp         = arch + '-g++'
+ld          = arch + '-ld'
+ar          = arch + '-ar'
+as          = arch + '-as'
+size        = arch + '-size'
+objdump     = arch + '-objdump'
+objcopy     = arch + '-objcopy'
+readelf     = arch + '-readelf'
+strip       = arch + '-strip'
+gdb         = arch + '-gdb'
+pkgconfig   = arch + '-pkg-config' 
+#exe_wrapper = 'wine32'
+
+[host_machine]
+system = 'windows'
+cpu_family = 'i686'
+cpu = 'i686'
+endian = 'little'
+
