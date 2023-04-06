@@ -135,8 +135,6 @@ if host_machine.system() == 'psp'
         ]
     )
     wth_link_args = [
-        '-L' + meson.current_source_dir() + '/../../JGE/lib/psp',
-        '-lfreetype',
         '-lm',
         '-lmikmod',
         '-lpsppower',
@@ -156,7 +154,6 @@ if host_machine.system() == 'psp'
         '-lpspctrl',
         '-lpspnet',
         '-lpspnet_apctl',
-        '-Wl,-zmax-page-size=128',
     ]
 else
     wth_cpp_args = wth_cpp_args + ['-DSDL_CONFIG']
@@ -181,19 +178,31 @@ if get_option('buildtype') == 'debug'
     )
 endif
 
-
-
 wth_name = 'wagic'
-#../../projects/mtg/include/PrecompiledHeader.h -o PrecompiledHeader.h.gch  
-wth = executable(
+wthlib = static_library(
     wth_name,
     sources: wth_srcs,
-    # cpp_pch: 'include/PrecompiledHeader.h',
     include_directories: [wth_inc_dir],
-    dependencies: [jge_dep, jgemain_dep],
     override_options: ['warning_level=0'],
     cpp_args: wth_cpp_args,
     link_args: wth_link_args,
+    dependencies: [jge_dep],
+)
+
+wthlib_dep = declare_dependency(
+    link_whole: wthlib,
+    include_directories: [wth_inc_dir],
+    dependencies: [jge_dep],
+    compile_args: wth_cpp_args,
+    link_args: wth_link_args,
+)
+
+#../../projects/mtg/include/PrecompiledHeader.h -o PrecompiledHeader.h.gch  
+wth = executable(
+    wth_name,
+    # cpp_pch: 'include/PrecompiledHeader.h',
+    override_options: ['warning_level=0'],
+    dependencies: [wthlib_dep, jgemain_dep],
 )
 
 if host_machine.system() == 'psp'

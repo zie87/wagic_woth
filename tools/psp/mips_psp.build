@@ -28,6 +28,7 @@ c_link_args = [
                 '-L/usr/local/pspdev/psp/lib',
                 '-L/usr/local/pspdev/psp/sdk/lib',
                 '-specs=/usr/local/pspdev/psp/sdk/lib/prxspecs',
+                '-Wl,-zmax-page-size=128',
                 '-Wl,-q,-T/usr/local/pspdev/psp/sdk/lib/linkfile.prx',
                 '-Wl,--gc-sections',
               ]
