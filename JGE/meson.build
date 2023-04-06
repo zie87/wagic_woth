@@ -150,7 +150,7 @@ else
 endif
 
 if get_option('buildtype') == 'debug'
-    jge_cpp_args = jge_cpp_args + ['-ggdb3']
+    jge_cpp_args = jge_cpp_args + ['-DDOLOG=1', '-ggdb3']
 endif
 
 jgetools = static_library(

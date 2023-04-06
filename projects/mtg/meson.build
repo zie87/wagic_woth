@@ -136,7 +136,6 @@ if host_machine.system() == 'psp'
     )
     wth_link_args = [
         '-lm',
-        '-lmikmod',
         '-lpsppower',
         '-lpspmpeg',
         '-lpspaudiocodec',
@@ -174,7 +173,7 @@ endif
 
 if get_option('buildtype') == 'debug'
     wth_cpp_args = (
-        wth_cpp_args + ['-ggdb3', '-D_DEBUG', '-DDEBUG', '-DDEBUG_CACHE']
+        wth_cpp_args + ['-ggdb3', '-DDOLOG=1', '-D_DEBUG', '-DDEBUG', '-DDEBUG_CACHE']
     )
 endif
 
@@ -219,6 +218,8 @@ if host_machine.system() == 'psp'
         depends: [wth],
     )
 endif
+
+subdir('tests')
 
 if get_option('build_docs')
   subdir('docs')
