@@ -121,6 +121,10 @@ if get_option('enable_testsuite')
     wth_srcs = wth_srcs + ['src/TestSuiteAI.cpp']
 endif
 
+if get_option('enable_ai_change_testing')
+    wth_cpp_args = wth_cpp_args + ['-DAI_CHANGE_TESTING=1']
+endif
+
 if host_machine.system() == 'psp'
     wth_cpp_args = (
         wth_cpp_args + [
