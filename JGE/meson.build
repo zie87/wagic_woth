@@ -15,12 +15,8 @@ hge_inc_dirs = [zipfs_inc_dir]
 hge_dependencies = []
 
 if host_machine.system() == 'psp'
-    psp_inc_dir = include_directories('include/psp')
-    freetype2_inc_dir = include_directories('include/psp/freetype2')
-
     hge_c_args = ['-D_PSP_FW_VERSION=150']
     hge_cpp_args = hge_c_args
-    hge_inc_dirs = hge_inc_dirs + [psp_inc_dir, freetype2_inc_dir]
 else
     sdl2_dep = dependency('sdl2')
 
@@ -93,6 +89,7 @@ jge_dependencies = [hge_dep, png_dep, jpeg_dep]
 
 if host_machine.system() == 'psp'
     boost_inc_dir = include_directories('../Boost')
+    freetype_dep = dependency('freetype2')
     jge_srcs = (
         jge_srcs + [
             'src/JGBKFont.cpp',
@@ -110,9 +107,8 @@ if host_machine.system() == 'psp'
 
     jge_c_args = jge_c_args + ['-D_PSP_FW_VERSION=371']
     jge_cpp_args = jge_cpp_args + ['-DDEVHOOK', '-DPSPFW3XX', '-DPSP']
-    jge_inc_dirs = (
-        jge_inc_dirs + [psp_inc_dir, freetype2_inc_dir, boost_inc_dir]
-    )
+    jge_inc_dirs = (jge_inc_dirs + [boost_inc_dir])
+    jge_dependencies = jge_dependencies + [freetype_dep]
 else
     jge_srcs = (
         jge_srcs + [
