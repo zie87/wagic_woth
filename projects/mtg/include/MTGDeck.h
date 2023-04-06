@@ -126,6 +126,7 @@ public:
 
     MTGCard * getCardByName(string name);
     int load(const char * config_file, const char * setName = NULL, int autoload = 1);
+    void loadFolder(const std::string& folder, const std::string& filename="" );
     int countByType(const char * _type);
     int countByColor(int color);
     int countBySet(int setId);

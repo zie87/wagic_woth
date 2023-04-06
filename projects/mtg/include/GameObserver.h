@@ -97,6 +97,7 @@ class GameObserver{
   int cardClick(MTGCardInstance * card, int abilityType);
   int cardClick(MTGCardInstance * card,Targetable * _object = NULL, bool log = true);
   GamePhase getCurrentGamePhase();
+  void setCurrentGamePhase(GamePhase phase) { currentGamePhase = phase; };
   const char * getCurrentGamePhaseName();
   const char * getNextGamePhaseName();
   void nextCombatStep();
