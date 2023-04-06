@@ -9,6 +9,8 @@
 #include "Threading.h"
 #include "AIPlayerBaka.h"
 
+#include <stdint.h>
+
 class TestSuiteActions
 {
 public:
@@ -104,6 +106,8 @@ public:
     static void ThreadProc(void* inParam);
     void setRules(Rules* rules) {mRules = rules;};
     void handleResults(bool wasAI, int error);
+
+    size_t run();
 };
 
 class TestSuiteAI:public AIPlayerBaka

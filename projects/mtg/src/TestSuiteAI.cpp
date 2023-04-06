@@ -757,7 +757,7 @@ void TestSuite::ThreadProc(void* inParam)
                 theGame.observer->loadTestSuitePlayer(0, &theGame);
                 theGame.observer->loadTestSuitePlayer(1, &theGame);
 
-                theGame.observer->startGame(theGame.gameType, instance->mRules);
+                theGame.observer->startGame(theGame.gameType, Rules::getRulesByFilename("testsuite.txt"));
                 theGame.initGame();
 
                 while(!theGame.observer->didWin())
@@ -775,6 +775,13 @@ void TestSuite::ThreadProc(void* inParam)
         }
     }
     LOG("Leaving TestSuite::ThreadProc");
+}
+
+size_t TestSuite::run() {
+    mProcessing = true;
+    ThreadProc(this);
+
+    return nbFailed + nbAIFailed;
 }
 
 boost::mutex TestSuiteGame::mMutex;
