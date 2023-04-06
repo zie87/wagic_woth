@@ -155,3 +155,5 @@ jge_dep = declare_dependency(
     include_directories: jge_inc_dirs,
     dependencies: jge_dependencies,
 )
+
+subdir('docs')
