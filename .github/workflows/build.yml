@@ -55,8 +55,8 @@ jobs:
     - name: Compile
       run: meson compile -C builddir/ -v
 
-  build-mingw:
-    name: Build mingw
+  build-mingw32:
+    name: Build MinGW (i686)
     runs-on: ubuntu-22.04
     strategy:
       matrix:
@@ -73,4 +73,24 @@ jobs:
         image: zie87/mingw
         shell: bash
         run: | 
-          ./tools/mingw/mingw_build_meson.sh ${{ matrix.build_type }}
+          ./tools/mingw/i686_build_meson.sh ${{ matrix.build_type }}
+
+  build-mingw64:
+    name: Build MinGW (x86_64)
+    runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        build_type: [Debug, Release]
+    steps:
+    - name: Check out repository
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 1
+    - name: Build in Docker container
+      uses: addnab/docker-run-action@v2
+      with:
+        options: --volume ${{ github.workspace }}:/woth --workdir /woth
+        image: zie87/mingw
+        shell: bash
+        run: | 
+          ./tools/mingw/x86_64_build_meson.sh ${{ matrix.build_type }}
