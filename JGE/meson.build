@@ -106,7 +106,11 @@ if host_machine.system() == 'psp'
         ]
     )
 
-    jge_main_srcs = jge_main_srcs + ['src/main.cpp',]
+    jge_main_srcs = (
+        jge_main_srcs + [
+            'src/main.cpp',
+        ]
+    )
 
     jge_c_args = jge_c_args + ['-D_PSP_FW_VERSION=371']
     jge_cpp_args = jge_cpp_args + ['-DDEVHOOK', '-DPSPFW3XX', '-DPSP']
@@ -121,9 +125,13 @@ else
             'src/pc/JSocket.cpp',
         ]
     )
-    
-    jge_main_srcs = jge_main_srcs + ['src/SDLmain.cpp',]
-    
+
+    jge_main_srcs = (
+        jge_main_srcs + [
+            'src/SDLmain.cpp',
+        ]
+    )
+
     sdl2_dep = dependency('sdl2')
     boost_dep = dependency('boost', modules: ['system', 'date_time', 'thread'])
 
