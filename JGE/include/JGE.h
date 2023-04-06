@@ -24,30 +24,10 @@
 
 #define DEBUG_PRINT
 
-#if defined(QT_CONFIG)
-#include <Qt>
-typedef u32 LocalKeySym;
-#define LOCAL_KEY_NONE Qt::Key_unknown
-
-#elif defined(SDL_CONFIG)
+#if defined(SDL_CONFIG)
 #include <SDL.h>
 typedef SDL_Keycode LocalKeySym;
 #define LOCAL_KEY_NONE SDLK_UNKNOWN
-
-#elif defined(WIN32)
-#include <windows.h>
-typedef WPARAM LocalKeySym;
-#define LOCAL_KEY_NONE ((WPARAM)-1)
-
-#elif defined(LINUX)
-#include <X11/XKBlib.h>
-#include <X11/keysym.h>
-typedef KeySym LocalKeySym;
-#define LOCAL_KEY_NONE XK_VoidSymbol
-
-#elif defined(ANDROID) // This is temporary until we understand how to send real key events from Java
-typedef long unsigned int LocalKeySym;
-#define LOCAL_KEY_NONE 0
 
 #else
 typedef u32 LocalKeySym;
@@ -55,9 +35,6 @@ typedef u32 LocalKeySym;
 
 #endif
 
-#if defined(ANDROID)
-#include <jni.h>
-#endif
 
 bool JGEGetButtonState(const JButton button);
 bool JGEGetButtonClick(const JButton button);
@@ -125,12 +102,6 @@ class JGE
  private:
 #endif
 
-#if defined (ANDROID)
-    JavaVM * mJavaVM;
-    JNIEnv * mJNIEnv;
-    jclass mJNIClass;
-    jmethodID midSendCommand;
-#endif
 
   bool mDone;
   float mDeltaTime;
@@ -165,10 +136,6 @@ class JGE
   static JGE* GetInstance();
   static void Destroy();
 
-#ifdef ANDROID
-    JNIEnv * getJNIEnv();
-  void setJVM (JavaVM * vm);
-#endif
   void Init();
   void End();
 
@@ -371,20 +338,6 @@ class JGE
 
   void Assert(const char *filename, long lineNumber);
 
-  /// Sends a message through JGE
-  /// Currently used only to communicate with the JNI Layer in Android
-  /// and in IOS to communicate with the EAGL layer
-  void SendCommand(std::string command);
-  void SendCommand(std::string command, std::string parameter);
-  void SendCommand(std::string command, float& x, float& y, float& width, float& height);
-
- #if defined (ANDROID)
-   /// Access to JNI Environment
-   void SetJNIEnv(JNIEnv * env, jclass cls);
-   void sendJNICommand(std::string command);
-   std::string getFileSystemLocation();
-#endif 
-  
  protected:
   JGE();
   ~JGE();

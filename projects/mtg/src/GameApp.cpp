@@ -87,14 +87,12 @@ GameApp::~GameApp()
 void GameApp::Create()
 {
     srand((unsigned int) time(0)); // initialize random
-#if !defined(QT_CONFIG) && !defined(IOS)
 #if defined (WIN32) && defined(_MSC_VER)
     _CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
 #elif defined (PSP)
     pspFpuSetEnable(0); //disable FPU Exceptions until we find where the FPU errors come from
     pspDebugScreenPrintf("Wagic:Loading resources...");
 #endif
-#endif //QT_CONFIG
     //_CrtSetBreakAlloc(368);
     LOG("starting Game");
 
@@ -426,7 +424,7 @@ void GameApp::Render()
     WResourceManager::Instance()->DebugRender();
 #endif
 
-#if defined(DEBUG) && !defined(IOS)
+#if defined(DEBUG) 
     JGE* mEngine = JGE::GetInstance();
     float fps = mEngine->GetFPS();
     totalFPS += fps;
@@ -460,14 +458,7 @@ void GameApp::SetCurrentState(GameState * state)
 {
     if (mCurrentState == state)
         return;
-
-    if (mCurrentState)
-        JGE::GetInstance()->SendCommand("leavegamestate:" + mCurrentState->getStringID());
-
     mCurrentState = state;
-
-    if (mCurrentState)
-        JGE::GetInstance()->SendCommand("entergamestate:" + mCurrentState->getStringID());
 }
 
 void GameApp::Pause()

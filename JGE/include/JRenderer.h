@@ -560,10 +560,8 @@ private:
 		bool mVRAM;
 	};
 
-#if (!defined IOS) && (!defined QT_CONFIG)
 	void LoadJPG(TextureInfo &textureInfo, const char *filename, int mode = 0, int TextureFormat = TEXTURE_FORMAT);
 	int LoadPNG(TextureInfo &textureInfo, const char *filename, int mode = 0, int TextureFormat = TEXTURE_FORMAT);
-#endif //(IOS)
 	
 	static JRenderer* mInstance;
 

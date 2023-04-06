@@ -23,7 +23,7 @@
 #include "NetworkPlayer.h"
 #endif
 
-#if defined (WIN32) || defined (LINUX) || defined(IOS)
+#if defined (WIN32) || defined (LINUX)
 #include <time.h>
 #endif
 
@@ -271,13 +271,7 @@ void GameStateDuel::setGamePhase(int newGamePhase) {
     if (mGamePhase == newGamePhase)
         return;
 
-    if (mGamePhase)
-        JGE::GetInstance()->SendCommand("leaveduelphase:" + string(stateStrings[mGamePhase]));
-
     mGamePhase = newGamePhase;
-
-    if (mGamePhase )
-        JGE::GetInstance()->SendCommand("enterduelphase:" +  string(stateStrings[mGamePhase]));
 }
 
 #ifdef AI_CHANGE_TESTING
@@ -480,12 +474,10 @@ void GameStateDuel::Update(float dt)
 
                     if(mWorkerThread.empty())
                     {   // "I don't like to wait" mode
+                        // TODO: thread count
                         size_t thread_count = 1;
                         startTime = JGEGetTime();
 
-                #ifdef QT_CONFIG
-                        thread_count = QThread::idealThreadCount();
-                #endif
                         for(size_t i = 0; i < (thread_count); i++)
                             mWorkerThread.push_back(boost::thread(ThreadProc, this));
                     }

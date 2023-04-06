@@ -12,7 +12,7 @@ using std::map;
 static map<const LocalKeySym, KeyRep> fattable;
 static map<const JButton, KeyRep> slimtable;
 
-#if defined(LINUX) || defined (IOS) || defined (ANDROID) ||  defined (SDL_CONFIG) || defined (QT_CONFIG)
+#if defined (SDL_CONFIG)
 const KeyRep& translateKey(LocalKeySym key)
 {
     {
@@ -23,11 +23,7 @@ const KeyRep& translateKey(LocalKeySym key)
 
     char* str = NULL;
 
-#if !defined(QT_CONFIG) && !defined(IOS) && !defined (SDL_CONFIG)
-    str = XKeysymToString(key);
-#elif defined (SDL_CONFIG)
     str = (char*)SDL_GetKeyName(key);
-#endif
     if (!str)
     {
         str = NEW char[11];
@@ -36,50 +32,6 @@ const KeyRep& translateKey(LocalKeySym key)
     const KeyRep k = make_pair(str, static_cast<JQuad*>(NULL));
     fattable[key] = k;
     return fattable[key];
-}
-#elif defined(WIN32)
-const KeyRep& translateKey(LocalKeySym key)
-{
-    {
-        map<const LocalKeySym, KeyRep>::iterator res;
-        if ((res = fattable.find(key)) != fattable.end())
-        return (res->second);
-    }
-    unsigned int sc = MapVirtualKey(key, 0);
-
-    switch (key)
-    {
-        case VK_LEFT: case VK_UP: case VK_RIGHT: case VK_DOWN: // arrow keys
-        case VK_PRIOR: case VK_NEXT: // page up and page down
-        case VK_END: case VK_HOME:
-        case VK_INSERT: case VK_DELETE:
-        case VK_DIVIDE: // numpad slash
-        case VK_NUMLOCK:
-        {
-            sc |= 0x100; // set extended bit
-            break;
-        }
-    }
-
-    char buf[256];
-    memset(buf, 0, 256);
-
-    string s;
-    // Convert to ANSI string
-    if (GetKeyNameTextA(sc << 16, buf, 256) > 0)
-    s = buf;
-
-    KeyRep k;
-    if (0 == s.length())
-    {
-        char*str = NEW char[11];
-        sprintf(str, "%d", key);
-        k = make_pair(str, static_cast<JQuad*>(NULL));
-    }
-    else k = make_pair(s, static_cast<JQuad*>(NULL));
-    fattable[key] = k;
-    return fattable[key];
-
 }
 #else // PSP
 

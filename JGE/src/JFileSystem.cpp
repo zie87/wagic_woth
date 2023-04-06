@@ -16,10 +16,6 @@ User folder is the only one that is really needed to guarantee both read and wri
 The content that users should not be touching.
 */
 
-#if defined(ANDROID)
-#include "../../include/PrecompiledHeader.h"
-#endif
-
 #ifdef WIN32
 #pragma warning(disable : 4786)
 #include <direct.h>
@@ -108,25 +104,6 @@ JFileSystem::JFileSystem(const string & _userPath, const string & _systemPath)
     string systemPath = _systemPath;
     string userPath = _userPath;
 
-#ifdef IOS
-    NSArray *paths = NSSearchPathForDirectoriesInDomains( NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString *documentsDirectory = [paths objectAtIndex:0];
-    
-    userPath = [[documentsDirectory  stringByAppendingString: @"/User/"] cStringUsingEncoding:1];
-    systemPath = [[documentsDirectory  stringByAppendingString: @"/Res/"] cStringUsingEncoding:1];
-
-#elif defined (ANDROID)
-    userPath = JGE::GetInstance()->getFileSystemLocation();
-    systemPath = "";
-
-	DebugTrace("User path " << userPath);
-#elif defined (QT_CONFIG)
-    QDir dir(QDir::homePath());
-    dir.cd(USERDIR);
-
-    userPath = QDir::toNativeSeparators(dir.absolutePath()).toStdString();
-    systemPath = "";
-#else
     //Find the Res.txt file and matching Res folders for backwards compatibility
     ifstream mfile("Res.txt");
     string resPath;
@@ -153,7 +130,6 @@ JFileSystem::JFileSystem(const string & _userPath, const string & _systemPath)
         }
         mfile.close();
     }
-#endif
 
 	// Make sure the base paths finish with a '/' or a '\'
 	if (! userPath.empty()) {

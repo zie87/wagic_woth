@@ -191,7 +191,6 @@ bool GuiCombat::clickOK()
     case END_FIRST_STRIKE:
         return false;
     case END_DAMAGE:
-        JGE::GetInstance()->SendCommand("combatGuiEndDamage");
         return false; // nothing;
     }
     return false;
