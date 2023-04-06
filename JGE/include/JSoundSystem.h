@@ -18,14 +18,6 @@
 
 #include "JTypes.h"
 
-#ifdef ANDROID
-#include <SLES/OpenSLES.h>
-#include "SLES/OpenSLES_Android.h"
-
-#elif defined USE_PHONON
-    #include <phonon/AudioOutput>
-    #include <phonon/MediaObject>
-#else
 #ifdef WIN32
     #include <windows.h>
 #elif defined (PSP)
@@ -42,41 +34,21 @@
     #include "JAudio.h"
     #include "JMP3.h"
 #endif
-#endif
 
 //------------------------------------------------------------------------------------------------
 using namespace std;
 
-#ifdef USE_PHONON
-class JMusic : public QObject
-{
-    Q_OBJECT
-#else
+
 class JMusic
 {
-#endif
 public:
     JMusic();
     ~JMusic();
     void Update();
     int getPlayTime();
 
-#ifdef USE_PHONON
-    Phonon::AudioOutput* mOutput;
-    Phonon::MediaObject* mMediaObject;
-    public slots:
-    void seekAtTheBegining();
-#elif defined (PSP)
+#if defined (PSP)
     JMP3* mTrack;
-#elif defined (IOS)
-    std::string filename;
-    std::string key;
-    std::string ext;
-#elif defined ANDROID
-    SLObjectItf playerObject;
-    SLPlayItf playInterface;
-    SLSeekItf seekInterface;
-    SLVolumeItf musicVolumeInterface;
 #else
     void* mTrack;
 #endif  
@@ -94,21 +66,6 @@ class JSample
 
 #if defined (PSP)
     WAVDATA *mSample;
-#elif defined (IOS)
-    std::string filename;
-    std::string key;
-    std::string ext;
-    
-    void* mSample;
-#elif defined (USE_PHONON)
-    Phonon::AudioOutput* mOutput;
-    Phonon::MediaObject* mMediaObject;
-    void* mSample;
-#elif defined ANDROID
-    SLObjectItf playerObject;
-    SLPlayItf playInterface;
-    SLVolumeItf sampleVolumeInterface;
-    void* mSample;
 #else
     void* mSample;
 #endif

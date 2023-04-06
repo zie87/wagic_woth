@@ -1,7 +1,7 @@
 #ifndef _DEBUG_H_
 #define _DEBUG_H_
 
-#if defined(WIN32) && defined(_MSC_VER) && !defined(QT_CONFIG)
+#if defined(WIN32) && defined(_MSC_VER) 
 #define snprintf sprintf_s
 #endif 
 

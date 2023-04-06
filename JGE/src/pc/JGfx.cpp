@@ -9,8 +9,6 @@
 //-------------------------------------------------------------------------------------
 #define GL_GLEXT_PROTOTYPES
 
-#if (!defined IOS) && (!defined QT_CONFIG)
-
 #include <png.h>
 
 #ifdef __cplusplus
@@ -28,7 +26,6 @@ extern "C" {
 #define png_infopp_NULL (png_infopp) NULL
 #define png_bytep_NULL (png_bytep) NULL
 #define int_p_NULL (int*)NULL
-#endif //IOS
 
 #include "../../include/JGE.h"
 #include "../../include/JRenderer.h"
@@ -36,7 +33,7 @@ extern "C" {
 #include "../../include/JFileSystem.h"
 #include "../../include/JAssert.h"
 
-#if (defined WIN32) && defined(_MSC_VER) && (!defined QT_CONFIG)
+#if (defined WIN32) && defined(_MSC_VER) 
 #ifndef __attribute__
 #define __attribute__((a))
 #endif
@@ -821,7 +818,7 @@ void JRenderer::BeginScene()
     esMatrixLoadIdentity(&theMvpMatrix);
     esOrtho(&theMvpMatrix, 0.0f, SCREEN_WIDTH_F, 0.0f, SCREEN_HEIGHT_F-1.0f,-1.0f, 1.0f);
 #endif //(!defined GL_ES_VERSION_2_0) && (!defined GL_VERSION_2_0)
-#if (defined WIN32) || ((defined GL_VERSION_ES_CM_1_1) && (!defined IOS))
+#if (defined WIN32) || (defined GL_VERSION_ES_CM_1_1)
     float scaleH = mActualHeight/SCREEN_HEIGHT_F;
     float scaleW = mActualWidth/SCREEN_WIDTH_F;
     if (scaleH != 1.0f || scaleW != 1.0f)
@@ -1631,7 +1628,6 @@ static int getNextPower2(int width)
 }
 
 
-#if (!defined IOS) && (!defined QT_CONFIG)
 static void jpg_null(j_decompress_ptr cinfo __attribute__((unused)))
 {
 }
@@ -1972,164 +1968,6 @@ int JRenderer::LoadPNG(TextureInfo &textureInfo, const char *filename, int mode 
 // 	tex = NULL;
 // }
 
-
-#elif (defined IOS)
-
-#include <UIKit/UIImage.h>
-
-JTexture* JRenderer::LoadTexture(const char* filename, int mode, int TextureFormat __attribute__((unused)))
-{
-    TextureInfo textureInfo;
-    JTexture *tex = NULL;
-    textureInfo.mBits = NULL;
-    int rawsize = 0;
-    BYTE* rawdata = NULL;
-    JFileSystem* fileSystem = JFileSystem::GetInstance();
-    NSData *texData = NULL;
-    UIImage *image = NULL;
-
-    do {
-        if (!fileSystem->OpenFile(filename))
-            break;
-
-        rawsize = fileSystem->GetFileSize();
-        rawdata = new BYTE[rawsize];
-
-        if (!rawdata)
-        {
-            fileSystem->CloseFile();
-            break;
-        }
-
-        fileSystem->ReadFile(rawdata, rawsize);
-        fileSystem->CloseFile();
-
-        texData = [[NSData alloc] initWithBytes:rawdata length:rawsize];
-        image = [[UIImage alloc] initWithData:texData];
-        CGImageAlphaInfo info;
-        BOOL hasAlpha;
-
-        info = CGImageGetAlphaInfo(image.CGImage);
-        hasAlpha = ((info == kCGImageAlphaPremultipliedLast) || (info == kCGImageAlphaPremultipliedFirst) || (info == kCGImageAlphaLast) || (info == kCGImageAlphaFirst) ? YES : NO);
-
-        if (image == nil) {
-            NSLog(@"Loading Texture : %s failed", filename);
-            break;
-        }
-
-        textureInfo.mWidth = CGImageGetWidth(image.CGImage);
-        textureInfo.mHeight = CGImageGetHeight(image.CGImage);
-        textureInfo.mTexWidth = getNextPower2(textureInfo.mWidth);
-        textureInfo.mTexHeight = getNextPower2(textureInfo.mHeight);
-
-        NSLog(@"Loading Texture : %s : %s : %ux%u", filename, (hasAlpha?"Alpha ":"No Alpha "), textureInfo.mWidth, textureInfo.mHeight);
-
-        textureInfo.mBits = new u8 [ textureInfo.mTexHeight * textureInfo.mTexWidth * 4 ];
-        if (textureInfo.mBits == NULL) {
-            NSLog(@"Texture %s failed to load\n", filename);
-            break;
-        }
-
-        CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
-        info = /*hasAlpha ?*/ kCGImageAlphaPremultipliedLast /*: kCGImageAlphaNoneSkipLast*/;
-
-        CGContextRef context =
-            CGBitmapContextCreate(textureInfo.mBits,
-            textureInfo.mTexWidth,
-            textureInfo.mTexHeight, 8,
-            4 * textureInfo.mTexWidth,
-            colorSpace,
-            info /*| kCGBitmapByteOrder32Big*/);
-        CGColorSpaceRelease(colorSpace);
-        CGContextClearRect( context, CGRectMake( 0, 0, textureInfo.mTexWidth, textureInfo.mTexHeight ) );
-        CGContextTranslateCTM( context, 0, textureInfo.mTexHeight - textureInfo.mHeight );
-        CGContextDrawImage( context, CGRectMake( 0, 0, textureInfo.mWidth, textureInfo.mHeight ), image.CGImage );
-
-        tex = new JTexture();
-
-        if (tex)
-        {
-            if (mImageFilter != NULL)
-                mImageFilter->ProcessImage((PIXEL_TYPE*)textureInfo.mBits, textureInfo.mWidth, textureInfo.mHeight);
-
-            tex->mFilter = TEX_FILTER_LINEAR;
-            tex->mWidth = textureInfo.mWidth;
-            tex->mHeight = textureInfo.mHeight;
-            tex->mTexWidth = textureInfo.mTexWidth;
-            tex->mTexHeight = textureInfo.mTexHeight;
-            tex->mBuffer = textureInfo.mBits;
-        } else {
-            NSLog(@"JTexture for %s not created\n", filename);
-        }
-
-        CGContextRelease(context);
-    } while(0);
-
-    if(rawdata)
-        delete[] rawdata;
-
-    [image release];
-    [texData release];
-
-    return tex;
-}
-#elif (defined QT_CONFIG)
-JTexture* JRenderer::LoadTexture(const char* filename, int mode, int TextureFormat __attribute__((unused)))
-{
-    JTexture *tex = NULL;
-    int rawsize = 0;
-    BYTE* rawdata = NULL;
-    JFileSystem* fileSystem = JFileSystem::GetInstance();
-
-    do {
-        if (!fileSystem->OpenFile(filename))
-            break;
-
-        rawsize = fileSystem->GetFileSize();
-        rawdata = new BYTE[rawsize];
-
-        if (!rawdata)
-        {
-            fileSystem->CloseFile();
-            break;
-        }
-
-        fileSystem->ReadFile(rawdata, rawsize);
-        fileSystem->CloseFile();
-
-        QImage tmpImage = QImage::fromData(rawdata, rawsize);
-        if(tmpImage.isNull())
-            break;
-
-        tex = new JTexture();
-        if (tex)
-        {
-            tmpImage = tmpImage.convertToFormat(QImage::Format_ARGB32_Premultiplied);
-            tmpImage = tmpImage.rgbSwapped();
-
-            if (mImageFilter != NULL)
-                mImageFilter->ProcessImage((PIXEL_TYPE*)tmpImage.bits(), tmpImage.width(), tmpImage.height());
-
-            tex->mFilter = TEX_FILTER_LINEAR;
-            tex->mWidth = tmpImage.width();
-            tex->mHeight = tmpImage.height();
-            tex->mTexWidth = getNextPower2(tmpImage.width());
-            tex->mTexHeight = getNextPower2(tmpImage.height());;
-            tex->mBuffer = new BYTE[tex->mTexWidth*tex->mTexHeight*4];
-
-            for(int i=0; i < tex->mHeight; i++)
-            {
-                memcpy(tex->mBuffer+(i*4*tex->mTexWidth), tmpImage.constScanLine(i), tmpImage.bytesPerLine());
-            }
-        }
-    } while(false);
-
-    if(rawdata)
-        delete[] rawdata;
-
-    return tex;
-}
-#endif //IOS
 
 void JRenderer::TransferTextureToGLContext(JTexture& inTexture)
 {
