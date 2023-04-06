@@ -16,6 +16,7 @@ wagic.prx
 
 /compile_commands.json
 /.cache
+/.wine
 
 /build
 /build_*
