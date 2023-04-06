@@ -190,7 +190,7 @@ wth = executable(
     sources: wth_srcs,
     # cpp_pch: 'include/PrecompiledHeader.h',
     include_directories: [wth_inc_dir],
-    dependencies: [jge_dep, hge_dep],
+    dependencies: [jge_dep, jgemain_dep],
     override_options: ['warning_level=0'],
     cpp_args: wth_cpp_args,
     link_args: wth_link_args,

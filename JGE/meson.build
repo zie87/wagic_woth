@@ -78,6 +78,8 @@ jge_srcs = [
     'src/tinyxml/tinyxmlparser.cpp',
 ]
 
+jge_main_srcs = []
+
 jge_c_args = []
 jge_cpp_args = []
 jge_inc_dirs = [include_directories('./include'), zipfs_inc_dir]
@@ -100,10 +102,11 @@ if host_machine.system() == 'psp'
             'src/JAudio.cpp',
             'src/JMP3.cpp',
             'src/decoder_prx.c',
-            'src/main.cpp',
             'src/vram.c',
         ]
     )
+
+    jge_main_srcs = jge_main_srcs + ['src/main.cpp',]
 
     jge_c_args = jge_c_args + ['-D_PSP_FW_VERSION=371']
     jge_cpp_args = jge_cpp_args + ['-DDEVHOOK', '-DPSPFW3XX', '-DPSP']
@@ -112,13 +115,15 @@ if host_machine.system() == 'psp'
 else
     jge_srcs = (
         jge_srcs + [
-            'src/SDLmain.cpp',
             'src/JDistortionMesh.cpp',
             'src/pc/JSfx.cpp',
             'src/pc/JGfx.cpp',
             'src/pc/JSocket.cpp',
         ]
     )
+    
+    jge_main_srcs = jge_main_srcs + ['src/SDLmain.cpp',]
+    
     sdl2_dep = dependency('sdl2')
     boost_dep = dependency('boost', modules: ['system', 'date_time', 'thread'])
 
@@ -150,8 +155,24 @@ jgetools = static_library(
     dependencies: jge_dependencies,
 )
 
+jgemain = static_library(
+    'jgemain',
+    sources: jge_main_srcs,
+    include_directories: jge_inc_dirs,
+    override_options: ['warning_level=0'],
+    c_args: jge_c_args,
+    cpp_args: jge_cpp_args,
+    dependencies: jge_dependencies,
+)
+
 jge_dep = declare_dependency(
     link_with: jgetools,
+    include_directories: jge_inc_dirs,
+    dependencies: jge_dependencies,
+)
+
+jgemain_dep = declare_dependency(
+    link_with: [jgetools, jgemain],
     include_directories: jge_inc_dirs,
     dependencies: jge_dependencies,
 )
