@@ -5,7 +5,6 @@
 
 #pragma once
 
-
 // Standard headers
 #include <algorithm>
 #include <cassert>
@@ -16,6 +15,6 @@
 #include <string>
 #include <vector>
 
-//#include "stdint.h"
+// #include "stdint.h"
 
 #include <stdint.h>

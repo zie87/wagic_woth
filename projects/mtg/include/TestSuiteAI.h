@@ -11,8 +11,7 @@
 
 #include <stdint.h>
 
-class TestSuiteActions
-{
+class TestSuiteActions {
 public:
     int nbitems;
     string actions[MAX_TESTSUITE_ACTIONS];
@@ -21,12 +20,10 @@ public:
     void cleanup();
 };
 
-
 class TestSuiteGame;
 class TestSuite;
 class TestSuiteAI;
-class TestSuiteState
-{
+class TestSuiteState {
 public:
     GamePhase phase;
     void parsePlayerState(int playerId, string s);
@@ -37,10 +34,10 @@ public:
     void cleanup(TestSuiteGame* tsGame);
 };
 
-class TestSuiteGame
-{
+class TestSuiteGame {
     friend class TestSuiteAI;
     friend class TestSuite;
+
 protected:
     string filename;
     int summoningSickness;
@@ -68,16 +65,15 @@ public:
     void ResetManapools();
     void initGame();
     void assertGame();
-    MTGPlayerCards * buildDeck(Player* player, int playerId);
+    MTGPlayerCards* buildDeck(Player* player, int playerId);
     GameType getGameType() { return gameType; };
     string getNextAction();
-    Interruptible * getActionByMTGId(int mtgid);
-    static int Log(const char * text);
-    void setObserver(GameObserver* anObserver) {observer = anObserver; };
+    Interruptible* getActionByMTGId(int mtgid);
+    static int Log(const char* text);
+    void setObserver(GameObserver* anObserver) { observer = anObserver; };
 };
 
-class TestSuite : public TestSuiteGame
-{
+class TestSuite : public TestSuiteGame {
 private:
     int currentfile;
     int nbfiles;
@@ -92,7 +88,7 @@ public:
     int startTime, endTime;
     unsigned int seed;
     int nbFailed, nbTests, nbAIFailed, nbAITests;
-    TestSuite(const char * filename);
+    TestSuite(const char* filename);
     ~TestSuite();
     void initGame(GameObserver* g);
     void pregameTests();
@@ -104,24 +100,23 @@ public:
         return files[currentfile - 1];
     };
     static void ThreadProc(void* inParam);
-    void setRules(Rules* rules) {mRules = rules;};
+    void setRules(Rules* rules) { mRules = rules; };
     void handleResults(bool wasAI, int error);
 
     size_t run();
 };
 
-class TestSuiteAI:public AIPlayerBaka
-{
+class TestSuiteAI : public AIPlayerBaka {
 private:
-    MTGCardInstance * getCard(string action);
+    MTGCardInstance* getCard(string action);
     float timer;
-    TestSuiteGame * suite;
+    TestSuiteGame* suite;
 
 public:
-    TestSuiteAI(TestSuiteGame *tsGame, int playerId);
+    TestSuiteAI(TestSuiteGame* tsGame, int playerId);
     virtual int Act(float dt);
     virtual int displayStack();
-    bool summoningSickness() {return (suite->summoningSickness == 1); }
+    bool summoningSickness() { return (suite->summoningSickness == 1); }
 };
 
 #endif
