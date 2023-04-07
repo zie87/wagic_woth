@@ -23,8 +23,8 @@
 
 #include <boost/shared_ptr.hpp>
 
-#if defined (SDL_CONFIG)
+#if defined(SDL_CONFIG)
 #define TOUCH_ENABLED
 #endif
 
-#endif //PRECOMPILEDHEADER_H
+#endif  // PRECOMPILEDHEADER_H
