@@ -173,7 +173,13 @@ endif
 
 if get_option('buildtype') == 'debug'
     wth_cpp_args = (
-        wth_cpp_args + ['-ggdb3', '-DDOLOG=1', '-D_DEBUG', '-DDEBUG', '-DDEBUG_CACHE']
+        wth_cpp_args + [
+            '-ggdb3',
+            '-DDOLOG=1',
+            '-D_DEBUG',
+            '-DDEBUG',
+            '-DDEBUG_CACHE',
+        ]
     )
 endif
 
@@ -222,5 +228,5 @@ endif
 subdir('tests')
 
 if get_option('build_docs')
-  subdir('docs')
+    subdir('docs')
 endif

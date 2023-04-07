@@ -94,3 +94,47 @@ jobs:
         shell: bash
         run: | 
           ./tools/mingw/x86_64_build_meson.sh ${{ matrix.build_type }}
+
+
+  coveralls:
+    runs-on: ubuntu-22.04
+    needs: [build-psp, build-linux, build-mingw32, build-mingw64]
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 1
+    - run: |
+        sudo apt update 
+        sudo apt install lcov git libsdl2-dev libpng-dev libjpeg-dev libfreetype-dev libz-dev libboost-all-dev 
+    - uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+    - run: pip install meson ninja
+    - name: Configure
+      run: meson setup builddir/ --buildtype debug -Denable_testsuite=true -Db_coverage=true
+      env:
+        CC: gcc-11
+        CXX: g++-11
+    - name: Compile
+      run: meson compile -C builddir/
+    - name: Lcov prepare
+      working-directory: ${{runner.workspace}}
+      run : |
+        lcov --zerocounters --directory ${{runner.workspace}}/builddir
+        lcov --capture --initial --directory . --output-file cov_base.info
+    - name: Run tests
+      run: |
+        cp ${{runner.workspace}}/wagic_woth/builddir/projects/mtg/tests/testsuite/wagic_testsuite  ${{runner.workspace}}/wagic_woth/projects/mtg/bin
+        cd  ${{runner.workspace}}/wagic_woth/projects/mtg/bin
+        ./wagic_testsuite
+    - name: Lcov creation
+      working-directory: ${{runner.workspace}}
+      run : |
+        lcov --capture --directory . --output-file cov.info
+        lcov --add-tracefile ./cov_base.info --add-tracefile ./cov.info --output-file cov_total.info
+        lcov --remove ./cov_total.info '/usr/include/*' '/usr/lib/*' '*/tests/*' '*/subprojects/*' -o cov_filter.info
+    - name: Coveralls
+      uses: coverallsapp/github-action@master
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        path-to-lcov: ${{runner.workspace}}/cov_filter.info
