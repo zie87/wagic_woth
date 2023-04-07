@@ -7,10 +7,6 @@ using zip_file_system::filesystem;
 using zip_file_system::izfstream;
 using namespace std;
 
-#include "unzip/unzip.h"
-
-using namespace std;
-
 //////////////////////////////////////////////////////////////////////////
 /// Interface for low level file access with ZIP archive support. All
 /// file operations in JGE are handled through this class so if a ZIP
