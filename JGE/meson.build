@@ -186,5 +186,5 @@ jgemain_dep = declare_dependency(
 )
 
 if get_option('build_docs')
-  subdir('docs')
+    subdir('docs')
 endif

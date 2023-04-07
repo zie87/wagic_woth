@@ -1,5 +1,6 @@
 # Wagic: War of the Homebrew
 [![build](https://github.com/zie87/wagic_woth/actions/workflows/build.yml/badge.svg)](https://github.com/zie87/wagic_woth/actions/workflows/build.yml)
+[![Coverage Status](https://coveralls.io/repos/github/zie87/wagic_woth/badge.svg?branch=main)](https://coveralls.io/github/zie87/wagic_woth?branch=main)
 
 # Build
 
