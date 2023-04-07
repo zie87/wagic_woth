@@ -5,4 +5,4 @@
 
 typedef boost::shared_ptr<JQuad> JQuadPtr;
 
-#endif 
+#endif

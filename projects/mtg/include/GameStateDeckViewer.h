@@ -22,48 +22,45 @@
 #define NO_USER_ACTIVITY_HELP_DELAY 10
 #define NO_USER_ACTIVITY_SHOWCARD_DELAY 0.1
 
-enum
-{
-    STAGE_TRANSITION_RIGHT = 0,
-    STAGE_TRANSITION_LEFT = 1,
-    STAGE_WAITING = 2,
-    STAGE_TRANSITION_UP = 3,
-    STAGE_TRANSITION_DOWN = 4,
-    STAGE_ONSCREEN_MENU = 5,
-    STAGE_WELCOME = 6,
-    STAGE_MENU = 7,
-    STAGE_FILTERS = 8,
+enum {
+    STAGE_TRANSITION_RIGHT    = 0,
+    STAGE_TRANSITION_LEFT     = 1,
+    STAGE_WAITING             = 2,
+    STAGE_TRANSITION_UP       = 3,
+    STAGE_TRANSITION_DOWN     = 4,
+    STAGE_ONSCREEN_MENU       = 5,
+    STAGE_WELCOME             = 6,
+    STAGE_MENU                = 7,
+    STAGE_FILTERS             = 8,
     STAGE_TRANSITION_SELECTED = 9
 };
 
 // TODO: need a better name for MENU_FIRST_MENU, this is reused for the 1st submenu of
 // available options in the duel menu
-enum
-{
-    MENU_CARD_PURCHASE = 2,
-    MENU_DECK_SELECTION = 10,
-    MENU_DECK_BUILDER = 11,
+enum {
+    MENU_CARD_PURCHASE      = 2,
+    MENU_DECK_SELECTION     = 10,
+    MENU_DECK_BUILDER       = 11,
     MENU_FIRST_DUEL_SUBMENU = 102,
     MENU_LANGUAGE_SELECTION = 103,
 };
 
 // enums for menu options
 // TODO: make these enums a little more descriptive. (ie should reflect what menu they are attached to )
-enum DECK_VIEWER_MENU_ITEMS
-{
-    MENU_ITEM_NEW_DECK = -30,
-    MENU_ITEM_CHEAT_MODE = -12,
-    MENU_ITEM_CANCEL = kCancelMenuID,
+enum DECK_VIEWER_MENU_ITEMS {
+    MENU_ITEM_NEW_DECK              = -30,
+    MENU_ITEM_CHEAT_MODE            = -12,
+    MENU_ITEM_CANCEL                = kCancelMenuID,
     MENU_ITEM_SAVE_RETURN_MAIN_MENU = 0,
-    MENU_ITEM_SAVE_RENAME = 1,
-    MENU_ITEM_SWITCH_DECKS_NO_SAVE = 2,
-    MENU_ITEM_MAIN_MENU = 3,
-    MENU_ITEM_EDITOR_CANCEL = kCancelMenuID,
-    MENU_ITEM_SAVE_AS_AI_DECK = 5,
-    MENU_ITEM_YES = 20,
-    MENU_ITEM_NO = 21,
-    MENU_ITEM_FILTER_BY = 22,
-    MENUITEM_MORE_INFO = kInfoMenuID
+    MENU_ITEM_SAVE_RENAME           = 1,
+    MENU_ITEM_SWITCH_DECKS_NO_SAVE  = 2,
+    MENU_ITEM_MAIN_MENU             = 3,
+    MENU_ITEM_EDITOR_CANCEL         = kCancelMenuID,
+    MENU_ITEM_SAVE_AS_AI_DECK       = 5,
+    MENU_ITEM_YES                   = 20,
+    MENU_ITEM_NO                    = 21,
+    MENU_ITEM_FILTER_BY             = 22,
+    MENUITEM_MORE_INFO              = kInfoMenuID
 
 };
 
@@ -79,12 +76,11 @@ enum DECK_VIEWER_MENU_ITEMS
 #define MAX_SAVED_FILTERS Constants::NB_Colors + 1
 #define CARDS_DISPLAYED 10
 
-class GameStateDeckViewer: public GameState, public JGuiListener
-{
+class GameStateDeckViewer : public GameState, public JGuiListener {
 private:
     vector<JQuadPtr> mIcons;
     JQuadPtr pspIcons[8];
-    JTexture * pspIconsTexture;
+    JTexture* pspIconsTexture;
     float last_user_activity;
     float onScreenTransition;
     float mRotation;
@@ -92,40 +88,40 @@ private:
     int mAlpha;
     int mStage;
     int useFilter;
-    JMusic * bgMusic;
+    JMusic* bgMusic;
     int lastPos;
     int lastTotal;
     int mSelected;
-    
+
     InteractiveButton *toggleDeckButton, *sellCardButton, *statsPrevButton, *filterButton;
 
-    WGuiFilters * filterMenu;
-    WSrcDeckViewer * source;
+    WGuiFilters* filterMenu;
+    WSrcDeckViewer* source;
 
-    DeckEditorMenu * welcome_menu;
-    SimpleMenu * subMenu;
-    DeckEditorMenu * menu;
+    DeckEditorMenu* welcome_menu;
+    SimpleMenu* subMenu;
+    DeckEditorMenu* menu;
     PriceList* pricelist;
-    PlayerData * playerdata;
+    PlayerData* playerdata;
     int price;
-    DeckDataWrapper * displayed_deck;
-    DeckDataWrapper * myDeck;
-    DeckDataWrapper * myCollection;
-    MTGCard * cardIndex[CARDS_DISPLAYED];
-    StatsWrapper *stw;
+    DeckDataWrapper* displayed_deck;
+    DeckDataWrapper* myDeck;
+    DeckDataWrapper* myCollection;
+    MTGCard* cardIndex[CARDS_DISPLAYED];
+    StatsWrapper* stw;
 
     int hudAlpha;
     string newDeckname;
     bool isAIDeckSave;
     bool mSwitching;
-    void saveDeck(); //Saves the deck and additional necessary information
-    void saveAsAIDeck(string deckName); // saves deck as an AI Deck
+    void saveDeck();                     // Saves the deck and additional necessary information
+    void saveAsAIDeck(string deckName);  // saves deck as an AI Deck
     int getCurrentPos();
     void sellCard();
     void setButtonState(bool state);
     bool userPressedButton();
     void RenderButtons();
-    
+
     pair<float, float> cardsCoordinates[CARDS_DISPLAYED];
 
 public:
@@ -139,7 +135,7 @@ public:
     void switchDisplay();
     void Start();
     virtual void End();
-    void addRemove(MTGCard * card);
+    void addRemove(MTGCard* card);
     virtual void Update(float dt);
     void renderOnScreenBasicInfo();
     void renderSlideBar();

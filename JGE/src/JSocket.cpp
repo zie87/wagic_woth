@@ -52,7 +52,7 @@ JSocket::~JSocket(){
 int JSocket::make_socket(uint16_t port)
 {
 	int sock = -1;
- #ifdef NETWORK_SUPPORT   
+#ifdef NETWORK_SUPPORT   
 	int ret;
 	struct sockaddr_in name;
 
@@ -104,7 +104,7 @@ void JSocket::readWrite(int val){
     tosend_data.pop();
   }
   if (size) write(val,data,size);
- #endif 
+#endif 
 }
 
 /* Start a client */
@@ -139,7 +139,7 @@ int JSocket::start_client(const char *szIpAddr){
  while(1){
    readWrite(sock);
  }
- #endif
+#endif
  return 0;
 }
 
@@ -225,6 +225,4 @@ int JSocket::start_server(const char *szIpAddr)
 	return 0;
 }
 
-#endif //NETWORK_SUPPORT
-
-
+#endif  // NETWORK_SUPPORT
