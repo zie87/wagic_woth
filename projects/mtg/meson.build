@@ -210,3 +210,7 @@ if host_machine.system() == 'psp'
         depends: [wth],
     )
 endif
+
+if get_option('build_docs')
+  subdir('docs')
+endif

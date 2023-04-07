@@ -11,7 +11,7 @@ if doxygen.found()
         cdata.set('HAVE_DOT', 'NO')
     endif
 
-    cdata.set('PROJECT_NAME', 'JGE++ Documentation')
+    cdata.set('PROJECT_NAME', 'Wagic, the Homebrew!?')
     cdata.set(
         'PROJECT_SRCDIR',
         join_paths(meson.current_source_dir(), '..', 'include'),

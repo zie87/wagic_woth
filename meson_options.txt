@@ -1,2 +1,3 @@
+option('build_docs', type : 'boolean', value : false, description : 'build documentation')
 option('enable_testsuite', type : 'boolean', value : false, description : 'intergate testsuite')
 option('enable_ai_change_testing', type : 'boolean', value : false, description : 'build with ai change tests')

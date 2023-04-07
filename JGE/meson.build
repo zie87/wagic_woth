@@ -156,4 +156,6 @@ jge_dep = declare_dependency(
     dependencies: jge_dependencies,
 )
 
-subdir('docs')
+if get_option('build_docs')
+  subdir('docs')
+endif
