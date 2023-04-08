@@ -8,7 +8,7 @@
 ## Linux build
 
 ```
-sudo apt install meson libsdl2-dev libpng-dev libjpeg-dev libfreetype-dev libz-dev libboost-all-dev 
+sudo apt install meson libsdl2-dev libpng-dev libjpeg-dev libfreetype-dev libz-dev
 ```
 
 ```
@@ -27,7 +27,7 @@ meson compile -v -C build/psp
 
 ### MinGW 32 Bit (Linux)
 ```
-sudo dnf install -y meson ninja-build wine mingw32-gcc-c++ mingw32-boost
+sudo dnf install -y meson ninja-build wine mingw32-gcc-c++
 ```
 
 ```
@@ -37,7 +37,7 @@ meson compile -v -C build/mingw32
 
 ### MinGW 64 Bit (Linux)
 ```
-sudo dnf install -y meson ninja-build wine mingw64-gcc-c++ mingw64-boost
+sudo dnf install -y meson ninja-build wine mingw64-gcc-c++
 ```
 
 ```

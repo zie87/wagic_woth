@@ -19,8 +19,8 @@ class JNetwork {
 private:
     int connected_to_ap;
     JSocket* socket;
-    boost::mutex sendMutex;
-    boost::mutex receiveMutex;
+    jge::mutex sendMutex;
+    jge::mutex receiveMutex;
     stringstream received;
     stringstream toSend;
     static map<string, processCmd> sCommandMap;
@@ -40,7 +40,7 @@ public:
     static void registerCommand(string command, processCmd processCommand, processCmd processResponse);
 
 private:
-    boost::thread* mpWorkerThread;
+    jge::thread* mpWorkerThread;
 };
 
 #endif

@@ -46,7 +46,7 @@ jobs:
     - run: pip install meson ninja
     - run: |
         sudo apt update 
-        sudo apt install git libsdl2-dev libpng-dev libjpeg-dev libfreetype-dev libz-dev libboost-all-dev 
+        sudo apt install git libsdl2-dev libpng-dev libjpeg-dev libfreetype-dev libz-dev
     - name: Configure
       run: meson setup builddir/ --buildtype ${{ matrix.build_type }}
       env:
@@ -105,7 +105,7 @@ jobs:
         fetch-depth: 1
     - run: |
         sudo apt update 
-        sudo apt install lcov git libsdl2-dev libpng-dev libjpeg-dev libfreetype-dev libz-dev libboost-all-dev 
+        sudo apt install lcov git libsdl2-dev libpng-dev libjpeg-dev libfreetype-dev libz-dev 
     - uses: actions/setup-python@v2
       with:
         python-version: '3.x'

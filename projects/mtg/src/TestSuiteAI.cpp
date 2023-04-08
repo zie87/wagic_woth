@@ -452,7 +452,7 @@ int TestSuite::loadNext() {
 
         // TODO: thread count
         size_t thread_count = 1;
-        for (size_t i = 0; i < (thread_count - 1); i++) mWorkerThread.push_back(new boost::thread(ThreadProc, this));
+        for (size_t i = 0; i < (thread_count - 1); i++) mWorkerThread.push_back(new jge::thread(ThreadProc, this));
     }
 
     cleanup();
@@ -633,7 +633,7 @@ size_t TestSuite::run() {
     return nbFailed + nbAIFailed;
 }
 
-boost::mutex TestSuiteGame::mMutex;
+jge::mutex TestSuiteGame::mMutex;
 
 TestSuiteGame::~TestSuiteGame() { SAFE_DELETE(observer); }
 
@@ -680,7 +680,7 @@ void TestSuiteGame::initGame() {
         p->life                = initState.players[i]->life;
         p->poisonCount         = initState.players[i]->poisonCount;
         stringstream stream;
-        stream << initState.players[i]->getRandomGenerator()->saveLoadedRandValues(stream);
+        initState.players[i]->getRandomGenerator()->saveLoadedRandValues(stream);
         p->getRandomGenerator()->loadRandValues(stream.str());
         MTGGameZone* playerZones[]       = {p->game->graveyard, p->game->library, p->game->hand, p->game->inPlay};
         MTGGameZone* loadedPlayerZones[] = {initState.players[i]->game->graveyard, initState.players[i]->game->library,

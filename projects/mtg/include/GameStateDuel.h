@@ -59,8 +59,8 @@ public:
     int totalTestGames;
     int testPlayer2Victories;
     int totalAIDecks;
-    static boost::mutex mMutex;
-    vector<boost::thread> mWorkerThread;
+    static jge::mutex mMutex;
+    vector<jge::thread> mWorkerThread;
     static void ThreadProc(void* inParam);
     void handleResults(GameObserver* aGame) {
         mMutex.lock();

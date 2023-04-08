@@ -90,7 +90,6 @@ jpeg_dep = dependency('libjpeg')
 jge_dependencies = [hge_dep, png_dep, jpeg_dep]
 
 if host_machine.system() == 'psp'
-    boost_inc_dir = include_directories('../Boost')
     freetype_dep = dependency('freetype2')
     jge_srcs = (
         jge_srcs + [
@@ -114,7 +113,6 @@ if host_machine.system() == 'psp'
 
     jge_c_args = jge_c_args + ['-D_PSP_FW_VERSION=371']
     jge_cpp_args = jge_cpp_args + ['-DDEVHOOK', '-DPSPFW3XX', '-DPSP']
-    jge_inc_dirs = (jge_inc_dirs + [boost_inc_dir])
     jge_dependencies = jge_dependencies + [freetype_dep]
 else
     jge_srcs = (
@@ -133,7 +131,6 @@ else
     )
 
     sdl2_dep = dependency('sdl2')
-    boost_dep = dependency('boost', modules: ['system', 'date_time', 'thread'])
 
     jge_c_args = jge_c_args + ['-DSDL_CONFIG']
 
@@ -146,7 +143,7 @@ else
     endif
 
     jge_cpp_args = jge_c_args
-    jge_dependencies = jge_dependencies + [sdl2_dep, boost_dep]
+    jge_dependencies = jge_dependencies + [sdl2_dep]
 endif
 
 if get_option('buildtype') == 'debug'

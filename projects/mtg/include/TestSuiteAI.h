@@ -53,7 +53,7 @@ protected:
     int currentAction;
     GameObserver* observer;
 
-    static boost::mutex mMutex;
+    static jge::mutex mMutex;
     virtual void handleResults(bool wasAI, int error);
     TestSuite* testsuite;
     bool load();
@@ -80,7 +80,7 @@ private:
     string files[1024];
 
     void cleanup();
-    vector<boost::thread*> mWorkerThread;
+    vector<jge::thread*> mWorkerThread;
     Rules* mRules;
     bool mProcessing;
 
@@ -94,7 +94,7 @@ public:
     void pregameTests();
     int loadNext();
     string getNextFile() {
-        boost::mutex::scoped_lock lock(mMutex);
+        jge::mutex::scoped_lock lock(mMutex);
         if (currentfile >= nbfiles) return "";
         currentfile++;
         return files[currentfile - 1];

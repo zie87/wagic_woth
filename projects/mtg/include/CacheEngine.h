@@ -15,7 +15,7 @@ struct CacheRequest {
     int cacheID;
 };
 
-const boost::posix_time::milliseconds kIdleTime(100);
+const jge::milliseconds kIdleTime(100);
 
 class CardRetrieverBase {
 public:
@@ -55,7 +55,7 @@ class ThreadedCardRetriever : public CardRetrieverBase {
 public:
     ThreadedCardRetriever(WCache<WCachedTexture, JTexture>& inCache) : CardRetrieverBase(inCache), mProcessing(true) {
         DebugTrace("Threaded Version");
-        mWorkerThread = boost::thread(ThreadProc, this);
+        mWorkerThread = jge::thread(ThreadProc, this);
     }
 
     virtual ~ThreadedCardRetriever() {
@@ -65,7 +65,7 @@ public:
     }
 
     void QueueRequest(const std::string& inFilePath, int inSubmode, int inCacheID) {
-        boost::mutex::scoped_lock lock(mMutex);
+        jge::mutex::scoped_lock lock(mMutex);
         // mRequestLookup is used to prevent duplicate requests for the same id
         if (mRequestLookup.find(inCacheID) == mRequestLookup.end() &&
             mTextureCache.cache.find(inCacheID) == mTextureCache.cache.end()) {
@@ -104,7 +104,7 @@ protected:
                 while (!instance->mRequestQueue.empty()) {
                     CacheRequest request;
                     {
-                        boost::mutex::scoped_lock lock(instance->mMutex);
+                        jge::mutex::scoped_lock lock(instance->mMutex);
                         request = instance->mRequestQueue.front();
                         instance->mRequestQueue.pop();
                     }
@@ -112,7 +112,7 @@ protected:
                     instance->mTextureCache.LoadIntoCache(request.cacheID, request.filename, request.submode);
 
                     {
-                        boost::mutex::scoped_lock lock(instance->mMutex);
+                        jge::mutex::scoped_lock lock(instance->mMutex);
                         instance->mRequestLookup.erase(request.cacheID);
                     }
 
@@ -120,20 +120,20 @@ protected:
                     // rumour has it that if a worker thread doesn't allow the main thread a chance to run, it can hang
                     // the unit
 #ifdef PSP
-                    boost::this_thread::sleep(boost::posix_time::milliseconds(10));
+                    jge::this_thread::sleep(jge::milliseconds(10));
 #endif
                 }
 
-                boost::this_thread::sleep(kIdleTime);
+                jge::this_thread::sleep(kIdleTime);
             }
         }
     }
 
-    boost::thread mWorkerThread;
+    jge::thread mWorkerThread;
 
     std::queue<CacheRequest> mRequestQueue;
     std::set<int> mRequestLookup;
-    boost::mutex mMutex;
+    jge::mutex mMutex;
     volatile bool mProcessing;
 };
 
