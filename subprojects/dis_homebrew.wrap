@@ -1,0 +1,4 @@
+[wrap-git]
+url = https://github.com/zie87/dis_homebrew.git
+push-url = git@github.com:zie87/dis_homebrew.git
+revision = main 
