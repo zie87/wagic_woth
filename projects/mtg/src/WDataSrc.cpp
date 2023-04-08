@@ -235,7 +235,7 @@ bool WSrcCards::setOffset(int pos) {
 }
 
 void WSrcCards::Shuffle() {
-    std::random_shuffle(cards.begin(), cards.end());
+    wth::shuffle(cards.begin(), cards.end());
     validate();
 }
 
