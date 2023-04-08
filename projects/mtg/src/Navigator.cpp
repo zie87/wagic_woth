@@ -32,6 +32,7 @@ enum {
  */
 class CardZone {
 public:
+    virtual ~CardZone() = default;
     /*
      **
      */
@@ -56,7 +57,9 @@ public:
                 // about to delete something earlier in the container, mCurrentCard
                 // won't be pointing anymore to the same element, so shift it
                 if (mCurrentCard >= index) {
-                    if (mCurrentCard > 0) --mCurrentCard;
+                    if (mCurrentCard > 0) {
+                        --mCurrentCard;
+                    }
                 }
                 mCards[index]->zoom = 1.0f;
 
@@ -74,8 +77,8 @@ public:
      ** up/down is rejected & moves to the next zone
      */
     virtual bool HandleSelection(JButton inKey) {
-        bool changeZone = true;
-        size_t oldIndex = mCurrentCard;
+        bool changeZone       = true;
+        const size_t oldIndex = mCurrentCard;
         if (inKey == JGE_BTN_LEFT) {
             if (mCurrentCard > 0) {
                 --mCurrentCard;
@@ -119,7 +122,9 @@ public:
      */
     CardZone* GetNeighbour(JButton inDirection) {
         CardZone* neighbour = this;
-        if (mNeighbours[inDirection]) neighbour = mNeighbours[inDirection];
+        if (mNeighbours[inDirection]) {
+            neighbour = mNeighbours[inDirection];
+        }
 
         return neighbour;
     }
@@ -133,7 +138,9 @@ public:
         if (mCards.empty()) {
             if (inDirection != JGE_BTN_NONE) {
                 CardZone* nextNeighbour = GetNeighbour(inDirection);
-                if (nextNeighbour) return nextNeighbour->EnterZone(inDirection);
+                if (nextNeighbour) {
+                    return nextNeighbour->EnterZone(inDirection);
+                }
             }
         }
 
@@ -151,8 +158,8 @@ public:
      **
      */
     PlayGuiObject* GetCurrentCard() {
-        PlayGuiObject* current = NULL;
-        if (mCards.size()) {
+        PlayGuiObject* current = nullptr;
+        if (!mCards.empty()) {
             if (mCurrentCard < mCards.size()) {
                 current = mCards[mCurrentCard];
             }
@@ -173,18 +180,21 @@ public:
  */
 class GridCardZone : public CardZone {
 public:
+    ~GridCardZone() override = default;
     GridCardZone(bool inEnforceAxisAlignment = false) : mEnforceAxisAlignment(inEnforceAxisAlignment) {}
 
-    virtual bool HandleSelection(JButton inKey) {
-        size_t oldIndex = mCurrentCard;
+    bool HandleSelection(JButton inKey) override {
+        const size_t oldIndex = mCurrentCard;
 
-        float minDistance     = 100000;
-        int selectedCardIndex = -1;
-        bool isHorizontal     = (inKey == JGE_BTN_LEFT || inKey == JGE_BTN_RIGHT);
+        float minDistance       = 100000;
+        int selectedCardIndex   = -1;
+        const bool isHorizontal = (inKey == JGE_BTN_LEFT || inKey == JGE_BTN_RIGHT);
 
         for (size_t index = 0; index < mCards.size(); ++index) {
             // skip yourself
-            if (mCurrentCard == index) continue;
+            if (mCurrentCard == index) {
+                continue;
+            }
 
             // skip if the card isn't on the same axis that we're stepping in
             // this flag is an optional override. If enabled, it forces you to only be able to thumb over to the next
@@ -197,15 +207,23 @@ public:
             }
 
             // if it's going in the wrong direction, skip
-            if (inKey == JGE_BTN_RIGHT && mCards[index]->x <= mCards[mCurrentCard]->x) continue;
-            if (inKey == JGE_BTN_LEFT && mCards[index]->x >= mCards[mCurrentCard]->x) continue;
-            if (inKey == JGE_BTN_DOWN && mCards[index]->y <= mCards[mCurrentCard]->y) continue;
-            if (inKey == JGE_BTN_UP && mCards[index]->y >= mCards[mCurrentCard]->y) continue;
+            if (inKey == JGE_BTN_RIGHT && mCards[index]->x <= mCards[mCurrentCard]->x) {
+                continue;
+            }
+            if (inKey == JGE_BTN_LEFT && mCards[index]->x >= mCards[mCurrentCard]->x) {
+                continue;
+            }
+            if (inKey == JGE_BTN_DOWN && mCards[index]->y <= mCards[mCurrentCard]->y) {
+                continue;
+            }
+            if (inKey == JGE_BTN_UP && mCards[index]->y >= mCards[mCurrentCard]->y) {
+                continue;
+            }
 
             // we've found a card on the same axis, stash its value & compare against the previous
-            float yDiff    = fabs(mCards[mCurrentCard]->y - mCards[index]->y);
-            float xDiff    = fabs(mCards[mCurrentCard]->x - mCards[index]->x);
-            float distance = sqrtf(yDiff * yDiff + xDiff * xDiff);
+            const float yDiff    = fabs(mCards[mCurrentCard]->y - mCards[index]->y);
+            const float xDiff    = fabs(mCards[mCurrentCard]->x - mCards[index]->x);
+            const float distance = sqrtf(yDiff * yDiff + xDiff * xDiff);
 
             // CardSelector does this thing where if the distance in the axis you're moving is less than the distance od
             // the card on the opposite axis, it would ignore the move - this made for some weird behavior where the UI
@@ -241,18 +259,20 @@ protected:
  */
 class HandCardZone : public GridCardZone {
 public:
+    ~HandCardZone() override = default;
     /*
      ** the card hand zone operates slightly differently than the default zones:
      ** if entering via up/down,
      ** set the current card selection to the bottom/top card
      */
-    virtual CardZone* EnterZone(JButton inDirection) {
+    CardZone* EnterZone(JButton inDirection) override {
         // TODO, check if the hand is flattened
-        if (mCards.size()) {
-            if (inDirection == JGE_BTN_UP)
+        if (!mCards.empty()) {
+            if (inDirection == JGE_BTN_UP) {
                 mCurrentCard = mCards.size() - 1;
-            else if (inDirection == JGE_BTN_DOWN)
+            } else if (inDirection == JGE_BTN_DOWN) {
                 mCurrentCard = 0;
+            }
         }
 
         return CardZone::EnterZone(inDirection);
@@ -264,7 +284,8 @@ public:
  */
 class LandCardZone : public GridCardZone {
 public:
-    virtual CardZone* EnterZone(JButton inDirection);
+    ~LandCardZone() override = default;
+    CardZone* EnterZone(JButton inDirection) override;
 };
 
 /*
@@ -272,7 +293,8 @@ public:
  */
 class CreatureCardZone : public GridCardZone {
 public:
-    virtual CardZone* EnterZone(JButton inDirection);
+    ~CreatureCardZone() override = default;
+    CardZone* EnterZone(JButton inDirection) override;
 };
 
 /*
@@ -284,7 +306,7 @@ public:
 CardZone* CreatureCardZone::EnterZone(JButton inDirection) {
     if ((inDirection == JGE_BTN_LEFT || inDirection == JGE_BTN_RIGHT) && mCards.empty()) {
         LandCardZone* landZone = dynamic_cast<LandCardZone*>(mNeighbours[JGE_BTN_DOWN]);
-        if (landZone == NULL) {
+        if (landZone == nullptr) {
             landZone = dynamic_cast<LandCardZone*>(mNeighbours[JGE_BTN_UP]);
         }
 
@@ -303,7 +325,7 @@ CardZone* CreatureCardZone::EnterZone(JButton inDirection) {
 CardZone* LandCardZone::EnterZone(JButton inDirection) {
     if ((inDirection == JGE_BTN_LEFT || inDirection == JGE_BTN_RIGHT) && mCards.empty()) {
         CreatureCardZone* creatureZone = dynamic_cast<CreatureCardZone*>(mNeighbours[JGE_BTN_DOWN]);
-        if (creatureZone == NULL) {
+        if (creatureZone == nullptr) {
             creatureZone = dynamic_cast<CreatureCardZone*>(mNeighbours[JGE_BTN_UP]);
         }
 
@@ -319,10 +341,10 @@ CardZone* LandCardZone::EnterZone(JButton inDirection) {
  ** Constructor.  All the navigation logic is initialized here, by pairing up each card zone with a set of neighbours.
  */
 Navigator::Navigator(GameObserver* observer, DuelLayers* inDuelLayers)
-    : CardSelectorBase(observer),
-      mDrawPosition(kDefaultCardPosition),
-      mDuelLayers(inDuelLayers),
-      mLimitorEnabled(false) {
+    : CardSelectorBase(observer)
+    , mDrawPosition(kDefaultCardPosition)
+    , mDuelLayers(inDuelLayers)
+    , mLimitorEnabled(false) {
     assert(mDuelLayers);
 
     // initialize the cardZone layout
@@ -425,7 +447,7 @@ Navigator::Navigator(GameObserver* observer, DuelLayers* inDuelLayers)
  **
  */
 Navigator::~Navigator() {
-    std::map<int, CardZone*>::iterator iter = mCardZones.begin();
+    auto iter = mCardZones.begin();
     for (; iter != mCardZones.end(); ++iter) {
         SAFE_DELETE(iter->second);
     }
@@ -453,10 +475,11 @@ bool Navigator::CheckUserInput(JButton inKey) {
         break;
     case JGE_BTN_CANCEL:
         mDrawMode = (mDrawMode + 1) % DrawMode::kNumDrawModes;
-        if (mDrawMode == DrawMode::kText)
+        if (mDrawMode == DrawMode::kText) {
             options[Options::DISABLECARDS].number = 1;
-        else
+        } else {
             options[Options::DISABLECARDS].number = 0;
+        }
         break;
     default:
         result = false;
@@ -474,16 +497,18 @@ bool Navigator::CheckUserInput(int x, int y) {
  ** reposition the selected card's draw location
  */
 void Navigator::Update(float dt) {
-    float boundary = mDuelLayers->RightBoundary();
-    float position = boundary - CardGui::BigWidth / 2;
-    if (GetCurrentCard() != NULL) {
+    const float boundary = mDuelLayers->RightBoundary();
+    float position       = boundary - CardGui::BigWidth / 2;
+    if (GetCurrentCard() != nullptr) {
         if ((GetCurrentCard()->x + CardGui::Width / 2 > position - CardGui::BigWidth / 2) &&
             (GetCurrentCard()->x - CardGui::Width / 2 < position + CardGui::BigWidth / 2)) {
             position = CardGui::BigWidth / 2 - 10;
         }
     }
 
-    if (position < CardGui::BigWidth / 2) position = CardGui::BigWidth / 2;
+    if (position < CardGui::BigWidth / 2) {
+        position = CardGui::BigWidth / 2;
+    }
 
     mDrawPosition.x = position;
     mDrawPosition.Update(dt);
@@ -492,16 +517,16 @@ void Navigator::Update(float dt) {
 /*
  **
  */
-PlayGuiObject* Navigator::GetCurrentCard() { return mCurrentZone ? mCurrentZone->GetCurrentCard() : NULL; }
+PlayGuiObject* Navigator::GetCurrentCard() { return mCurrentZone ? mCurrentZone->GetCurrentCard() : nullptr; }
 
 /*
  **
  */
 void Navigator::Render() {
-    if (GetCurrentCard() != NULL) {
+    if (GetCurrentCard() != nullptr) {
         GetCurrentCard()->Render();
 
-        CardView* card = dynamic_cast<CardView*>(GetCurrentCard());
+        auto* card = dynamic_cast<CardView*>(GetCurrentCard());
         if (card) {
             card->DrawCard(mDrawPosition, mDrawMode);
         }
@@ -514,7 +539,7 @@ void Navigator::Render() {
 void Navigator::HandleKeyStroke(JButton inKey) {
     assert(mCurrentZone);
     if (mCurrentZone) {
-        bool changeZone = mCurrentZone->HandleSelection(inKey);
+        const bool changeZone = mCurrentZone->HandleSelection(inKey);
 
         if (changeZone && !mLimitorEnabled) {
             mCurrentZone->LeaveZone(inKey);
@@ -538,7 +563,7 @@ void Navigator::PushLimitor() {}
  **
  */
 void Navigator::Limit(LimitorFunctor<PlayGuiObject>* inLimitor, CardView::SelectorZone inZone) {
-    mLimitorEnabled = (inLimitor != NULL);
+    mLimitorEnabled = (inLimitor != nullptr);
     if (inZone == CardView::handZone) {
         mCurrentZone->LeaveZone(JGE_BTN_NONE);
 
@@ -549,7 +574,7 @@ void Navigator::Limit(LimitorFunctor<PlayGuiObject>* inLimitor, CardView::Select
             mCurrentZone = mCurrentZoneStack.top();
             mCurrentZoneStack.pop();
             assert(mCurrentZone);
-            if (mCurrentZone == NULL) {
+            if (mCurrentZone == nullptr) {
                 mCurrentZone = mCardZones[kCardZone_PlayerHand];
             }
         }
@@ -562,8 +587,8 @@ void Navigator::Limit(LimitorFunctor<PlayGuiObject>* inLimitor, CardView::Select
  **
  */
 int Navigator::CardToCardZone(PlayGuiObject* inCard) {
-    int result        = kCardZone_Unknown;
-    GuiAvatar* avatar = dynamic_cast<GuiAvatar*>(inCard);
+    int result   = kCardZone_Unknown;
+    auto* avatar = dynamic_cast<GuiAvatar*>(inCard);
     if (avatar) {
         if (avatar->player->isAI()) {
             result = kCardZone_AIAvatar;
@@ -572,7 +597,7 @@ int Navigator::CardToCardZone(PlayGuiObject* inCard) {
         }
     }
 
-    GuiGraveyard* graveyard = dynamic_cast<GuiGraveyard*>(inCard);
+    auto* graveyard = dynamic_cast<GuiGraveyard*>(inCard);
     if (graveyard) {
         if (graveyard->player->isAI()) {
             result = kCardZone_AIGraveyard;
@@ -581,7 +606,7 @@ int Navigator::CardToCardZone(PlayGuiObject* inCard) {
         }
     }
 
-    GuiLibrary* library = dynamic_cast<GuiLibrary*>(inCard);
+    auto* library = dynamic_cast<GuiLibrary*>(inCard);
     if (library) {
         if (library->player->isAI()) {
             result = kCardZone_AILibrary;
@@ -590,12 +615,12 @@ int Navigator::CardToCardZone(PlayGuiObject* inCard) {
         }
     }
 
-    GuiOpponentHand* opponentHand = dynamic_cast<GuiOpponentHand*>(inCard);
+    auto* opponentHand = dynamic_cast<GuiOpponentHand*>(inCard);
     if (opponentHand) {
         result = kCardZone_AIHand;
     }
 
-    CardView* card = dynamic_cast<CardView*>(inCard);
+    auto* card = dynamic_cast<CardView*>(inCard);
     {
         if (card) {
             if (card->owner == CardView::handZone) {
@@ -608,7 +633,9 @@ int Navigator::CardToCardZone(PlayGuiObject* inCard) {
                 } else if (card->getCard()->isLand()) {
                     result = isAI ? kCardZone_AILands : kCardZone_PlayerLands;
                 } else if (card->getCard()->isSpell()) {
-                    if (card->getCard()->target != NULL) isAI = card->getCard()->target->owner->isAI();
+                    if (card->getCard()->target != nullptr) {
+                        isAI = card->getCard()->target->owner->isAI();
+                    }
 
                     // nasty hack:  the lines above don't always work, as when an enchantment comes into play, its
                     // ability hasn't been activated yet, so it doesn't yet have a target.  Instead, we now look at the
@@ -623,8 +650,9 @@ int Navigator::CardToCardZone(PlayGuiObject* inCard) {
                     } else {
                         result = isAI ? kCardZone_AIEnchantmentsAndArtifacts : kCardZone_PlayerEnchantmentsAndArtifacts;
                     }
-                } else
+                } else {
                     assert(false);
+                }
             } else {
                 assert(false);
             }
@@ -640,7 +668,7 @@ int Navigator::CardToCardZone(PlayGuiObject* inCard) {
  */
 void Navigator::Add(PlayGuiObject* card) {
     // figure out what card's been added, add it to the appropriate pile
-    int zone = CardToCardZone(card);
+    const int zone = CardToCardZone(card);
     if (zone != kCardZone_Unknown) {
         mCardZones[zone]->AddCard(card);
     }
@@ -650,7 +678,7 @@ void Navigator::Add(PlayGuiObject* card) {
  **
  */
 void Navigator::Remove(PlayGuiObject* card) {
-    int zone = CardToCardZone(card);
+    const int zone = CardToCardZone(card);
     if (zone != kCardZone_Unknown) {
         mCardZones[zone]->RemoveCard(card);
     }

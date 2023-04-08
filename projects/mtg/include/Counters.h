@@ -1,5 +1,5 @@
-#ifndef _COUNTERS_H_
-#define _COUNTERS_H_
+#ifndef COUNTERS_H
+#define COUNTERS_H
 #include <string>
 
 using std::string;
@@ -16,11 +16,11 @@ public:
     Counter(MTGCardInstance* _target, int _power, int _toughness);
     Counter(MTGCardInstance* _target, const char* _name, int _power = 0, int _toughness = 0);
     int init(MTGCardInstance* _target, const char* _name, int _power, int _toughness);
-    bool sameAs(const char* _name, int _power, int _toughness);
-    bool cancels(int _power, int _toughness);
+    bool sameAs(const char* _name, int _power, int _toughness) const;
+    bool cancels(int _power, int _toughness) const;
     int cancelCounter(int power, int toughness);
-    int added();
-    int removed();
+    int added() const;
+    int removed() const;
 };
 
 /* Various families of counters attached to an instance of a card */
@@ -37,7 +37,7 @@ public:
     int removeCounter(int _power, int _toughness);
     Counter* hasCounter(const char* _name, int _power = 0, int _toughness = 0);
     Counter* hasCounter(int _power, int _toughness);
-    Counter* getNext(Counter* previous = NULL);
+    Counter* getNext(Counter* previous = nullptr);
     int init();
 };
 

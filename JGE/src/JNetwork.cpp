@@ -31,18 +31,21 @@
 #endif
 
 #include <sstream>
+#include <utility>
 #include "../include/JSocket.h"
 
 std::map<std::string, processCmd> JNetwork::sCommandMap;
 
 bool JNetwork::isConnected() {
-    if (connected_to_ap != 1) return false;
+    if (connected_to_ap != 1) {
+        return false;
+    }
     return socket->isConnected();
 }
 
-JNetwork::JNetwork() : mpWorkerThread(NULL) {
+JNetwork::JNetwork() : connected_to_ap(1), mpWorkerThread(nullptr) {
 #if (defined WIN32) || (defined LINUX)
-    connected_to_ap = 1;
+
 #else
     connected_to_ap = 0;
 #endif
@@ -54,12 +57,14 @@ JNetwork::~JNetwork() {
         mpWorkerThread->join();
         delete mpWorkerThread;
     }
-    if (socket) delete socket;
+    if (socket) {
+        delete socket;
+    }
 }
 
 bool JNetwork::sendCommand(std::string xString) {
-    std::string aString = xString;
-    jge::mutex::scoped_lock l(sendMutex);
+    std::string aString = std::move(xString);
+    jge::mutex::scoped_lock const l(sendMutex);
     if (!socket) {
         DebugTrace("sendCommand failed: no sockeet");
         return false;
@@ -76,18 +81,20 @@ bool JNetwork::sendCommand(std::string xString) {
     return true;
 }
 
-void JNetwork::registerCommand(std::string command, processCmd processCommand, processCmd processResponse) {
+void JNetwork::registerCommand(const std::string& command, processCmd processCommand, processCmd processResponse) {
     sCommandMap[command + "Command"]  = processCommand;
     sCommandMap[command + "Response"] = processResponse;
 }
 
 void JNetwork::ThreadProc(void* param) {
-    JNetwork* pThis  = reinterpret_cast<JNetwork*>(param);
-    JSocket* pSocket = NULL;
-    if (pThis->serverIP.size()) {
+    auto* pThis      = reinterpret_cast<JNetwork*>(param);
+    JSocket* pSocket = nullptr;
+    if (!pThis->serverIP.empty()) {
         DebugTrace("Starting Client Thread");
         pThis->socket = new JSocket(pThis->serverIP);
-        if (pThis->socket->isConnected()) pSocket = pThis->socket;
+        if (pThis->socket->isConnected()) {
+            pSocket = pThis->socket;
+        }
     } else {
         DebugTrace("Starting Server Thread");
         pThis->socket = new JSocket();
@@ -98,8 +105,8 @@ void JNetwork::ThreadProc(void* param) {
     while (pSocket && pSocket->isConnected()) {
         char buff[1024];
         {
-            jge::mutex::scoped_lock l(pThis->receiveMutex);
-            int len = pSocket->Read(buff, sizeof(buff));
+            jge::mutex::scoped_lock const l(pThis->receiveMutex);
+            const int len = pSocket->Read(buff, sizeof(buff));
             if (len) {
                 DebugTrace("receiving " << len << " bytes : " << buff);
                 pThis->received << buff;
@@ -107,13 +114,12 @@ void JNetwork::ThreadProc(void* param) {
             // Checking for some command to execute
             size_t found = pThis->received.str().find("Command");
             if (found != std::string::npos) {
-                std::map<std::string, processCmd>::iterator ite =
-                    sCommandMap.find((pThis->received.str()).substr(0, found) + "Command");
+                auto ite = sCommandMap.find((pThis->received.str()).substr(0, found) + "Command");
                 if (ite != sCommandMap.end()) {
                     DebugTrace("begin of command received : " << pThis->received.str());
                     DebugTrace("begin of command toSend : " << pThis->toSend.str());
 
-                    jge::mutex::scoped_lock l(pThis->sendMutex);
+                    jge::mutex::scoped_lock const l(pThis->sendMutex);
                     pThis->toSend << pThis->received.str().substr(0, found) + "Response ";
                     pThis->received.str("");
                     processCmd theMethod = (ite)->second;
@@ -126,13 +132,12 @@ void JNetwork::ThreadProc(void* param) {
             // Checking for some response to execute
             found = pThis->received.str().find("Response");
             if (found != std::string::npos) {
-                std::map<std::string, processCmd>::iterator ite =
-                    sCommandMap.find((pThis->received.str()).substr(0, found) + "Response");
+                auto ite = sCommandMap.find((pThis->received.str()).substr(0, found) + "Response");
                 if (ite != sCommandMap.end()) {
                     DebugTrace("begin of response received : " << pThis->received.str());
                     DebugTrace("begin of response toSend : " << pThis->toSend.str());
 
-                    jge::mutex::scoped_lock l(pThis->sendMutex);
+                    jge::mutex::scoped_lock const l(pThis->sendMutex);
                     std::string aString;
                     pThis->received >> aString;
                     processCmd theMethod = (ite)->second;
@@ -145,7 +150,7 @@ void JNetwork::ThreadProc(void* param) {
             }
         }
 
-        jge::mutex::scoped_lock l(pThis->sendMutex);
+        jge::mutex::scoped_lock const l(pThis->sendMutex);
         if (!pThis->toSend.str().empty()) {
             DebugTrace("sending  " << pThis->toSend.str().size() << " bytes : " << pThis->toSend.str());
             pSocket->Write((char*)pThis->toSend.str().c_str(), pThis->toSend.str().size() + 1);
@@ -158,8 +163,10 @@ void JNetwork::ThreadProc(void* param) {
 
 #if defined(WIN32) || defined(LINUX)
 int JNetwork::connect(std::string ip) {
-    if (mpWorkerThread) return 0;
-    serverIP       = ip;
+    if (mpWorkerThread) {
+        return 0;
+    }
+    serverIP       = std::move(ip);
     mpWorkerThread = new jge::thread(JNetwork::ThreadProc, this);
     return 42;
 }

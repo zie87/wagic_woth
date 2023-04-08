@@ -6,8 +6,8 @@
 ** hgeDistortionMesh helper class header
 */
 
-#ifndef HGEDISTORT_H
-#define HGEDISTORT_H
+#ifndef HGE_HGEDISTORT_H
+#define HGE_HGEDISTORT_H
 
 // #include "hge.h"
 #include "../JTypes.h"
@@ -52,8 +52,8 @@ public:
     PIXEL_TYPE GetColor(int col, int row) const;
     void GetDisplacement(int col, int row, float* dx, float* dy, int ref) const;
 
-    int GetRows() { return nRows; }
-    int GetCols() { return nCols; }
+    int GetRows() const { return nRows; }
+    int GetCols() const { return nCols; }
 
 private:
     hgeDistortionMesh();

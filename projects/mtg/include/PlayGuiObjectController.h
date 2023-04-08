@@ -1,5 +1,5 @@
-#ifndef _PLAYGUIOBJECTCONTROLLER_H_
-#define _PLAYGUIOBJECTCONTROLLER_H_
+#ifndef PLAYGUIOBJECTCONTROLLER_H
+#define PLAYGUIOBJECTCONTROLLER_H
 
 #define BIG_CARD_RENDER_TIME 0.4
 
@@ -12,10 +12,10 @@ protected:
     int getClosestItem(int direction, float tolerance);
     static int showBigCards;  // 0 hide, 1 show, 2 show text
 public:
-    virtual void Update(float dt);
-    virtual bool CheckUserInput(JButton key);
-    PlayGuiObjectController(GameObserver* observer) : GuiLayer(observer) { last_user_move = 0; };
-    virtual void Render() { GuiLayer::Render(); };
+    void Update(float dt) override;
+    bool CheckUserInput(JButton key) override;
+    PlayGuiObjectController(GameObserver* observer) : GuiLayer(observer), last_user_move(0){};
+    void Render() override { GuiLayer::Render(); };
 };
 
 #endif

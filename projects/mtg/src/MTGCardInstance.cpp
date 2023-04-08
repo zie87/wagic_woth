@@ -8,6 +8,8 @@
 #include "PrecompiledHeader.h"
 
 #include "MTGCardInstance.h"
+
+#include <utility>
 #include "CardDescriptor.h"
 #include "Counters.h"
 #include "Subtypes.h"
@@ -17,11 +19,17 @@ SUPPORT_OBJECT_ANALYTICS(MTGCardInstance)
 MTGCardInstance MTGCardInstance::AnyCard = MTGCardInstance();
 MTGCardInstance MTGCardInstance::NoCard  = MTGCardInstance();
 
-MTGCardInstance::MTGCardInstance() : CardPrimitive(), MTGCard(), Damageable(0, 0), view(NULL) { initMTGCI(); }
+MTGCardInstance::MTGCardInstance() : Damageable(nullptr, 0), view(nullptr) { initMTGCI(); }
 MTGCardInstance::MTGCardInstance(MTGCard* card, MTGPlayerCards* arg_belongs_to)
-    : CardPrimitive(card->data), MTGCard(card), Damageable(0, card->data->getToughness()), view(NULL) {
-    if (arg_belongs_to)
-        if (arg_belongs_to->owner) observer = arg_belongs_to->owner->getObserver();
+    : CardPrimitive(card->data)
+    , MTGCard(card)
+    , Damageable(nullptr, card->data->getToughness())
+    , view(nullptr) {
+    if (arg_belongs_to) {
+        if (arg_belongs_to->owner) {
+            observer = arg_belongs_to->owner->getObserver();
+        }
+    }
 
     initMTGCI();
     model         = card;
@@ -30,11 +38,13 @@ MTGCardInstance::MTGCardInstance(MTGCard* card, MTGPlayerCards* arg_belongs_to)
     origpower     = power;
     origtoughness = toughness;
     belongs_to    = arg_belongs_to;
-    owner         = NULL;
-    if (arg_belongs_to) owner = arg_belongs_to->library->owner;
+    owner         = nullptr;
+    if (arg_belongs_to) {
+        owner = arg_belongs_to->library->owner;
+    }
     lastController = owner;
-    defenser       = NULL;
-    banding        = NULL;
+    defenser       = nullptr;
+    banding        = nullptr;
     life           = toughness;
     preventable    = 0;
     thatmuch       = 0;
@@ -43,9 +53,9 @@ MTGCardInstance::MTGCardInstance(MTGCard* card, MTGPlayerCards* arg_belongs_to)
 }
 
 MTGCardInstance* MTGCardInstance::createSnapShot() {
-    MTGCardInstance* snapShot = NEW MTGCardInstance(*this);
-    snapShot->previous        = NULL;
-    snapShot->counters        = NEW Counters(snapShot);
+    auto* snapShot     = NEW MTGCardInstance(*this);
+    snapShot->previous = nullptr;
+    snapShot->counters = NEW Counters(snapShot);
     controller()->game->garbage->addCard(snapShot);
     return snapShot;
 }
@@ -75,11 +85,11 @@ void MTGCardInstance::copy(MTGCardInstance* card) {
     alias           = data->alias;
 
     // Now this is dirty...
-    int backupid               = mtgid;
-    int castMethodBackUP       = this->castMethod;
+    const int backupid         = mtgid;
+    const int castMethodBackUP = this->castMethod;
     mtgid                      = source->getId();
     MTGCardInstance* oldStored = this->storedSourceCard;
-    Spell* spell               = NEW Spell(observer, this);
+    auto* spell                = NEW Spell(observer, this);
     observer                   = card->observer;
     AbilityFactory af(observer);
     af.addAbilities(observer->mLayers->actionLayer()->getMaxId(), spell);
@@ -92,7 +102,7 @@ void MTGCardInstance::copy(MTGCardInstance* card) {
 
 MTGCardInstance::~MTGCardInstance() {
     SAFE_DELETE(counters);
-    if (previous != NULL) {
+    if (previous != nullptr) {
         // DebugTrace("MTGCardInstance::~MTGCardInstance():  deleting " << ToHex(previous));
         SAFE_DELETE(previous);
     }
@@ -109,12 +119,12 @@ int MTGCardInstance::init() {
 
 void MTGCardInstance::initMTGCI() {
     sample                            = "";
-    model                             = NULL;
+    model                             = nullptr;
     isToken                           = false;
     lifeOrig                          = 0;
     doDamageTest                      = 1;
     skipDamageTestOnce                = false;
-    belongs_to                        = NULL;
+    belongs_to                        = nullptr;
     tapped                            = 0;
     untapping                         = 0;
     frozen                            = 0;
@@ -150,11 +160,13 @@ void MTGCardInstance::initMTGCI() {
     chooseacolor                      = -1;
     chooseasubtype                    = "";
     coinSide                          = -1;
-    isAttacking                       = NULL;
-    storedCard                        = NULL;
-    storedSourceCard                  = NULL;
+    isAttacking                       = nullptr;
+    storedCard                        = nullptr;
+    storedSourceCard                  = nullptr;
 
-    for (int i = 0; i < ManaCost::MANA_PAID_WITH_RETRACE + 1; i++) alternateCostPaid[i] = 0;
+    for (int i = 0; i < ManaCost::MANA_PAID_WITH_RETRACE + 1; i++) {
+        alternateCostPaid[i] = 0;
+    }
 
     paymenttype        = MTGAbility::PUT_INTO_PLAY;
     reduxamount        = 0;
@@ -162,19 +174,19 @@ void MTGCardInstance::initMTGCI() {
     preventable        = 0;
     thatmuch           = 0;
     flanked            = 0;
-    target             = NULL;
-    playerTarget       = NULL;
+    target             = nullptr;
+    playerTarget       = nullptr;
     type_as_damageable = DAMAGEABLE_MTGCARDINSTANCE;
-    banding            = NULL;
-    owner              = NULL;
+    banding            = nullptr;
+    owner              = nullptr;
     counters           = NEW Counters(this);
-    previousZone       = NULL;
-    previous           = NULL;
-    next               = NULL;
-    lastController     = NULL;
+    previousZone       = nullptr;
+    previous           = nullptr;
+    next               = nullptr;
+    lastController     = nullptr;
     regenerateTokens   = 0;
     blocked            = false;
-    currentZone        = NULL;
+    currentZone        = nullptr;
     cardsAbilities     = vector<MTGAbility*>();
     data = this;  // an MTGCardInstance point to itself for data, allows to update it without killing the underlying
                   // database item
@@ -185,14 +197,16 @@ void MTGCardInstance::initMTGCI() {
         for (size_t i = 0; i < values.size(); ++i) {
             // Don' want to send any event to the gameObserver inside of initMCGI, so calling the parent setSubtype
             // method instead of mine
-            CardPrimitive::setSubtype(values[i].c_str());
+            CardPrimitive::setSubtype(values[i]);
         }
     }
 
     int colored = 0;
 
     for (int i = Constants::MTG_COLOR_GREEN; i <= Constants::MTG_COLOR_WHITE; ++i) {
-        if (this->hasColor(i)) ++colored;
+        if (this->hasColor(i)) {
+            ++colored;
+        }
     }
     if (colored > 1) {
         isMultiColored = 1;
@@ -207,21 +221,26 @@ void MTGCardInstance::initMTGCI() {
 const string MTGCardInstance::getDisplayName() const { return getName(); }
 
 void MTGCardInstance::addType(int type) {
-    bool before = hasType(type);
+    const bool before = hasType(type);
     CardPrimitive::addType(type);
 
-    if (!before) mPropertiesChangedSinceLastUpdate = true;
+    if (!before) {
+        mPropertiesChangedSinceLastUpdate = true;
+    }
 
     // If the card name is not set, set it to the type.
     // This is a hack for "transform", used in combination with "losesubtypes" on Basic Lands
     // See removeType below
-    if (!name.length()) setName(MTGAllCards::findType(type));
+    if (!name.length()) {
+        setName(MTGAllCards::findType(type));
+    }
 
     WEvent* e = NEW WEventCardChangeType(this, type, before, true);
-    if (observer)
+    if (observer) {
         observer->receiveEvent(e);
-    else
+    } else {
         SAFE_DELETE(e);
+    }
 }
 
 void MTGCardInstance::addType(char* type_text) { setSubtype(type_text); }
@@ -229,38 +248,43 @@ void MTGCardInstance::addType(char* type_text) { setSubtype(type_text); }
 void MTGCardInstance::setType(const char* type_text) { setSubtype(type_text); }
 
 void MTGCardInstance::setSubtype(string value) {
-    int id = MTGAllCards::findType(value);
+    const int id = MTGAllCards::findType(std::move(value));
     addType(id);
 }
 int MTGCardInstance::removeType(string value, int removeAll) {
-    int id = MTGAllCards::findType(value);
+    const int id = MTGAllCards::findType(std::move(value));
     return removeType(id, removeAll);
 }
 
 int MTGCardInstance::removeType(int id, int removeAll) {
-    bool before = hasType(id);
-    int result  = CardPrimitive::removeType(id, removeAll);
-    bool after  = hasType(id);
+    const bool before = hasType(id);
+    const int result  = CardPrimitive::removeType(id, removeAll);
+    const bool after  = hasType(id);
     if (before != after) {
         mPropertiesChangedSinceLastUpdate = true;
         // Basic lands have the same name as their subtypes, and TargetChoosers don't make a distinction between name
         // and type, so if we remove a subtype "Forest", we also need to remove its name.
         // This means the card might lose its name, but usually when we force remove a type, we add another one just
         // after that. see "AddType" above which force sets a name if necessary
-        if (name.compare(MTGAllCards::findType(id)) == 0) setName("");
+        if (name == MTGAllCards::findType(id)) {
+            setName("");
+        }
     }
     WEvent* e = NEW WEventCardChangeType(this, id, before, after);
-    if (observer)
+    if (observer) {
         observer->receiveEvent(e);
-    else
+    } else {
         SAFE_DELETE(e);
+    }
     return result;
 }
 
 int MTGCardInstance::isInPlay(GameObserver* game) {
     for (int i = 0; i < 2; i++) {
         MTGGameZone* zone = game->players[i]->game->inPlay;
-        if (zone->hasCard(this)) return 1;
+        if (zone->hasCard(this)) {
+            return 1;
+        }
     }
     return 0;
 }
@@ -270,9 +294,13 @@ int MTGCardInstance::afterDamage() {
         skipDamageTestOnce = false;
         return 0;
     }
-    if (!doDamageTest) return 0;
+    if (!doDamageTest) {
+        return 0;
+    }
     doDamageTest = 0;
-    if (!isCreature()) return 0;
+    if (!isCreature()) {
+        return 0;
+    }
     if (life <= 0 && isInPlay(observer)) {
         return destroy();
     }
@@ -292,11 +320,13 @@ int MTGCardInstance::bury() {
     return 0;
 }
 int MTGCardInstance::destroy() {
-    if (!triggerRegenerate()) return bury();
+    if (!triggerRegenerate()) {
+        return bury();
+    }
     return 0;
 }
 
-MTGGameZone* MTGCardInstance::getCurrentZone() { return currentZone; }
+MTGGameZone* MTGCardInstance::getCurrentZone() const { return currentZone; }
 
 int MTGCardInstance::has(int basicAbility) { return basicAbilities[basicAbility]; }
 
@@ -339,14 +369,18 @@ void MTGCardInstance::eventblocked(MTGCardInstance* opponent) {
 
 // Taps the card
 void MTGCardInstance::tap() {
-    if (tapped) return;
+    if (tapped) {
+        return;
+    }
     tapped    = 1;
     WEvent* e = NEW WEventCardTap(this, 0, 1);
     observer->receiveEvent(e);
 }
 
 void MTGCardInstance::untap() {
-    if (!tapped) return;
+    if (!tapped) {
+        return;
+    }
     tapped    = 0;
     WEvent* e = NEW WEventCardTap(this, 1, 0);
     observer->receiveEvent(e);
@@ -354,7 +388,7 @@ void MTGCardInstance::untap() {
 
 void MTGCardInstance::setUntapping() { untapping = 1; }
 
-int MTGCardInstance::isUntapping() { return untapping; }
+int MTGCardInstance::isUntapping() const { return untapping; }
 
 // Tries to Untap the card
 void MTGCardInstance::attemptUntap() {
@@ -365,30 +399,38 @@ void MTGCardInstance::attemptUntap() {
 }
 
 // Tells if the card is tapped or not
-int MTGCardInstance::isTapped() { return tapped; }
+int MTGCardInstance::isTapped() const { return tapped; }
 
 int MTGCardInstance::regenerate() {
-    if (has(Constants::CANTREGEN)) return 0;
+    if (has(Constants::CANTREGEN)) {
+        return 0;
+    }
     return ++regenerateTokens;
 }
 
 int MTGCardInstance::triggerRegenerate() {
-    if (!regenerateTokens) return 0;
-    if (has(Constants::CANTREGEN)) return 0;
+    if (!regenerateTokens) {
+        return 0;
+    }
+    if (has(Constants::CANTREGEN)) {
+        return 0;
+    }
     regenerateTokens--;
     tap();
     if (isCreature()) {
         life = toughness;
         initAttackersDefensers();
-        if (life < 1) return 0;  // regeneration didn't work (wither ?)
+        if (life < 1) {
+            return 0;  // regeneration didn't work (wither ?)
+        }
     }
     return 1;
 }
 
 int MTGCardInstance::initAttackersDefensers() {
     setAttacker(0);
-    setDefenser(NULL);
-    banding = NULL;
+    setDefenser(nullptr);
+    banding = nullptr;
     blockers.clear();
     blocked     = 0;
     didattacked = 0;
@@ -413,8 +455,12 @@ int MTGCardInstance::cleanup() {
 }
 
 int MTGCardInstance::stillInUse() {
-    if (observer->mLayers->actionLayer()->stillInUse(this)) return 1;
-    if (!previous) return 0;
+    if (observer->mLayers->actionLayer()->stillInUse(this)) {
+        return 1;
+    }
+    if (!previous) {
+        return 0;
+    }
     if (previous->stillNeeded) {
         previous->stillNeeded = false;
         return 1;
@@ -430,9 +476,15 @@ int MTGCardInstance::stillInUse() {
  * sickness" rule. Ignore this rule for creatures with haste (see rule 502.5).
  */
 int MTGCardInstance::hasSummoningSickness() {
-    if (!summoningSickness) return 0;
-    if (basicAbilities[(int)Constants::HASTE]) return 0;
-    if (!isCreature()) return 0;
+    if (!summoningSickness) {
+        return 0;
+    }
+    if (basicAbilities[(int)Constants::HASTE]) {
+        return 0;
+    }
+    if (!isCreature()) {
+        return 0;
+    }
     return 1;
 }
 
@@ -443,16 +495,25 @@ MTGCardInstance* MTGCardInstance::changeController(Player* newController) {
     return copy;
 }
 
-Player* MTGCardInstance::controller() { return lastController; }
+Player* MTGCardInstance::controller() const { return lastController; }
 
 int MTGCardInstance::canAttack() {
-    if (tapped) return 0;
-    if (hasSummoningSickness()) return 0;
-    if ((basicAbilities[(int)Constants::DEFENSER] || basicAbilities[(int)Constants::CANTATTACK]) &&
-        !basicAbilities[(int)Constants::CANATTACK])
+    if (tapped) {
         return 0;
-    if (!isCreature()) return 0;
-    if (!isInPlay(observer)) return 0;
+    }
+    if (hasSummoningSickness()) {
+        return 0;
+    }
+    if ((basicAbilities[(int)Constants::DEFENSER] || basicAbilities[(int)Constants::CANTATTACK]) &&
+        !basicAbilities[(int)Constants::CANATTACK]) {
+        return 0;
+    }
+    if (!isCreature()) {
+        return 0;
+    }
+    if (!isInPlay(observer)) {
+        return 0;
+    }
     return 1;
 }
 
@@ -471,28 +532,55 @@ int MTGCardInstance::setToughness(int value) {
 }
 
 int MTGCardInstance::canBlock() {
-    if (tapped) return 0;
-    if (basicAbilities[(int)Constants::CANTBLOCK]) return 0;
-    if (!isCreature()) return 0;
-    if (!isInPlay(observer)) return 0;
+    if (tapped) {
+        return 0;
+    }
+    if (basicAbilities[(int)Constants::CANTBLOCK]) {
+        return 0;
+    }
+    if (!isCreature()) {
+        return 0;
+    }
+    if (!isInPlay(observer)) {
+        return 0;
+    }
     return 1;
 }
 
 int MTGCardInstance::canBlock(MTGCardInstance* opponent) {
-    if (!canBlock()) return 0;
-    if (!opponent) return 1;
-    if (!opponent->isAttacker()) return 0;
+    if (!canBlock()) {
+        return 0;
+    }
+    if (!opponent) {
+        return 1;
+    }
+    if (!opponent->isAttacker()) {
+        return 0;
+    }
     // Comprehensive rule 502.7f : If a creature with protection attacks, it can't be blocked by creatures that have the
     // stated quality.
-    if (opponent->protectedAgainst(this)) return 0;
-    if (opponent->cantBeBlockedBy(this)) return 0;
-    if (opponent->basicAbilities[(int)Constants::UNBLOCKABLE]) return 0;
-    if (opponent->basicAbilities[(int)Constants::ONEBLOCKER] && opponent->blocked) return 0;
-    if (opponent->basicAbilities[(int)Constants::STRONG] && power < opponent->power) return 0;
-    if (this->basicAbilities[(int)Constants::WEAK] && power < opponent->power) return 0;
-    if (opponent->basicAbilities[(int)Constants::FEAR] &&
-        !(this->hasType(Subtypes::TYPE_ARTIFACT) || this->hasColor(Constants::MTG_COLOR_BLACK)))
+    if (opponent->protectedAgainst(this)) {
         return 0;
+    }
+    if (opponent->cantBeBlockedBy(this)) {
+        return 0;
+    }
+    if (opponent->basicAbilities[(int)Constants::UNBLOCKABLE]) {
+        return 0;
+    }
+    if (opponent->basicAbilities[(int)Constants::ONEBLOCKER] && opponent->blocked) {
+        return 0;
+    }
+    if (opponent->basicAbilities[(int)Constants::STRONG] && power < opponent->power) {
+        return 0;
+    }
+    if (this->basicAbilities[(int)Constants::WEAK] && power < opponent->power) {
+        return 0;
+    }
+    if (opponent->basicAbilities[(int)Constants::FEAR] &&
+        !(this->hasType(Subtypes::TYPE_ARTIFACT) || this->hasColor(Constants::MTG_COLOR_BLACK))) {
+        return 0;
+    }
 
     // intimidate
     if (opponent->basicAbilities[(int)Constants::INTIMIDATE] && !(this->hasType(Subtypes::TYPE_ARTIFACT))) {
@@ -503,55 +591,82 @@ int MTGCardInstance::canBlock(MTGCardInstance* opponent) {
                 break;
             }
         }
-        if (!canblock) return 0;
+        if (!canblock) {
+            return 0;
+        }
     }
 
     if (opponent->basicAbilities[(int)Constants::FLYING] &&
-        !(basicAbilities[(int)Constants::FLYING] || basicAbilities[(int)Constants::REACH]))
+        !(basicAbilities[(int)Constants::FLYING] || basicAbilities[(int)Constants::REACH])) {
         return 0;
+    }
     // Can block only creatures with flying if has cloud
-    if (basicAbilities[(int)Constants::CLOUD] && !(opponent->basicAbilities[(int)Constants::FLYING])) return 0;
+    if (basicAbilities[(int)Constants::CLOUD] && !(opponent->basicAbilities[(int)Constants::FLYING])) {
+        return 0;
+    }
     // If opponent has shadow and a creature does not have either shadow or reachshadow it cannot be blocked
     if (opponent->basicAbilities[(int)Constants::SHADOW] &&
-        !(basicAbilities[(int)Constants::SHADOW] || basicAbilities[(int)Constants::REACHSHADOW]))
+        !(basicAbilities[(int)Constants::SHADOW] || basicAbilities[(int)Constants::REACHSHADOW])) {
         return 0;
+    }
     // If opponent does not have shadow and a creature has shadow it cannot be blocked
-    if (!opponent->basicAbilities[(int)Constants::SHADOW] && basicAbilities[(int)Constants::SHADOW]) return 0;
-    if (opponent->basicAbilities[(int)Constants::HORSEMANSHIP] && !basicAbilities[(int)Constants::HORSEMANSHIP])
+    if (!opponent->basicAbilities[(int)Constants::SHADOW] && basicAbilities[(int)Constants::SHADOW]) {
         return 0;
-    if (opponent->basicAbilities[(int)Constants::SWAMPWALK] && controller()->game->inPlay->hasType("swamp")) return 0;
-    if (opponent->basicAbilities[(int)Constants::FORESTWALK] && controller()->game->inPlay->hasType("forest")) return 0;
-    if (opponent->basicAbilities[(int)Constants::ISLANDWALK] && controller()->game->inPlay->hasType("island")) return 0;
-    if (opponent->basicAbilities[(int)Constants::MOUNTAINWALK] && controller()->game->inPlay->hasType("mountain"))
+    }
+    if (opponent->basicAbilities[(int)Constants::HORSEMANSHIP] && !basicAbilities[(int)Constants::HORSEMANSHIP]) {
         return 0;
-    if (opponent->basicAbilities[(int)Constants::PLAINSWALK] && controller()->game->inPlay->hasType("plains")) return 0;
+    }
+    if (opponent->basicAbilities[(int)Constants::SWAMPWALK] && controller()->game->inPlay->hasType("swamp")) {
+        return 0;
+    }
+    if (opponent->basicAbilities[(int)Constants::FORESTWALK] && controller()->game->inPlay->hasType("forest")) {
+        return 0;
+    }
+    if (opponent->basicAbilities[(int)Constants::ISLANDWALK] && controller()->game->inPlay->hasType("island")) {
+        return 0;
+    }
+    if (opponent->basicAbilities[(int)Constants::MOUNTAINWALK] && controller()->game->inPlay->hasType("mountain")) {
+        return 0;
+    }
+    if (opponent->basicAbilities[(int)Constants::PLAINSWALK] && controller()->game->inPlay->hasType("plains")) {
+        return 0;
+    }
     if (opponent->basicAbilities[(int)Constants::LEGENDARYWALK] &&
-        controller()->game->inPlay->hasPrimaryType("legendary", "land"))
+        controller()->game->inPlay->hasPrimaryType("legendary", "land")) {
         return 0;
+    }
     if (opponent->basicAbilities[(int)Constants::DESERTWALK] &&
-        controller()->game->inPlay->hasSpecificType("land", "desert"))
+        controller()->game->inPlay->hasSpecificType("land", "desert")) {
         return 0;
+    }
     if (opponent->basicAbilities[(int)Constants::SNOWSWAMPWALK] &&
-        controller()->game->inPlay->hasSpecificType("snow", "swamp"))
+        controller()->game->inPlay->hasSpecificType("snow", "swamp")) {
         return 0;
+    }
     if (opponent->basicAbilities[(int)Constants::SNOWFORESTWALK] &&
-        controller()->game->inPlay->hasSpecificType("snow", "forest"))
+        controller()->game->inPlay->hasSpecificType("snow", "forest")) {
         return 0;
+    }
     if (opponent->basicAbilities[(int)Constants::SNOWISLANDWALK] &&
-        controller()->game->inPlay->hasSpecificType("snow", "island"))
+        controller()->game->inPlay->hasSpecificType("snow", "island")) {
         return 0;
+    }
     if (opponent->basicAbilities[(int)Constants::SNOWMOUNTAINWALK] &&
-        controller()->game->inPlay->hasSpecificType("snow", "mountain"))
+        controller()->game->inPlay->hasSpecificType("snow", "mountain")) {
         return 0;
+    }
     if (opponent->basicAbilities[(int)Constants::SNOWPLAINSWALK] &&
-        controller()->game->inPlay->hasSpecificType("snow", "plains"))
+        controller()->game->inPlay->hasSpecificType("snow", "plains")) {
         return 0;
+    }
     if (opponent->basicAbilities[(int)Constants::SNOWWALK] &&
-        controller()->game->inPlay->hasPrimaryType("snow", "land"))
+        controller()->game->inPlay->hasPrimaryType("snow", "land")) {
         return 0;
+    }
     if (opponent->basicAbilities[(int)Constants::NONBASICWALK] &&
-        controller()->game->inPlay->hasTypeButNotType("land", "basic"))
+        controller()->game->inPlay->hasTypeButNotType("land", "basic")) {
         return 0;
+    }
     return 1;
 }
 
@@ -561,11 +676,12 @@ MTGCardInstance* MTGCardInstance::getNextPartner() {
     MTGInPlay* inplay               = controller()->game->inPlay;
     MTGCardInstance* bandingPartner = inplay->getNextAttacker(banding);
     while (bandingPartner) {
-        if (basicAbilities[(int)Constants::BANDING] || bandingPartner->basicAbilities[(int)Constants::BANDING])
+        if (basicAbilities[(int)Constants::BANDING] || bandingPartner->basicAbilities[(int)Constants::BANDING]) {
             return bandingPartner;
+        }
         bandingPartner = inplay->getNextAttacker(bandingPartner);
     }
-    return NULL;
+    return nullptr;
 }
 
 int MTGCardInstance::DangerRanking() {
@@ -581,26 +697,41 @@ int MTGCardInstance::DangerRanking() {
             result += 1;
         }
     }
-    if (result > 1) danger += 1;
-    if (result > 2) danger += 1;
-    if (result > 4) danger += 1;
-    if (result > 6) danger += 1;
-    if (result > 10) danger += 1;
+    if (result > 1) {
+        danger += 1;
+    }
+    if (result > 2) {
+        danger += 1;
+    }
+    if (result > 4) {
+        danger += 1;
+    }
+    if (result > 6) {
+        danger += 1;
+    }
+    if (result > 10) {
+        danger += 1;
+    }
     return danger;
 }
 
 int MTGCardInstance::setAttacker(int value) {
-    Targetable* previousTarget = NULL;
-    Targetable* target         = NULL;
+    Targetable* previousTarget = nullptr;
+    Targetable* target         = nullptr;
     Player* p                  = controller()->opponent();
-    if (value) target = p;
-    if (attacker) previousTarget = p;
+    if (value) {
+        target = p;
+    }
+    if (attacker) {
+        previousTarget = p;
+    }
     attacker  = value;
     WEvent* e = NEW WEventCreatureAttacker(this, previousTarget, target);
-    if (observer)
+    if (observer) {
         observer->receiveEvent(e);
-    else
+    } else {
         SAFE_DELETE(e);
+    }
     return 1;
 }
 
@@ -609,18 +740,17 @@ int MTGCardInstance::toggleAttacker() {
         // if (!basicAbilities[Constants::VIGILANCE]) tap();
         setAttacker(1);
         return 1;
-    } else {
-        // untap();
-        setAttacker(0);
-        isAttacking = NULL;
-        return 1;
-    }
+    }  // untap();
+    setAttacker(0);
+    isAttacking = nullptr;
+    return 1;
+
     return 0;
 }
 
-int MTGCardInstance::isAttacker() { return attacker; }
+int MTGCardInstance::isAttacker() const { return attacker; }
 
-MTGCardInstance* MTGCardInstance::isDefenser() { return defenser; }
+MTGCardInstance* MTGCardInstance::isDefenser() const { return defenser; }
 
 int MTGCardInstance::nbOpponents() {
     int result                = 0;
@@ -633,28 +763,32 @@ int MTGCardInstance::nbOpponents() {
 }
 
 int MTGCardInstance::raiseBlockerRankOrder(MTGCardInstance* blocker) {
-    std::list<MTGCardInstance*>::iterator it1 = find(blockers.begin(), blockers.end(), blocker);
-    std::list<MTGCardInstance*>::iterator it2 = it1;
-    if (blockers.begin() == it2)
+    auto it1 = find(blockers.begin(), blockers.end(), blocker);
+    auto it2 = it1;
+    if (blockers.begin() == it2) {
         ++it2;
-    else
+    } else {
         --it2;
+    }
 
     std::iter_swap(it1, it2);
     WEvent* e = NEW WEventCreatureBlockerRank(*it1, *it2, this);
-    if (observer)
+    if (observer) {
         observer->receiveEvent(e);
-    else
+    } else {
         SAFE_DELETE(e);
+    }
     // delete(e);
     return 1;
 }
 
 int MTGCardInstance::getDefenserRank(MTGCardInstance* blocker) {
     int result = 0;
-    for (std::list<MTGCardInstance*>::iterator it1 = blockers.begin(); it1 != blockers.end(); ++it1) {
+    for (auto it1 = blockers.begin(); it1 != blockers.end(); ++it1) {
         result++;
-        if ((*it1) == blocker) return result;
+        if ((*it1) == blocker) {
+            return result;
+        }
     }
     return 0;
 };
@@ -665,7 +799,7 @@ int MTGCardInstance::removeBlocker(MTGCardInstance* blocker) {
     // Or "automatically" in the damage phase, when they die and regenerate (see
     // http://code.google.com/p/wagic/issues/detail?id=563 ) In the second case, we still want the card to be marked as
     // "blocked" this turn
-    if (!blockers.size() && observer->currentGamePhase == MTG_PHASE_COMBATBLOCKERS) {
+    if (blockers.empty() && observer->currentGamePhase == MTG_PHASE_COMBATBLOCKERS) {
         blocked = false;
     }
     return 1;
@@ -680,7 +814,9 @@ int MTGCardInstance::addBlocker(MTGCardInstance* blocker) {
 // Returns opponents to this card for this turn. This * should * take into account banding
 MTGCardInstance* MTGCardInstance::getNextOpponent(MTGCardInstance* previous) {
     int foundprevious = 0;
-    if (!previous) foundprevious = 1;
+    if (!previous) {
+        foundprevious = 1;
+    }
     if (attacker) {
         MTGInPlay* inPlay = observer->opponent()->game->inPlay;
         for (int i = 0; i < inPlay->nb_cards; i++) {
@@ -708,7 +844,7 @@ MTGCardInstance* MTGCardInstance::getNextOpponent(MTGCardInstance* previous) {
             }
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 int MTGCardInstance::setDefenser(MTGCardInstance* opponent) {
@@ -718,11 +854,17 @@ int MTGCardInstance::setDefenser(MTGCardInstance* opponent) {
             defenser->removeBlocker(this);
         }
     }
-    WEvent* e = NULL;
-    if (defenser != opponent) e = NEW WEventCreatureBlocker(this, defenser, opponent);
+    WEvent* e = nullptr;
+    if (defenser != opponent) {
+        e = NEW WEventCreatureBlocker(this, defenser, opponent);
+    }
     defenser = opponent;
-    if (defenser) defenser->addBlocker(this);
-    if (e) observer->receiveEvent(e);
+    if (defenser) {
+        defenser->addBlocker(this);
+    }
+    if (e) {
+        observer->receiveEvent(e);
+    }
     return 1;
 }
 
@@ -733,30 +875,37 @@ int MTGCardInstance::toggleDefenser(MTGCardInstance* opponent) {
             didblocked = 1;
             if (opponent && opponent->controller()->isAI() &&
                 opponent->controller()->playMode != Player::MODE_TEST_SUITE) {
-                if (opponent->view != NULL) {
+                if (opponent->view != nullptr) {
                     // todo: quote wololo "change this into a cool blinking effects when opposing creature has cursor
                     // focus."
                     opponent->view->actZ += .8f;
                     opponent->view->actT -= .2f;
                 }
             }
-            if (!opponent) didblocked = 0;
+            if (!opponent) {
+                didblocked = 0;
+            }
             return 1;
         }
     }
     return 0;
 }
 
-bool MTGCardInstance::matchesCastFilter(int castFilter) {
-    if (castFilter == Constants::CAST_DONT_CARE) return true;                           // everything
-    if (castFilter == Constants::CAST_ALL) return (castMethod != Constants::NOT_CAST);  // everything except "not cast"
-    if (castFilter == Constants::CAST_ALTERNATE && castMethod > Constants::CAST_NORMALLY)
+bool MTGCardInstance::matchesCastFilter(int castFilter) const {
+    if (castFilter == Constants::CAST_DONT_CARE) {
+        return true;  // everything
+    }
+    if (castFilter == Constants::CAST_ALL) {
+        return (castMethod != Constants::NOT_CAST);  // everything except "not cast"
+    }
+    if (castFilter == Constants::CAST_ALTERNATE && castMethod > Constants::CAST_NORMALLY) {
         return true;  // all alternate casts
+    }
     return (castFilter == castMethod);
 };
 
 int MTGCardInstance::addProtection(TargetChooser* tc) {
-    tc->targetter = NULL;
+    tc->targetter = nullptr;
     protections.push_back(tc);
     return protections.size();
 }
@@ -764,7 +913,9 @@ int MTGCardInstance::addProtection(TargetChooser* tc) {
 int MTGCardInstance::removeProtection(TargetChooser* tc, int erase) {
     for (size_t i = 0; i < protections.size(); i++) {
         if (protections[i] == tc) {
-            if (erase) delete (protections[i]);
+            if (erase) {
+                delete (protections[i]);
+            }
             protections.erase(protections.begin() + i);
             return 1;
         }
@@ -775,18 +926,22 @@ int MTGCardInstance::removeProtection(TargetChooser* tc, int erase) {
 int MTGCardInstance::protectedAgainst(MTGCardInstance* card) {
     // Basic protections
     for (int i = Constants::PROTECTIONGREEN; i <= Constants::PROTECTIONWHITE; i++) {
-        if (basicAbilities[i] && card->hasColor(i - Constants::PROTECTIONGREEN + Constants::MTG_COLOR_GREEN)) return 1;
+        if (basicAbilities[i] && card->hasColor(i - Constants::PROTECTIONGREEN + Constants::MTG_COLOR_GREEN)) {
+            return 1;
+        }
     }
 
     // General protections
     for (size_t i = 0; i < protections.size(); i++) {
-        if (protections[i]->canTarget(card)) return 1;
+        if (protections[i]->canTarget(card)) {
+            return 1;
+        }
     }
     return 0;
 }
 
 int MTGCardInstance::addCantBeTarget(TargetChooser* tc) {
-    tc->targetter = NULL;
+    tc->targetter = nullptr;
     canttarget.push_back(tc);
     return canttarget.size();
 }
@@ -794,7 +949,9 @@ int MTGCardInstance::addCantBeTarget(TargetChooser* tc) {
 int MTGCardInstance::removeCantBeTarget(TargetChooser* tc, int erase) {
     for (size_t i = 0; i < canttarget.size(); i++) {
         if (canttarget[i] == tc) {
-            if (erase) delete (canttarget[i]);
+            if (erase) {
+                delete (canttarget[i]);
+            }
             canttarget.erase(canttarget.begin() + i);
             return 1;
         }
@@ -804,7 +961,9 @@ int MTGCardInstance::removeCantBeTarget(TargetChooser* tc, int erase) {
 
 int MTGCardInstance::CantBeTargetby(MTGCardInstance* card) {
     for (size_t i = 0; i < canttarget.size(); i++) {
-        if (canttarget[i]->canTarget(card)) return 1;
+        if (canttarget[i]->canTarget(card)) {
+            return 1;
+        }
     }
     return 0;
 }
@@ -817,7 +976,9 @@ int MTGCardInstance::addCantBeBlockedBy(TargetChooser* tc) {
 int MTGCardInstance::removeCantBeBlockedBy(TargetChooser* tc, int erase) {
     for (size_t i = 0; i < cantBeBlockedBys.size(); i++) {
         if (cantBeBlockedBys[i] == tc) {
-            if (erase) delete (cantBeBlockedBys[i]);
+            if (erase) {
+                delete (cantBeBlockedBys[i]);
+            }
             cantBeBlockedBys.erase(cantBeBlockedBys.begin() + i);
             return 1;
         }
@@ -827,14 +988,18 @@ int MTGCardInstance::removeCantBeBlockedBy(TargetChooser* tc, int erase) {
 
 int MTGCardInstance::cantBeBlockedBy(MTGCardInstance* card) {
     for (size_t i = 0; i < cantBeBlockedBys.size(); i++) {
-        if (cantBeBlockedBys[i]->canTarget(card)) return 1;
+        if (cantBeBlockedBys[i]->canTarget(card)) {
+            return 1;
+        }
     }
     return 0;
 }
 
 /* Choose a sound sample to associate to that card */
 const string& MTGCardInstance::getSample() {
-    if (sample.size()) return sample;
+    if (!sample.empty()) {
+        return sample;
+    }
 
     for (int i = types.size() - 1; i > 0; i--) {
         string type = MTGAllCards::findType(types[i]);
@@ -850,7 +1015,9 @@ const string& MTGCardInstance::getSample() {
 
     if (basicAbilities.any()) {
         for (size_t x = 0; x < basicAbilities.size(); ++x) {
-            if (!basicAbilities.test(x)) continue;
+            if (!basicAbilities.test(x)) {
+                continue;
+            }
             string type = Constants::MTGBasicAbilities[x];
             type        = type + ".wav";
             if (getObserver() && getObserver()->getResourceManager()) {
@@ -862,8 +1029,10 @@ const string& MTGCardInstance::getSample() {
         }
     }
 
-    string type = "";
-    if (!types.size()) return sample;
+    string type;
+    if (types.empty()) {
+        return sample;
+    }
     type = MTGAllCards::findType(types[0]);
     std::transform(type.begin(), type.end(), type.begin(), ::tolower);
     type.append(".wav");
@@ -881,17 +1050,19 @@ int MTGCardInstance::stepPower(CombatStep step) {
     switch (step) {
     case FIRST_STRIKE:
     case END_FIRST_STRIKE:
-        if (has(Constants::FIRSTSTRIKE) || has(Constants::DOUBLESTRIKE))
+        if (has(Constants::FIRSTSTRIKE) || has(Constants::DOUBLESTRIKE)) {
             return MAX(0, power);
-        else
+        } else {
             return 0;
+        }
     case DAMAGE:
     case END_DAMAGE:
     default:
-        if (has(Constants::FIRSTSTRIKE) && !has(Constants::DOUBLESTRIKE))
+        if (has(Constants::FIRSTSTRIKE) && !has(Constants::DOUBLESTRIKE)) {
             return 0;
-        else
+        } else {
             return MAX(0, power);
+        }
     }
 }
 

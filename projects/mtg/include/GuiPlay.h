@@ -1,5 +1,5 @@
-#ifndef _GUIPLAY_H_
-#define _GUIPLAY_H_
+#ifndef GUIPLAY_H
+#define GUIPLAY_H
 
 #include "GuiLayers.h"
 #include "CardGui.h"
@@ -58,7 +58,7 @@ protected:
         void EnstackAttacker(CardView*);
         void EnstackBlocker(CardView*);
         void Update(float dt);
-        void Render();
+        void Render() const;
     };
 
     class Lands : public HorzStack {};
@@ -66,7 +66,6 @@ protected:
     class Planeswalker : public HorzStack {};
     class Spells : public VertStack {};
 
-protected:
     Creatures selfCreatures, opponentCreatures;
     BattleField battleField;
     Lands selfLands, opponentLands;
@@ -78,12 +77,12 @@ protected:
 
 public:
     GuiPlay(GameObserver*);
-    ~GuiPlay();
-    virtual void Render();
+    ~GuiPlay() override;
+    void Render() override;
     void Replace();
-    void Update(float dt);
-    virtual int receiveEventPlus(WEvent* e);
-    virtual int receiveEventMinus(WEvent* e);
+    void Update(float dt) override;
+    int receiveEventPlus(WEvent* e) override;
+    int receiveEventMinus(WEvent* e) override;
 };
 
-#endif  // _GUIPLAY_H_
+#endif  // GUIPLAY_H

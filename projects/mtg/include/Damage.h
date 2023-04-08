@@ -1,5 +1,5 @@
-#ifndef _DAMAGE_H_
-#define _DAMAGE_H_
+#ifndef DAMAGE_H
+#define DAMAGE_H
 
 #include <JGui.h>
 #include "GuiLayers.h"
@@ -21,6 +21,7 @@ class GameObserver;
 class Damageable : public Targetable {
 protected:
 public:
+    ~Damageable() override = default;
     int life;
     int handsize;
     int poisonCount;
@@ -29,11 +30,13 @@ public:
     int thatmuch;
     int lifeLostThisTurn;
     int type_as_damageable;
-    Damageable(GameObserver* observer, int _life) : Targetable(observer) {
-        life             = _life;
-        lifeLostThisTurn = 0;
-    };
-    int getLife() { return life; };
+    Damageable(GameObserver* observer, int _life)
+        : Targetable(observer)
+        , life(_life)
+        , lifeLostThisTurn(0){
+
+          };
+    int getLife() const { return life; };
     virtual int dealDamage(int damage) {
         life -= damage;
         return life;
@@ -56,12 +59,12 @@ public:
     Damageable* target;
     int typeOfDamage;
     int damage;
-    void Render();
+    void Render() override;
     Damage(GameObserver* observer, MTGCardInstance* source, Damageable* target);
     Damage(GameObserver* observer, MTGCardInstance* source, Damageable* target, int damage,
            int typeOfDamage = DAMAGE_OTHER);
-    int resolve();
-    virtual std::ostream& toString(std::ostream& out) const;
+    int resolve() override;
+    std::ostream& toString(std::ostream& out) const override;
 };
 
 class DamageStack : public GuiLayer, public Interruptible {
@@ -69,10 +72,10 @@ protected:
     int currentState;
 
 public:
-    int receiveEvent(WEvent* event);
-    int resolve();
-    void Render();
-    virtual std::ostream& toString(std::ostream& out) const;
+    int receiveEvent(WEvent* event) override;
+    int resolve() override;
+    void Render() override;
+    std::ostream& toString(std::ostream& out) const override;
     DamageStack(GameObserver* observer);
 };
 

@@ -1,5 +1,5 @@
-#ifndef _GAME_STATE_MENU_H_
-#define _GAME_STATE_MENU_H_
+#ifndef GAMESTATEMENU_H
+#define GAMESTATEMENU_H
 
 #include <JGui.h>
 #include <dirent.h>
@@ -58,14 +58,14 @@ private:
 
 public:
     GameStateMenu(GameApp* parent);
-    virtual ~GameStateMenu();
-    virtual void Create();
-    virtual void Destroy();
-    virtual void Start();
-    virtual void End();
-    virtual void Update(float dt);
-    virtual void Render();
-    virtual void ButtonPressed(int controllerId, int controlId);
+    ~GameStateMenu() override;
+    void Create() override;
+    void Destroy() override;
+    void Start() override;
+    void End() override;
+    void Update(float dt) override;
+    void Render() override;
+    void ButtonPressed(int controllerId, int controlId) override;
 
     int nextSetFolder(const string& root, const string& file);  // Retrieves the next directory to have matching file
     void createUsersFirstDeck(int setId);

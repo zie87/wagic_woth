@@ -1,5 +1,5 @@
-#ifndef _REPLACEMENT_EFFECTS_H_
-#define _REPLACEMENT_EFFECTS_H_
+#ifndef REPLACEMENTEFFECTS_H
+#define REPLACEMENTEFFECTS_H
 
 #include <list>
 
@@ -26,10 +26,10 @@ protected:
     int typeOfDamage;
 
 public:
-    REDamagePrevention(MTGAbility* _source, TargetChooser* _tcSource = NULL, TargetChooser* _tcTarget = NULL,
+    REDamagePrevention(MTGAbility* _source, TargetChooser* _tcSource = nullptr, TargetChooser* _tcTarget = nullptr,
                        int _damage = -1, bool _oneShot = true, int typeOfDamage = DAMAGE_ALL_TYPES);
-    WEvent* replace(WEvent* e);
-    ~REDamagePrevention();
+    WEvent* replace(WEvent* e) override;
+    ~REDamagePrevention() override;
 };
 
 class RECountersPrevention : public ReplacementEffect {
@@ -41,10 +41,11 @@ protected:
     Counter* counter;
 
 public:
-    RECountersPrevention(MTGAbility* _source, MTGCardInstance* cardSource = NULL, MTGCardInstance* cardTarget = NULL,
-                         TargetChooser* tc = NULL, Counter* counter = NULL);
-    WEvent* replace(WEvent* e);
-    ~RECountersPrevention();
+    RECountersPrevention(MTGAbility* _source, MTGCardInstance* cardSource = nullptr,
+                         MTGCardInstance* cardTarget = nullptr, TargetChooser* tc = nullptr,
+                         Counter* counter = nullptr);
+    WEvent* replace(WEvent* e) override;
+    ~RECountersPrevention() override;
 };
 
 class ReplacementEffects {

@@ -8,8 +8,8 @@
 //
 //-------------------------------------------------------------------------------------
 
-#ifndef _JSPLINE_H
-#define _JSPLINE_H
+#ifndef JSPLINE_H
+#define JSPLINE_H
 
 #include "JRenderer.h"
 #include <vector>
@@ -29,19 +29,13 @@ public:
     /// @param _y - Y position.
     ///
     //////////////////////////////////////////////////////////////////////////
-    Point(float _x, float _y) {
-        x = _x;
-        y = _y;
-    }
+    Point(float _x, float _y) : x(_x), y(_y) {}
 
     //////////////////////////////////////////////////////////////////////////
     /// Constructor, set position to default (0.0f, 0.0f)
     ///
     //////////////////////////////////////////////////////////////////////////
-    Point() {
-        x = 0.0f;
-        y = 0.0f;
-    }
+    Point() : x(0.0f), y(0.0f) {}
 
     float x;  ///< X position.
     float y;  ///< Y position.
@@ -133,7 +127,7 @@ public:
     /// @return Number of pixels for this spline.
     ///
     //////////////////////////////////////////////////////////////////////////
-    int GetPixelCount();
+    int GetPixelCount() const;
 
     //////////////////////////////////////////////////////////////////////////
     /// Get a pixel on the spline.

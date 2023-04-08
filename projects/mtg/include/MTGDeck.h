@@ -1,5 +1,5 @@
-#ifndef _MTGDECK_H_
-#define _MTGDECK_H_
+#ifndef MTGDECK_H
+#define MTGDECK_H
 
 #define MTG_ERROR -1
 
@@ -10,6 +10,7 @@
 #include <Threading.h>
 #include <Subtypes.h>
 #include <string>
+#include <utility>
 
 using std::string;
 class GameApp;
@@ -30,9 +31,9 @@ public:
     void count(MTGCard* c);
 
     int totalCards();
-    std::string getName();
-    std::string getBlock();
-    void processConfLine(std::string line);
+    std::string getName() const;
+    std::string getBlock() const;
+    void processConfLine(const std::string& line);
 
     enum {
         // For memoized counts
@@ -68,7 +69,7 @@ public:
 
     int Add(const char* subtype);
     int findSet(std::string value);
-    int findBlock(std::string s);
+    int findBlock(const std::string& s);
     int size();
 
     int getSetNum(MTGSetInfo* i);
@@ -120,21 +121,21 @@ public:
 #endif
 
     MTGCard* getCardByName(string name);
-    int load(const char* config_file, const char* setName = NULL, int autoload = 1);
+    int load(const char* config_file, const char* setName = nullptr, int autoload = 1);
     void loadFolder(const std::string& folder, const std::string& filename = "");
     int countByType(const char* _type);
     int countByColor(int color);
     int countBySet(int setId);
-    int totalCards();
+    int totalCards() const;
     int randomCardId();
 
     static int findType(std::string subtype, bool forceAdd = true) {
-        jge::mutex::scoped_lock lock(instance->mMutex);
-        return instance->subtypesList.find(subtype, forceAdd);
+        jge::mutex::scoped_lock const lock(instance->mMutex);
+        return instance->subtypesList.find(std::move(subtype), forceAdd);
     };
-    static int add(std::string value, unsigned int parentType) {
-        jge::mutex::scoped_lock lock(instance->mMutex);
-        return instance->subtypesList.add(value, parentType);
+    static int add(const std::string& value, unsigned int parentType) {
+        jge::mutex::scoped_lock const lock(instance->mMutex);
+        return instance->subtypesList.add(std::move(value), parentType);
     };
     static std::string findType(unsigned int id) { return instance->subtypesList.find(id); };
     static const std::vector<std::string>& getValuesById() { return instance->subtypesList.getValuesById(); };
@@ -149,11 +150,11 @@ public:
     static bool isSubType(unsigned int type) { return instance->subtypesList.isSubType(type); };
 
     static void sortSubtypeList() {
-        jge::mutex::scoped_lock lock(instance->mMutex);
+        jge::mutex::scoped_lock const lock(instance->mMutex);
         instance->subtypesList.sortSubTypes();
     }
 
-    static int findSubtypeId(std::string value) { return instance->subtypesList.find(value, false); }
+    static int findSubtypeId(std::string value) { return instance->subtypesList.find(std::move(value), false); }
 
     static void loadInstance();
     static void unloadAll();
@@ -165,7 +166,7 @@ private:
     std::map<std::string, MTGCard*> mtgCardByNameCache;
     int processConfLine(std::string& s, MTGCard* card, CardPrimitive* primitive);
     bool addCardToCollection(MTGCard* card, int setId);
-    CardPrimitive* addPrimitive(CardPrimitive* primitive, MTGCard* card = NULL);
+    CardPrimitive* addPrimitive(CardPrimitive* primitive, MTGCard* card = nullptr);
 };
 
 #define MTGCollection() MTGAllCards::getInstance()
@@ -188,12 +189,12 @@ public:
     std::string meta_unlockRequirements;
 
     int meta_id;
-    int totalCards();
+    int totalCards() const;
     int totalPrice();
     MTGDeck(MTGAllCards* _allcards);
     MTGDeck(const char* config_file, MTGAllCards* _allcards, int meta_only = 0, int difficultySetting = 0);
-    int addRandomCards(int howmany, int* setIds = NULL, int nbSets = 0, int rarity = -1, const char* subtype = NULL,
-                       int* colors = NULL, int nbcolors = 0);
+    int addRandomCards(int howmany, int* setIds = nullptr, int nbSets = 0, int rarity = -1,
+                       const char* subtype = nullptr, int* colors = nullptr, int nbcolors = 0);
     int add(int cardid);
     int add(MTGDeck* deck);  // adds the contents of "deck" into myself
     int complete();
@@ -205,7 +206,7 @@ public:
     int save();
     int save(const std::string& destFileName, bool useExpandedDescriptions, const std::string& deckTitle,
              const std::string& deckDesc);
-    MTGCard* getCardById(int id);
+    MTGCard* getCardById(int id) const;
 };
 
 #endif

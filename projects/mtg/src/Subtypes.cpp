@@ -25,14 +25,21 @@ Subtypes::Subtypes() {
 }
 
 int Subtypes::find(std::string value, bool forceAdd) {
-    if (!value.size()) return 0;
+    if (value.empty()) {
+        return 0;
+    }
 
-    if (value[0] >= 97 && value[0] <= 122)
+    if (value[0] >= 97 && value[0] <= 122) {
         value[0] -= 32;  // Poor man's camelcase. We assume strings we get are either Camelcased or lowercase
-    std::map<std::string, int>::iterator it = values.find(value);
-    if (it != values.end()) return it->second;
-    if (!forceAdd) return 0;
-    int id        = (int)(valuesById.size() + 1);
+    }
+    auto it = values.find(value);
+    if (it != values.end()) {
+        return it->second;
+    }
+    if (!forceAdd) {
+        return 0;
+    }
+    const int id  = (int)(valuesById.size() + 1);
     values[value] = id;
     valuesById.push_back(value);
     return id;
@@ -42,29 +49,35 @@ int Subtypes::find(std::string value, bool forceAdd) {
 // The association can happen only once, a subtype is then definitely associated to its parent type.
 // If you associate "goblin" to "creature", trying to associate "goblin" to "land" afterwards will fail. "goblin" will
 // stay associated to its first parent.
-int Subtypes::add(std::string value, unsigned int parentType) {
-    unsigned int subtype = find(value);
+int Subtypes::add(const std::string& value, unsigned int parentType) {
+    const unsigned int subtype = find(value);
     if (parentType && isSubType(subtype)) {
-        if ((unsigned int)(subtypesToType.size()) < subtype + 1)
+        if ((unsigned int)(subtypesToType.size()) < subtype + 1) {
             subtypesToType.resize(1 + subtype * 2, 0);  // multiplying by 2 to avoid resizing at every insertion
+        }
         subtypesToType[subtype] = parentType;
     }
     if (isSubType(subtype) && (parentType == TYPE_CREATURE)) {
         if (value != "forest" &&
-            value != "Forest")  // http://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid=136196 one creature
-                                // with a land subtype exist, but the card has special ruling.
+            value != "Forest") {  // http://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid=136196 one
+                                  // creature with a land subtype exist, but the card has special ruling.
             subtypesCreature.push_back(value);
+        }
     }
     return subtype;
 }
 
 std::string Subtypes::find(unsigned int id) {
-    if (valuesById.size() < id || !id) return "";
+    if (valuesById.size() < id || !id) {
+        return "";
+    }
     return valuesById[id - 1];
 }
 
 bool Subtypes::isSubtypeOfType(unsigned int subtype, unsigned int type) {
-    if ((size_t)subtype >= subtypesToType.size()) return false;
+    if ((size_t)subtype >= subtypesToType.size()) {
+        return false;
+    }
 
     return (subtypesToType[subtype] == type);
 }
@@ -86,7 +99,6 @@ const std::vector<std::string>& Subtypes::getValuesById() { return valuesById; }
 void Subtypes::sortSubTypes() {
     sort(subtypesCreature.begin(), subtypesCreature.end());
     subtypesCreature.erase(unique(subtypesCreature.begin(), subtypesCreature.end()), subtypesCreature.end());
-    return;
 }
 
 const std::vector<std::string>& Subtypes::getCreatureValuesById() {

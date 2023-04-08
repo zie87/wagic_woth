@@ -38,13 +38,13 @@ const int kHitzonePliancy = 50;
 const int kTapEventTimeout = 250;
 
 uint64_t lastTickCount;
-JGE* g_engine             = NULL;
-JApp* g_app               = NULL;
-JGameLauncher* g_launcher = NULL;
+JGE* g_engine             = nullptr;
+JApp* g_app               = nullptr;
+JGameLauncher* g_launcher = nullptr;
 
 class SdlApp;
 
-SdlApp* g_SdlApp = NULL;
+SdlApp* g_SdlApp = nullptr;
 
 class SdlApp {
 public: /* For easy interfacing with JGE static functions */
@@ -63,15 +63,14 @@ public: /* For easy interfacing with JGE static functions */
     int mMouseDownY;
     static SdlApp* sInstance;
 
-public:
     SdlApp()
-        : Running(true),
-          window(NULL),
-          gl_context(NULL),
-          lastMouseUpTime(0),
-          lastFingerDownTime(0),
-          mMouseDownX(0),
-          mMouseDownY(0) {
+        : Running(true)
+        , window(nullptr)
+        , gl_context(nullptr)
+        , lastMouseUpTime(0)
+        , lastFingerDownTime(0)
+        , mMouseDownX(0)
+        , mMouseDownY(0) {
         sInstance = this;
     }
 
@@ -79,9 +78,13 @@ public:
         SDL_Event Event;
         if (g_engine) {
             for (int x = 0; x < 5 && SDL_WaitEventTimeout(&Event, 10); ++x) {
-                if (!g_engine->IsPaused()) sInstance->OnEvent(&Event);
+                if (!g_engine->IsPaused()) {
+                    sInstance->OnEvent(&Event);
+                }
             }
-            if (!g_engine->IsPaused()) sInstance->OnUpdate();
+            if (!g_engine->IsPaused()) {
+                sInstance->OnUpdate();
+            }
         }
     }
 
@@ -98,7 +101,6 @@ public:
         return 0;
     }
 
-public:
     bool OnInit();
 
     void OnResize(int width, int height) {
@@ -141,8 +143,8 @@ public:
 
     void OnKeyPressed(const SDL_KeyboardEvent& event);
     void OnMouseDoubleClicked(const SDL_MouseButtonEvent& event);
-    void OnMouseClicked(const SDL_MouseButtonEvent& event);
-    void OnMouseMoved(const SDL_MouseMotionEvent& event);
+    void OnMouseClicked(const SDL_MouseButtonEvent& event) const;
+    void OnMouseMoved(const SDL_MouseMotionEvent& event) const;
     void OnMouseWheel(int x, int y);
 
     void OnTouchEvent(const SDL_TouchFingerEvent& event);
@@ -158,7 +160,8 @@ public:
         /* On Android, this is triggered when the device orientation changed */
         case SDL_WINDOWEVENT:
             window = SDL_GetWindowFromID(Event->window.windowID);
-            int h, w;
+            int h;
+            int w;
             SDL_GetWindowSize(window, &w, &h);
             OnResize(w, h);
             break;
@@ -177,7 +180,7 @@ public:
             break;
 
         case SDL_MOUSEBUTTONUP: {
-            Uint32 eventTime = SDL_GetTicks();
+            const Uint32 eventTime = SDL_GetTicks();
             if (eventTime - lastMouseUpTime <= 500) {
                 OnMouseDoubleClicked(Event->button);
             } else {
@@ -211,14 +214,14 @@ public:
         }
     }
 
-    void OnUpdate();
+    void OnUpdate() const;
 
-    void OnCleanup() {
+    void OnCleanup() const {
         SDL_GL_DeleteContext(gl_context);
         SDL_Quit();
     }
 };
-SdlApp* SdlApp::sInstance = NULL;
+SdlApp* SdlApp::sInstance = nullptr;
 
 static const struct {
     LocalKeySym keysym;
@@ -273,7 +276,9 @@ int JGEGetTime() { return (int)SDL_GetTicks(); }
 bool JGEToggleFullscreen() {
     // cycle between the display modes
     ++gDisplayMode;
-    if (gDisplayMode > DisplayMode_fullscreen) gDisplayMode = DisplayMode_lowRes;
+    if (gDisplayMode > DisplayMode_fullscreen) {
+        gDisplayMode = DisplayMode_lowRes;
+    }
 
     SDL_DisplayMode mode;
     SDL_GetCurrentDisplayMode(0, &mode);
@@ -304,8 +309,8 @@ bool JGEToggleFullscreen() {
         return false;
     }
 
-    int x = (mode.w - width) / 2;
-    int y = (mode.h - height) / 2;
+    const int x = (mode.w - width) / 2;
+    const int y = (mode.h - height) / 2;
 
     SDL_SetWindowPosition(g_SdlApp->window, x, y);
     SDL_SetWindowSize(g_SdlApp->window, width, height);
@@ -326,25 +331,25 @@ bool InitGame(void) {
 }
 
 void DestroyGame(void) {
-    if (g_engine != NULL) {
-        g_engine->SetApp(NULL);
+    if (g_engine != nullptr) {
+        g_engine->SetApp(nullptr);
     }
 
     if (g_app) {
         g_app->Destroy();
         delete g_app;
-        g_app = NULL;
+        g_app = nullptr;
     }
 
     JGE::Destroy();
 
-    g_engine = NULL;
+    g_engine = nullptr;
 }
 
-void SdlApp::OnUpdate() {
+void SdlApp::OnUpdate() const {
     static int tickCount = 0;
     tickCount            = JGEGetTime();
-    int64_t dt           = (tickCount - lastTickCount);
+    const int64_t dt     = (tickCount - lastTickCount);
     lastTickCount        = tickCount;
 
     if (g_engine->IsDone()) {
@@ -360,7 +365,9 @@ void SdlApp::OnUpdate() {
         std::cerr << oor.what();
     }
 
-    if (g_engine) g_engine->Render();
+    if (g_engine) {
+        g_engine->Render();
+    }
 
     SDL_GL_SwapWindow(window);
 }
@@ -373,9 +380,9 @@ void SdlApp::OnKeyPressed(const SDL_KeyboardEvent& event) {
     }
 }
 
-void SdlApp::OnMouseMoved(const SDL_MouseMotionEvent& event) {
-    int actualWidth  = (int)JRenderer::GetInstance()->GetActualWidth();
-    int actualHeight = (int)JRenderer::GetInstance()->GetActualHeight();
+void SdlApp::OnMouseMoved(const SDL_MouseMotionEvent& event) const {
+    const int actualWidth  = (int)JRenderer::GetInstance()->GetActualWidth();
+    const int actualHeight = (int)JRenderer::GetInstance()->GetActualHeight();
 
     if (event.y >= viewPort.y && event.y <= viewPort.y + viewPort.h && event.x >= viewPort.x &&
         event.x <= viewPort.x + viewPort.w) {
@@ -400,14 +407,14 @@ void SdlApp::OnMouseWheel(int x, int y) {
     }
 }
 
-void SdlApp::OnMouseClicked(const SDL_MouseButtonEvent& event) {
+void SdlApp::OnMouseClicked(const SDL_MouseButtonEvent& event) const {
     if (event.type == SDL_MOUSEBUTTONDOWN) {
         if (event.button == SDL_BUTTON_LEFT) /* Left button */
         {
             // this is intended to convert window coordinate into game coordinate.
             // this is correct only if the game and window have the same aspect ratio, otherwise, it's just wrong
-            int actualWidth  = (int)JRenderer::GetInstance()->GetActualWidth();
-            int actualHeight = (int)JRenderer::GetInstance()->GetActualHeight();
+            const int actualWidth  = (int)JRenderer::GetInstance()->GetActualWidth();
+            const int actualHeight = (int)JRenderer::GetInstance()->GetActualHeight();
 
             if (event.y >= viewPort.y && event.y <= viewPort.y + viewPort.h && event.x >= viewPort.x &&
                 event.x <= viewPort.x + viewPort.w) {
@@ -450,10 +457,10 @@ void SdlApp::OnTouchEvent(const SDL_TouchFingerEvent& event) {
     if (event.fingerId == 0) {
         if (event.y >= viewPort.y && event.y <= viewPort.y + viewPort.h && event.x >= viewPort.x &&
             event.x <= viewPort.x + viewPort.w) {
-            int actualWidth  = (int)JRenderer::GetInstance()->GetActualWidth();
-            int actualHeight = (int)JRenderer::GetInstance()->GetActualHeight();
+            const int actualWidth  = (int)JRenderer::GetInstance()->GetActualWidth();
+            const int actualHeight = (int)JRenderer::GetInstance()->GetActualHeight();
 
-            Uint32 eventTime = SDL_GetTicks();
+            const Uint32 eventTime = SDL_GetTicks();
             if (event.type == SDL_FINGERDOWN) {
                 mMouseDownX = event.x;
                 mMouseDownY = event.y;
@@ -468,7 +475,8 @@ void SdlApp::OnTouchEvent(const SDL_TouchFingerEvent& event) {
 }
 
 bool SdlApp::OnInit() {
-    int window_w, window_h;
+    int window_w;
+    int window_h;
 
     DebugTrace("I R in da OnInit()");
     if (SDL_Init(SDL_INIT_EVERYTHING) < 0) {
@@ -482,7 +490,8 @@ bool SdlApp::OnInit() {
     window_w = SCREEN_WIDTH;
     window_h = SCREEN_HEIGHT;
 
-    int buffers, samples;
+    int buffers;
+    int samples;
 
     SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
     SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
@@ -510,10 +519,10 @@ bool SdlApp::OnInit() {
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 1);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
 
-    Uint32 flags = SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE;
+    const Uint32 flags = SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE;
     window = SDL_CreateWindow(g_launcher->GetName(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, window_w, window_h,
                               flags);
-    if (window == NULL) {
+    if (window == nullptr) {
         DebugTrace(SDL_GetError());
         return false;
     }
@@ -574,7 +583,7 @@ int main(int argc, char* argv[]) {
 
     g_launcher = new JGameLauncher();
 
-    u32 flags = g_launcher->GetInitFlags();
+    const u32 flags = g_launcher->GetInitFlags();
 
     if ((flags & JINIT_FLAG_ENABLE3D) != 0) {
         JRenderer::Set3DFlag(true);
@@ -582,11 +591,15 @@ int main(int argc, char* argv[]) {
 
     g_SdlApp = new SdlApp();
 
-    int result = g_SdlApp->OnExecute();
+    const int result = g_SdlApp->OnExecute();
 
-    if (g_launcher) delete g_launcher;
+    if (g_launcher) {
+        delete g_launcher;
+    }
 
-    if (g_SdlApp) delete g_SdlApp;
+    if (g_SdlApp) {
+        delete g_SdlApp;
+    }
 
     // Shutdown
     DestroyGame();

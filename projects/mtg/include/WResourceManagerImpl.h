@@ -1,5 +1,5 @@
-#ifndef RESOURCEMANAGERIMPLIMPL_H
-#define RESOURCEMANAGERIMPLIMPL_H
+#ifndef WRESOURCEMANAGERIMPL_H
+#define WRESOURCEMANAGERIMPL_H
 #include <JTypes.h>
 #include "MTGDeck.h"
 #include "MTGCard.h"
@@ -126,77 +126,72 @@ struct WManagedQuad {
 class ResourceManagerImpl : public WResourceManager {
 public:
     ResourceManagerImpl();
-    virtual ~ResourceManagerImpl();
+    ~ResourceManagerImpl() override;
 
-    bool IsThreaded();
+    bool IsThreaded() override;
 
-    JQuadPtr RetrieveCard(MTGCard* card, int style = RETRIEVE_NORMAL, int submode = CACHE_NORMAL);
-    JSample* RetrieveSample(const string& filename, int style = RETRIEVE_NORMAL, int submode = CACHE_NORMAL);
-    JTexture* RetrieveTexture(const string& filename, int style = RETRIEVE_NORMAL, int submode = CACHE_NORMAL);
+    JQuadPtr RetrieveCard(MTGCard* card, int style = RETRIEVE_NORMAL, int submode = CACHE_NORMAL) override;
+    JSample* RetrieveSample(const string& filename, int style = RETRIEVE_NORMAL, int submode = CACHE_NORMAL) override;
+    JTexture* RetrieveTexture(const string& filename, int style = RETRIEVE_NORMAL, int submode = CACHE_NORMAL) override;
     JQuadPtr RetrieveQuad(const string& filename, float offX = 0.0f, float offY = 0.0f, float width = 0.0f,
                           float height = 0.0f, string resname = "", int style = RETRIEVE_LOCK,
-                          int submode = CACHE_NORMAL, int id = 0);
-    JQuadPtr RetrieveTempQuad(const string& filename, int submode = CACHE_NORMAL);
+                          int submode = CACHE_NORMAL, int id = 0) override;
+    JQuadPtr RetrieveTempQuad(const string& filename, int submode = CACHE_NORMAL) override;
     hgeParticleSystemInfo* RetrievePSI(const string& filename, JQuad* texture, int style = RETRIEVE_NORMAL,
-                                       int submode = CACHE_NORMAL);
-    int RetrieveError();
+                                       int submode = CACHE_NORMAL) override;
+    int RetrieveError() override;
 
-    void Release(JTexture* tex);
-    void Release(JSample* sample);
+    void Release(JTexture* tex) override;
+    void Release(JSample* sample) override;
     bool RemoveOldest();
 
-    void ClearUnlocked();  // Remove unlocked items.
-    void Refresh();        // Refreshes all files in cache, for when mode/profile changes.
+    void ClearUnlocked() override;  // Remove unlocked items.
+    void Refresh() override;        // Refreshes all files in cache, for when mode/profile changes.
 
-    unsigned int nowTime();
+    unsigned int nowTime() override;
 
-    unsigned long Size();
-    unsigned long SizeCached();
-    unsigned long SizeManaged();
+    unsigned long Size() const;
+    unsigned long SizeCached() const;
+    unsigned long SizeManaged() const;
 
     unsigned int Count();
-    unsigned int CountCached();
+    unsigned int CountCached() const;
     unsigned int CountManaged();
 
     int CreateQuad(const string& quadName, const string& textureName, float x, float y, float width, float height);
-    JQuadPtr GetQuad(const string& quadName);
+    JQuadPtr GetQuad(const string& quadName) override;
     JQuadPtr GetQuad(int id);
 
     int AddQuadToManaged(const WManagedQuad& inManagedQuad);
 
     // Our file redirect system.
-    string graphicsFile(const string& filename);
-    string avatarFile(const string& filename);
-    string cardFile(const string& filename);
-    string musicFile(const string& filename);
-    string sfxFile(const string& filename);
-    bool fileOK(const string&);
-    bool dirOK(const string& dirname);
+    string graphicsFile(const string& filename) override;
+    string avatarFile(const string& filename) override;
+    string cardFile(const string& filename) override;
+    string musicFile(const string& filename) override;
+    string sfxFile(const string& filename) override;
+    bool fileOK(const string&) override;
+    bool dirOK(const string& dirname) override;
 
     // For backwards compatibility with JResourceManager. Avoid using these, they're not optimal.
-    int CreateTexture(const string& textureName);
-    JTexture* GetTexture(const string& textureName);
+    int CreateTexture(const string& textureName) override;
+    JTexture* GetTexture(const string& textureName) override;
     JTexture* GetTexture(int id);
 
     // Font management functions
-    void InitFonts(const std::string& inLang);
-    int ReloadWFonts();
-    WFont* LoadWFont(const string& inFontname, int inFontHeight, int inFontID);
-    WFont* GetWFont(int id);
+    void InitFonts(const std::string& inLang) override;
+    int ReloadWFonts() override;
+    WFont* LoadWFont(const string& inFontname, int inFontHeight, int inFontID) override;
+    WFont* GetWFont(int id) override;
     void RemoveWFonts();
 
     // Wrapped from JSoundSystem. TODO: Privatize.
-    JMusic* ssLoadMusic(const char* fileName);
+    JMusic* ssLoadMusic(const char* fileName) override;
 
     // Resets the cache limits on when it starts to purge data.
-    void ResetCacheLimits();
+    void ResetCacheLimits() override;
 
-    void DebugRender();
-
-#ifdef DEBUG_CACHE
-    unsigned long menuCached;
-    string debugMessage;
-#endif
+    void DebugRender() override;
 
 private:
     bool bThemedCards;    // Does the theme have a "sets" directory for overwriting cards?
@@ -220,6 +215,12 @@ private:
     typedef std::map<int, WFont*> FontMap;
     FontMap mWFontMap;
     std::string mFontFileExtension;
+
+public:
+#ifdef DEBUG_CACHE
+    unsigned long menuCached;
+    string debugMessage;
+#endif
 };
 
 #endif

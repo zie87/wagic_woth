@@ -13,21 +13,17 @@
 #include "../include/JRenderer.h"
 #include "../include/JMD2Model.h"
 
-MD2Animation::MD2Animation(int start, int end) {
-    mStartFrame = start;
-    mEndFrame   = end;
-}
+MD2Animation::MD2Animation(int start, int end) : mStartFrame(start), mEndFrame(end) {}
 
-JRenderer* JMD2Model::mRenderer = NULL;
+JRenderer* JMD2Model::mRenderer = nullptr;
 
 //-------------------------------------------------------------------------------------------------
-JMD2Model::JMD2Model() {
+JMD2Model::JMD2Model() : mAnimations((MD2Animation**)malloc(sizeof(MD2Animation) * MAX_ANIMATION)) {
     mRenderer = JRenderer::GetInstance();
 
-    int endFrames[] = {39, 46, 60, 66, 73, 95, 112, 122, 135, 154, 161, 169, 177, 185, 190, 198};
-    int startFrame  = 0;
+    const int endFrames[] = {39, 46, 60, 66, 73, 95, 112, 122, 135, 154, 161, 169, 177, 185, 190, 198};
+    int startFrame        = 0;
 
-    mAnimations = (MD2Animation**)malloc(sizeof(MD2Animation) * MAX_ANIMATION);
     for (int i = 0; i < MAX_ANIMATION; i++) {
         mAnimations[i] = new MD2Animation(startFrame, endFrames[i]);
         startFrame     = endFrames[i] + 1;
@@ -36,23 +32,33 @@ JMD2Model::JMD2Model() {
     mState     = -1;
     mNextState = STATE_IDLE;
 
-    mModel          = NULL;
+    mModel          = nullptr;
     mAnimationSpeed = 6.0f;
 }
 
 //-------------------------------------------------------------------------------------------------
 JMD2Model::~JMD2Model() {
     if (mModel) {
-        if (mModel->triIndex != NULL) free(mModel->triIndex);
-        if (mModel->pointList != NULL) free(mModel->pointList);
-        if (mModel->st != NULL) free(mModel->st);
-        if (mModel->modelTex != NULL) delete mModel->modelTex;
+        if (mModel->triIndex != nullptr) {
+            free(mModel->triIndex);
+        }
+        if (mModel->pointList != nullptr) {
+            free(mModel->pointList);
+        }
+        if (mModel->st != nullptr) {
+            free(mModel->st);
+        }
+        if (mModel->modelTex != nullptr) {
+            delete mModel->modelTex;
+        }
 
         free(mModel);
     }
 
     if (mAnimations) {
-        for (int i = 0; i < MAX_ANIMATION; i++) delete mAnimations[i];
+        for (int i = 0; i < MAX_ANIMATION; i++) {
+            delete mAnimations[i];
+        }
 
         free(mAnimations);
     }
@@ -67,16 +73,20 @@ bool JMD2Model::Load(char* filename, char* textureName) {
 
     modelHeader_t* modelHeader;  // model header
 
-    stIndex_t* stPtr;                // texture data
-    frame_t* frame;                  // frame data
-    Vector3D* pointListPtr;          // index variable
-    mesh_t *triIndex, *bufIndexPtr;  // index variables
-    int i, j;                        // index variables
+    stIndex_t* stPtr;        // texture data
+    frame_t* frame;          // frame data
+    Vector3D* pointListPtr;  // index variable
+    mesh_t* triIndex;
+    mesh_t* bufIndexPtr;  // index variables
+    int i;
+    int j;  // index variables
 
     // open the model file
 
     JFileSystem* fileSystem = JFileSystem::GetInstance();
-    if (!fileSystem->OpenFile(filename)) return false;
+    if (!fileSystem->OpenFile(filename)) {
+        return false;
+    }
     // filePtr = fopen(filename, "rb");
     // if (filePtr == NULL)
     //	return false;
@@ -99,7 +109,9 @@ bool JMD2Model::Load(char* filename, char* textureName) {
 
     // allocate memory for model data
     mModel = (modelData_t*)malloc(sizeof(modelData_t));
-    if (mModel == NULL) return false;
+    if (mModel == nullptr) {
+        return false;
+    }
 
     // allocate memory for all vertices used in model, including animations
     mModel->pointList = (Vector3D*)malloc(sizeof(Vector3D) * modelHeader->numXYZ * modelHeader->numFrames);
@@ -124,18 +136,18 @@ bool JMD2Model::Load(char* filename, char* textureName) {
     }
 
     JTexture* tex = mRenderer->LoadTexture(textureName);
-    if (tex)
+    if (tex) {
         mModel->modelTex = tex;
-    else {
+    } else {
         free(mModel);
-        mModel = NULL;
+        mModel = nullptr;
 
         free(buffer);
         return false;
     }
 
-    float texWidth  = (float)tex->mWidth;
-    float texHeight = (float)tex->mHeight;
+    auto texWidth  = (float)tex->mWidth;
+    auto texHeight = (float)tex->mHeight;
 
     // allocate memory for the model texture coordinates
     mModel->st = (texCoord_t*)malloc(sizeof(texCoord_t) * modelHeader->numST);
@@ -369,15 +381,21 @@ void JMD2Model::Update(float dt) {
     if (mModel->interpol >= 1.0) {
         mModel->interpol = 0.0f;
 
-        int startFrame = mAnimations[mState]->mStartFrame;
-        int endFrame   = mAnimations[mState]->mEndFrame;
+        const int startFrame = mAnimations[mState]->mStartFrame;
+        const int endFrame   = mAnimations[mState]->mEndFrame;
 
-        if ((startFrame < 0) || (endFrame < 0)) return;
+        if ((startFrame < 0) || (endFrame < 0)) {
+            return;
+        }
 
-        if ((startFrame >= mModel->numFrames) || (endFrame >= mModel->numFrames)) return;
+        if ((startFrame >= mModel->numFrames) || (endFrame >= mModel->numFrames)) {
+            return;
+        }
 
         mModel->currentFrame++;
-        if (mModel->currentFrame >= endFrame) mModel->currentFrame = startFrame;
+        if (mModel->currentFrame >= endFrame) {
+            mModel->currentFrame = startFrame;
+        }
 
         mModel->nextFrame = mModel->currentFrame + 1;
 
@@ -398,12 +416,18 @@ void JMD2Model::Render() {
     Vector3D* pointList;      // current frame vertices
     Vector3D* nextPointList;  // next frame vertices
     int i;
-    float x1, y1, z1;  // current frame point values
-    float x2, y2, z2;  // next frame point values
+    float x1;
+    float y1;
+    float z1;  // current frame point values
+    float x2;
+    float y2;
+    float z2;  // next frame point values
 
     Vector3D vertex[3];
 
-    if (mModel == NULL) return;
+    if (mModel == nullptr) {
+        return;
+    }
 
     pointList     = &mModel->pointList[mModel->numPoints * mModel->currentFrame];
     nextPointList = &mModel->pointList[mModel->numPoints * mModel->nextFrame];

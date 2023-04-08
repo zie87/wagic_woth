@@ -1,5 +1,5 @@
-#ifndef _MANACOST_H_
-#define _MANACOST_H_
+#ifndef MANACOST_H
+#define MANACOST_H
 
 #include "utils.h"
 #include "MTGDefinitions.h"
@@ -51,7 +51,7 @@ public:
     ManaCost* suspend;
     string alternativeName;
     bool isMulti;
-    static ManaCost* parseManaCost(string value, ManaCost* _manacost = NULL, MTGCardInstance* c = NULL);
+    static ManaCost* parseManaCost(string value, ManaCost* _manacost = nullptr, MTGCardInstance* c = nullptr);
     virtual void resetCosts();
     void x();
     int hasX();
@@ -61,7 +61,7 @@ public:
     int hasAnotherCost();
     ManaCost(std::vector<int8_t>& _cost, int nb_elems = 1);
     ManaCost();
-    ~ManaCost();
+    virtual ~ManaCost();
     ManaCost(ManaCost* _manaCost);
     ManaCost(const ManaCost& manaCost);
     ManaCost& operator=(const ManaCost& manaCost);
@@ -81,11 +81,11 @@ public:
     //
     int addExtraCost(ExtraCost* _cost);
     int addExtraCosts(ExtraCosts* _cost);
-    int setExtraCostsAction(MTGAbility* action, MTGCardInstance* card);
-    int isExtraPaymentSet();
-    int canPayExtra();
-    int doPayExtra();
-    ExtraCost* getExtraCost(unsigned int i);
+    int setExtraCostsAction(MTGAbility* action, MTGCardInstance* card) const;
+    int isExtraPaymentSet() const;
+    int canPayExtra() const;
+    int doPayExtra() const;
+    ExtraCost* getExtraCost(unsigned int i) const;
 
     int addHybrid(int c1, int v1, int c2, int v2);
     int tryToPayHybrids(std::vector<ManaCostHybrid>& _hybrids, int _nbhybrids, std::vector<int8_t>& diff);
@@ -110,12 +110,13 @@ protected:
     Player* player;
 
 public:
+    ~ManaPool() override = default;
     void Empty();
     ManaPool(Player* player);
     ManaPool(ManaCost* _manaCost, Player* player);
     int remove(int color, int value);
-    int add(int color, int value, MTGCardInstance* source = NULL);
-    int add(ManaCost* _cost, MTGCardInstance* source = NULL);
+    int add(int color, int value, MTGCardInstance* source = nullptr);
+    int add(ManaCost* _cost, MTGCardInstance* source = nullptr);
     int pay(ManaCost* _cost);
 };
 

@@ -4,16 +4,18 @@
 #include "OptionItem.h"
 #include "Player.h"
 
-// using std::cout;
-using std::endl;
-
 ManaIcon::ManaIcon(int color, float x, float y, float destx, float desty)
-    : Pos(x, y, 0.5, 0.0, 255), f(-1), destx(destx), desty(desty), mode(ALIVE), color(color) {
-    hgeParticleSystemInfo* psi = NULL;
-    JQuadPtr mq                = WResourceManager::Instance()->GetQuad("stars");
+    : Pos(x, y, 0.5, 0.0, 255)
+    , f(-1)
+    , destx(destx)
+    , desty(desty)
+    , mode(ALIVE)
+    , color(color) {
+    hgeParticleSystemInfo* psi = nullptr;
+    const JQuadPtr mq          = WResourceManager::Instance()->GetQuad("stars");
 
     if (!mq.get()) {
-        particleSys = NULL;
+        particleSys = nullptr;
         return;
     }
 
@@ -39,7 +41,9 @@ ManaIcon::ManaIcon(int color, float x, float y, float destx, float desty)
 
     if (!psi) {
         psi = NEW hgeParticleSystemInfo();
-        if (!psi) return;
+        if (!psi) {
+            return;
+        }
         hgeParticleSystemInfo* defaults = WResourceManager::Instance()->RetrievePSI("mana.psi", mq.get());
         if (defaults) {
             memcpy(psi, defaults, sizeof(hgeParticleSystemInfo));
@@ -90,8 +94,9 @@ ManaIcon::ManaIcon(int color, float x, float y, float destx, float desty)
 
         particleSys = NEW hgeParticleSystem(psi);
         SAFE_DELETE(psi);  // This version of psi is not handled by cache, so kill it here.
-    } else
+    } else {
         particleSys = NEW hgeParticleSystem(psi);  // Cache will clean psi up later.
+    }
 
     // if we want to throttle the amount of particles for mana,
     // here's where to do it - this is hardcoded to something like 114 in the psi file
@@ -125,7 +130,9 @@ ManaIcon::ManaIcon(int color, float x, float y, float destx, float desty)
 ManaIcon::~ManaIcon() { SAFE_DELETE(particleSys); }
 
 void ManaIcon::Render() {
-    if (!particleSys) return;
+    if (!particleSys) {
+        return;
+    }
 
     JRenderer* renderer = JRenderer::GetInstance();
 
@@ -141,13 +148,17 @@ void ManaIcon::Update(float dt, float shift) {
     zoomP3 += zoomP5 * dt;
     zoomP4 += zoomP6 * dt;
 
-    if (OptionManaDisplay::STATIC == options[Options::MANADISPLAY].number) shift = 0;
+    if (OptionManaDisplay::STATIC == options[Options::MANADISPLAY].number) {
+        shift = 0;
+    }
 
     switch (mode) {
     case DROPPING:
         f += dt * 700;
         actY += f * dt;
-        if (actY > SCREEN_HEIGHT * 2) mode = DEAD;
+        if (actY > SCREEN_HEIGHT * 2) {
+            mode = DEAD;
+        }
         break;
     case WITHERING:
         actT += dt * 4;
@@ -160,7 +171,9 @@ void ManaIcon::Update(float dt, float shift) {
         zoomP2 *= f;
         yP1 += yP3 * dt;
         actY = y + yP2 * sinf(M_PI * yP1);
-        if (f < 0) mode = DEAD;
+        if (f < 0) {
+            mode = DEAD;
+        }
         break;
     case ALIVE:
         x += 10 * dt * (destx - x);
@@ -187,18 +200,24 @@ void ManaIcon::Update(float dt, float shift) {
 void ManaIcon::Wither() {
     mode = WITHERING;
     f    = 1.0;
-    if (particleSys) particleSys->Stop();
+    if (particleSys) {
+        particleSys->Stop();
+    }
 }
 void ManaIcon::Drop() {
     mode = DROPPING;
-    if (f < 0) f = 0;
-    if (particleSys) particleSys->Stop();
+    if (f < 0) {
+        f = 0;
+    }
+    if (particleSys) {
+        particleSys->Stop();
+    }
 }
 
 GuiMana::GuiMana(float x, float y, Player* p) : GuiLayer(p->getObserver()), x(x), y(y), owner(p) {}
 
 GuiMana::~GuiMana() {
-    for (vector<ManaIcon*>::iterator it = manas.begin(); it != manas.end(); ++it) {
+    for (auto it = manas.begin(); it != manas.end(); ++it) {
         delete (*it);
     }
 }
@@ -209,18 +228,25 @@ void GuiMana::RenderStatic() {
     int totalColors = 0;
     WFont* mFont    = WResourceManager::Instance()->GetWFont(Fonts::MAIN_FONT);
     JRenderer* r    = JRenderer::GetInstance();
-    for (int i = 0; i < Constants::NB_Colors; ++i) values[i] = 0;
-    for (vector<ManaIcon*>::iterator it = manas.begin(); it != manas.end(); ++it)
+    for (int i = 0; i < Constants::NB_Colors; ++i) {
+        values[i] = 0;
+    }
+    for (auto it = manas.begin(); it != manas.end(); ++it) {
         if (ManaIcon::ALIVE == (*it)->mode) {
             values[(*it)->color]++;
-            if (values[(*it)->color] == 1) totalColors++;
+            if (values[(*it)->color] == 1) {
+                totalColors++;
+            }
         }
+    }
 
-    if (!totalColors) return;
+    if (!totalColors) {
+        return;
+    }
 
-    float x0   = x - 20 * totalColors;
-    x0         = std::max(40.f, x0);
-    float xEnd = x0 + 20 * totalColors;
+    float x0         = x - 20 * totalColors;
+    x0               = std::max(40.f, x0);
+    const float xEnd = x0 + 20 * totalColors;
     r->FillRoundRect(x0, y - 5, static_cast<float>(20 * totalColors + 5), 20, 2, ARGB(128, 0, 0, 0));
 
     int offset = 0;
@@ -244,11 +270,14 @@ void GuiMana::RenderStatic() {
 }
 
 void GuiMana::Render() {
-    for (vector<ManaIcon*>::iterator it = manas.begin(); it != manas.end(); ++it) (*it)->Render();
+    for (auto it = manas.begin(); it != manas.end(); ++it) {
+        (*it)->Render();
+    }
 
     if (OptionManaDisplay::DYNAMIC != options[Options::MANADISPLAY].number &&
-        OptionManaDisplay::NOSTARSDYNAMIC != options[Options::MANADISPLAY].number)
+        OptionManaDisplay::NOSTARSDYNAMIC != options[Options::MANADISPLAY].number) {
         RenderStatic();
+    }
 }
 
 bool remove_dead(ManaIcon* m) { return ManaIcon::DEAD != m->mode; }
@@ -256,42 +285,55 @@ bool remove_dead(ManaIcon* m) { return ManaIcon::DEAD != m->mode; }
 void GuiMana::Update(float dt) {
     if (observer->getResourceManager()) {
         float shift = 0;
-        for (vector<ManaIcon*>::iterator it = manas.begin(); it != manas.end(); ++it) {
+        for (auto it = manas.begin(); it != manas.end(); ++it) {
             (*it)->Update(dt, shift);
             shift += 15;
         }
     }
-    vector<ManaIcon*>::iterator it = partition(manas.begin(), manas.end(), &remove_dead);
+    auto it = partition(manas.begin(), manas.end(), &remove_dead);
     if (it != manas.end()) {
-        for (vector<ManaIcon*>::iterator q = it; q != manas.end(); ++q) SAFE_DELETE(*q);
+        for (auto q = it; q != manas.end(); ++q) {
+            SAFE_DELETE(*q);
+        }
         manas.erase(it, manas.end());
     }
 }
 
 int GuiMana::receiveEventPlus(WEvent* e) {
-    if (WEventEngageMana* event = dynamic_cast<WEventEngageMana*>(e)) {
-        if (event->destination != owner->getManaPool()) return 0;
-        if (event->card && event->card->view)
+    if (auto* event = dynamic_cast<WEventEngageMana*>(e)) {
+        if (event->destination != owner->getManaPool()) {
+            return 0;
+        }
+        if (event->card && event->card->view) {
             manas.push_back(NEW ManaIcon(event->color, event->card->view->actX, event->card->view->actY, x, y));
-        else
+        } else {
             manas.push_back(NEW ManaIcon(event->color, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, x, y));
+        }
         return 1;
-    } else
-        return 0;
+    }
+    return 0;
 }
 
 int GuiMana::receiveEventMinus(WEvent* e) {
-    if (WEventConsumeMana* event = dynamic_cast<WEventConsumeMana*>(e)) {
-        if (event->source != owner->getManaPool()) return 0;
-        for (vector<ManaIcon*>::iterator it = manas.begin(); it != manas.end(); ++it)
+    if (auto* event = dynamic_cast<WEventConsumeMana*>(e)) {
+        if (event->source != owner->getManaPool()) {
+            return 0;
+        }
+        for (auto it = manas.begin(); it != manas.end(); ++it) {
             if ((event->color == (*it)->color) && (ManaIcon::ALIVE == (*it)->mode)) {
                 (*it)->Wither();
                 return 1;
             }
+        }
         return 1;
-    } else if (WEventEmptyManaPool* event2 = dynamic_cast<WEventEmptyManaPool*>(e)) {
-        if (event2->source != owner->getManaPool()) return 0;
-        for (vector<ManaIcon*>::iterator it = manas.begin(); it != manas.end(); ++it) (*it)->Drop();
+    }
+    if (auto* event2 = dynamic_cast<WEventEmptyManaPool*>(e)) {
+        if (event2->source != owner->getManaPool()) {
+            return 0;
+        }
+        for (auto it = manas.begin(); it != manas.end(); ++it) {
+            (*it)->Drop();
+        }
         return 1;
     }
     return 0;

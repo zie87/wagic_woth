@@ -1,5 +1,5 @@
-#ifndef _GUIAVATARS_H_
-#define _GUIAVATARS_H_
+#ifndef GUIAVATARS_H
+#define GUIAVATARS_H
 
 #include "GuiLayers.h"
 
@@ -17,18 +17,18 @@ protected:
 
 public:
     GuiAvatars(GameObserver* observer);
-    ~GuiAvatars();
+    ~GuiAvatars() override;
 
     GuiAvatar* GetSelf();
     GuiAvatar* GetOpponent();
-    void Update(float dt);
-    void Render();
+    void Update(float dt) override;
+    void Render() override;
     void Activate(PlayGuiObject* c);
     void Deactivate(PlayGuiObject* c);
-    int receiveEventPlus(WEvent*);
-    int receiveEventMinus(WEvent*);
-    bool CheckUserInput(JButton key);
+    int receiveEventPlus(WEvent*) override;
+    int receiveEventMinus(WEvent*) override;
+    bool CheckUserInput(JButton key) override;
     float LeftBoundarySelf();
 };
 
-#endif  // _GUIAVATARS_H_
+#endif  // GUIAVATARS_H

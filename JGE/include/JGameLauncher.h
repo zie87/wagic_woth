@@ -8,8 +8,8 @@
 //
 //-------------------------------------------------------------------------------------
 
-#ifndef _GAME_LAUNCHER_H_
-#define _GAME_LAUNCHER_H_
+#ifndef JGAMELAUNCHER_H
+#define JGAMELAUNCHER_H
 
 #include "JApp.h"
 #include "JTypes.h"

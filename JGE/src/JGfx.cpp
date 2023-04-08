@@ -52,7 +52,11 @@ void Swap(float* a, float* b) {
 }
 
 JQuad::JQuad(JTexture* tex, float x, float y, float width, float height)
-    : mTex(tex), mX(x), mY(y), mWidth(width), mHeight(height) {
+    : mTex(tex)
+    , mX(x)
+    , mY(y)
+    , mWidth(width)
+    , mHeight(height) {
     mHotSpotX = 0.0f;
     mHotSpotY = 0.0f;
     mBlend    = DEFAULT_BLEND;  // GU_TFX_MODULATE;
@@ -62,7 +66,7 @@ JQuad::JQuad(JTexture* tex, float x, float y, float width, float height)
     mVFlipped = false;
 }
 
-void JQuad::GetTextureRect(float* x, float* y, float* w, float* h) {
+void JQuad::GetTextureRect(float* x, float* y, float* w, float* h) const {
     *x = mX;
     *y = mY;
     *w = mWidth;

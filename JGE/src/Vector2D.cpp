@@ -13,9 +13,11 @@
 float Vector2D::Length(void) const { return sqrtf(x * x + y * y); }
 
 float Vector2D::Normalize(void) {
-    float fLength = Length();
+    const float fLength = Length();
 
-    if (fLength == 0.0f) return 0.0f;
+    if (fLength == 0.0f) {
+        return 0.0f;
+    }
 
     (*this) *= (1.0f / fLength);
 
@@ -30,20 +32,20 @@ Vector2D Vector2D::Direction(void) const {
     return temp;
 }
 
-float Vector2D::Angle(const Vector2D& xE) {
-    float dot   = (*this) * xE;
-    float cross = (*this) ^ xE;
+float Vector2D::Angle(const Vector2D& xE) const {
+    const float dot   = (*this) * xE;
+    const float cross = (*this) ^ xE;
 
     // angle between segments
-    float angle = atan2f(cross, dot);
+    const float angle = atan2f(cross, dot);
 
     return angle;
 }
 
 Vector2D& Vector2D::Rotate(float angle) {
-    float tx = x;
-    x        = x * cosf(angle) - y * sinf(angle);
-    y        = tx * sinf(angle) + y * cosf(angle);
+    const float tx = x;
+    x              = x * cosf(angle) - y * sinf(angle);
+    y              = tx * sinf(angle) + y * cosf(angle);
 
     return *this;
 }

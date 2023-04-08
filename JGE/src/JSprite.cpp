@@ -10,44 +10,42 @@
 
 #include "../include/JSprite.h"
 
-JRenderer* JSprite::mRenderer = NULL;
+JRenderer* JSprite::mRenderer = nullptr;
 
 //------------------------------------------------------------------------------------------------
-JSprite::JSprite(JTexture* tex, float x, float y, float width, float height, bool flipped) {
+JSprite::JSprite(JTexture* tex, float x, float y, float width, float height, bool flipped)
+    : mFrameCount(0)
+    , mAlpha(255.0f)
+    , mAnimating(false)
+    , mAnimationType(ANIMATION_TYPE_LOOPING)
+    , mColor(ARGB(0, 255, 255, 255))
+    , mCurrentFrame(0)
+    , mDelta(1)
+    , mDirection(0.0f)
+    , mDuration(100.0f)
+    , mHScale(1.0f)
+    , mRotation(0.0f)
+    , mSpeed(0.0f)
+    , mTex(tex)
+    , mTimer(0)
+    , mVScale(1.0f)
+    , mX(0.0f)
+    , mY(0.0f) {
     mRenderer = JRenderer::GetInstance();
 
     // mQuad = new JQuad(tex, x, y, width, height);
     // Rect *rect = new Rect((int)x, (int)y, (int)width, (int)height);
     // mFrames[0] = rect;
-    mFrameCount   = 0;
-    mCurrentFrame = 0;
-    mX            = 0.0f;
-    mY            = 0.0f;
-    mTimer        = 0;
-
-    mAnimationType = ANIMATION_TYPE_LOOPING;
-    mDelta         = 1;
-    mAnimating     = false;
-    mDuration      = 100.0f;
-    mAlpha         = 255.0f;
-    mHScale        = 1.0f;
-    mVScale        = 1.0f;
-    mRotation      = 0.0f;
-    mDirection     = 0.0f;
-    mSpeed         = 0.0f;
-
-    mColor = ARGB(0, 255, 255, 255);
 
     mFrames.clear();
     mFrames.reserve(8);
 
-    mTex = tex;
-
-    if (mTex != NULL) {
+    if (mTex != nullptr) {
         mActive = true;
         AddFrame(x, y, width, height, flipped);
-    } else
+    } else {
         mActive = false;
+    }
 }
 
 //------------------------------------------------------------------------------------------------
@@ -58,16 +56,20 @@ JSprite::~JSprite() {
     // 			delete mFrames[i];
     // 	}
 
-    while (mFrames.size() > 0) {
+    while (!mFrames.empty()) {
         JQuad* quad = mFrames.back();
         mFrames.pop_back();
-        if (quad != NULL) delete quad;
+        if (quad != nullptr) {
+            delete quad;
+        }
     }
 }
 
 //------------------------------------------------------------------------------------------------
 void JSprite::Update(float dt) {
-    if (!mAnimating) return;
+    if (!mAnimating) {
+        return;
+    }
 
     mTimer += dt;
     if (mTimer > mDuration) {
@@ -75,11 +77,11 @@ void JSprite::Update(float dt) {
         mCurrentFrame += mDelta;
 
         if (mCurrentFrame >= mFrameCount) {
-            if (mAnimationType == ANIMATION_TYPE_LOOPING)
+            if (mAnimationType == ANIMATION_TYPE_LOOPING) {
                 mCurrentFrame = 0;
-            else if (mAnimationType == ANIMATION_TYPE_ONCE_AND_GONE)
+            } else if (mAnimationType == ANIMATION_TYPE_ONCE_AND_GONE) {
                 mActive = false;
-            else if (mAnimationType == ANIMATION_TYPE_ONCE_AND_STAY) {
+            } else if (mAnimationType == ANIMATION_TYPE_ONCE_AND_STAY) {
                 mCurrentFrame = mFrameCount - 1;
                 mAnimating    = false;
             } else if (mAnimationType == ANIMATION_TYPE_ONCE_AND_BACK) {
@@ -110,7 +112,7 @@ void JSprite::Render() {
         //(float)mFrames[mCurrentFrame]->height); if (mDoAlpha)
 
         //		{
-        int alpha = (int)mAlpha;
+        const int alpha = (int)mAlpha;
         //			//mQuad->SetColor(ARGB(alpha,255,255,255));
 
 #if defined(PSP)
@@ -133,8 +135,8 @@ void JSprite::AddFrame(float x, float y, float width, float height, bool flipped
     // mFlipped[mFrameCount] = flipped;
     // mFrames[mFrameCount++] = new JQuad(mTex, x, y, width, height);
 
-    JQuad* quad = new JQuad(mTex, x, y, width, height);
-    if (quad != NULL) {
+    auto* quad = new JQuad(mTex, x, y, width, height);
+    if (quad != nullptr) {
         quad->SetHFlip(flipped);
         mFrames.push_back(quad);
 
@@ -169,8 +171,8 @@ void JSprite::RestartAnimation() {
 }
 
 void JSprite::SetDirection(float x, float y) {
-    float dx = x - mX;
-    float dy = y - mY;
+    const float dx = x - mX;
+    const float dy = y - mY;
 
     // from atan2:
     //	    -pi/2
@@ -185,12 +187,17 @@ void JSprite::SetDirection(float x, float y) {
 }
 
 void JSprite::SetFlip(bool flip, int index) {
-    int size = (int)mFrames.size();
+    const int size = (int)mFrames.size();
     if (index == -1) {
-        for (int i = 0; i < size; i++)
-            if (mFrames[i] != NULL) mFrames[i]->SetHFlip(flip);
+        for (int i = 0; i < size; i++) {
+            if (mFrames[i] != nullptr) {
+                mFrames[i]->SetHFlip(flip);
+            }
+        }
     } else {
-        if (index >= 0 && index < size) mFrames[index]->SetHFlip(flip);
+        if (index >= 0 && index < size) {
+            mFrames[index]->SetHFlip(flip);
+        }
     }
 }
 
@@ -209,7 +216,7 @@ void JSprite::StartAnimation() {
 }
 
 void JSprite::StopAnimation() { mAnimating = false; }
-bool JSprite::IsAnimating() { return mAnimating; }
+bool JSprite::IsAnimating() const { return mAnimating; }
 
 void JSprite::SetAlpha(float alpha) { mAlpha = alpha; }
 void JSprite::SetScale(float hscale, float vscale) {
@@ -220,26 +227,31 @@ void JSprite::SetScale(float scale) {
     mHScale = scale;
     mVScale = scale;
 }
-float JSprite::GetScale() { return mHScale; }
+float JSprite::GetScale() const { return mHScale; }
 void JSprite::SetRotation(float rot) { mRotation = rot; }
 
 // JQuad* JSprite::GetQuad() { return mQuad; }
 
-float JSprite::GetXVelocity() { return cosf(mDirection) * mSpeed; }
-float JSprite::GetYVelocity() { return sinf(mDirection) * mSpeed; }
+float JSprite::GetXVelocity() const { return cosf(mDirection) * mSpeed; }
+float JSprite::GetYVelocity() const { return sinf(mDirection) * mSpeed; }
 
 void JSprite::SetSpeed(float speed) { mSpeed = speed; }
-float JSprite::GetSpeed() { return mSpeed; }
+float JSprite::GetSpeed() const { return mSpeed; }
 void JSprite::SetDirection(float angle) { mDirection = angle; }
 
 void JSprite::SetHotSpot(float x, float y, int index) {
-    int size = (int)mFrames.size();
+    const int size = (int)mFrames.size();
 
     if (index == -1) {
-        for (int i = 0; i < size; i++)
-            if (mFrames[i] != NULL) mFrames[i]->SetHotSpot(x, y);
+        for (int i = 0; i < size; i++) {
+            if (mFrames[i] != nullptr) {
+                mFrames[i]->SetHotSpot(x, y);
+            }
+        }
     } else {
-        if (index >= 0 && index < size) mFrames[index]->SetHotSpot(x, y);
+        if (index >= 0 && index < size) {
+            mFrames[index]->SetHotSpot(x, y);
+        }
     }
 }
 
@@ -265,36 +277,38 @@ void JSprite::SetColor(PIXEL_TYPE color) { mColor = (color & 0x00ffffff); }
 //
 // }
 
-float JSprite::GetAlpha() { return mAlpha; }
-float JSprite::GetDirection() { return mDirection; }
-float JSprite::GetRotation() { return mRotation; }
+float JSprite::GetAlpha() const { return mAlpha; }
+float JSprite::GetDirection() const { return mDirection; }
+float JSprite::GetRotation() const { return mRotation; }
 
 void JSprite::SetId(int id) { mId = id; }
-int JSprite::GetId() { return mId; }
+int JSprite::GetId() const { return mId; }
 
-int JSprite::GetCurrentFrameIndex() { return mCurrentFrame; }
+int JSprite::GetCurrentFrameIndex() const { return mCurrentFrame; }
 void JSprite::SetCurrentFrameIndex(int frame) {
-    if (frame < (int)mFrames.size()) mCurrentFrame = frame;
+    if (frame < (int)mFrames.size()) {
+        mCurrentFrame = frame;
+    }
 }
 
 JQuad* JSprite::GetCurrentFrame() {
-    if (mCurrentFrame < (signed int)mFrames.size())
+    if (mCurrentFrame < (signed int)mFrames.size()) {
         return mFrames[mCurrentFrame];
-    else
-        return NULL;
+    }
+    return nullptr;
 }
 
 int JSprite::GetFrameCount() { return (int)mFrames.size(); }
 
 JQuad* JSprite::GetFrame(int index) {
-    if (index < (signed int)mFrames.size())
+    if (index < (signed int)mFrames.size()) {
         return mFrames[index];
-    else
-        return NULL;
+    }
+    return nullptr;
 }
 
-float JSprite::GetX() { return mX; }
-float JSprite::GetY() { return mY; }
+float JSprite::GetX() const { return mX; }
+float JSprite::GetY() const { return mY; }
 
 void JSprite::SetX(float x) { mX = x; }
 void JSprite::SetY(float y) { mY = y; }
@@ -302,11 +316,13 @@ void JSprite::SetY(float y) { mY = y; }
 void JSprite::SetActive(bool f) {
     mActive = f;
     if (mActive) {
-        if (mFrames.size() == 0) mActive = false;
+        if (mFrames.empty()) {
+            mActive = false;
+        }
     }
 }
 
-bool JSprite::IsActive() { return mActive; }
+bool JSprite::IsActive() const { return mActive; }
 
 void JSprite::Move(float dx, float dy) {
     mX += dx;
@@ -314,20 +330,21 @@ void JSprite::Move(float dx, float dy) {
 }
 
 // ------------------------------------------------------------------------------------------------
-JSpriteList::JSpriteList(int count) {
-    mCount = count;
-    mList  = new JSprite*[count];
+JSpriteList::JSpriteList(int count) : mCount(count), mList(new JSprite*[count]) {
     // mVictims = new JSpriteList*[count];
 
     for (int i = 0; i < mCount; i++) {
-        mList[i] = NULL;
+        mList[i] = nullptr;
         // mVictims[i] = NULL;
     }
 }
 
 JSpriteList::~JSpriteList() {
-    for (int i = 0; i < mCount; i++)
-        if (mList[i]) delete mList[i];
+    for (int i = 0; i < mCount; i++) {
+        if (mList[i]) {
+            delete mList[i];
+        }
+    }
 
     delete[] mList;
     // delete[] mVictims;
@@ -344,14 +361,17 @@ void JSpriteList::Update(float dt) {
 }
 
 void JSpriteList::Render() {
-    for (int i = 0; i < mCount; i++)
-        if (mList[i] && mList[i]->IsActive()) mList[i]->Render();
+    for (int i = 0; i < mCount; i++) {
+        if (mList[i] && mList[i]->IsActive()) {
+            mList[i]->Render();
+        }
+    }
 }
 
 void JSpriteList::AddSprite(JSprite* sprite)  //, JSpriteList* victim)
 {
     for (int i = 0; i < mCount; i++) {
-        if (mList[i] == NULL) {
+        if (mList[i] == nullptr) {
             mList[i] = sprite;
             // mVictims[i] = victim;
             return;
@@ -361,7 +381,7 @@ void JSpriteList::AddSprite(JSprite* sprite)  //, JSpriteList* victim)
 
 JSprite* JSpriteList::Activate(float x, float y) {
     for (int i = 0; i < mCount; i++) {
-        if (mList[i] != NULL && !mList[i]->IsActive()) {
+        if (mList[i] != nullptr && !mList[i]->IsActive()) {
             mList[i]->SetActive(true);
             mList[i]->SetPosition(x, y);
             mList[i]->RestartAnimation();
@@ -370,12 +390,12 @@ JSprite* JSpriteList::Activate(float x, float y) {
         }
     }
 
-    return NULL;
+    return nullptr;
 }
 
 void JSpriteList::Activate(float x, float y, int index) {
     if (index < mCount) {
-        if (mList[index] != NULL) {
+        if (mList[index] != nullptr) {
             mList[index]->SetActive(true);
             mList[index]->SetPosition(x, y);
             mList[index]->RestartAnimation();
@@ -388,12 +408,12 @@ JSprite* JSpriteList::GetSprite(int index) {
         return mList[index];
     }
 
-    return NULL;
+    return nullptr;
 }
 
 void JSpriteList::EnableAll(bool flag) {
     for (int i = 0; i < mCount; i++) {
-        if (mList[i] != NULL) {
+        if (mList[i] != nullptr) {
             mList[i]->SetActive(flag);
             mList[i]->RestartAnimation();
         }

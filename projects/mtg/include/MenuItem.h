@@ -1,5 +1,5 @@
-#ifndef _MENU_ITEM_H
-#define _MENU_ITEM_H
+#ifndef MENUITEM_H
+#define MENUITEM_H
 
 #include "WFont.h"
 #include <JGui.h>
@@ -30,20 +30,20 @@ protected:
 public:
     MenuItem(int id, WFont* font, std::string text, float x, float y, JQuad* _off, JQuad* _on, const char* particle,
              JQuad* particleQuad, bool hasFocus = false);
-    ~MenuItem();
-    virtual void Render();
-    virtual void Update(float dt);
+    ~MenuItem() override;
+    void Render() override;
+    void Update(float dt) override;
 
-    virtual void Entering();
-    virtual bool Leaving(JButton key);
-    virtual bool ButtonPressed();
-    virtual bool getTopLeft(float& top, float& left) {
+    void Entering() override;
+    bool Leaving(JButton key) override;
+    bool ButtonPressed() override;
+    bool getTopLeft(float& top, float& left) override {
         top  = mY;
         left = mX;
         return true;
     };
 
-    virtual std::ostream& toString(std::ostream& out) const;
+    std::ostream& toString(std::ostream& out) const override;
 };
 
 class OtherMenuItem : public MenuItem {
@@ -54,9 +54,9 @@ private:
 public:
     OtherMenuItem(int id, WFont* font, std::string text, float x, float y, JQuad* _off, JQuad* _on, JButton _key,
                   bool hasFocus = false);
-    ~OtherMenuItem();
-    virtual void Render();
-    virtual void Update(float dt);
+    ~OtherMenuItem() override;
+    void Render() override;
+    void Update(float dt) override;
 };
 
 #endif

@@ -1,5 +1,5 @@
-#ifndef _STORYFLOW_H_
-#define _STORYFLOW_H_
+#ifndef STORYFLOW_H
+#define STORYFLOW_H
 
 #include <string>
 #include <map>
@@ -15,12 +15,12 @@ public:
     float mX;
     float mY;
     StoryDialogElement(float x, float y, int id = 0);
-    void Entering(){};
-    bool Leaving(JButton key) { return false; };
-    bool ButtonPressed() { return false; };
+    void Entering() override{};
+    bool Leaving(JButton key) override { return false; };
+    bool ButtonPressed() override { return false; };
     bool hasFocus() { return false; };
     virtual float getHeight() = 0;
-    virtual bool getTopLeft(float& top, float& left) {
+    bool getTopLeft(float& top, float& left) override {
         top  = mY;
         left = mX;
         return true;
@@ -32,21 +32,21 @@ public:
     std::string text;
     int align;
     int font;
-    StoryText(std::string text, float mX, float mY, std::string align = "center", int font = 0, int id = 0);
+    StoryText(std::string text, float mX, float mY, const std::string& align = "center", int font = 0, int id = 0);
 
-    void Render();
-    void Update(float dt);
-    virtual std::ostream& toString(std::ostream& out) const;
-    float getHeight();
+    void Render() override;
+    void Update(float dt) override;
+    std::ostream& toString(std::ostream& out) const override;
+    float getHeight() override;
 };
 class StoryImage : public StoryDialogElement {
 public:
     std::string img;
     StoryImage(std::string img, float mX, float mY);
-    void Render();
-    void Update(float dt);
-    virtual std::ostream& toString(std::ostream& out) const;
-    float getHeight();
+    void Render() override;
+    void Update(float dt) override;
+    std::ostream& toString(std::ostream& out) const override;
+    float getHeight() override;
 };
 
 class StoryReward : public StoryText {
@@ -61,10 +61,10 @@ public:
     std::string value;
     int type;
 
-    StoryReward(std::string _type, std::string _value, std::string text, float _mX, float _mY,
-                std::string align = "center", int font = 0, int id = 0);
-    void Update(float dt);
-    void Render();
+    StoryReward(const std::string& _type, std::string _value, std::string text, float _mX, float _mY,
+                const std::string& align = "center", int font = 0, int id = 0);
+    void Update(float dt) override;
+    void Render() override;
 
     static bool rewardSoundPlayed;
     static bool rewardsEnabled;
@@ -78,23 +78,23 @@ public:
     bool mHasFocus;
     float mScale;
     float mTargetScale;
-    StoryChoice(std::string id, std::string text, int JGOid, float mX, float mY, std::string _align, int _font,
+    StoryChoice(std::string id, std::string text, int JGOid, float mX, float mY, const std::string& _align, int _font,
                 bool hasFocus);
-    void Render();
-    void Update(float dt);
+    void Render() override;
+    void Update(float dt) override;
 
-    void Entering();
-    bool Leaving(JButton key);
-    bool ButtonPressed();
-    bool hasFocus();
-    virtual std::ostream& toString(std::ostream& out) const;
-    float getHeight();
+    void Entering() override;
+    bool Leaving(JButton key) override;
+    bool ButtonPressed() override;
+    bool hasFocus() const;
+    std::ostream& toString(std::ostream& out) const override;
+    float getHeight() override;
 };
 
 class StoryFlow;
 class StoryPage {
 protected:
-    std::string safeAttribute(TiXmlElement* element, std::string attribute);
+    std::string safeAttribute(TiXmlElement* element, const std::string& attribute);
 
 public:
     StoryFlow* mParent;
@@ -113,10 +113,10 @@ private:
 
 public:
     StoryDialog(TiXmlElement* el, StoryFlow* mParent);
-    ~StoryDialog();
-    void Update(float dt);
-    void Render();
-    void ButtonPressed(int, int);
+    ~StoryDialog() override;
+    void Update(float dt) override;
+    void Render() override;
+    void ButtonPressed(int, int) override;
 
     static float currentY;
     static float previousY;
@@ -131,27 +131,27 @@ public:
     GameObserver* game;
     Rules* rules;
     StoryDuel(TiXmlElement* el, StoryFlow* mParent);
-    virtual ~StoryDuel();
-    void Update(float dt);
-    void Render();
+    ~StoryDuel() override;
+    void Update(float dt) override;
+    void Render() override;
     void init();
 };
 
 class StoryFlow {
 private:
     std::map<std::string, StoryPage*> pages;
-    bool parse(std::string filename);
+    bool parse(const std::string& filename);
     StoryPage* loadPage(TiXmlElement* element);
-    bool _gotoPage(std::string id);
+    bool _gotoPage(const std::string& id);
 
 public:
     std::string currentPageId;
     std::string folder;
-    StoryFlow(std::string folder);
+    StoryFlow(const std::string& folder);
     ~StoryFlow();
 
-    bool gotoPage(std::string id);
-    bool loadPageId(std::string id);
+    bool gotoPage(const std::string& id);
+    bool loadPageId(const std::string& id);
     void Update(float dt);
     void Render();
 };

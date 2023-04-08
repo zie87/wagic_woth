@@ -15,39 +15,45 @@ float DeckMenuItem::mYOffset = 0;
 
 DeckMenuItem::DeckMenuItem(DeckMenu* _parent, int id, int fontId, std::string text, float x, float y, bool hasFocus,
                            bool autoTranslate, DeckMetaData* deckMetaData)
-    : JGuiObject(id), parent(_parent), fontId(fontId), mX(x), mY(y) {
-    WFont* mFont      = WResourceManager::Instance()->GetWFont(fontId);
-    mMetaData         = deckMetaData;
-    mText             = trim(text);
-    mIsValidSelection = false;
+    : JGuiObject(id)
+    , mIsValidSelection(false)
+    , parent(_parent)
+    , fontId(fontId)
+    , mText(trim(text))
+    , mX(x)
+    , mY(y)
+    , mMetaData(deckMetaData) {
+    WFont* mFont = WResourceManager::Instance()->GetWFont(fontId);
 
-    if (autoTranslate) mText = _(mText);
+    if (autoTranslate) {
+        mText = _(mText);
+    }
 
     mHasFocus           = hasFocus;
     float newImageWidth = 0.0f;
     if (mMetaData && !mMetaData->getGamesPlayed()) {
         JTexture* tex = WResourceManager::Instance()->RetrieveTexture("new.png");
         if (tex) {
-            JQuadPtr quad = WResourceManager::Instance()->RetrieveQuad(
+            const JQuadPtr quad = WResourceManager::Instance()->RetrieveQuad(
                 "new.png", 2.0f, 2.0f, tex->mWidth - 4.0f,
                 tex->mHeight - 4.0f);  // avoids weird rectangle around the texture because of bilinear filtering
             newImageWidth = quad->mWidth;
         }
     }
 
-    float titleStringWidth = mFont->GetStringWidth(mText.c_str());
-    mTitleResetWidth       = (titleStringWidth - newImageWidth) / 2;
-    mScrollEnabled         = titleStringWidth > (ITEM_PX_WIDTH - newImageWidth);
-    mScrollerOffset        = 0.0f;
+    const float titleStringWidth = mFont->GetStringWidth(mText.c_str());
+    mTitleResetWidth             = (titleStringWidth - newImageWidth) / 2;
+    mScrollEnabled               = titleStringWidth > (ITEM_PX_WIDTH - newImageWidth);
+    mScrollerOffset              = 0.0f;
 
     if (hasFocus) {
         mIsValidSelection = true;
         Entering();
     }
 
-    if (mMetaData && mMetaData->getAvatarFilename().size() > 0)
+    if (mMetaData && !mMetaData->getAvatarFilename().empty()) {
         mImageFilename = mMetaData->getAvatarFilename();
-    else {
+    } else {
         // this is a non-deck menu item (ie "Random", "Cancel", etc
         switch (id) {
         case kRandomPlayerMenuID:
@@ -72,7 +78,9 @@ DeckMenuItem::DeckMenuItem(DeckMenu* _parent, int id, int fontId, std::string te
 
 void DeckMenuItem::Update(float dt) {
     mScrollerOffset += kHorizontalScrollSpeed * dt;
-    if ((mScrollerOffset) > mTitleResetWidth) mScrollerOffset = -ITEM_PX_WIDTH;
+    if ((mScrollerOffset) > mTitleResetWidth) {
+        mScrollerOffset = -ITEM_PX_WIDTH;
+    }
 }
 
 void DeckMenuItem::RenderWithOffset(float yOffset) {
@@ -80,14 +88,19 @@ void DeckMenuItem::RenderWithOffset(float yOffset) {
 
     WFont* mFont = WResourceManager::Instance()->GetWFont(fontId);
 
-    if (!(mHasFocus && mScrollEnabled)) mScrollerOffset = 0;
-    if (!mHasFocus && mScrollEnabled) mScrollerOffset = -1 * (getWidth() - ITEM_PX_WIDTH) / 2;
-    float offSet = mScrollerOffset;
+    if (!(mHasFocus && mScrollEnabled)) {
+        mScrollerOffset = 0;
+    }
+    if (!mHasFocus && mScrollEnabled) {
+        mScrollerOffset = -1 * (getWidth() - ITEM_PX_WIDTH) / 2;
+    }
+    const float offSet = mScrollerOffset;
 
-    if (mHasFocus)
+    if (mHasFocus) {
         mFont->SetScale(SCALE_SELECTED);
-    else
+    } else {
         mFont->SetScale(SCALE_NORMAL);
+    }
 
     mFont->DrawString(mText.c_str(), mX, mY + yOffset, JGETEXT_CENTER, offSet, ITEM_PX_WIDTH);
     mDisplayInitialized = true;
@@ -95,12 +108,14 @@ void DeckMenuItem::RenderWithOffset(float yOffset) {
     if (mMetaData && !mMetaData->getGamesPlayed()) {
         JTexture* tex = WResourceManager::Instance()->RetrieveTexture("new.png");
         if (tex) {
-            JQuadPtr quad = WResourceManager::Instance()->RetrieveQuad(
+            const JQuadPtr quad = WResourceManager::Instance()->RetrieveQuad(
                 "new.png", 2.0f, 2.0f, tex->mWidth - 4.0f,
                 tex->mHeight - 4.0f);  // avoids weird rectangle aroudn the texture because of bilinear filtering
             quad->SetHotSpot(quad->mWidth / 2.0f, quad->mHeight / 2.0f);
-            float x = mX + std::min(ITEM_PX_WIDTH - quad->mWidth, getWidth()) / 2 + quad->mWidth / 2;
-            if (quad) JRenderer::GetInstance()->RenderQuad(quad.get(), x, mY + yOffset + quad->mHeight / 2, 0.5);
+            const float x = mX + std::min(ITEM_PX_WIDTH - quad->mWidth, getWidth()) / 2 + quad->mWidth / 2;
+            if (quad) {
+                JRenderer::GetInstance()->RenderQuad(quad.get(), x, mY + yOffset + quad->mHeight / 2, 0.5);
+            }
         }
     }
     mFont->SetScale(SCALE_NORMAL);
@@ -109,14 +124,18 @@ void DeckMenuItem::RenderWithOffset(float yOffset) {
 void DeckMenuItem::Render() { RenderWithOffset(0); }
 
 void DeckMenuItem::checkUserClick() {
-    int x1 = -1, y1 = -1;
+    int x1 = -1;
+    int y1 = -1;
     if (mEngine->GetLeftClickCoordinates(x1, y1)) {
         mIsValidSelection = false;
-        int x2 = kItemXOffset, y2 = static_cast<int>(mY + mYOffset);
-        if ((x1 >= x2) && (x1 <= (x2 + ITEM_PX_WIDTH)) && (y1 >= y2) && (y1 < (y2 + kItemYHeight)))
+        const int x2      = kItemXOffset;
+        const int y2      = static_cast<int>(mY + mYOffset);
+        if ((x1 >= x2) && (x1 <= (x2 + ITEM_PX_WIDTH)) && (y1 >= y2) && (y1 < (y2 + kItemYHeight))) {
             mIsValidSelection = true;
-    } else
+        }
+    } else {
         mIsValidSelection = true;
+    }
 }
 
 void DeckMenuItem::Entering() {
@@ -145,7 +164,9 @@ float DeckMenuItem::getWidth() const {
 }
 
 std::string DeckMenuItem::getDeckName() const {
-    if (mMetaData) return mMetaData->getName();
+    if (mMetaData) {
+        return mMetaData->getName();
+    }
 
     std::string s;
     std::stringstream out;
@@ -159,4 +180,4 @@ std::ostream& DeckMenuItem::toString(std::ostream& out) const {
                << " ; mX,mY : " << mX << "," << mY;
 }
 
-DeckMenuItem::~DeckMenuItem() { mMetaData = NULL; }
+DeckMenuItem::~DeckMenuItem() { mMetaData = nullptr; }

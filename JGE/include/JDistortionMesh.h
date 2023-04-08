@@ -10,8 +10,8 @@
 //
 //-------------------------------------------------------------------------------------
 
-#ifndef _JDISTORT_MESH_H
-#define _JDISTORT_MESH_H
+#ifndef JDISTORTIONMESH_H
+#define JDISTORTIONMESH_H
 
 #include "JRenderer.h"
 

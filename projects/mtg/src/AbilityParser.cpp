@@ -16,21 +16,21 @@ void AutoLineMacro::parse(const string& stringMacro) {
     // we convert to lower, because the counterpart (auto strings) is converted to lower at parse time
     std::transform(s.begin(), s.end(), s.begin(), ::tolower);
 
-    size_t firstSpace = s.find(" ");
+    const size_t firstSpace = s.find(' ');
     if (firstSpace == string::npos) {
         DebugTrace("FATAL:error parsing macro : " << s);
         return;
     }
 
-    size_t firstParenthesis = s.find("(");
+    const size_t firstParenthesis = s.find('(');
 
     if (firstParenthesis != string::npos && firstParenthesis < firstSpace) {
         // The string has params
-        mName                          = s.substr(0, firstParenthesis);
-        size_t firstClosingParenthesis = s.find(")");
-        string params = s.substr(firstParenthesis + 1, firstClosingParenthesis - (firstParenthesis + 1));
-        mParams       = split(params, ',');
-        mResult       = s.substr(firstClosingParenthesis + 2);
+        mName                                = s.substr(0, firstParenthesis);
+        const size_t firstClosingParenthesis = s.find(')');
+        const string params = s.substr(firstParenthesis + 1, firstClosingParenthesis - (firstParenthesis + 1));
+        mParams             = split(params, ',');
+        mResult             = s.substr(firstClosingParenthesis + 2);
     } else {
         // no params
         mName   = s.substr(0, firstSpace);
@@ -42,23 +42,25 @@ void AutoLineMacro::parse(const string& stringMacro) {
 
 string AutoLineMacro::process(const string& s) {
     string temp = s;
-    if (!mParams.size()) {
+    if (mParams.empty()) {
         // no params, simple macro
         wth::replace_all(temp, mName, mResult);
         return temp;
     }
 
     // params, complex macro
-    string toFind = mName + "(";
+    const string toFind = mName + "(";
     string result;
     size_t occurence = temp.find(toFind);
-    if (occurence == string::npos) return s;
+    if (occurence == string::npos) {
+        return s;
+    }
 
     while (occurence != string::npos) {
         result.append(temp.substr(0, occurence));
-        size_t closingParenthesis = temp.find(")");
-        size_t paramsStart        = occurence + toFind.length();
-        string params             = temp.substr(paramsStart, closingParenthesis - paramsStart);
+        const size_t closingParenthesis = temp.find(')');
+        const size_t paramsStart        = occurence + toFind.length();
+        const string params             = temp.substr(paramsStart, closingParenthesis - paramsStart);
 
         vector<string> vParams = split(params, ',');
         if (vParams.size() != mParams.size()) {
@@ -78,7 +80,7 @@ string AutoLineMacro::process(const string& s) {
 }
 
 bool AutoLineMacro::AddMacro(const string& s) {
-    AutoLineMacro* alm = NEW AutoLineMacro(s);
+    auto* alm = NEW AutoLineMacro(s);
     if (gAutoLineMacrosIndex[alm->mName]) {
         DebugTrace("WARNING, Macro already exists: " << alm->mName);
         delete alm;

@@ -1,5 +1,5 @@
-#ifndef _GUICOMBAT_H_
-#define _GUICOMBAT_H_
+#ifndef GUICOMBAT_H
+#define GUICOMBAT_H
 
 #include <vector>
 #include "WEvent.h"
@@ -23,7 +23,7 @@ protected:
     void remaskBlkViews(AttackerDamaged* before, AttackerDamaged* after);
     void shiftLeft();
     void shiftRight(DamagerDamaged* oldActive);
-    bool didClickOnButton(Pos buttonPosition, int& x, int& y);
+    bool didClickOnButton(const Pos& buttonPosition, int& x, int& y);
     int resolve();
 
 public:
@@ -31,14 +31,14 @@ public:
     void autoaffectDamage(AttackerDamaged* attacker, CombatStep);
 
     GuiCombat(GameObserver* go);
-    ~GuiCombat();
-    virtual void Update(float dt);
-    virtual void Render();
+    ~GuiCombat() override;
+    void Update(float dt) override;
+    void Render() override;
     bool clickOK();
-    virtual bool CheckUserInput(JButton key);
-    virtual int receiveEventPlus(WEvent* e);
-    virtual int receiveEventMinus(WEvent* e);
+    bool CheckUserInput(JButton key) override;
+    int receiveEventPlus(WEvent* e) override;
+    int receiveEventMinus(WEvent* e) override;
     typedef vector<AttackerDamaged*>::iterator inner_iterator;
 };
 
-#endif  // _GUICOMBAT_H_
+#endif  // GUICOMBAT_H

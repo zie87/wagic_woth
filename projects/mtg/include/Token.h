@@ -1,5 +1,5 @@
-#ifndef _TOKEN_H_
-#define _TOKEN_H_
+#ifndef TOKEN_H
+#define TOKEN_H
 
 #include "MTGCardInstance.h"
 
@@ -10,7 +10,7 @@ public:
     Token(string _name, MTGCardInstance* source, int _power = 0, int _toughness = 0);
     Token(int id);
     Token(const Token& source);
-    virtual MTGCardInstance* clone();
+    MTGCardInstance* clone() override;
 };
 
 #endif

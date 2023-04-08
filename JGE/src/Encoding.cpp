@@ -22199,17 +22199,21 @@ static const u16 cp936ext_2uni_pagea8[128 - 122] = {
 };
 
 static int gb2312_mbtowc(ucs4_t* pwc, const u8* s, int n) {
-    u8 c1 = s[0];
+    const u8 c1 = s[0];
     if ((c1 >= 0x21 && c1 <= 0x29) || (c1 >= 0x30 && c1 <= 0x77)) {
         if (n >= 2) {
-            u8 c2 = s[1];
+            const u8 c2 = s[1];
             if (c2 >= 0x21 && c2 < 0x7f) {
-                u32 i  = 94 * (c1 - 0x21) + (c2 - 0x21);
-                u16 wc = 0xfffd;
+                const u32 i = 94 * (c1 - 0x21) + (c2 - 0x21);
+                u16 wc      = 0xfffd;
                 if (i < 1410) {
-                    if (i < 831) wc = gb2312_2uni_page21[i];
+                    if (i < 831) {
+                        wc = gb2312_2uni_page21[i];
+                    }
                 } else {
-                    if (i < 8178) wc = gb2312_2uni_page30[i - 1410];
+                    if (i < 8178) {
+                        wc = gb2312_2uni_page30[i - 1410];
+                    }
                 }
                 if (wc != 0xfffd) {
                     *pwc = (ucs4_t)wc;
@@ -22224,17 +22228,21 @@ static int gb2312_mbtowc(ucs4_t* pwc, const u8* s, int n) {
 }
 
 static int cp936ext_mbtowc(ucs4_t* pwc, const u8* s, int n) {
-    u8 c1 = s[0];
+    const u8 c1 = s[0];
     if ((c1 == 0xa6) || (c1 == 0xa8)) {
         if (n >= 2) {
-            u8 c2 = s[1];
+            const u8 c2 = s[1];
             if ((c2 >= 0x40 && c2 < 0x7f) || (c2 >= 0x80 && c2 < 0xff)) {
-                u32 i  = 190 * (c1 - 0x81) + (c2 - (c2 >= 0x80 ? 0x41 : 0x40));
-                u16 wc = 0xfffd;
+                const u32 i = 190 * (c1 - 0x81) + (c2 - (c2 >= 0x80 ? 0x41 : 0x40));
+                u16 wc      = 0xfffd;
                 if (i < 7410) {
-                    if (i >= 7189 && i < 7211) wc = cp936ext_2uni_pagea6[i - 7189];
+                    if (i >= 7189 && i < 7211) {
+                        wc = cp936ext_2uni_pagea6[i - 7189];
+                    }
                 } else {
-                    if (i >= 7532 && i < 7538) wc = cp936ext_2uni_pagea8[i - 7532];
+                    if (i >= 7532 && i < 7538) {
+                        wc = cp936ext_2uni_pagea8[i - 7532];
+                    }
                 }
                 if (wc != 0xfffd) {
                     *pwc = (ucs4_t)wc;
@@ -22250,15 +22258,17 @@ static int cp936ext_mbtowc(ucs4_t* pwc, const u8* s, int n) {
 
 /* unicode <-> cjk */
 static int gbkext1_mbtowc(ucs4_t* pwc, const u8* s, int n) {
-    u8 c1 = s[0];
+    const u8 c1 = s[0];
     if ((c1 >= 0x81 && c1 <= 0xa0)) {
         if (n >= 2) {
-            u8 c2 = s[1];
+            const u8 c2 = s[1];
             if ((c2 >= 0x40 && c2 < 0x7f) || (c2 >= 0x80 && c2 < 0xff)) {
-                u32 i  = 190 * (c1 - 0x81) + (c2 - (c2 >= 0x80 ? 0x41 : 0x40));
-                u16 wc = 0xfffd;
+                const u32 i = 190 * (c1 - 0x81) + (c2 - (c2 >= 0x80 ? 0x41 : 0x40));
+                u16 wc      = 0xfffd;
                 {
-                    if (i < 6080) wc = gbkext1_2uni_page81[i];
+                    if (i < 6080) {
+                        wc = gbkext1_2uni_page81[i];
+                    }
                 }
                 if (wc != 0xfffd) {
                     *pwc = (ucs4_t)wc;
@@ -22273,15 +22283,17 @@ static int gbkext1_mbtowc(ucs4_t* pwc, const u8* s, int n) {
 }
 
 static int gbkext2_mbtowc(ucs4_t* pwc, const u8* s, int n) {
-    u8 c1 = s[0];
+    const u8 c1 = s[0];
     if ((c1 >= 0xa8 && c1 <= 0xfe)) {
         if (n >= 2) {
-            u8 c2 = s[1];
+            const u8 c2 = s[1];
             if ((c2 >= 0x40 && c2 < 0x7f) || (c2 >= 0x80 && c2 < 0xa1)) {
-                u32 i  = 96 * (c1 - 0x81) + (c2 - (c2 >= 0x80 ? 0x41 : 0x40));
-                u16 wc = 0xfffd;
+                const u32 i = 96 * (c1 - 0x81) + (c2 - (c2 >= 0x80 ? 0x41 : 0x40));
+                u16 wc      = 0xfffd;
                 {
-                    if (i < 12016) wc = gbkext2_2uni_pagea8[i - 3744];
+                    if (i < 12016) {
+                        wc = gbkext2_2uni_pagea8[i - 3744];
+                    }
                 }
                 if (wc != 0xfffd) {
                     *pwc = (ucs4_t)wc;
@@ -22296,12 +22308,14 @@ static int gbkext2_mbtowc(ucs4_t* pwc, const u8* s, int n) {
 }
 
 static int _gbk_mbtowc(ucs4_t* pwc, const u8* s, int n) {
-    u8 c = *s;
+    const u8 c = *s;
 
     if (c >= 0x81 && c < 0xff) {
-        if (n < 2) return RET_TOOFEW(0);
+        if (n < 2) {
+            return RET_TOOFEW(0);
+        }
         if (c >= 0xa1 && c <= 0xf7) {
-            u8 c2 = s[1];
+            const u8 c2 = s[1];
             if (c == 0xa1) {
                 if (c2 == 0xa4) {
                     *pwc = 0x00b7;
@@ -22318,17 +22332,25 @@ static int _gbk_mbtowc(ucs4_t* pwc, const u8* s, int n) {
                 buf[0] = c - 0x80;
                 buf[1] = c2 - 0x80;
                 ret    = gb2312_mbtowc(pwc, buf, 2);
-                if (ret != RET_ILSEQ) return ret;
+                if (ret != RET_ILSEQ) {
+                    return ret;
+                }
                 buf[0] = c;
                 buf[1] = c2;
                 ret    = cp936ext_mbtowc(pwc, buf, 2);
-                if (ret != RET_ILSEQ) return ret;
+                if (ret != RET_ILSEQ) {
+                    return ret;
+                }
             }
         }
-        if (c >= 0x81 && c <= 0xa0) return gbkext1_mbtowc(pwc, s, 2);
-        if (c >= 0xa8 && c <= 0xfe) return gbkext2_mbtowc(pwc, s, 2);
+        if (c >= 0x81 && c <= 0xa0) {
+            return gbkext1_mbtowc(pwc, s, 2);
+        }
+        if (c >= 0xa8 && c <= 0xfe) {
+            return gbkext2_mbtowc(pwc, s, 2);
+        }
         if (c == 0xa2) {
-            u8 c2 = s[1];
+            const u8 c2 = s[1];
             if (c2 >= 0xa1 && c2 <= 0xaa) {
                 *pwc = 0x2170 + (c2 - 0xa1);
                 return 2;
@@ -22339,7 +22361,7 @@ static int _gbk_mbtowc(ucs4_t* pwc, const u8* s, int n) {
 }
 
 static int ascii_mbtowc(ucs4_t* pwc, const u8* s, int n __attribute__((unused))) {
-    u8 c = *s;
+    const u8 c = *s;
     if (c < 0x80) {
         *pwc = (ucs4_t)c;
         return 1;
@@ -22348,13 +22370,17 @@ static int ascii_mbtowc(ucs4_t* pwc, const u8* s, int n __attribute__((unused)))
 }
 
 static int gbk_mbtowc(ucs4_t* pwc, const u8* s, int n) {
-    u8 c = *s;
+    const u8 c = *s;
 
     /* Code set 0 (ASCII or GB 1988-89) */
-    if (c < 0x80) return ascii_mbtowc(pwc, s, n);
+    if (c < 0x80) {
+        return ascii_mbtowc(pwc, s, n);
+    }
     /* Code set 1 (GBK) */
     if (c >= 0x81 && c < 0xff) {
-        if (n < 2) return RET_TOOFEW(0);
+        if (n < 2) {
+            return RET_TOOFEW(0);
+        }
         return _gbk_mbtowc(pwc, s, 2);
     }
     return RET_ILSEQ;
@@ -22362,6 +22388,8 @@ static int gbk_mbtowc(ucs4_t* pwc, const u8* s, int n) {
 
 u16 charsets_gbk_to_ucs(const u8* cjk) {
     ucs4_t u = 0;
-    if (gbk_mbtowc(&u, cjk, 2) < 1) u = 0x1FFF;
+    if (gbk_mbtowc(&u, cjk, 2) < 1) {
+        u = 0x1FFF;
+    }
     return (u16)u;
 }

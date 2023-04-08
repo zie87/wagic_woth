@@ -54,23 +54,25 @@ public:
 class WLBFont : public WFont {
 public:
     WLBFont(int inFontID, const char* fontname, int lineheight, bool useVideoRAM = false);
-    ~WLBFont() { SAFE_DELETE(it); };
+    ~WLBFont() override { SAFE_DELETE(it); };
 
-    void DrawString(const char* s, float x, float y, int align = JGETEXT_LEFT, float leftOffset = 0, float width = 0) {
+    void DrawString(const char* s, float x, float y, int align = JGETEXT_LEFT, float leftOffset = 0,
+                    float width = 0) override {
         it->DrawString(s, x, y, align, leftOffset, width);
     };
-    void DrawString(std::string s, float x, float y, int align = JGETEXT_LEFT, float leftOffset = 0, float width = 0) {
+    void DrawString(std::string s, float x, float y, int align = JGETEXT_LEFT, float leftOffset = 0,
+                    float width = 0) override {
         it->DrawString(s, x, y, align, leftOffset, width);
     };
-    void SetColor(PIXEL_TYPE color) { it->SetColor(color); };
-    PIXEL_TYPE GetColor() const { return it->GetColor(); };
-    void SetScale(float scale) { it->SetScale(scale); };
-    float GetScale() const { return it->GetScale(); };
-    float GetHeight() const { return it->GetHeight(); };
-    float GetStringWidth(const char* s) const { return it->GetStringWidth(s); };
-    void SetTracking(float tracking) { it->SetTracking(tracking); };
-    void SetBase(int base) { it->SetBase(base); };
-    void FormatText(string& s, std::vector<string>& output);
+    void SetColor(PIXEL_TYPE color) override { it->SetColor(color); };
+    PIXEL_TYPE GetColor() const override { return it->GetColor(); };
+    void SetScale(float scale) override { it->SetScale(scale); };
+    float GetScale() const override { return it->GetScale(); };
+    float GetHeight() const override { return it->GetHeight(); };
+    float GetStringWidth(const char* s) const override { return it->GetStringWidth(s); };
+    void SetTracking(float tracking) override { it->SetTracking(tracking); };
+    void SetBase(int base) override { it->SetBase(base); };
+    void FormatText(string& s, std::vector<string>& output) override;
 
 private:
     JLBFont* it;
@@ -80,21 +82,22 @@ class WFBFont : public WFont {
 public:
     WFBFont(int inFontID, const char* fontname, int lineheight, bool useVideoRAM = false);
     WFBFont(int inFontID) : WFont(inFontID){};  // Legacy : remove it when possible
-    ~WFBFont();
+    ~WFBFont() override;
 
-    void DrawString(std::string s, float x, float y, int align = JGETEXT_LEFT, float leftOffset = 0, float width = 0);
-    void SetColor(PIXEL_TYPE color);
-    PIXEL_TYPE GetColor() const { return mColor0; };
-    void SetScale(float scale);
-    float GetScale() const;
-    float GetHeight() const;
-    virtual float GetStringWidth(const char* s) const;
-    void SetTracking(float tracking){};
-    void SetBase(int base){};
-    void FormatText(string& s, std::vector<string>& output){};
+    void DrawString(std::string s, float x, float y, int align = JGETEXT_LEFT, float leftOffset = 0,
+                    float width = 0) override;
+    void SetColor(PIXEL_TYPE color) override;
+    PIXEL_TYPE GetColor() const override { return mColor0; };
+    void SetScale(float scale) override;
+    float GetScale() const override;
+    float GetHeight() const override;
+    float GetStringWidth(const char* s) const override;
+    void SetTracking(float tracking) override{};
+    void SetBase(int base) override{};
+    void FormatText(string& s, std::vector<string>& output) override{};
 
-    virtual void DrawString(const char* s, float x, float y, int align = JGETEXT_LEFT, float leftOffset = 0,
-                            float width = 0);
+    void DrawString(const char* s, float x, float y, int align = JGETEXT_LEFT, float leftOffset = 0,
+                    float width = 0) override;
     virtual int GetCode(const u8* ch, int* charLength) const = 0;
     virtual int GetMana(const u8* ch) const                  = 0;
 
@@ -131,12 +134,13 @@ class WGBKFont : public WFBFont {
 public:
     WGBKFont(int inFontID, const char* fontname, int lineheight, bool useVideoRAM = false);
 
-    int PreCacheChar(const u8* ch);
-    float GetStringWidth(const char* s) const;
-    void DrawString(const char* s, float x, float y, int align = JGETEXT_LEFT, float leftOffset = 0, float width = 0);
-    int GetCode(const u8* ch, int* charLength) const;
-    int GetMana(const u8* ch) const;
-    void FormatText(string& s, std::vector<string>& output);
+    int PreCacheChar(const u8* ch) override;
+    float GetStringWidth(const char* s) const override;
+    void DrawString(const char* s, float x, float y, int align = JGETEXT_LEFT, float leftOffset = 0,
+                    float width = 0) override;
+    int GetCode(const u8* ch, int* charLength) const override;
+    int GetMana(const u8* ch) const override;
+    void FormatText(string& s, std::vector<string>& output) override;
 };
 
 class WUFont : public WFBFont {
@@ -144,9 +148,9 @@ public:
     WUFont(int inFontID, const char* fontname, int lineheight, bool useVideoRAM = false)
         : WFBFont(inFontID, fontname, lineheight, useVideoRAM){};
 
-    int GetCode(const u8* ch, int* charLength) const;
-    int GetMana(const u8* ch) const;
-    void FormatText(string& s, std::vector<string>& output);
+    int GetCode(const u8* ch, int* charLength) const override;
+    int GetMana(const u8* ch) const override;
+    void FormatText(string& s, std::vector<string>& output) override;
 };
 
 #endif

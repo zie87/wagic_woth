@@ -51,22 +51,23 @@ enum ENUM_MENU_STATE_MINOR {
     MENU_STATE_MINOR                 = 0xF00
 };
 
-GameStateMenu::GameStateMenu(GameApp* parent) : GameState(parent, "menu") {
-    mGuiController    = NULL;
-    subMenuController = NULL;
-    gameTypeMenu      = NULL;
+GameStateMenu::GameStateMenu(GameApp* parent)
+    : GameState(parent, "menu")
+    , gameTypeMenu(nullptr)
+    , langChoices(false)
+    , mGuiController(nullptr)
+    , mVolume(0)
+    , primitivesLoadCounter(-1)
+    , scroller(nullptr)
+    , subMenuController(nullptr)
+    , timeIndex(0) {
     // bgMusic = NULL;
-    timeIndex             = 0;
-    mVolume               = 0;
-    scroller              = NULL;
-    langChoices           = false;
-    primitivesLoadCounter = -1;
 }
 
 GameStateMenu::~GameStateMenu() {}
 
 void GameStateMenu::Create() {
-    mGuiController = NULL;
+    mGuiController = nullptr;
     mReadConf      = 0;
 
     // load all the icon images. Menu icons are managed, so we can do this here.
@@ -78,26 +79,30 @@ void GameStateMenu::Create() {
             sprintf(buf, "menuicons%d%d", i, j);
             mIcons[n] = WResourceManager::Instance()->RetrieveQuad("menuicons.png", 2 + i * 36.0f, 2.0f + j * 36.0f,
                                                                    32.0f, 32.0f, buf);
-            if (mIcons[n]) mIcons[n]->SetHotSpot(16, 16);
+            if (mIcons[n]) {
+                mIcons[n]->SetHotSpot(16, 16);
+            }
             n++;
         }
     }
 
-    currentState    = MENU_STATE_MAJOR_LOADING_CARDS;
-    bool langChosen = false;
-    string lang     = options[Options::LANG].str;
-    if (lang.size()) {
+    currentState      = MENU_STATE_MAJOR_LOADING_CARDS;
+    bool langChosen   = false;
+    const string lang = options[Options::LANG].str;
+    if (!lang.empty()) {
         string langpath = "lang/";
         langpath.append(lang);
         langpath.append(".txt");
-        if (JFileSystem::GetInstance()->FileExists(langpath)) langChosen = true;
+        if (JFileSystem::GetInstance()->FileExists(langpath)) {
+            langChosen = true;
+        }
     }
     if (!langChosen) {
         currentState = MENU_STATE_MAJOR_LANG | MENU_STATE_MINOR_NONE;
     }
     scroller    = NEW TextScroller(Fonts::MAIN_FONT, SCREEN_WIDTH / 2 - 90, SCREEN_HEIGHT - 17, 180);
     scrollerSet = 0;
-    splashTex   = NULL;
+    splashTex   = nullptr;
 
     JFileSystem::GetInstance()->scanfolder("sets/", setFolders);
     mCurrentSetFolderIndex = 0;
@@ -114,7 +119,7 @@ void GameStateMenu::Destroy() {
 void GameStateMenu::Start() {
     LOG("GameStateMenu::Start");
     JRenderer::GetInstance()->EnableVSync(true);
-    subMenuController = NULL;
+    subMenuController = nullptr;
     SAFE_DELETE(mGuiController);
 
     GameApp::playMusic("Track0.mp3");
@@ -129,9 +134,13 @@ void GameStateMenu::Start() {
     mBg       = WResourceManager::Instance()->RetrieveQuad("menutitle.png", 0, 0, 256,
                                                            166);  // Create background quad for rendering.
 
-    if (mBg) mBg->SetHotSpot(128, 50);
+    if (mBg) {
+        mBg->SetHotSpot(128, 50);
+    }
 
-    if (MENU_STATE_MAJOR_MAINMENU == currentState) currentState = currentState | MENU_STATE_MINOR_FADEIN;
+    if (MENU_STATE_MAJOR_MAINMENU == currentState) {
+        currentState = currentState | MENU_STATE_MINOR_FADEIN;
+    }
 
     wallpaper        = "";
     scrollerSet      = 0;  // This will force-update the scroller text
@@ -140,23 +149,25 @@ void GameStateMenu::Start() {
 
 void GameStateMenu::genNbCardsStr() {
     // How many cards total ?
-    PlayerData* playerdata = NEW PlayerData(MTGCollection());
-    size_t totalUnique     = MTGCollection()->primitives.size();
-    size_t totalPrints     = MTGCollection()->totalCards();
+    auto* playerdata         = NEW PlayerData(MTGCollection());
+    const size_t totalUnique = MTGCollection()->primitives.size();
+    const size_t totalPrints = MTGCollection()->totalCards();
 
     if (totalUnique != totalPrints) {
-        if (playerdata && !options[Options::ACTIVE_PROFILE].isDefault())
+        if (playerdata && !options[Options::ACTIVE_PROFILE].isDefault()) {
             sprintf(nbcardsStr, _("%s: %i cards (%i) (%i unique)").c_str(),
                     options[Options::ACTIVE_PROFILE].str.c_str(), playerdata->collection->totalCards(), totalPrints,
                     totalUnique);
-        else
+        } else {
             sprintf(nbcardsStr, _("%i cards (%i unique)").c_str(), totalPrints, totalUnique);
+        }
     } else {
-        if (playerdata && !options[Options::ACTIVE_PROFILE].isDefault())
+        if (playerdata && !options[Options::ACTIVE_PROFILE].isDefault()) {
             sprintf(nbcardsStr, _("%s: %i cards (%i)").c_str(), options[Options::ACTIVE_PROFILE].str.c_str(),
                     playerdata->collection->totalCards(), totalPrints);
-        else
+        } else {
             sprintf(nbcardsStr, _("%i cards").c_str(), totalPrints);
+        }
     }
 
     SAFE_DELETE(playerdata);
@@ -166,26 +177,32 @@ void GameStateMenu::fillScroller() {
     scroller->Reset();
     char buff2[512];
 
-    if (!options[Options::DIFFICULTY_MODE_UNLOCKED].number)
+    if (!options[Options::DIFFICULTY_MODE_UNLOCKED].number) {
         scroller->Add(_("Unlock the difficult mode for more challenging duels!"));
+    }
 
-    for (map<string, Unlockable*>::iterator it = Unlockable::unlockables.begin(); it != Unlockable::unlockables.end();
-         ++it) {
+    for (auto it = Unlockable::unlockables.begin(); it != Unlockable::unlockables.end(); ++it) {
         Unlockable* award = it->second;
         if (!award->isUnlocked()) {
-            if (award->getValue("teaser").size()) scroller->Add(_(award->getValue("teaser")));
+            if (!award->getValue("teaser").empty()) {
+                scroller->Add(_(award->getValue("teaser")));
+            }
         }
     }
 
-    if (!options[Options::RANDOMDECK_MODE_UNLOCKED].number)
+    if (!options[Options::RANDOMDECK_MODE_UNLOCKED].number) {
         scroller->Add(_("You haven't unlocked the random deck mode yet"));
-    if (!options[Options::EVILTWIN_MODE_UNLOCKED].number)
+    }
+    if (!options[Options::EVILTWIN_MODE_UNLOCKED].number) {
         scroller->Add(_("You haven't unlocked the evil twin mode yet"));
+    }
 
     // Unlocked sets
     int nbunlocked = 0;
     for (int i = 0; i < setlist.size(); i++) {
-        if (1 == options[Options::optionSet(i)].number) nbunlocked++;
+        if (1 == options[Options::optionSet(i)].number) {
+            nbunlocked++;
+        }
     }
     sprintf(buff2, _("You have unlocked %i expansions out of %i").c_str(), nbunlocked, setlist.size());
     scroller->Add(buff2);
@@ -197,36 +214,47 @@ void GameStateMenu::fillScroller() {
 }
 
 int GameStateMenu::gamePercentComplete() {
-    if (mPercentComplete) return mPercentComplete;
+    if (mPercentComplete) {
+        return mPercentComplete;
+    }
 
     int done  = 0;
     int total = 0;
 
     total++;
-    if (options[Options::DIFFICULTY_MODE_UNLOCKED].number) done++;
+    if (options[Options::DIFFICULTY_MODE_UNLOCKED].number) {
+        done++;
+    }
 
-    for (map<string, Unlockable*>::iterator it = Unlockable::unlockables.begin(); it != Unlockable::unlockables.end();
-         ++it) {
+    for (auto it = Unlockable::unlockables.begin(); it != Unlockable::unlockables.end(); ++it) {
         total++;
-        if (it->second->isUnlocked()) total++;
+        if (it->second->isUnlocked()) {
+            total++;
+        }
     }
 
     total++;
-    if (options[Options::RANDOMDECK_MODE_UNLOCKED].number) done++;
+    if (options[Options::RANDOMDECK_MODE_UNLOCKED].number) {
+        done++;
+    }
 
     total++;
-    if (options[Options::EVILTWIN_MODE_UNLOCKED].number) done++;
+    if (options[Options::EVILTWIN_MODE_UNLOCKED].number) {
+        done++;
+    }
 
     // Unlocked sets
     total += setlist.size();
     for (int i = 0; i < setlist.size(); i++) {
-        if (1 == options[Options::optionSet(i)].number) done++;
+        if (1 == options[Options::optionSet(i)].number) {
+            done++;
+        }
     }
 
     // unlocked AI decks
-    int currentlyUnlocked = options[Options::AIDECKS_UNLOCKED].number;
-    int totalAIDecks      = AIPlayer::getTotalAIDecks();
-    int reallyUnlocked    = MIN(currentlyUnlocked, totalAIDecks);
+    const int currentlyUnlocked = options[Options::AIDECKS_UNLOCKED].number;
+    const int totalAIDecks      = AIPlayer::getTotalAIDecks();
+    const int reallyUnlocked    = MIN(currentlyUnlocked, totalAIDecks);
     total += totalAIDecks / 10;
     done += reallyUnlocked / 10;
 
@@ -244,8 +272,9 @@ int GameStateMenu::nextSetFolder(const string& root, const string& file) {
 
         if (JFileSystem::GetInstance()->FileExists(mCurrentSetFileName)) {
             mCurrentSetName = setFolders[mCurrentSetFolderIndex];
-            if (mCurrentSetName.length() && (mCurrentSetName[mCurrentSetName.length() - 1] == '/'))
+            if (mCurrentSetName.length() && (mCurrentSetName[mCurrentSetName.length() - 1] == '/')) {
                 mCurrentSetName.resize(mCurrentSetName.length() - 1);
+            }
             found = true;
         }
         mCurrentSetFolderIndex++;
@@ -262,30 +291,44 @@ void GameStateMenu::End() {
 }
 
 string GameStateMenu::loadRandomWallpaper() {
-    if (wallpaper.size()) return wallpaper;
+    if (!wallpaper.empty()) {
+        return wallpaper;
+    }
 
     vector<string> wallpapers;
     izfstream file;
-    if (!JFileSystem::GetInstance()->openForRead(file, "graphics/wallpapers.txt")) return wallpaper;
+    if (!JFileSystem::GetInstance()->openForRead(file, "graphics/wallpapers.txt")) {
+        return wallpaper;
+    }
 
     string s;
     while (std::getline(file, s)) {
-        if (!s.size()) continue;
-        if (s[s.size() - 1] == '\r') s.erase(s.size() - 1);  // Handle DOS files
+        if (s.empty()) {
+            continue;
+        }
+        if (s[s.size() - 1] == '\r') {
+            s.erase(s.size() - 1);  // Handle DOS files
+        }
         wallpapers.push_back(s);
     }
     file.close();
 
-    int rnd   = rand() % (wallpapers.size());
-    wallpaper = wallpapers[rnd];
+    const int rnd = rand() % (wallpapers.size());
+    wallpaper     = wallpapers[rnd];
     return wallpaper;
 }
 
 string GameStateMenu::getLang(string s) {
-    if (!s.size()) return "";
-    if (s[s.size() - 1] == '\r') s.erase(s.size() - 1);  // Handle DOS files
-    size_t found = s.find("#LANG:");
-    if (found != 0) return "";
+    if (s.empty()) {
+        return "";
+    }
+    if (s[s.size() - 1] == '\r') {
+        s.erase(s.size() - 1);  // Handle DOS files
+    }
+    const size_t found = s.find("#LANG:");
+    if (found != 0) {
+        return "";
+    }
     return s.substr(6);
 }
 
@@ -299,14 +342,18 @@ void GameStateMenu::setLang(int id) {
 void GameStateMenu::loadLangMenu() {
     LOG("GameStateMenu::loadLangMenu");
     subMenuController = NEW SimpleMenu(JGE::GetInstance(), MENU_LANGUAGE_SELECTION, this, Fonts::MENU_FONT, 150, 60);
-    if (!subMenuController) return;
+    if (!subMenuController) {
+        return;
+    }
 
     vector<string> langFiles = JFileSystem::GetInstance()->scanfolder("lang/");
     for (size_t i = 0; i < langFiles.size(); ++i) {
         izfstream file;
         string filePath = "lang/";
         filePath.append(langFiles[i]);
-        if (!JFileSystem::GetInstance()->openForRead(file, filePath)) continue;
+        if (!JFileSystem::GetInstance()->openForRead(file, filePath)) {
+            continue;
+        }
 
         string s;
         string lang;
@@ -317,9 +364,9 @@ void GameStateMenu::loadLangMenu() {
 
         file.close();
 
-        if (lang.size()) {
-            langChoices  = true;
-            string filen = langFiles[i];
+        if (!lang.empty()) {
+            langChoices        = true;
+            const string filen = langFiles[i];
             langs.push_back(filen.substr(0, filen.size() - 4));
             subMenuController->Add(langs.size(), lang.c_str());
         }
@@ -331,7 +378,7 @@ void GameStateMenu::listPrimitives() {
     LOG("GameStateMenu::listPrimitives");
     vector<string> primitiveFiles = JFileSystem::GetInstance()->scanfolder("sets/primitives/");
 
-    if (!primitiveFiles.size()) {
+    if (primitiveFiles.empty()) {
         DebugTrace("GameStateMenu.cpp:WARNING:Primitives folder is missing");
         primitivesLoadCounter = 0;
         return;
@@ -341,7 +388,9 @@ void GameStateMenu::listPrimitives() {
         string filename = "sets/primitives/";
         filename.append(primitiveFiles[i]);
 
-        if (!JFileSystem::GetInstance()->FileExists(filename)) continue;
+        if (!JFileSystem::GetInstance()->FileExists(filename)) {
+            continue;
+        }
         primitives.push_back(filename);
     }
     primitivesLoadCounter = 0;
@@ -356,31 +405,34 @@ void GameStateMenu::ensureMGuiController() {
             mFont->SetColor(ARGB(255, 255, 255, 255));
             vector<ModRulesMainMenuItem*> items = gModRules.menu.main;
 
-            int numItems    = (int)items.size();
-            float startX    = 80.f;
-            float totalSize = SCREEN_WIDTH_F - (2 * startX);
-            float space     = 0;
-            if (numItems < 2)
+            const int numItems    = (int)items.size();
+            float startX          = 80.f;
+            const float totalSize = SCREEN_WIDTH_F - (2 * startX);
+            float space           = 0;
+            if (numItems < 2) {
                 startX = SCREEN_WIDTH_F / 2;
-            else
+            } else {
                 space = totalSize / (numItems - 1);
+            }
 
             for (size_t i = 0; i < items.size(); ++i) {
                 ModRulesMainMenuItem* item = items[i];
-                int iconId                 = (item->mIconId - 1) * 2;
+                const int iconId           = (item->mIconId - 1) * 2;
                 mGuiController->Add(NEW MenuItem(item->mActionId, mFont, item->mDisplayName, startX + (i * space),
                                                  40 + SCREEN_HEIGHT / 2, mIcons[iconId].get(), mIcons[iconId + 1].get(),
                                                  item->mParticleFile.c_str(),
                                                  WResourceManager::Instance()->GetQuad("particles").get(), (i == 0)));
             }
 
-            JQuadPtr jq = WResourceManager::Instance()->RetrieveTempQuad("button_shoulder.png");
-            if (!jq.get()) return;
+            const JQuadPtr jq = WResourceManager::Instance()->RetrieveTempQuad("button_shoulder.png");
+            if (!jq.get()) {
+                return;
+            }
             jq->SetHFlip(false);
             jq->SetColor(ARGB(abs(255), 255, 255, 255));
             mFont                                     = WResourceManager::Instance()->GetWFont(Fonts::OPTION_FONT);
             vector<ModRulesOtherMenuItem*> otherItems = gModRules.menu.other;
-            if (otherItems.size()) {
+            if (!otherItems.empty()) {
                 mGuiController->Add(NEW OtherMenuItem(otherItems[0]->mActionId, mFont, otherItems[0]->mDisplayName,
                                                       SCREEN_WIDTH - 64, 2, jq.get(), jq.get(), otherItems[0]->mKey,
                                                       false));
@@ -394,13 +446,16 @@ void GameStateMenu::Update(float dt) {
     switch (MENU_STATE_MAJOR & currentState) {
     case MENU_STATE_MAJOR_LANG:
         if (MENU_STATE_MINOR_NONE == (currentState & MENU_STATE_MINOR)) {
-            if (!subMenuController) loadLangMenu();
+            if (!subMenuController) {
+                loadLangMenu();
+            }
         }
         if (!langChoices) {
             currentState = MENU_STATE_MAJOR_LOADING_CARDS;
             SAFE_DELETE(subMenuController);
-        } else
+        } else {
             subMenuController->Update(dt);
+        }
         break;
     case MENU_STATE_MAJOR_LOADING_CARDS:
         if (primitivesLoadCounter == -1) {
@@ -408,12 +463,12 @@ void GameStateMenu::Update(float dt) {
         }
         if (primitivesLoadCounter < (int)(primitives.size())) {
 #ifdef _DEBUG
-            int startTime = JGEGetTime();
+            const int startTime = JGEGetTime();
 #endif
             MTGCollection()->load(primitives[primitivesLoadCounter].c_str());
 #if _DEBUG
-            int endTime     = JGEGetTime();
-            int elapsedTime = (endTime - startTime);
+            const int endTime     = JGEGetTime();
+            const int elapsedTime = (endTime - startTime);
             DebugTrace("Time elapsed while loading " << primitives[primitivesLoadCounter] << " : " << elapsedTime
                                                      << " ms");
 #endif
@@ -438,11 +493,13 @@ void GameStateMenu::Update(float dt) {
                        << "==");
 
             // Force default, if necessary.
-            if (options[Options::ACTIVE_PROFILE].str == "") options[Options::ACTIVE_PROFILE].str = "Default";
+            if (options[Options::ACTIVE_PROFILE].str.empty()) {
+                options[Options::ACTIVE_PROFILE].str = "Default";
+            }
 
             // Release splash texture
             WResourceManager::Instance()->Release(splashTex);
-            splashTex = NULL;
+            splashTex = nullptr;
 
             // check for deleted collection / first-timer
             if (JFileSystem::GetInstance()->FileExists(options.profileFile(PLAYER_COLLECTION))) {
@@ -463,17 +520,22 @@ void GameStateMenu::Update(float dt) {
         options.reloadProfile();  // Handles building a new deck, if needed.
         break;
     case MENU_STATE_MAJOR_MAINMENU: {
-        if (!scrollerSet) fillScroller();
+        if (!scrollerSet) {
+            fillScroller();
+        }
         ensureMGuiController();
-        if (mGuiController) mGuiController->Update(dt);
+        if (mGuiController) {
+            mGuiController->Update(dt);
+        }
 
         // Hook for Top Menu actions
         vector<ModRulesOtherMenuItem*> items = gModRules.menu.other;
         for (size_t i = 0; i < items.size(); ++i) {
-            if (mEngine->GetButtonState(items[i]->mKey) && items[i]->getMatchingGameState())
+            if (mEngine->GetButtonState(items[i]->mKey) && items[i]->getMatchingGameState()) {
                 mParent->DoTransition(
                     TRANSITION_FADE,
                     items[i]->getMatchingGameState());  // TODO: Add the transition as a parameter in the rules file
+            }
         }
         break;
     }
@@ -508,7 +570,9 @@ void GameStateMenu::Update(float dt) {
         break;
 #endif  // NETWORK_SUPPORT
     case MENU_STATE_MAJOR_SUBMENU:
-        if (subMenuController) subMenuController->Update(dt);
+        if (subMenuController) {
+            subMenuController->Update(dt);
+        }
         ensureMGuiController();
         mGuiController->Update(dt);
         break;
@@ -520,11 +584,11 @@ void GameStateMenu::Update(float dt) {
                     NEW SimpleMenu(JGE::GetInstance(), MENU_FIRST_DUEL_SUBMENU, this, Fonts::MENU_FONT, 150, 60);
                 if (subMenuController) {
                     for (size_t i = 0; i < Rules::RulesList.size(); ++i) {
-                        Rules* rules  = Rules::RulesList[i];
-                        bool unlocked = rules->unlockOption == INVALID_OPTION
-                                            ? (rules->mUnlockOptionString.size() == 0 ||
-                                               options[rules->mUnlockOptionString].number != 0)
-                                            : options[rules->unlockOption].number != 0;
+                        Rules* rules        = Rules::RulesList[i];
+                        const bool unlocked = rules->unlockOption == INVALID_OPTION
+                                                  ? (rules->mUnlockOptionString.empty() ||
+                                                     options[rules->mUnlockOptionString].number != 0)
+                                                  : options[rules->unlockOption].number != 0;
                         if (!rules->hidden && (unlocked)) {
                             subMenuController->Add(SUBMENUITEM_END_OFFSET + i, rules->displayName.c_str());
                         }
@@ -532,10 +596,11 @@ void GameStateMenu::Update(float dt) {
                     subMenuController->Add(SUBMENUITEM_CANCEL, "Cancel");
                 }
             } else {
-                if (mParent->gameType == GAME_TYPE_STORY)
+                if (mParent->gameType == GAME_TYPE_STORY) {
                     mParent->DoTransition(TRANSITION_FADE, GAME_STATE_STORY);
-                else
+                } else {
                     mParent->DoTransition(TRANSITION_FADE, GAME_STATE_DUEL);
+                }
                 currentState = MENU_STATE_MAJOR_MAINMENU;
             }
         }
@@ -550,8 +615,9 @@ void GameStateMenu::Update(float dt) {
         if (subMenuController->isClosed()) {
             SAFE_DELETE(subMenuController);
             currentState &= ~MENU_STATE_MINOR_SUBMENU_CLOSING;
-        } else
+        } else {
             subMenuController->Update(dt);
+        }
         break;
     case MENU_STATE_MINOR_NONE:;  // Nothing to do.
     }
@@ -599,30 +665,33 @@ void GameStateMenu::RenderTopMenu() {
 }
 
 void GameStateMenu::Render() {
-    if ((currentState & MENU_STATE_MINOR) == MENU_STATE_MINOR_FADEIN) return;
+    if ((currentState & MENU_STATE_MINOR) == MENU_STATE_MINOR_FADEIN) {
+        return;
+    }
 
     JRenderer* renderer = JRenderer::GetInstance();
     WFont* mFont        = WResourceManager::Instance()->GetWFont(Fonts::MENU_FONT);
     if ((currentState & MENU_STATE_MAJOR) == MENU_STATE_MAJOR_LANG) {
     } else if ((currentState & MENU_STATE_MAJOR) == MENU_STATE_MAJOR_LOADING_CARDS) {
-        string wp = loadRandomWallpaper();
-        if (wp.size()) {
+        const string wp = loadRandomWallpaper();
+        if (!wp.empty()) {
             JTexture* wpTex = WResourceManager::Instance()->RetrieveTexture(wp);
             if (wpTex) {
-                JQuadPtr wpQuad = WResourceManager::Instance()->RetrieveTempQuad(wp);
+                const JQuadPtr wpQuad = WResourceManager::Instance()->RetrieveTempQuad(wp);
                 renderer->RenderQuad(wpQuad.get(), 0, 0, 0, SCREEN_WIDTH_F / wpQuad->mWidth,
                                      SCREEN_HEIGHT_F / wpQuad->mHeight);
             }
         }
 
         char text[512];
-        if (mCurrentSetName.size()) {
+        if (!mCurrentSetName.empty()) {
             sprintf(text, _("LOADING SET: %s").c_str(), mCurrentSetName.c_str());
         } else {
-            if (primitivesLoadCounter <= (int)(primitives.size()))
+            if (primitivesLoadCounter <= (int)(primitives.size())) {
                 sprintf(text, "LOADING PRIMITIVES");
-            else
+            } else {
                 sprintf(text, "LOADING...");
+            }
         }
         mFont->SetColor(ARGB(170, 0, 0, 0));
         mFont->DrawString(text, SCREEN_WIDTH / 2 + 2, SCREEN_HEIGHT - 50 + 2, JGETEXT_CENTER);
@@ -638,12 +707,16 @@ void GameStateMenu::Render() {
         };
         renderer->FillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, colors);
 
-        if (mGuiController) mGuiController->Render();
+        if (mGuiController) {
+            mGuiController->Render();
+        }
 
         renderer->FillRoundRect(SCREEN_WIDTH / 2 - 100, SCREEN_HEIGHT, 191, 6, 5, ARGB(100, 10, 5, 0));
         scroller->Render();
 
-        if (mBg.get()) renderer->RenderQuad(mBg.get(), SCREEN_WIDTH / 2, 50);
+        if (mBg.get()) {
+            renderer->RenderQuad(mBg.get(), SCREEN_WIDTH / 2, 50);
+        }
 
         RenderTopMenu();
     }
@@ -656,7 +729,9 @@ void GameStateMenu::ButtonPressed(int controllerId, int controlId) {
     DebugTrace("GameStateMenu: controllerId " << controllerId << " selected");
     switch (controllerId) {
     case MENU_LANGUAGE_SELECTION:
-        if (controlId == kInfoMenuID) break;
+        if (controlId == kInfoMenuID) {
+            break;
+        }
         setLang(controlId);
         WResourceManager::Instance()->ReloadWFonts();  // Fix for choosing Chinese language at first time.
         subMenuController->Close();
@@ -752,7 +827,7 @@ void GameStateMenu::ButtonPressed(int controllerId, int controlId) {
             break;
         case SUBMENUITEM_CANCEL:
         case kInfoMenuID:  // Triangle button
-            if (subMenuController != NULL) {
+            if (subMenuController != nullptr) {
                 subMenuController->Close();
             }
 #ifdef NETWORK_SUPPORT

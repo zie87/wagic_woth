@@ -1,5 +1,5 @@
-#ifndef _CARDSELECTOR_H_
-#define _CARDSELECTOR_H_
+#ifndef CARDSELECTOR_H
+#define CARDSELECTOR_H
 
 #include <vector>
 #include <stack>
@@ -21,21 +21,22 @@ class DuelLayers;
 
 template <typename T>
 struct LimitorFunctor {
-    virtual bool select(T*)  = 0;
-    virtual bool greyout(T*) = 0;
+    virtual ~LimitorFunctor() = default;
+    virtual bool select(T*)   = 0;
+    virtual bool greyout(T*)  = 0;
     typedef T Target;
 };
 
 class CardSelectorBase : public GuiLayer {
 public:
     CardSelectorBase(GameObserver* observer, int inDrawMode = DrawMode::kNormal)
-        : GuiLayer(observer),
-          mDrawMode(inDrawMode)
+        : GuiLayer(observer)
+        , mDrawMode(inDrawMode)
 
               {};
     virtual void Add(PlayGuiObject*)                                                            = 0;
     virtual void Remove(PlayGuiObject*)                                                         = 0;
-    virtual bool CheckUserInput(JButton key)                                                    = 0;
+    bool CheckUserInput(JButton key) override                                                   = 0;
     virtual void PushLimitor()                                                                  = 0;
     virtual void PopLimitor()                                                                   = 0;
     virtual void Limit(LimitorFunctor<PlayGuiObject>* inLimitor, CardView::SelectorZone inZone) = 0;
@@ -70,17 +71,17 @@ protected:
 
 public:
     CardSelector(GameObserver* observer, DuelLayers*);
-    void Add(PlayGuiObject*);
-    void Remove(PlayGuiObject*);
-    bool CheckUserInput(JButton key);
-    void Update(float dt);
-    void Render();
-    void Push();
-    void Pop();
+    void Add(PlayGuiObject*) override;
+    void Remove(PlayGuiObject*) override;
+    bool CheckUserInput(JButton key) override;
+    void Update(float dt) override;
+    void Render() override;
+    void Push() override;
+    void Pop() override;
 
-    void Limit(LimitorFunctor<PlayGuiObject>* limitor, CardView::SelectorZone);
-    void PushLimitor();
-    void PopLimitor();
+    void Limit(LimitorFunctor<PlayGuiObject>* limitor, CardView::SelectorZone) override;
+    void PushLimitor() override;
+    void PopLimitor() override;
 
     typedef PlayGuiObject Target;
 };

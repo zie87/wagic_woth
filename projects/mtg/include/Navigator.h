@@ -15,23 +15,23 @@ class CardZone;
 class Navigator : public CardSelectorBase {
 public:
     Navigator(GameObserver* observer, DuelLayers* inDuelLayers);
-    virtual ~Navigator();
+    ~Navigator() override;
 
     // Inherited functions from GuiLayer
-    bool CheckUserInput(JButton inKey);
+    bool CheckUserInput(JButton inKey) override;
     bool CheckUserInput(int x, int y);
-    void Update(float dt);
-    void Render();
+    void Update(float dt) override;
+    void Render() override;
 
     // Limitor operations
-    void PushLimitor();
-    void PopLimitor();
-    void Limit(LimitorFunctor<PlayGuiObject>* inLimitor, CardView::SelectorZone inZone);
+    void PushLimitor() override;
+    void PopLimitor() override;
+    void Limit(LimitorFunctor<PlayGuiObject>* inLimitor, CardView::SelectorZone inZone) override;
 
-    virtual void Add(PlayGuiObject*);
-    virtual void Remove(PlayGuiObject*);
-    virtual void Push() {}
-    virtual void Pop() {}
+    void Add(PlayGuiObject*) override;
+    void Remove(PlayGuiObject*) override;
+    void Push() override {}
+    void Pop() override {}
 
 protected:
     PlayGuiObject* GetCurrentCard();

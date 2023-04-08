@@ -1,5 +1,5 @@
-#ifndef _GAMEOBSERVER_H_
-#define _GAMEOBSERVER_H_
+#ifndef GAMEOBSERVER_H
+#define GAMEOBSERVER_H
 
 #include "Player.h"
 #include "MTGAbility.h"
@@ -85,18 +85,18 @@ public:
     Trash* mTrash;
 
     GameType gameType() const { return mGameType; };
-    TargetChooser* getCurrentTargetChooser();
+    TargetChooser* getCurrentTargetChooser() const;
     void stackObjectClicked(Interruptible* action);
 
     int cardClickLog(bool log, Player* clickedPlayer, MTGGameZone* zone, MTGCardInstance* backup, size_t index,
                      int toReturn);
     int cardClick(MTGCardInstance* card, MTGAbility* ability);
     int cardClick(MTGCardInstance* card, int abilityType);
-    int cardClick(MTGCardInstance* card, Targetable* _object = NULL, bool log = true);
-    GamePhase getCurrentGamePhase();
+    int cardClick(MTGCardInstance* card, Targetable* _object = nullptr, bool log = true);
+    GamePhase getCurrentGamePhase() const;
     void setCurrentGamePhase(GamePhase phase) { currentGamePhase = phase; };
-    const char* getCurrentGamePhaseName();
-    const char* getNextGamePhaseName();
+    const char* getCurrentGamePhaseName() const;
+    const char* getNextGamePhaseName() const;
     void nextCombatStep();
     void userRequestNextGamePhase(bool allowInterrupt = true, bool log = true);
     void cleanupPhase();
@@ -113,16 +113,16 @@ public:
     Player* isInterrupting;
     Player* opponent();
     Player* nextTurnsPlayer();
-    Player* currentlyActing();
-    GameObserver(WResourceManager* output = 0, JGE* input = 0);
+    Player* currentlyActing() const;
+    GameObserver(WResourceManager* output = nullptr, JGE* input = nullptr);
     ~GameObserver();
     void gameStateBasedEffects();
     void enchantmentStatus();
     void Affinity();
-    void addObserver(MTGAbility* observer);
-    bool removeObserver(ActionElement* observer);
+    void addObserver(MTGAbility* observer) const;
+    bool removeObserver(ActionElement* observer) const;
     void startGame(GameType, Rules* rules);
-    void untapPhase();
+    void untapPhase() const;
     MTGCardInstance* isCardWaiting() { return cardWaitingForTargets; }
     int isInPlay(MTGCardInstance* card);
     int isInGrave(MTGCardInstance* card);
@@ -130,7 +130,7 @@ public:
     void Update(float dt);
     void Render();
     void ButtonPressed(PlayGuiObject*);
-    int getPlayersNumber() { return players.size(); };
+    int getPlayersNumber() const { return players.size(); };
 
     int receiveEvent(WEvent* event);
     bool connectRule;
@@ -145,39 +145,39 @@ public:
 #endif
     );
     bool undo();
-    bool isLoading() { return mLoading; };
-    void Mulligan(Player* player = NULL);
+    bool isLoading() const { return mLoading; };
+    void Mulligan(Player* player = nullptr);
     Player* getPlayer(size_t index) { return players[index]; };
-    bool isStarted() { return (mLayers != NULL); };
+    bool isStarted() const { return (mLayers != nullptr); };
     RandomGenerator* getRandomGenerator() { return &randomGenerator; };
     WResourceManager* getResourceManager() {
-        if (this)
+        if (this) {
             return mResourceManager;
-        else
-            return 0;
+        }
+        return nullptr;
     };
-    CardSelectorBase* getCardSelector() { return mLayers->mCardSelector; };
+    CardSelectorBase* getCardSelector() const { return mLayers->mCardSelector; };
     bool operator==(const GameObserver& aGame);
     JGE* getInput() { return mJGE; };
     DeckManager* getDeckManager() { return mDeckManager; };
-    void dumpAssert(bool val);
+    void dumpAssert(bool val) const;
     void resetStartupGame();
     void setLoser(Player* aPlayer) { gameOver = aPlayer; };
 
-    bool didWin(Player* aPlayer = 0) const {
+    bool didWin(Player* aPlayer = nullptr) const {
         if (!gameOver) {
             // nobody won
             return false;
-        } else if (!aPlayer) {
+        }
+        if (!aPlayer) {
             // somebody won and we don't care who
             return true;
-        } else if (gameOver == aPlayer) {
+        }
+        if (gameOver == aPlayer) {
             // aPlayer lost
             return false;
-        } else {
-            // aPlayer won
-            return true;
-        }
+        }  // aPlayer won
+        return true;
     };
 };
 

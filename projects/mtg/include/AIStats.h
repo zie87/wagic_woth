@@ -1,5 +1,5 @@
-#ifndef _AISTATS_H_
-#define _AISTATS_H_
+#ifndef AISTATS_H
+#define AISTATS_H
 
 #define STATS_PLAYER_MULTIPLIER 15
 #define STATS_CREATURE_MULTIPLIER 10
@@ -25,7 +25,10 @@ public:
     int occurences;
     bool direct;
     AIStat(int _source, int _value, int _occurences, bool _direct)
-        : source(_source), value(_value), occurences(_occurences), direct(_direct){};
+        : source(_source)
+        , value(_value)
+        , occurences(_occurences)
+        , direct(_direct){};
 };
 
 class AIStats {

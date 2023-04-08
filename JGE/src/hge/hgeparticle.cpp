@@ -26,10 +26,11 @@
 unsigned int g_seed = 0;
 
 void Random_Seed(int seed) {
-    if (!seed)
+    if (!seed) {
         g_seed = JGE::GetInstance()->GetTime();
-    else
+    } else {
         g_seed = seed;
+    }
 }
 
 int Random_Int(int min, int max) {
@@ -50,7 +51,9 @@ hgeParticleSystem::hgeParticleSystem(const char* filename, JQuad* sprite) {
     // hge=hgeCreate(HGE_VERSION);
 
     // psi=hge->Resource_Load(filename);
-    if (!fileSys->OpenFile(filename)) return;
+    if (!fileSys->OpenFile(filename)) {
+        return;
+    }
 
     // if(!psi) return;
 
@@ -85,7 +88,12 @@ hgeParticleSystem::hgeParticleSystem(const char* filename, JQuad* sprite) {
     bUpdateBoundingBox = false;
 }
 
-hgeParticleSystem::hgeParticleSystem(hgeParticleSystemInfo* psi) {
+hgeParticleSystem::hgeParticleSystem(hgeParticleSystemInfo* psi)
+    : fEmissionResidue(0.0f)
+    , bUpdateBoundingBox(false)
+    , fAge(-2.0)
+    , mTimer(0.0f)
+    , nParticlesAlive(0) {
     // hge=hgeCreate(HGE_VERSION);
 
     memcpy(&info, psi, sizeof(hgeParticleSystemInfo));
@@ -94,13 +102,7 @@ hgeParticleSystem::hgeParticleSystem(hgeParticleSystemInfo* psi) {
     vecLocation.y = vecPrevLocation.y = 0.0f;
     fTx = fTy = 0;
 
-    fEmissionResidue = 0.0f;
-    nParticlesAlive  = 0;
-    fAge             = -2.0;
-    mTimer           = 0.0f;
-
     rectBoundingBox.Clear();
-    bUpdateBoundingBox = false;
 }
 
 hgeParticleSystem::hgeParticleSystem(const hgeParticleSystem& ps) {
@@ -111,24 +113,31 @@ hgeParticleSystem::hgeParticleSystem(const hgeParticleSystem& ps) {
 void hgeParticleSystem::Update(float fDeltaTime) {
     int i;
     float ang;
-    hgeVector vecAccel, vecAccel2;
+    hgeVector vecAccel;
+    hgeVector vecAccel2;
 
     if (fAge >= 0) {
         fAge += fDeltaTime;
-        if (fAge >= info.fLifetime) fAge = -2.0f;
+        if (fAge >= info.fLifetime) {
+            fAge = -2.0f;
+        }
     }
 
     mTimer += fDeltaTime;
-    if (mTimer < 0.01f) return;
+    if (mTimer < 0.01f) {
+        return;
+    }
 
     fDeltaTime = mTimer;
     mTimer     = 0.0f;
 
     // update all alive particles
 
-    if (bUpdateBoundingBox) rectBoundingBox.Clear();
+    if (bUpdateBoundingBox) {
+        rectBoundingBox.Clear();
+    }
 
-    ParticleBuffer::iterator particle = mParticleBuffer.begin();
+    auto particle = mParticleBuffer.begin();
     while (particle != mParticleBuffer.end()) {
         particle->fAge += fDeltaTime;
         if (particle->fAge >= particle->fTerminalAge) {
@@ -160,7 +169,9 @@ void hgeParticleSystem::Update(float fDeltaTime) {
         particle->fSize += particle->fSizeDelta * fDeltaTime;
         particle->colColor += particle->colColorDelta * fDeltaTime;
 
-        if (bUpdateBoundingBox) rectBoundingBox.Encapsulate(particle->vecLocation.x, particle->vecLocation.y);
+        if (bUpdateBoundingBox) {
+            rectBoundingBox.Encapsulate(particle->vecLocation.x, particle->vecLocation.y);
+        }
 
         ++particle;
     }
@@ -168,12 +179,14 @@ void hgeParticleSystem::Update(float fDeltaTime) {
     // generate new particles
 
     if (fAge != -2.0f) {
-        float fParticlesNeeded = info.nEmission * fDeltaTime + fEmissionResidue;
-        int nParticlesCreated  = (unsigned int)fParticlesNeeded;
-        fEmissionResidue       = fParticlesNeeded - nParticlesCreated;
+        const float fParticlesNeeded = info.nEmission * fDeltaTime + fEmissionResidue;
+        const int nParticlesCreated  = (unsigned int)fParticlesNeeded;
+        fEmissionResidue             = fParticlesNeeded - nParticlesCreated;
 
         for (i = 0; i < nParticlesCreated; i++) {
-            if (nParticlesAlive >= MAX_PARTICLES) break;
+            if (nParticlesAlive >= MAX_PARTICLES) {
+                break;
+            }
 
             hgeParticle newParticle;
             newParticle.fAge         = 0.0f;
@@ -184,7 +197,9 @@ void hgeParticleSystem::Update(float fDeltaTime) {
             newParticle.vecLocation.y += Random_Float(-2.0f, 2.0f);
 
             ang = info.fDirection - M_PI_2 + Random_Float(0, info.fSpread) - info.fSpread / 2.0f;
-            if (info.bRelative) ang += (vecPrevLocation - vecLocation).Angle() + M_PI_2;
+            if (info.bRelative) {
+                ang += (vecPrevLocation - vecLocation).Angle() + M_PI_2;
+            }
             newParticle.vecVelocity.x = cosf(ang);
             newParticle.vecVelocity.y = sinf(ang);
             newParticle.vecVelocity *= Random_Float(info.fSpeedMin, info.fSpeedMax);
@@ -219,7 +234,9 @@ void hgeParticleSystem::Update(float fDeltaTime) {
             newParticle.colColorDelta.b = (info.colColorEnd.b - newParticle.colColor.b) / newParticle.fTerminalAge;
             newParticle.colColorDelta.a = (info.colColorEnd.a - newParticle.colColor.a) / newParticle.fTerminalAge;
 
-            if (bUpdateBoundingBox) rectBoundingBox.Encapsulate(newParticle.vecLocation.x, newParticle.vecLocation.y);
+            if (bUpdateBoundingBox) {
+                rectBoundingBox.Encapsulate(newParticle.vecLocation.x, newParticle.vecLocation.y);
+            }
 
             mParticleBuffer.push_back(newParticle);
             ++nParticlesAlive;
@@ -230,13 +247,14 @@ void hgeParticleSystem::Update(float fDeltaTime) {
 }
 
 void hgeParticleSystem::MoveTo(float x, float y, bool bMoveParticles) {
-    float dx, dy;
+    float dx;
+    float dy;
 
     if (bMoveParticles) {
         dx = x - vecLocation.x;
         dy = y - vecLocation.y;
 
-        ParticleBuffer::iterator particle = mParticleBuffer.begin();
+        auto particle = mParticleBuffer.begin();
         for (; particle != mParticleBuffer.end(); ++particle) {
             particle->vecLocation.x += dx;
             particle->vecLocation.y += dy;
@@ -267,10 +285,11 @@ void hgeParticleSystem::FireAt(float x, float y) {
 void hgeParticleSystem::Fire() {
     mTimer = 0.0f;
 
-    if (info.fLifetime == -1.0f)
+    if (info.fLifetime == -1.0f) {
         fAge = -1.0f;
-    else
+    } else {
         fAge = 0.0f;
+    }
 }
 
 void hgeParticleSystem::Stop(bool bKillParticles) {
@@ -283,7 +302,7 @@ void hgeParticleSystem::Stop(bool bKillParticles) {
 }
 
 void hgeParticleSystem::Render() {
-    ParticleBuffer::iterator particle = mParticleBuffer.begin();
+    auto particle = mParticleBuffer.begin();
     for (; particle != mParticleBuffer.end(); ++particle) {
         info.sprite->SetColor(particle->colColor.GetHWColor());
         JRenderer::GetInstance()->RenderQuad(info.sprite, particle->vecLocation.x + fTx, particle->vecLocation.y + fTy,

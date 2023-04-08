@@ -1,5 +1,5 @@
-#ifndef _CARDEFFECT_H_
-#define _CARDEFFECT_H_
+#ifndef CARDEFFECT_H
+#define CARDEFFECT_H
 
 #include <JGE.h>
 #include "Effects.h"
@@ -9,13 +9,13 @@ struct CardGui;
 class CardEffect : public Effect {
 public:
     CardEffect(CardGui* target);
-    ~CardEffect();
+    ~CardEffect() override;
 
 private:
     CardGui* target;
 
 public:
-    virtual void Render();
+    void Render() override;
 };
 
-#endif  // _CARDEFFECT_H_
+#endif  // CARDEFFECT_H

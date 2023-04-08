@@ -17,9 +17,7 @@
 
 #define SMALL_NUMBER 0.0001f
 
-JSpline::JSpline() {
-    mCount = 0;
-
+JSpline::JSpline() : mCount(0) {
     mMidPoints.reserve(32);
     mPixels.reserve(32);
 }
@@ -34,10 +32,14 @@ JSpline::~JSpline() {
 bool JSpline::Load(const char* filename, float xscale, float yscale) {
     JFileSystem* fileSystem = JFileSystem::GetInstance();
 
-    if (fileSystem == NULL) return false;
-    if (!fileSystem->OpenFile(filename)) return false;
+    if (fileSystem == nullptr) {
+        return false;
+    }
+    if (!fileSystem->OpenFile(filename)) {
+        return false;
+    }
 
-    int size        = fileSystem->GetFileSize();
+    const int size  = fileSystem->GetFileSize();
     char* xmlBuffer = new char[size];
     fileSystem->ReadFile(xmlBuffer, size);
 
@@ -49,13 +51,14 @@ bool JSpline::Load(const char* filename, float xscale, float yscale) {
     mMidPoints.clear();
     mPixels.clear();
 
-    TiXmlNode* node = 0;
+    TiXmlNode* node = nullptr;
     // TiXmlElement* todoElement = 0;
     TiXmlElement* element;
 
     node = doc.RootElement();
 
-    float xx, yy;
+    float xx;
+    float yy;
 
     for (element = node->FirstChildElement(); element; element = element->NextSiblingElement()) {
         xx = 0.0f;
@@ -63,7 +66,7 @@ bool JSpline::Load(const char* filename, float xscale, float yscale) {
         element->QueryFloatAttribute("x", &xx);
         element->QueryFloatAttribute("y", &yy);
 
-        Point pt(xx * xscale, yy * yscale);
+        const Point pt(xx * xscale, yy * yscale);
         AddControlPoint(pt);
     }
 
@@ -74,9 +77,9 @@ bool JSpline::Load(const char* filename, float xscale, float yscale) {
 }
 
 void JSpline::PointOnCurve(Point& out, float t, const Point& p0, const Point& p1, const Point& p2, const Point& p3) {
-    float t2 = t * t;
-    float t3 = t2 * t;
-    out.x    = 0.5f * ((2.0f * p1.x) + (-p0.x + p2.x) * t + (2.0f * p0.x - 5.0f * p1.x + 4 * p2.x - p3.x) * t2 +
+    const float t2 = t * t;
+    const float t3 = t2 * t;
+    out.x          = 0.5f * ((2.0f * p1.x) + (-p0.x + p2.x) * t + (2.0f * p0.x - 5.0f * p1.x + 4 * p2.x - p3.x) * t2 +
                     (-p0.x + 3.0f * p1.x - 3.0f * p2.x + p3.x) * t3);
 
     out.y = 0.5f * ((2.0f * p1.y) + (-p0.y + p2.y) * t + (2.0f * p0.y - 5.0f * p1.y + 4 * p2.y - p3.y) * t2 +
@@ -84,9 +87,10 @@ void JSpline::PointOnCurve(Point& out, float t, const Point& p0, const Point& p1
 }
 
 void JSpline::GeneratePixels() {
-    float x, y;
+    float x;
+    float y;
 
-    float inc = SMALL_NUMBER;
+    const float inc = SMALL_NUMBER;
 
     mPixels.clear();
 
@@ -94,7 +98,7 @@ void JSpline::GeneratePixels() {
     y = mMidPoints[1].y;
 
     Point newPt(x, y);
-    Point extraPt;
+    const Point extraPt;
 
     mPixels.push_back(newPt);
 
@@ -103,10 +107,10 @@ void JSpline::GeneratePixels() {
         while (t <= 1.0f) {
             PointOnCurve(newPt, t, mMidPoints[n], mMidPoints[n + 1], mMidPoints[n + 2], mMidPoints[n + 3]);
 
-            float dx = newPt.x - x;
-            float dy = newPt.y - y;
+            const float dx = newPt.x - x;
+            const float dy = newPt.y - y;
 
-            float dist = sqrtf(dx * dx + dy * dy);
+            const float dist = sqrtf(dx * dx + dy * dy);
             if (dist >= MID_POINT_THRESHOLD) {
                 //
                 // extraPt.x = (newPt.x+x)/2;
@@ -141,7 +145,7 @@ void JSpline::GetPixel(Point& point, int index) {
     }
 }
 
-int JSpline::GetPixelCount() { return mCount; }
+int JSpline::GetPixelCount() const { return mCount; }
 
 void JSpline::Render(float x, float y, PIXEL_TYPE color, PIXEL_TYPE controlColor) {
     if (mCount > 0) {
@@ -150,10 +154,13 @@ void JSpline::Render(float x, float y, PIXEL_TYPE color, PIXEL_TYPE controlColor
 
         int size = mPixels.size();
 
-        for (int i = 0; i < size - 1; i++)
+        for (int i = 0; i < size - 1; i++) {
             renderer->DrawLine(x + mPixels[i].x, y + mPixels[i].y, x + mPixels[i + 1].x, y + mPixels[i + 1].y, color);
+        }
 
         size = mMidPoints.size();
-        for (int i = 0; i < size; i++) renderer->FillRect(mMidPoints[i].x - 3, mMidPoints[i].y - 3, 6, 6, controlColor);
+        for (int i = 0; i < size; i++) {
+            renderer->FillRect(mMidPoints[i].x - 3, mMidPoints[i].y - 3, 6, 6, controlColor);
+        }
     }
 }

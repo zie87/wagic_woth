@@ -8,8 +8,8 @@
 //
 //-------------------------------------------------------------------------------------
 
-#ifndef _JGUI_H
-#define _JGUI_H
+#ifndef JGUI_H
+#define JGUI_H
 
 #include "JGE.h"
 #include "JSprite.h"
@@ -60,7 +60,7 @@ public:
     // Used for mouse support so that the GUI engine can found out which Object was selected
     virtual bool getTopLeft(float& top, float& left) { return false; };
 
-    int GetId();
+    int GetId() const;
 };
 
 class JGuiController {
@@ -95,7 +95,7 @@ public:
     int mCount;
 
     JGuiController(JGE* jge, int id, JGuiListener* listener);
-    ~JGuiController();
+    virtual ~JGuiController();
 
     virtual void Render();
     virtual void Update(float dt);
@@ -110,7 +110,7 @@ public:
     void SetStyle(int style);
     void SetCursor(JSprite* cursor);
 
-    bool IsActive();
+    bool IsActive() const;
     void SetActive(bool flag);
 };
 

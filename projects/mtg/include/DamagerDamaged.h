@@ -1,5 +1,5 @@
-#ifndef _DAMAGERDAMAGED_H_
-#define _DAMAGERDAMAGED_H_
+#ifndef DAMAGERDAMAGED_H
+#define DAMAGERDAMAGED_H
 
 #include "MTGCardInstance.h"
 #include "CardGui.h"
@@ -21,7 +21,7 @@ struct DamagerDamaged : TransientCardView {
     DamagerDamaged(MTGCardInstance* card, float x, float y, bool show, Player* damageSelecter);
     DamagerDamaged(MTGCardInstance* card, const Pos& ref, bool show, Player* damageSelecter);
 
-    ~DamagerDamaged();
+    ~DamagerDamaged() override;
     void Render(CombatStep mode);
 };
 
@@ -30,7 +30,7 @@ struct AttackerDamaged : DamagerDamaged {
     vector<DefenserDamaged*> blockers;
     AttackerDamaged(MTGCardInstance* card, float x, float y, bool show, Player* damageSelecter);
     AttackerDamaged(MTGCardInstance* card, const Pos& ref, bool show, Player* damageSelecter);
-    ~AttackerDamaged();
+    ~AttackerDamaged() override;
 };
 
 #endif

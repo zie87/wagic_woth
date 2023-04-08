@@ -1,13 +1,15 @@
 #include "PrecompiledHeader.h"
 
 #include "ModRules.h"
+
+#include <utility>
 #include "utils.h"
 #include "GameState.h"
 #include "../../../JGE/src/tinyxml/tinyxml.h"
 
 ModRules gModRules;
 
-bool ModRules::load(std::string filename) {
+bool ModRules::load(const std::string& filename) {
     std::string xmlBuffer;
     if (!JFileSystem::GetInstance()->readIntoString(filename, xmlBuffer)) {
         DebugTrace("FATAL: cannot find modrules.xml");
@@ -19,7 +21,7 @@ bool ModRules::load(std::string filename) {
 
     for (TiXmlNode* node = doc.FirstChild(); node; node = node->NextSibling()) {
         TiXmlElement* element = node->ToElement();
-        if (element != NULL) {
+        if (element != nullptr) {
             if (strcmp(element->Value(), "menu") == 0) {
                 menu.parse(element);
             } else if (strcmp(element->Value(), "general") == 0) {
@@ -36,23 +38,34 @@ bool ModRules::load(std::string filename) {
     return true;
 }
 
-int ModRulesMenuItem::strToAction(std::string str) {
-    if (str.compare("playMenu") == 0) return MENUITEM_PLAY;
-    if (str.compare("deckEditor") == 0) return MENUITEM_DECKEDITOR;
-    if (str.compare("shop") == 0) return MENUITEM_SHOP;
-    if (str.compare("options") == 0) return MENUITEM_OPTIONS;
-    if (str.compare("quit") == 0) return MENUITEM_EXIT;
-    if (str.compare("trophies") == 0) return MENUITEM_TROPHIES;
+int ModRulesMenuItem::strToAction(const std::string& str) {
+    if (str == "playMenu") {
+        return MENUITEM_PLAY;
+    }
+    if (str == "deckEditor") {
+        return MENUITEM_DECKEDITOR;
+    }
+    if (str == "shop") {
+        return MENUITEM_SHOP;
+    }
+    if (str == "options") {
+        return MENUITEM_OPTIONS;
+    }
+    if (str == "quit") {
+        return MENUITEM_EXIT;
+    }
+    if (str == "trophies") {
+        return MENUITEM_TROPHIES;
+    }
 
     return MENUITEM_PLAY;
 }
 
-ModRulesMenuItem::ModRulesMenuItem(std::string actionIdStr, std::string displayName) {
-    mActionId    = strToAction(actionIdStr);
-    mDisplayName = displayName;
-}
+ModRulesMenuItem::ModRulesMenuItem(const std::string& actionIdStr, std::string displayName)
+    : mActionId(strToAction(std::move(actionIdStr)))
+    , mDisplayName(std::move(displayName)) {}
 
-int ModRulesMenuItem::getMatchingGameState() { return getMatchingGameState(mActionId); }
+int ModRulesMenuItem::getMatchingGameState() const { return getMatchingGameState(mActionId); }
 
 int ModRulesMenuItem::getMatchingGameState(int actionId) {
     switch (actionId) {
@@ -69,26 +82,42 @@ int ModRulesMenuItem::getMatchingGameState(int actionId) {
     }
 }
 
-ModRulesMainMenuItem::ModRulesMainMenuItem(std::string actionIdStr, std::string displayName, int iconId,
+ModRulesMainMenuItem::ModRulesMainMenuItem(const std::string& actionIdStr, std::string displayName, int iconId,
                                            std::string particleFile)
-    : ModRulesMenuItem(actionIdStr, displayName), mIconId(iconId), mParticleFile(particleFile) {}
+    : ModRulesMenuItem(std::move(actionIdStr), std::move(displayName))
+    , mIconId(iconId)
+    , mParticleFile(std::move(particleFile)) {}
 
-JButton ModRulesOtherMenuItem::strToJButton(string str) {
-    if (str.compare("btn_next") == 0) return JGE_BTN_NEXT;
-    if (str.compare("btn_prev") == 0) return JGE_BTN_PREV;
-    if (str.compare("btn_ctrl") == 0) return JGE_BTN_CTRL;
-    if (str.compare("btn_menu") == 0) return JGE_BTN_MENU;
-    if (str.compare("btn_cancel") == 0) return JGE_BTN_CANCEL;
-    if (str.compare("btn_pri") == 0) return JGE_BTN_PRI;
-    if (str.compare("btn_sec") == 0) return JGE_BTN_SEC;
+JButton ModRulesOtherMenuItem::strToJButton(const string& str) {
+    if (str == "btn_next") {
+        return JGE_BTN_NEXT;
+    }
+    if (str == "btn_prev") {
+        return JGE_BTN_PREV;
+    }
+    if (str == "btn_ctrl") {
+        return JGE_BTN_CTRL;
+    }
+    if (str == "btn_menu") {
+        return JGE_BTN_MENU;
+    }
+    if (str == "btn_cancel") {
+        return JGE_BTN_CANCEL;
+    }
+    if (str == "btn_pri") {
+        return JGE_BTN_PRI;
+    }
+    if (str == "btn_sec") {
+        return JGE_BTN_SEC;
+    }
 
     return JGE_BTN_NEXT;
 }
 
-ModRulesOtherMenuItem::ModRulesOtherMenuItem(std::string actionIdStr, std::string displayName, std::string keyStr)
-    : ModRulesMenuItem(actionIdStr, displayName) {
-    mKey = strToJButton(keyStr);
-}
+ModRulesOtherMenuItem::ModRulesOtherMenuItem(const std::string& actionIdStr, std::string displayName,
+                                             const std::string& keyStr)
+    : ModRulesMenuItem(std::move(actionIdStr), std::move(displayName))
+    , mKey(strToJButton(std::move(keyStr))) {}
 
 void ModRulesMenu::parse(TiXmlElement* element) {
     TiXmlNode* mainNode = element->FirstChild("main");
@@ -116,37 +145,44 @@ void ModRulesMenu::parse(TiXmlElement* element) {
 }
 
 ModRulesMenu::~ModRulesMenu() {
-    for (size_t i = 0; i < main.size(); ++i) SAFE_DELETE(main[i]);
+    for (size_t i = 0; i < main.size(); ++i) {
+        SAFE_DELETE(main[i]);
+    }
 
-    for (size_t i = 0; i < other.size(); ++i) SAFE_DELETE(other[i]);
+    for (size_t i = 0; i < other.size(); ++i) {
+        SAFE_DELETE(other[i]);
+    }
 
     main.clear();
     other.clear();
 }
 
 // inGame rules
-ModRulesGame::ModRulesGame() { mCanInterrupt = true; }
+ModRulesGame::ModRulesGame() : mCanInterrupt(true) {}
 
 void ModRulesGame::parse(TiXmlElement* element) {
-    int value = ModRules::getValueAsInt(element, "canInterrupt");
-    if (value != -1) mCanInterrupt = value > 0;
+    const int value = ModRules::getValueAsInt(element, "canInterrupt");
+    if (value != -1) {
+        mCanInterrupt = value > 0;
+    }
 }
 
 // General Rules
-ModRulesGeneral::ModRulesGeneral() {
-    mHasDeckEditor = true;
-    mHasShop       = true;
-}
+ModRulesGeneral::ModRulesGeneral() : mHasDeckEditor(true), mHasShop(true) {}
 
 void ModRulesGeneral::parse(TiXmlElement* element) {
     int value = ModRules::getValueAsInt(element, "hasDeckEditor");
-    if (value != -1) mHasDeckEditor = value > 0;
+    if (value != -1) {
+        mHasDeckEditor = value > 0;
+    }
 
     value = ModRules::getValueAsInt(element, "hasShop");
-    if (value != -1) mHasShop = value > 0;
+    if (value != -1) {
+        mHasShop = value > 0;
+    }
 }
 
-int ModRules::getValueAsInt(TiXmlElement* element, std::string childName) {
+int ModRules::getValueAsInt(TiXmlElement* element, const std::string& childName) {
     TiXmlNode* node = element->FirstChild(childName.c_str());
     if (node) {
         const char* value = node->ToElement()->GetText();
@@ -155,13 +191,14 @@ int ModRules::getValueAsInt(TiXmlElement* element, std::string childName) {
     return -1;
 }
 
-ModRulesCards::ModRulesCards() {
-    activateEffect = NEW SimpleCardEffectRotate(M_PI / 2);  // Default activation effect
+ModRulesCards::ModRulesCards() : activateEffect(NEW SimpleCardEffectRotate(M_PI / 2)) {
+    // Default activation effect
 }
 
-SimpleCardEffect* ModRulesCards::parseEffect(std::string s) {
-    size_t limiter = s.find("(");
-    std::string function, params;
+SimpleCardEffect* ModRulesCards::parseEffect(const std::string& s) {
+    const size_t limiter = s.find('(');
+    std::string function;
+    std::string params;
     if (limiter != string::npos) {
         function = s.substr(0, limiter);
         params   = s.substr(limiter + 1, s.size() - 2 - limiter);
@@ -169,21 +206,20 @@ SimpleCardEffect* ModRulesCards::parseEffect(std::string s) {
         function = s;
     }
 
-    if (function.compare("rotate") == 0) {
+    if (function == "rotate") {
         return NEW SimpleCardEffectRotate(M_PI * atoi(params.c_str()) / 180);
     }
 
-    if (function.compare("mask") == 0) {
+    if (function == "mask") {
         std::vector<std::string> argb = split(params, ',');
         if (argb.size() < 4) {
             DebugTrace("not enough params in mask");
-            return NULL;
+            return nullptr;
         }
-        PIXEL_TYPE mask =
-            ARGB(atoi(argb[0].c_str()), atoi(argb[1].c_str()), atoi(argb[2].c_str()), atoi(argb[3].c_str()));
+        auto mask = ARGB(atoi(argb[0].c_str()), atoi(argb[1].c_str()), atoi(argb[2].c_str()), atoi(argb[3].c_str()));
         return NEW SimpleCardEffectMask(mask);
     }
-    return NULL;
+    return nullptr;
 }
 
 void ModRulesCards::parse(TiXmlElement* element) {
@@ -205,31 +241,29 @@ void ModRulesCards::parse(TiXmlElement* element) {
 
 ModRulesCards::~ModRulesCards() { SAFE_DELETE(activateEffect); }
 
-ModRulesBackGroundCardGuiItem::ModRulesBackGroundCardGuiItem(string ColorId, string ColorName, string DisplayImg,
-                                                             string DisplayThumb, string MenuIcon) {
-    mColorId      = atoi(ColorId.c_str());
-    MColorName    = ColorName;
-    mDisplayImg   = DisplayImg;
-    mDisplayThumb = DisplayThumb;
-    mMenuIcon     = atoi(MenuIcon.c_str());
-}
+ModRulesBackGroundCardGuiItem::ModRulesBackGroundCardGuiItem(const string& ColorId, string ColorName, string DisplayImg,
+                                                             string DisplayThumb, const string& MenuIcon)
+    : mColorId(atoi(ColorId.c_str()))
+    , MColorName(std::move(ColorName))
+    , mDisplayImg(std::move(DisplayImg))
+    , mDisplayThumb(std::move(DisplayThumb))
+    , mMenuIcon(atoi(MenuIcon.c_str())) {}
 
 ModRulesRenderCardGuiItem::ModRulesRenderCardGuiItem(string name, int posX, int posY, string formattedData,
                                                      string filter, bool font, int fontSize, PIXEL_TYPE fontColor,
-                                                     int SizeIcon, int IconPosX, int IconPosY, string FileName) {
-    mName          = name;
-    mPosX          = posX;
-    mPosY          = posY;
-    mFormattedData = formattedData;
-    mFilter        = filter;
-    mFontSize      = fontSize;
-    mFont          = font;
-    mFontColor     = fontColor;
-    mSizeIcon      = SizeIcon;
-    mIconPosX      = IconPosX;
-    mIconPosY      = IconPosY;
-    mFileName      = FileName;
-}
+                                                     int SizeIcon, int IconPosX, int IconPosY, string FileName)
+    : mName(std::move(name))
+    , mFileName(std::move(FileName))
+    , mFilter(std::move(filter))
+    , mFont(font)
+    , mFontColor(fontColor)
+    , mFontSize(fontSize)
+    , mFormattedData(std::move(formattedData))
+    , mIconPosX(IconPosX)
+    , mIconPosY(IconPosY)
+    , mPosX(posX)
+    , mPosY(posY)
+    , mSizeIcon(SizeIcon) {}
 
 void ModRulesCardGui::parse(TiXmlElement* element) {
     std::string _Name;
@@ -379,9 +413,15 @@ void ModRulesCardGui::parse(TiXmlElement* element) {
 }
 
 ModRulesCardGui::~ModRulesCardGui() {
-    for (size_t i = 0; i < background.size(); ++i) SAFE_DELETE(background[i]);
-    for (size_t i = 0; i < renderbig.size(); ++i) SAFE_DELETE(renderbig[i]);
-    for (size_t i = 0; i < rendertinycrop.size(); ++i) SAFE_DELETE(rendertinycrop[i]);
+    for (size_t i = 0; i < background.size(); ++i) {
+        SAFE_DELETE(background[i]);
+    }
+    for (size_t i = 0; i < renderbig.size(); ++i) {
+        SAFE_DELETE(renderbig[i]);
+    }
+    for (size_t i = 0; i < rendertinycrop.size(); ++i) {
+        SAFE_DELETE(rendertinycrop[i]);
+    }
 
     background.clear();
     renderbig.clear();

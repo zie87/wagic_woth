@@ -15,7 +15,7 @@
 #include "../include/JParticleEffect.h"
 
 //-------------------------------------------------------------------------------------
-JParticleSystem::JParticleSystem() { mActive = false; }
+JParticleSystem::JParticleSystem() : mActive(false) {}
 
 JParticleSystem::~JParticleSystem() { mEffects.clear(); }
 
@@ -24,14 +24,15 @@ void JParticleSystem::ClearAll() { mEffects.clear(); }
 void JParticleSystem::Update(float dt) {
     if (!mEffects.empty()) {
         JParticleEffect* effect;
-        std::list<JParticleEffect*>::iterator curr = mEffects.begin();
+        auto curr = mEffects.begin();
         while (curr != mEffects.end()) {
             effect = *curr;
             effect->Update(dt);
             if (effect->Done()) {
                 mEffects.erase(curr++);
-            } else
+            } else {
                 ++curr;
+            }
         }
     }
 }
@@ -39,7 +40,7 @@ void JParticleSystem::Update(float dt) {
 void JParticleSystem::Render() {
     if (!mEffects.empty()) {
         JParticleEffect* effect;
-        std::list<JParticleEffect*>::iterator curr = mEffects.begin();
+        auto curr = mEffects.begin();
         while (curr != mEffects.end()) {
             effect = *curr;
             effect->Render();
@@ -50,7 +51,7 @@ void JParticleSystem::Render() {
 }
 
 void JParticleSystem::StartEffect(JParticleEffect* effect) {
-    std::list<JParticleEffect*>::iterator curr = mEffects.begin();
+    auto curr = mEffects.begin();
     while (curr != mEffects.end()) {
         if (effect == *curr && effect->GetParticleSystem() == this) {
             effect->Start();
@@ -66,7 +67,7 @@ void JParticleSystem::StartEffect(JParticleEffect* effect) {
 void JParticleSystem::StopAllEffects() {
     if (!mEffects.empty()) {
         JParticleEffect* effect;
-        std::list<JParticleEffect*>::iterator curr = mEffects.begin();
+        auto curr = mEffects.begin();
         while (curr != mEffects.end()) {
             effect = *curr;
             effect->Stop();
@@ -75,6 +76,6 @@ void JParticleSystem::StopAllEffects() {
     }
 }
 
-bool JParticleSystem::IsActive() { return mActive; }
+bool JParticleSystem::IsActive() const { return mActive; }
 
 void JParticleSystem::SetActive(bool flag) { mActive = flag; }

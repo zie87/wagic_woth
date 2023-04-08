@@ -1,5 +1,5 @@
-#ifndef _JSOCKET_H_
-#define _JSOCKET_H_
+#ifndef JSOCKET_H
+#define JSOCKET_H
 
 #include <queue>
 #include "Threading.h"
@@ -18,7 +18,7 @@ public:
     } SOCKET_STATE;
 
     // Server creation
-    JSocket(std::string ipAddr);
+    JSocket(const std::string& ipAddr);
     // Client creation
     JSocket();
     ~JSocket();

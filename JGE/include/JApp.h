@@ -8,8 +8,8 @@
 //
 //-------------------------------------------------------------------------------------
 
-#ifndef _JAPP_H_
-#define _JAPP_H_
+#ifndef JAPP_H
+#define JAPP_H
 
 class JGE;
 

@@ -1,5 +1,5 @@
-#ifndef _DECKMENU_ITEM_H
-#define _DECKMENU_ITEM_H
+#ifndef DECKMENUITEM_H
+#define DECKMENUITEM_H
 
 #include <string>
 #include <JLBFont.h>
@@ -30,19 +30,19 @@ private:
 
 public:
     DeckMenuItem(DeckMenu* _parent, int id, int fontId, string text, float x, float y, bool hasFocus = false,
-                 bool autoTranslate = false, DeckMetaData* meta = NULL);
-    ~DeckMenuItem();
+                 bool autoTranslate = false, DeckMetaData* meta = nullptr);
+    ~DeckMenuItem() override;
 
     virtual void Relocate(float x, float y);
     virtual void RenderWithOffset(float yOffset);
-    virtual void Render();
-    virtual void Update(float dt);
-    virtual void Entering();
-    virtual bool Leaving(JButton key);
-    virtual bool ButtonPressed();
-    virtual std::ostream& toString(std::ostream& out) const;
+    void Render() override;
+    void Update(float dt) override;
+    void Entering() override;
+    bool Leaving(JButton key) override;
+    bool ButtonPressed() override;
+    std::ostream& toString(std::ostream& out) const override;
 
-    virtual bool getTopLeft(float& top, float& left) {
+    bool getTopLeft(float& top, float& left) override {
         top  = mY + mYOffset;
         left = mX;
         return true;
@@ -56,20 +56,22 @@ public:
     std::string getDescription() const { return mDescription; };
     std::string getText() const { return mText; };
     bool hasFocus() const { return mHasFocus; };
-    bool hasMetaData() const { return mMetaData == NULL ? false : true; };
+    bool hasMetaData() const { return mMetaData == nullptr ? false : true; };
 
     float getWidth() const;
     std::string getDeckName() const;
 
     std::string getDeckStatsSummary() const {
-        if (mMetaData) return mMetaData->getStatsSummary();
+        if (mMetaData) {
+            return mMetaData->getStatsSummary();
+        }
         return "";
     }
 
     DeckMetaData* getMetaData() const { return mMetaData; }
 
     // Setters
-    void setDescription(const std::string description) { mDescription = description; };
+    void setDescription(const std::string& description) { mDescription = description; };
 
     ;
 };

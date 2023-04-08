@@ -1,3 +1,6 @@
+#ifndef STYLEMANAGER_H
+#define STYLEMANAGER_H
+
 class WStyle {
 public:
     friend class StyleManager;
@@ -33,3 +36,5 @@ protected:
     string activeStyle;
     map<string, WStyle*> styles;
 };
+
+#endif

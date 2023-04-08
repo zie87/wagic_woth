@@ -1,5 +1,5 @@
-#ifndef _GUISTATIC_H_
-#define _GUISTATIC_H_
+#ifndef GUISTATIC_H
+#define GUISTATIC_H
 
 #include "Player.h"
 #include "MTGGameZones.h"
@@ -12,8 +12,8 @@ class CardView;
 struct GuiStatic : public PlayGuiObject {
     GuiAvatars* parent;
     GuiStatic(float desiredHeight, float x, float y, bool hasFocus, GuiAvatars* parent);
-    virtual void Entering();
-    virtual bool Leaving(JButton key);
+    void Entering() override;
+    bool Leaving(JButton key) override;
 };
 
 struct GuiAvatar : public GuiStatic {
@@ -30,9 +30,9 @@ protected:
 
 public:
     Player* player;
-    virtual void Render();
+    void Render() override;
     GuiAvatar(float x, float y, bool hasFocus, Player* player, Corner corner, GuiAvatars* parent);
-    virtual std::ostream& toString(std::ostream& out) const;
+    std::ostream& toString(std::ostream& out) const override;
 };
 
 struct GuiGameZone : public GuiStatic {
@@ -44,14 +44,14 @@ public:
     MTGGameZone* zone;
     CardDisplay* cd;
     int showCards;
-    virtual void Render();
-    virtual bool CheckUserInput(JButton key);
-    virtual void Update(float dt);
+    void Render() override;
+    bool CheckUserInput(JButton key) override;
+    void Update(float dt) override;
     GuiGameZone(float x, float y, bool hasFocus, MTGGameZone* zone, GuiAvatars* parent);
-    ~GuiGameZone();
-    virtual void ButtonPressed(int controllerId, int controlId);
+    ~GuiGameZone() override;
+    void ButtonPressed(int controllerId, int controlId) override;
     void toggleDisplay();
-    virtual std::ostream& toString(std::ostream& out) const;
+    std::ostream& toString(std::ostream& out) const override;
 };
 // opponenthand
 class GuiOpponentHand : public GuiGameZone {
@@ -60,7 +60,7 @@ public:
     GuiOpponentHand(float _x, float _y, bool hasFocus, Player* player, GuiAvatars* Parent);
     int receiveEventPlus(WEvent*);
     int receiveEventMinus(WEvent*);
-    virtual std::ostream& toString(std::ostream& out) const;
+    std::ostream& toString(std::ostream& out) const override;
 };
 // end of my addition
 class GuiGraveyard : public GuiGameZone {
@@ -69,14 +69,14 @@ public:
     GuiGraveyard(float _x, float _y, bool hasFocus, Player* player, GuiAvatars* parent);
     int receiveEventPlus(WEvent*);
     int receiveEventMinus(WEvent*);
-    virtual std::ostream& toString(std::ostream& out) const;
+    std::ostream& toString(std::ostream& out) const override;
 };
 
 class GuiLibrary : public GuiGameZone {
 public:
     Player* player;
     GuiLibrary(float _x, float _y, bool hasFocus, Player* player, GuiAvatars* parent);
-    virtual std::ostream& toString(std::ostream& out) const;
+    std::ostream& toString(std::ostream& out) const override;
 };
 
-#endif  // _GUISTATIC_H_
+#endif  // GUISTATIC_H

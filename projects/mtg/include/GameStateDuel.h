@@ -1,5 +1,5 @@
-#ifndef _GAME_STATE_DUEL_H_
-#define _GAME_STATE_DUEL_H_
+#ifndef GAMESTATEDUEL_H
+#define GAMESTATEDUEL_H
 
 #include "GameState.h"
 #include "SimpleMenu.h"
@@ -42,14 +42,14 @@ private:
     int OpponentsDeckid;
     string musictrack;
 
-    bool MusicExist(string FileName);
+    bool MusicExist(const string& FileName);
     void ConstructOpponentMenu();  // loads the opponentMenu if it doesn't exist
     void initScroller();
     void setGamePhase(int newGamePhase);
 
 public:
     GameStateDuel(GameApp* parent);
-    virtual ~GameStateDuel();
+    ~GameStateDuel() override;
 #ifdef TESTSUITE
     void loadTestSuitePlayers();
 #endif
@@ -70,14 +70,14 @@ public:
     };
 #endif
 
-    virtual void ButtonPressed(int ControllerId, int ControlId);
-    virtual void Start();
-    virtual void End();
-    virtual void Update(float dt);
-    virtual void Render();
+    void ButtonPressed(int ControllerId, int ControlId) override;
+    void Start() override;
+    void End() override;
+    void Update(float dt) override;
+    void Render() override;
     void initRand(unsigned seed = 0);
 
-    void OnScroll(int inXVelocity, int inYVelocity);
+    void OnScroll(int inXVelocity, int inYVelocity) override;
 
     enum ENUM_DUEL_STATE_MENU_ITEM {
         MENUITEM_CANCEL        = kCancelMenuID,

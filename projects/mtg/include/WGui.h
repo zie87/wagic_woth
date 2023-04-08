@@ -1,10 +1,11 @@
-#ifndef _WGUI_H_
-#define _WGUI_H_
+#ifndef WGUI_H
+#define WGUI_H
 /**
   @file WFilter.h
   Includes classes and functionality related to card filtering.
 */
 #include <set>
+#include <utility>
 
 class hgeDistortionMesh;
 class GameStateOptions;
@@ -62,7 +63,7 @@ public:
     } CONFIRM_TYPE;
 
     WGuiBase(){};
-    virtual ~WGuiBase(){};
+    ~WGuiBase() override{};
 
     /**
      If false, the option will be skipped over when moving the selection cursor.
@@ -124,7 +125,7 @@ public:
     */
     virtual void setData() = 0;
 
-    virtual void ButtonPressed(int controllerId, int controlId){};
+    void ButtonPressed(int controllerId, int controlId) override{};
     /**
       Used when it is necessary to update some information. Often called from confirmChange(), but also called
       in other places, such as to reload the list of possible profiles after a new one is created. See OptionProfile
@@ -182,37 +183,37 @@ protected:
 */
 class WGuiItem : public WGuiBase {
 public:
-    virtual void Entering(JButton key);
-    virtual bool Leaving(JButton key);
-    virtual bool CheckUserInput(JButton key);
-    virtual void Update(float dt){};
-    virtual void Render();
+    void Entering(JButton key) override;
+    bool Leaving(JButton key) override;
+    bool CheckUserInput(JButton key) override;
+    void Update(float dt) override{};
+    void Render() override;
 
     WGuiItem(string _display, u8 _mF = 0);
-    virtual ~WGuiItem(){};
+    ~WGuiItem() override{};
 
-    string _(string input);  // Override global with our flag checker.
+    string _(string input) const;  // Override global with our flag checker.
 
-    virtual void setData(){};
+    void setData() override{};
 
-    virtual bool hasFocus() { return mFocus; };
-    virtual void setFocus(bool bFocus) { mFocus = bFocus; };
+    bool hasFocus() override { return mFocus; };
+    void setFocus(bool bFocus) override { mFocus = bFocus; };
 
-    virtual string getDisplay() const { return displayValue; };
-    virtual void setDisplay(string s) { displayValue = s; };
+    string getDisplay() const override { return displayValue; };
+    void setDisplay(string s) override { displayValue = s; };
 
-    virtual int getId() { return INVALID_ID; };
-    virtual float getX() { return x; };
-    virtual float getY() { return y; };
-    virtual float getWidth() { return width; };
-    virtual float getHeight() { return height; };
-    virtual float minWidth();
-    virtual float minHeight();
-    virtual void setId(int _id){};
-    virtual void setX(float _x) { x = _x; };
-    virtual void setY(float _y) { y = _y; };
-    virtual void setWidth(float _w) { width = _w; };
-    virtual void setHeight(float _h) { height = _h; };
+    int getId() override { return INVALID_ID; };
+    float getX() override { return x; };
+    float getY() override { return y; };
+    float getWidth() override { return width; };
+    float getHeight() override { return height; };
+    float minWidth() override;
+    float minHeight() override;
+    void setId(int _id) override{};
+    void setX(float _x) override { x = _x; };
+    void setY(float _y) override { y = _y; };
+    void setWidth(float _w) override { width = _w; };
+    void setHeight(float _h) override { height = _h; };
     enum {
         NO_TRANSLATE = (1 << 1),
     };
@@ -232,9 +233,9 @@ protected:
 class WGuiImage : public WGuiItem {
 public:
     WGuiImage(WDataSource* wds, float _w = 0, float _h = 0, int _margin = 0);
-    virtual bool Selectable() { return false; };
-    virtual void Render();
-    virtual float getHeight();
+    bool Selectable() override { return false; };
+    void Render() override;
+    float getHeight() override;
     virtual void imageScale(float _w, float _h);
     virtual void setSource(WDataSource* s) { source = s; };
 
@@ -250,7 +251,7 @@ protected:
 class WGuiCardImage : public WGuiImage {
 public:
     WGuiCardImage(WDataSource* wds, bool _thumb = false);
-    virtual void Render();
+    void Render() override;
     WSyncable mOffset;
 
 protected:
@@ -262,13 +263,13 @@ protected:
 */
 class WGuiCardDistort : public WGuiCardImage {
 public:
-    WGuiCardDistort(WDataSource* wds, bool _thumb = false, WDataSource* _distort = NULL);
-    ~WGuiCardDistort();
-    virtual void Render();
+    WGuiCardDistort(WDataSource* wds, bool _thumb = false, WDataSource* _distort = nullptr);
+    ~WGuiCardDistort() override;
+    void Render() override;
     WDistort xy;
     /* we assume first xy is the top left of the distorted card */
-    virtual float getX() { return xy[0]; };
-    virtual float getY() { return xy[1]; };
+    float getX() override { return xy[0]; };
+    float getY() override { return xy[1]; };
 
 protected:
     hgeDistortionMesh* mesh;
@@ -280,48 +281,48 @@ protected:
 */
 class WGuiDeco : public WGuiBase {
 public:
-    WGuiDeco(WGuiBase* _it) { it = _it; };
-    virtual ~WGuiDeco() { SAFE_DELETE(it); };
+    WGuiDeco(WGuiBase* _it) : it(_it){};
+    ~WGuiDeco() override { SAFE_DELETE(it); };
 
-    virtual bool Selectable() { return it->Selectable(); };
-    virtual bool Visible() { return it->Visible(); };
-    virtual bool Changed() { return it->Changed(); };
-    virtual void confirmChange(bool confirmed) { it->confirmChange(confirmed); };
-    virtual CONFIRM_TYPE needsConfirm() { return it->needsConfirm(); };
-    virtual bool yieldFocus() { return it->yieldFocus(); };
+    bool Selectable() override { return it->Selectable(); };
+    bool Visible() override { return it->Visible(); };
+    bool Changed() override { return it->Changed(); };
+    void confirmChange(bool confirmed) override { it->confirmChange(confirmed); };
+    CONFIRM_TYPE needsConfirm() override { return it->needsConfirm(); };
+    bool yieldFocus() override { return it->yieldFocus(); };
 
-    virtual void Entering(JButton key) { it->Entering(key); };
-    virtual bool Leaving(JButton key) { return it->Leaving(key); };
-    virtual void Update(float dt) { it->Update(dt); };
-    virtual void updateValue() { it->updateValue(); };
-    virtual void Reload() { it->Reload(); };
-    virtual void Overlay() { it->Overlay(); };
-    virtual void Underlay() { it->Underlay(); };
-    virtual void Render() { it->Render(); };
-    virtual void setData() { it->setData(); };
+    void Entering(JButton key) override { it->Entering(key); };
+    bool Leaving(JButton key) override { return it->Leaving(key); };
+    void Update(float dt) override { it->Update(dt); };
+    void updateValue() override { it->updateValue(); };
+    void Reload() override { it->Reload(); };
+    void Overlay() override { it->Overlay(); };
+    void Underlay() override { it->Underlay(); };
+    void Render() override { it->Render(); };
+    void setData() override { it->setData(); };
 
-    virtual void ButtonPressed(int controllerId, int controlId) { it->ButtonPressed(controllerId, controlId); };
+    void ButtonPressed(int controllerId, int controlId) override { it->ButtonPressed(controllerId, controlId); };
 
-    virtual bool hasFocus() { return it->hasFocus(); };
-    virtual string getDisplay() const { return it->getDisplay(); };
-    virtual int getId() { return it->getId(); };
-    virtual float getX() { return it->getX(); };
-    virtual float getY() { return it->getY(); };
-    virtual float getWidth() { return it->getWidth(); };
-    virtual float getHeight() { return it->getHeight(); };
-    virtual PIXEL_TYPE getColor(int type) { return it->getColor(type); };
+    bool hasFocus() override { return it->hasFocus(); };
+    string getDisplay() const override { return it->getDisplay(); };
+    int getId() override { return it->getId(); };
+    float getX() override { return it->getX(); };
+    float getY() override { return it->getY(); };
+    float getWidth() override { return it->getWidth(); };
+    float getHeight() override { return it->getHeight(); };
+    PIXEL_TYPE getColor(int type) override { return it->getColor(type); };
     WGuiBase* getDecorated() { return it; };
 
-    virtual void setFocus(bool bFocus) { it->setFocus(bFocus); };
-    virtual void setDisplay(string s) { it->setDisplay(s); };
-    virtual void setId(int _id) { it->setId(_id); };
-    virtual void setX(float _x) { it->setX(_x); };
-    virtual void setY(float _y) { it->setY(_y); };
-    virtual void setWidth(float _w) { it->setWidth(_w); };
-    virtual void setHeight(float _h) { it->setHeight(_h); };
-    virtual void setHidden(bool bHidden) { it->setHidden(bHidden); };
-    virtual void setVisible(bool bVisisble) { it->setVisible(bVisisble); };
-    virtual bool CheckUserInput(JButton key) { return it->CheckUserInput(key); };
+    void setFocus(bool bFocus) override { it->setFocus(bFocus); };
+    void setDisplay(string s) override { it->setDisplay(s); };
+    void setId(int _id) override { it->setId(_id); };
+    void setX(float _x) override { it->setX(_x); };
+    void setY(float _y) override { it->setY(_y); };
+    void setWidth(float _w) override { it->setWidth(_w); };
+    void setHeight(float _h) override { it->setHeight(_h); };
+    void setHidden(bool bHidden) override { it->setHidden(bHidden); };
+    void setVisible(bool bVisisble) override { it->setVisible(bVisisble); };
+    bool CheckUserInput(JButton key) override { return it->CheckUserInput(key); };
 
 protected:
     WGuiBase* it;
@@ -335,13 +336,13 @@ class WGuiAward : public WGuiItem {
 public:
     WGuiAward(int _id, string name, string _text, string _details = "");
     WGuiAward(string _id, string name, string _text, string _details = "");
-    virtual ~WGuiAward();
-    virtual void Render();
-    virtual bool Selectable() { return Visible(); };
-    virtual bool Visible();
-    virtual int getId() { return id; };
-    virtual void Underlay();
-    virtual void Overlay();
+    ~WGuiAward() override;
+    void Render() override;
+    bool Selectable() override { return Visible(); };
+    bool Visible() override;
+    int getId() override { return id; };
+    void Underlay() override;
+    void Overlay() override;
 
 protected:
     string details;
@@ -356,28 +357,28 @@ protected:
 class WGuiSplit : public WGuiItem {
 public:
     WGuiSplit(WGuiBase* _left, WGuiBase* _right);
-    virtual ~WGuiSplit();
+    ~WGuiSplit() override;
 
-    virtual bool yieldFocus();
-    virtual void Reload();
-    virtual void Overlay();
-    virtual void Underlay();
-    virtual void setData();
-    virtual bool isModal();
-    virtual void setModal(bool val);
-    virtual void Render();
-    virtual void Update(float dt);
-    virtual void setX(float _x);
-    virtual void setY(float _y);
-    virtual void setWidth(float _w);
-    virtual void setHeight(float _h);
-    virtual float getHeight();
-    virtual void ButtonPressed(int controllerId, int controlId);
-    virtual void confirmChange(bool confirmed);
+    bool yieldFocus() override;
+    void Reload() override;
+    void Overlay() override;
+    void Underlay() override;
+    void setData() override;
+    bool isModal() override;
+    void setModal(bool val) override;
+    void Render() override;
+    void Update(float dt) override;
+    void setX(float _x) override;
+    void setY(float _y) override;
+    void setWidth(float _w) override;
+    void setHeight(float _h) override;
+    float getHeight() override;
+    void ButtonPressed(int controllerId, int controlId) override;
+    void confirmChange(bool confirmed) override;
 
-    virtual void Entering(JButton key);
-    virtual bool Leaving(JButton key);
-    virtual bool CheckUserInput(JButton key);
+    void Entering(JButton key) override;
+    bool Leaving(JButton key) override;
+    bool CheckUserInput(JButton key) override;
 
     bool bRight;
     float percentRight;
@@ -391,17 +392,17 @@ public:
 class WDecoConfirm : public WGuiDeco {
 public:
     WDecoConfirm(JGuiListener* _listener, WGuiBase* it);
-    virtual ~WDecoConfirm();
+    ~WDecoConfirm() override;
 
-    virtual bool isModal();
-    virtual void setData();
-    virtual void setModal(bool val);
-    virtual void Entering(JButton key);
-    virtual bool Leaving(JButton key);
-    virtual void Update(float dt);
-    virtual void Overlay();
-    virtual void ButtonPressed(int controllerId, int controlId);
-    virtual bool CheckUserInput(JButton key);
+    bool isModal() override;
+    void setData() override;
+    void setModal(bool val) override;
+    void Entering(JButton key) override;
+    bool Leaving(JButton key) override;
+    void Update(float dt) override;
+    void Overlay() override;
+    void ButtonPressed(int controllerId, int controlId) override;
+    bool CheckUserInput(JButton key) override;
 
     string confirm;
     string cancel;
@@ -425,8 +426,8 @@ protected:
 */
 class WDecoEnum : public WGuiDeco {
 public:
-    WDecoEnum(WGuiBase* _it, EnumDefinition* _edef = NULL);
-    virtual void Render();
+    WDecoEnum(WGuiBase* _it, EnumDefinition* _edef = nullptr);
+    void Render() override;
     string lookupVal(int value);
 
 protected:
@@ -439,9 +440,9 @@ protected:
 class WDecoCheat : public WGuiDeco {
 public:
     WDecoCheat(WGuiBase* _it);
-    virtual bool Visible();
-    bool Selectable();
-    virtual void Reload();
+    bool Visible() override;
+    bool Selectable() override;
+    void Reload() override;
 
 protected:
     bool bVisible;
@@ -453,10 +454,10 @@ protected:
 class WGuiButton : public WGuiDeco {
 public:
     WGuiButton(WGuiBase* _it, int _controller, int _control, JGuiListener* jgl);
-    virtual void updateValue();
-    virtual bool CheckUserInput(JButton key);
-    virtual bool Selectable() { return Visible(); };
-    virtual PIXEL_TYPE getColor(int type);
+    void updateValue() override;
+    bool CheckUserInput(JButton key) override;
+    bool Selectable() override { return Visible(); };
+    PIXEL_TYPE getColor(int type) override;
     virtual int getControlID() { return control; };
     virtual int getControllerID() { return controller; };
 
@@ -470,9 +471,9 @@ protected:
 */
 class WGuiHeader : public WGuiItem {
 public:
-    WGuiHeader(string _displayValue) : WGuiItem(_displayValue){};
-    virtual bool Selectable() { return false; };
-    virtual void Render();
+    WGuiHeader(string _displayValue) : WGuiItem(std::move(_displayValue)){};
+    bool Selectable() override { return false; };
+    void Render() override;
 };
 
 /**
@@ -480,9 +481,9 @@ public:
 */
 class WDecoStyled : public WGuiDeco {
 public:
-    WDecoStyled(WGuiItem* _it) : WGuiDeco(_it) { mStyle = DS_DEFAULT; };
-    PIXEL_TYPE getColor(int type);
-    void subBack(WGuiBase* item);
+    WDecoStyled(WGuiItem* _it) : WGuiDeco(_it), mStyle(DS_DEFAULT){};
+    PIXEL_TYPE getColor(int type) override;
+    void subBack(WGuiBase* item) override;
     enum {
         DS_DEFAULT        = (1 << 0),
         DS_COLOR_BRIGHT   = (1 << 1),
@@ -504,33 +505,34 @@ public:
 class WGuiMenu : public WGuiItem {
 public:
     friend class WGuiFilters;
-    virtual ~WGuiMenu();
-    WGuiMenu(JButton next = JGE_BTN_RIGHT, JButton prev = JGE_BTN_LEFT, bool mDPad = false, WSyncable* syncme = NULL);
+    ~WGuiMenu() override;
+    WGuiMenu(JButton next = JGE_BTN_RIGHT, JButton prev = JGE_BTN_LEFT, bool mDPad = false,
+             WSyncable* syncme = nullptr);
 
-    virtual bool yieldFocus();
-    virtual void Render();
-    virtual void Reload();
-    virtual void Update(float dt);
-    virtual void ButtonPressed(int controllerId, int controlId);
+    bool yieldFocus() override;
+    void Render() override;
+    void Reload() override;
+    void Update(float dt) override;
+    void ButtonPressed(int controllerId, int controlId) override;
     virtual void Add(WGuiBase* item);  // Remember, does not set X & Y of items automatically.
-    virtual void confirmChange(bool confirmed);
-    virtual bool Leaving(JButton key);
-    virtual void Entering(JButton key);
-    virtual void subBack(WGuiBase* item);
-    virtual bool CheckUserInput(JButton key);
+    void confirmChange(bool confirmed) override;
+    bool Leaving(JButton key) override;
+    void Entering(JButton key) override;
+    void subBack(WGuiBase* item) override;
+    bool CheckUserInput(JButton key) override;
     WGuiBase* Current();
     virtual int getSelected() { return currentItem; };
     virtual void setSelected(vector<WGuiBase*>::iterator& it) {
-        int c = it - items.begin();
+        const int c = it - items.begin();
         setSelected(c);
     };
     virtual void setSelected(int newItem);
     virtual bool nextItem();
     virtual bool prevItem();
-    virtual bool isModal();
-    virtual void setModal(bool val);
+    bool isModal() override;
+    void setModal(bool val) override;
 
-    void setData();
+    void setData() override;
 
 protected:
     virtual void syncMove();
@@ -550,16 +552,16 @@ protected:
 */
 class WGuiList : public WGuiMenu {
 public:
-    WGuiList(std::string name, WSyncable* syncme = NULL);
+    WGuiList(std::string name, WSyncable* syncme = nullptr);
 
     std::string failMsg;
 
-    virtual void Render();
-    virtual void confirmChange(bool confirmed);
-    virtual void ButtonPressed(int controllerId, int controlId);
-    virtual void setData();
+    void Render() override;
+    void confirmChange(bool confirmed) override;
+    void ButtonPressed(int controllerId, int controlId) override;
+    void setData() override;
     WGuiBase* operator[](int);
-    virtual bool CheckUserInput(JButton key);
+    bool CheckUserInput(JButton key) override;
 
 protected:
     bool mFocus;
@@ -575,18 +577,18 @@ protected:
 class WGuiTabMenu : public WGuiMenu {
 public:
     WGuiTabMenu() : WGuiMenu(JGE_BTN_NEXT, JGE_BTN_PREV){};
-    virtual void Render();
-    virtual void Add(WGuiBase* it);
+    void Render() override;
+    void Add(WGuiBase* it) override;
     void save();
-    virtual bool CheckUserInput(JButton key);
+    bool CheckUserInput(JButton key) override;
 };
 /**
   A variant of WGuiList that renders as a horizontal row, rather than vertically.
 */
 class WGuiListRow : public WGuiList {
 public:
-    WGuiListRow(std::string n, WSyncable* s = NULL);
-    virtual void Render();
+    WGuiListRow(std::string n, WSyncable* s = nullptr);
+    void Render() override;
 };
 
 /**
@@ -596,25 +598,25 @@ class WGuiFilters : public WGuiItem {
 public:
     friend class WGuiFilterItem;
     WGuiFilters(std::string header, WSrcCards* src);
-    ~WGuiFilters();
-    bool CheckUserInput(JButton key);
+    ~WGuiFilters() override;
+    bool CheckUserInput(JButton key) override;
     std::string getCode();  // For use in filter factory.
-    void Update(float dt);
-    void Render();
-    void Entering(JButton key);
+    void Update(float dt) override;
+    void Render() override;
+    void Entering(JButton key) override;
     void addColumn();
     void recolorFilter(int color);
     bool isAvailable(int type);
-    bool isAvailableCode(std::string code);
+    bool isAvailableCode(const std::string& code);
     bool Finish(bool emptyset = false);  // Returns true if card set reasonably expected to be changed.
-    bool isFinished() { return bFinished; };
-    void ButtonPressed(int controllerId, int controlId);
+    bool isFinished() const { return bFinished; };
+    void ButtonPressed(int controllerId, int controlId) override;
     void buildList();
     void setSrc(WSrcCards* wsc);
 
 protected:
     void clearArgs();
-    void addArg(std::string display, std::string code);
+    void addArg(const std::string& display, const std::string& code);
     std::vector<std::pair<std::string, std::string> > tempArgs;  // TODO FIXME this is inefficient
     bool bFinished;
     int recolorTo;
@@ -630,10 +632,10 @@ class WGuiFilterItem : public WGuiItem {
 public:
     friend class WGuiFilters;
     WGuiFilterItem(WGuiFilters* parent);
-    void updateValue();
-    void ButtonPressed(int controllerId, int controlId);
+    void updateValue() override;
+    void ButtonPressed(int controllerId, int controlId) override;
     std::string getCode();
-    bool isModal();
+    bool isModal() override;
     enum {
         STATE_UNSET,
         STATE_CHOOSE_TYPE,
@@ -672,14 +674,14 @@ protected:
 class WGuiKeyBinder : public WGuiList {
 public:
     WGuiKeyBinder(std::string name, GameStateOptions* parent);
-    virtual bool isModal();
-    virtual bool CheckUserInput(JButton);
-    virtual void setData();
-    virtual void Update(float);
-    virtual void Render();
-    virtual CONFIRM_TYPE needsConfirm();
-    virtual void ButtonPressed(int controllerId, int controlId);
-    virtual bool yieldFocus();
+    bool isModal() override;
+    bool CheckUserInput(JButton) override;
+    void setData() override;
+    void Update(float) override;
+    void Render() override;
+    CONFIRM_TYPE needsConfirm() override;
+    void ButtonPressed(int controllerId, int controlId) override;
+    bool yieldFocus() override;
 
 protected:
     GameStateOptions* parent;

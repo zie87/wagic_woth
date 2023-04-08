@@ -2,8 +2,8 @@
   A Filter/Mask system for Card Instances to find cards matching specific settings such as color, type, etc...
 */
 
-#ifndef _CARDDESCRIPTOR_H_
-#define _CARDDESCRIPTOR_H_
+#ifndef CARDDESCRIPTOR_H
+#define CARDDESCRIPTOR_H
 
 #include "MTGCardInstance.h"
 #include "MTGGameZones.h"

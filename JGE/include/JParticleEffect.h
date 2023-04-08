@@ -8,8 +8,8 @@
 //
 //-------------------------------------------------------------------------------------
 
-#ifndef __PARTICLE_EFFECT_H__
-#define __PARTICLE_EFFECT_H__
+#ifndef JPARTICLEEFFECT_H
+#define JPARTICLEEFFECT_H
 
 #define MAX_EMITTER 5
 
@@ -107,7 +107,7 @@ public:
     /// @return X position.
     ///
     //////////////////////////////////////////////////////////////////////////
-    float GetX();
+    float GetX() const;
 
     //////////////////////////////////////////////////////////////////////////
     /// Get Y position.
@@ -115,7 +115,7 @@ public:
     /// @return Y position.
     ///
     //////////////////////////////////////////////////////////////////////////
-    float GetY();
+    float GetY() const;
 
     //////////////////////////////////////////////////////////////////////////
     /// Move the particle effect over to a new position. All the existing

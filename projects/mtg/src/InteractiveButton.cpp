@@ -7,6 +7,7 @@
 //
 
 #include <iostream>
+#include <utility>
 #include "PrecompiledHeader.h"
 
 #include "InteractiveButton.h"
@@ -17,26 +18,30 @@
 
 const int kButtonHeight = 30;
 
-InteractiveButton::InteractiveButton(JGuiController* _parent, int id, int fontId, string text, float x, float y,
+InteractiveButton::InteractiveButton(JGuiController* _parent, int id, int fontId, const string& text, float x, float y,
                                      JButton actionKey, bool hasFocus, bool autoTranslate)
-    : SimpleButton(_parent, id, fontId, text, x, y, hasFocus, autoTranslate) {
+    : SimpleButton(_parent, id, fontId, std::move(text), x, y, hasFocus, autoTranslate)
+    , mActionKey(actionKey) {
     setIsSelectionValid(false);  // by default it's turned off since you can't auto select it.
-    mActionKey = actionKey;
 }
 
 void InteractiveButton::Entering() {}
 
 void InteractiveButton::checkUserClick() {
-    int x1 = -1, y1 = -1;
+    int x1 = -1;
+    int y1 = -1;
     if (mEngine->GetLeftClickCoordinates(x1, y1)) {
         setIsSelectionValid(false);
-        int buttonImageWidth = static_cast<int>(GetWidth());
-        int x2 = static_cast<int>(getX()), y2 = static_cast<int>(getY() + mYOffset);
-        int buttonHeight = kButtonHeight;
-        if ((x1 >= x2) && (x1 <= (x2 + buttonImageWidth)) && (y1 >= y2) && (y1 < (y2 + buttonHeight)))
+        const int buttonImageWidth = static_cast<int>(GetWidth());
+        const int x2               = static_cast<int>(getX());
+        const int y2               = static_cast<int>(getY() + mYOffset);
+        const int buttonHeight     = kButtonHeight;
+        if ((x1 >= x2) && (x1 <= (x2 + buttonImageWidth)) && (y1 >= y2) && (y1 < (y2 + buttonHeight))) {
             setIsSelectionValid(true);
-    } else
+        }
+    } else {
         setIsSelectionValid(false);
+    }
 }
 
 bool InteractiveButton::ButtonPressed() {
@@ -53,14 +58,16 @@ bool InteractiveButton::ButtonPressed() {
 }
 
 void InteractiveButton::Render() {
-    if (!isSelectionValid()) return;
+    if (!isSelectionValid()) {
+        return;
+    }
     JRenderer* renderer             = JRenderer::GetInstance();
     WFont* mainFont                 = WResourceManager::Instance()->GetWFont(Fonts::MAIN_FONT);
     const string detailedInfoString = _(getText());
-    float stringWidth               = mainFont->GetStringWidth(detailedInfoString.c_str());
-    float pspIconsSize              = 0.5;
-    float mainFontHeight            = mainFont->GetHeight();
-    float boxStartX                 = getX() - 5;
+    const float stringWidth         = mainFont->GetStringWidth(detailedInfoString.c_str());
+    const float pspIconsSize        = 0.5;
+    const float mainFontHeight      = mainFont->GetHeight();
+    const float boxStartX           = getX() - 5;
     mXOffset                        = 0;
     mYOffset                        = 0;
 
@@ -72,9 +79,9 @@ void InteractiveButton::Render() {
     mYOffset += 2;
 #endif
 
-    float buttonXOffset = getX() - mXOffset;
-    float buttonYOffset = getY() + mYOffset;
-    if (buttonImage != NULL) {
+    const float buttonXOffset = getX() - mXOffset;
+    const float buttonYOffset = getY() + mYOffset;
+    if (buttonImage != nullptr) {
         renderer->RenderQuad(buttonImage.get(), buttonXOffset - buttonImage.get()->mWidth / 2,
                              buttonYOffset + mainFontHeight / 2, 0, pspIconsSize, pspIconsSize);
     }
@@ -83,10 +90,12 @@ void InteractiveButton::Render() {
 }
 
 void InteractiveButton::setImage(const JQuadPtr imagePtr) {
-    buttonImage        = imagePtr;
-    float imageXOffset = getX() - buttonImage.get()->mWidth;
+    buttonImage              = imagePtr;
+    const float imageXOffset = getX() - buttonImage.get()->mWidth;
 
-    if (imageXOffset < 0) setX(getX() - imageXOffset / 2 + 5);
+    if (imageXOffset < 0) {
+        setX(getX() - imageXOffset / 2 + 5);
+    }
 }
 
 /* Accessors */

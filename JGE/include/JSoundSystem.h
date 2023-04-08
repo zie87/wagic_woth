@@ -8,8 +8,8 @@
 //
 //-------------------------------------------------------------------------------------
 
-#ifndef _JSOUNDSYSTEM_H_
-#define _JSOUNDSYSTEM_H_
+#ifndef JSOUNDSYSTEM_H
+#define JSOUNDSYSTEM_H
 
 #include <stdio.h>
 #include <stdlib.h>

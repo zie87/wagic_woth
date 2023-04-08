@@ -1,5 +1,5 @@
-#ifndef _JNETWORK_H_
-#define _JNETWORK_H_
+#ifndef JNETWORK_H
+#define JNETWORK_H
 
 // Network support for PSP
 // #define NETWORK_SUPPORT
@@ -37,7 +37,7 @@ public:
     static int connect_to_apctl(int config);
 #endif
     bool sendCommand(std::string command);
-    static void registerCommand(std::string command, processCmd processCommand, processCmd processResponse);
+    static void registerCommand(const std::string& command, processCmd processCommand, processCmd processResponse);
 
 private:
     jge::thread* mpWorkerThread;

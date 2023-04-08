@@ -1,5 +1,5 @@
-#ifndef _MTGCARD_H_
-#define _MTGCARD_H_
+#ifndef MTGCARD_H
+#define MTGCARD_H
 
 #define MTG_IMAGE_WIDTH 200
 #define MTG_IMAGE_HEIGHT 285
@@ -43,7 +43,7 @@ public:
     int getMTGId() const;
     int getId() const;
     char getRarity() const;
-    const std::string getImageName();
+    std::string getImageName() const;
 };
 
 #endif

@@ -7,7 +7,7 @@
 
 #define LIB_GRAVE_OFFSET 230
 
-GuiAvatars::GuiAvatars(GameObserver* observer) : GuiLayer(observer), active(NULL) {
+GuiAvatars::GuiAvatars(GameObserver* observer) : GuiLayer(observer), active(nullptr) {
     Add(self = NEW GuiAvatar(SCREEN_WIDTH, SCREEN_HEIGHT, false, observer->players[0], GuiAvatar::BOTTOM_RIGHT, this));
     self->zoom = 0.9f;
     Add(selfGraveyard = NEW GuiGraveyard(SCREEN_WIDTH - GuiAvatar::Width - GuiGameZone::Width / 2 - 11,
@@ -55,7 +55,9 @@ void GuiAvatars::Activate(PlayGuiObject* c) {
         self->zoom                                = 1.0f;
         active                                    = self;
     }
-    if (opponent != c && self != c) c->alpha = 255.0f;
+    if (opponent != c && self != c) {
+        c->alpha = 255.0f;
+    }
 }
 void GuiAvatars::Deactivate(PlayGuiObject* c) {
     c->zoom      = 1.0;
@@ -63,11 +65,11 @@ void GuiAvatars::Deactivate(PlayGuiObject* c) {
     if ((opponentGraveyard == c) || (opponentLibrary == c) || (opponentHand == c) || (opponent == c)) {
         opponentGraveyard->alpha = opponentLibrary->alpha = opponentHand->alpha = 0;
         opponent->zoom                                                          = 0.9f;
-        active                                                                  = NULL;
+        active                                                                  = nullptr;
     } else if ((selfGraveyard == c) || (selfLibrary == c) || (self == c)) {
         selfGraveyard->alpha = selfLibrary->alpha = 0;
         self->zoom                                = 0.5f;
-        active                                    = NULL;
+        active                                    = nullptr;
     }
 }
 
@@ -84,13 +86,27 @@ int GuiAvatars::receiveEventMinus(WEvent* e) {
 }
 
 bool GuiAvatars::CheckUserInput(JButton key) {
-    if (self->CheckUserInput(key)) return true;
-    if (opponent->CheckUserInput(key)) return true;
-    if (selfGraveyard->CheckUserInput(key)) return true;
-    if (opponentGraveyard->CheckUserInput(key)) return true;
-    if (opponentHand->CheckUserInput(key)) return true;
-    if (selfLibrary->CheckUserInput(key)) return true;
-    if (opponentLibrary->CheckUserInput(key)) return true;
+    if (self->CheckUserInput(key)) {
+        return true;
+    }
+    if (opponent->CheckUserInput(key)) {
+        return true;
+    }
+    if (selfGraveyard->CheckUserInput(key)) {
+        return true;
+    }
+    if (opponentGraveyard->CheckUserInput(key)) {
+        return true;
+    }
+    if (opponentHand->CheckUserInput(key)) {
+        return true;
+    }
+    if (selfLibrary->CheckUserInput(key)) {
+        return true;
+    }
+    if (opponentLibrary->CheckUserInput(key)) {
+        return true;
+    }
     return false;
 }
 
@@ -105,9 +121,9 @@ void GuiAvatars::Update(float dt) {
 }
 
 void GuiAvatars::Render() {
-    JRenderer* r = JRenderer::GetInstance();
-    float w      = 54;
-    float h      = 54;
+    JRenderer* r  = JRenderer::GetInstance();
+    const float w = 54;
+    const float h = 54;
     if (opponent == active) {
         r->FillRect(opponent->actX, opponent->actY, w * opponent->actZ, h * opponent->actZ, ARGB(200, 0, 0, 0));
     } else if (self == active) {

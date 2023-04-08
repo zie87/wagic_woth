@@ -1,5 +1,5 @@
-#ifndef _JASSERT_H_
-#define _JASSERT_H_
+#ifndef JASSERT_H
+#define JASSERT_H
 
 #include "JGE.h"
 

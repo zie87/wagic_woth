@@ -8,8 +8,8 @@
 //
 //-------------------------------------------------------------------------------------
 
-#ifndef _JGE_H_
-#define _JGE_H_
+#ifndef JGE_H
+#define JGE_H
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -159,7 +159,7 @@ public:
     ///
     /// @return Elapsed time in seconds.
     //////////////////////////////////////////////////////////////////////////
-    float GetDelta();
+    float GetDelta() const;
 
     // override the current delta time.
     void SetDelta(float delta);
@@ -171,7 +171,7 @@ public:
     ///
     /// @return Number of frames per second.
     //////////////////////////////////////////////////////////////////////////
-    float GetFPS();
+    float GetFPS() const;
 
     //////////////////////////////////////////////////////////////////////////
     /// Check the current state of a button.
@@ -293,7 +293,7 @@ public:
 
     // Getter, may have to move that in the JGuiListener
     // Returns false if nothing has been clicked, true otherwise
-    bool GetLeftClickCoordinates(int& x, int& y);
+    bool GetLeftClickCoordinates(int& x, int& y) const;
 
     // Scroll events - currently triggered by SDL JOYBALL events
     void Scroll(int inXVelocity, int inYVelocity);
@@ -303,8 +303,8 @@ public:
     ///
     /// @return Status of the system.
     //////////////////////////////////////////////////////////////////////////
-    bool IsDone() { return mDone; }
-    bool IsPaused() { return mPaused; }
+    bool IsDone() const { return mDone; }
+    bool IsPaused() const { return mPaused; }
 
     //////////////////////////////////////////////////////////////////////////
     /// Set the user's core application class.

@@ -4,7 +4,8 @@
 #include "GuiStatic.h"
 
 GuiStatic::GuiStatic(float desiredHeight, float x, float y, bool hasFocus, GuiAvatars* parent)
-    : PlayGuiObject(desiredHeight, x, y, 0, hasFocus), parent(parent) {}
+    : PlayGuiObject(desiredHeight, x, y, 0, hasFocus)
+    , parent(parent) {}
 
 void GuiStatic::Entering() { parent->Activate(this); }
 
@@ -14,31 +15,35 @@ bool GuiStatic::Leaving(JButton key) {
 }
 
 GuiAvatar::GuiAvatar(float x, float y, bool hasFocus, Player* player, Corner corner, GuiAvatars* parent)
-    : GuiStatic(static_cast<float>(GuiAvatar::Height), x, y, hasFocus, parent),
-      avatarRed(255),
-      currentLife(player->life),
-      currentpoisonCount(player->poisonCount),
-      corner(corner),
-      player(player) {
+    : GuiStatic(static_cast<float>(GuiAvatar::Height), x, y, hasFocus, parent)
+    , avatarRed(255)
+    , currentLife(player->life)
+    , currentpoisonCount(player->poisonCount)
+    , corner(corner)
+    , player(player) {
     type = GUI_AVATAR;
 }
 
 void GuiAvatar::Render() {
-    JRenderer* r    = JRenderer::GetInstance();
-    int life        = player->life;
-    int poisonCount = player->poisonCount;
-    WFont* mFont    = WResourceManager::Instance()->GetWFont(Fonts::MAIN_FONT);
+    JRenderer* r          = JRenderer::GetInstance();
+    const int life        = player->life;
+    const int poisonCount = player->poisonCount;
+    WFont* mFont          = WResourceManager::Instance()->GetWFont(Fonts::MAIN_FONT);
     mFont->SetScale(DEFAULT_MAIN_FONT_SCALE);
     // Avatar
-    int lifeDiff = life - currentLife;
+    const int lifeDiff = life - currentLife;
     if (lifeDiff < 0 && currentLife > 0) {
         avatarRed = 192 + (3 * 255 * lifeDiff) / currentLife / 4;
-        if (avatarRed < 0) avatarRed = 0;
+        if (avatarRed < 0) {
+            avatarRed = 0;
+        }
     }
-    int poisonDiff = poisonCount - currentpoisonCount;
+    const int poisonDiff = poisonCount - currentpoisonCount;
     if (poisonDiff < 0 && currentpoisonCount > 0) {
         avatarRed = 192 + (3 * 255 * poisonDiff) / currentpoisonCount / 4;
-        if (avatarRed < 0) avatarRed = 0;
+        if (avatarRed < 0) {
+            avatarRed = 0;
+        }
     }
     currentpoisonCount = poisonCount;
     currentLife        = life;
@@ -71,15 +76,19 @@ void GuiAvatar::Render() {
 
     if (avatarRed < 255) {
         avatarRed += 3;
-        if (avatarRed > 255) avatarRed = 255;
+        if (avatarRed > 255) {
+            avatarRed = 255;
+        }
     }
 
-    if (player->getObserver()->currentPlayer == player)
+    if (player->getObserver()->currentPlayer == player) {
         r->DrawRect(x0 - 1, y0 - 1, 36 * actZ, 51 * actZ, ARGB((int)actA, 0, 255, 0));
-    else if (player->getObserver()->currentActionPlayer == player)
+    } else if (player->getObserver()->currentActionPlayer == player) {
         r->DrawRect(x0, y0, 34 * actZ, 49 * actZ, ARGB((int)actA, 0, 0, 255));
-    if (player->getObserver()->isInterrupting == player)
+    }
+    if (player->getObserver()->isInterrupting == player) {
         r->DrawRect(x0, y0, 34 * actZ, 49 * actZ, ARGB((int)actA, 255, 0, 0));
+    }
 
     // Life
     char buffer[10];
@@ -120,9 +129,9 @@ std::ostream& GuiAvatar::toString(std::ostream& out) const {
 }
 
 void GuiGameZone::toggleDisplay() {
-    if (showCards)
+    if (showCards) {
         showCards = 0;
-    else {
+    } else {
         showCards = 1;
         cd->init(zone);
     }
@@ -130,8 +139,8 @@ void GuiGameZone::toggleDisplay() {
 
 void GuiGameZone::Render() {
     // Texture
-    JQuadPtr quad = WResourceManager::Instance()->GetQuad(kGenericCardThumbnailID);
-    float scale   = defaultHeight / quad->mHeight;
+    const JQuadPtr quad = WResourceManager::Instance()->GetQuad(kGenericCardThumbnailID);
+    const float scale   = defaultHeight / quad->mHeight;
     quad->SetColor(ARGB((int)(actA), 255, 255, 255));
 
     JRenderer::GetInstance()->RenderQuad(quad.get(), actX, actY, 0.0, scale * actZ, scale * actZ);
@@ -141,9 +150,10 @@ void GuiGameZone::Render() {
         x0 += 7;
     }
 
-    if (mHasFocus)
+    if (mHasFocus) {
         JRenderer::GetInstance()->FillRect(actX, actY, quad->mWidth * scale * actZ, quad->mHeight * scale * actZ,
                                            ARGB(abs(128 - wave), 255, 255, 255));
+    }
 
     // Number of cards
     WFont* mFont = WResourceManager::Instance()->GetWFont(Fonts::MAIN_FONT);
@@ -153,27 +163,37 @@ void GuiGameZone::Render() {
     sprintf(buffer, "%i", zone->nb_cards);
     mFont->SetColor(ARGB(mAlpha, 0, 0, 0));
     mFont->DrawString(buffer, x0 + 1, actY + 1);
-    if (actA > 120) mAlpha = 255;
+    if (actA > 120) {
+        mAlpha = 255;
+    }
     mFont->SetColor(ARGB(mAlpha, 255, 255, 255));
     mFont->DrawString(buffer, x0, actY);
 
-    if (showCards) cd->Render();
-    for (vector<CardView*>::iterator it = cards.begin(); it != cards.end(); ++it) (*it)->Render();
+    if (showCards) {
+        cd->Render();
+    }
+    for (auto it = cards.begin(); it != cards.end(); ++it) {
+        (*it)->Render();
+    }
     PlayGuiObject::Render();
 }
 
 void GuiGameZone::ButtonPressed(int controllerId, int controlId) { zone->owner->getObserver()->ButtonPressed(this); }
 
 bool GuiGameZone::CheckUserInput(JButton key) {
-    if (showCards) return cd->CheckUserInput(key);
+    if (showCards) {
+        return cd->CheckUserInput(key);
+    }
     return false;
 }
 
 void GuiGameZone::Update(float dt) {
-    if (showCards) cd->Update(dt);
+    if (showCards) {
+        cd->Update(dt);
+    }
     PlayGuiObject::Update(dt);
 
-    for (vector<CardView*>::iterator it = cards.begin(); it != cards.end(); ++it) {
+    for (auto it = cards.begin(); it != cards.end(); ++it) {
         CardView* c = (*it);
         c->Update(dt);
 
@@ -187,15 +207,20 @@ void GuiGameZone::Update(float dt) {
 }
 
 GuiGameZone::GuiGameZone(float x, float y, bool hasFocus, MTGGameZone* zone, GuiAvatars* parent)
-    : GuiStatic(static_cast<float>(GuiGameZone::Height), x, y, hasFocus, parent), zone(zone) {
-    cd        = NEW CardDisplay(0, zone->owner->getObserver(), static_cast<int>(x), static_cast<int>(y), this);
-    cd->zone  = zone;
-    showCards = 0;
+    : GuiStatic(static_cast<float>(GuiGameZone::Height), x, y, hasFocus, parent)
+    , zone(zone)
+    , cd(NEW CardDisplay(0, zone->owner->getObserver(), static_cast<int>(x), static_cast<int>(y), this))
+    , showCards(0) {
+    cd->zone = zone;
 }
 
 GuiGameZone::~GuiGameZone() {
-    if (cd) delete cd;
-    for (vector<CardView*>::iterator it = cards.begin(); it != cards.end(); ++it) delete (*it);
+    if (cd) {
+        delete cd;
+    }
+    for (auto it = cards.begin(); it != cards.end(); ++it) {
+        delete (*it);
+    }
 }
 
 std::ostream& GuiGameZone::toString(std::ostream& out) const {
@@ -203,18 +228,20 @@ std::ostream& GuiGameZone::toString(std::ostream& out) const {
 }
 
 GuiGraveyard::GuiGraveyard(float x, float y, bool hasFocus, Player* player, GuiAvatars* parent)
-    : GuiGameZone(x, y, hasFocus, player->game->graveyard, parent), player(player) {
+    : GuiGameZone(x, y, hasFocus, player->game->graveyard, parent)
+    , player(player) {
     type = GUI_GRAVEYARD;
 }
 
 int GuiGraveyard::receiveEventPlus(WEvent* e) {
-    if (WEventZoneChange* event = dynamic_cast<WEventZoneChange*>(e))
+    if (auto* event = dynamic_cast<WEventZoneChange*>(e)) {
         if (event->to == zone) {
             CardView* t;
-            if (event->card->view)
+            if (event->card->view) {
                 t = NEW CardView(CardView::nullZone, event->card, *(event->card->view));
-            else
+            } else {
                 t = NEW CardView(CardView::nullZone, event->card, x, y);
+            }
             t->x     = x + Width / 2;
             t->y     = y + Height / 2;
             t->zoom  = 0.6f;
@@ -222,19 +249,23 @@ int GuiGraveyard::receiveEventPlus(WEvent* e) {
             cards.push_back(t);
             return 1;
         }
+    }
     return 0;
 }
 
 int GuiGraveyard::receiveEventMinus(WEvent* e) {
-    if (WEventZoneChange* event = dynamic_cast<WEventZoneChange*>(e))
-        if (event->from == zone)
-            for (vector<CardView*>::iterator it = cards.begin(); it != cards.end(); ++it)
+    if (auto* event = dynamic_cast<WEventZoneChange*>(e)) {
+        if (event->from == zone) {
+            for (auto it = cards.begin(); it != cards.end(); ++it) {
                 if (event->card->previous == (*it)->card) {
                     CardView* cv = *it;
                     cards.erase(it);
                     zone->owner->getObserver()->mTrash->trash(cv);
                     return 1;
                 }
+            }
+        }
+    }
     return 0;
 }
 
@@ -242,18 +273,20 @@ std::ostream& GuiGraveyard::toString(std::ostream& out) const { return out << "G
 
 // opponenthand begins
 GuiOpponentHand::GuiOpponentHand(float x, float y, bool hasFocus, Player* player, GuiAvatars* parent)
-    : GuiGameZone(x, y, hasFocus, player->game->hand, parent), player(player) {
+    : GuiGameZone(x, y, hasFocus, player->game->hand, parent)
+    , player(player) {
     type = GUI_OPPONENTHAND;
 }
 
 int GuiOpponentHand::receiveEventPlus(WEvent* e) {
-    if (WEventZoneChange* event = dynamic_cast<WEventZoneChange*>(e))
+    if (auto* event = dynamic_cast<WEventZoneChange*>(e)) {
         if (event->to == zone) {
             CardView* t;
-            if (event->card->view)
+            if (event->card->view) {
                 t = NEW CardView(CardView::nullZone, event->card, *(event->card->view));
-            else
+            } else {
                 t = NEW CardView(CardView::nullZone, event->card, x, y);
+            }
             t->x     = x + Width / 2;
             t->y     = y + Height / 2;
             t->zoom  = 0.6f;
@@ -261,26 +294,31 @@ int GuiOpponentHand::receiveEventPlus(WEvent* e) {
             cards.push_back(t);
             return 1;
         }
+    }
     return 0;
 }
 
 int GuiOpponentHand::receiveEventMinus(WEvent* e) {
-    if (WEventZoneChange* event = dynamic_cast<WEventZoneChange*>(e))
-        if (event->from == zone)
-            for (vector<CardView*>::iterator it = cards.begin(); it != cards.end(); ++it)
+    if (auto* event = dynamic_cast<WEventZoneChange*>(e)) {
+        if (event->from == zone) {
+            for (auto it = cards.begin(); it != cards.end(); ++it) {
                 if (event->card->previous == (*it)->card) {
                     CardView* cv = *it;
                     cards.erase(it);
                     zone->owner->getObserver()->mTrash->trash(cv);
                     return 1;
                 }
+            }
+        }
+    }
     return 0;
 }
 
 std::ostream& GuiOpponentHand::toString(std::ostream& out) const { return out << "GuiOpponentHand :::"; }
 
 GuiLibrary::GuiLibrary(float x, float y, bool hasFocus, Player* player, GuiAvatars* parent)
-    : GuiGameZone(x, y, hasFocus, player->game->library, parent), player(player) {
+    : GuiGameZone(x, y, hasFocus, player->game->library, parent)
+    , player(player) {
     type = GUI_LIBRARY;
 }
 

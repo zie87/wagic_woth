@@ -1,3 +1,5 @@
+#include <utility>
+
 #include "PrecompiledHeader.h"
 
 #include "OptionItem.h"
@@ -5,65 +7,84 @@
 #include "Translate.h"
 
 // WCFilterFactory
-WCFilterFactory* WCFilterFactory::me = NULL;
+WCFilterFactory* WCFilterFactory::me = nullptr;
 
 WCFilterFactory* WCFilterFactory::GetInstance() {
-    if (!me) me = NEW WCFilterFactory();
+    if (!me) {
+        me = NEW WCFilterFactory();
+    }
     return me;
 }
 void WCFilterFactory::Destroy() { SAFE_DELETE(me); }
 size_t WCFilterFactory::findNext(string src, size_t start, char open, char close) {
     int num = 0;
     for (size_t x = start; x < src.size(); x++) {
-        if (src[x] == open) num++;
+        if (src[x] == open) {
+            num++;
+        }
         if (src[x] == close) {
             num--;
-            if (num == 0) return x;
+            if (num == 0) {
+                return x;
+            }
         }
     }
     return string::npos;
 }
 WCardFilter* WCFilterFactory::Construct(string src) {
     size_t x = 0;
-    string whitespaces(" \t\f\v\n\r");
+    const string whitespaces(" \t\f\v\n\r");
     x = src.find_first_not_of(whitespaces);
-    if (x != string::npos) src = src.substr(x);
+    if (x != string::npos) {
+        src = src.substr(x);
+    }
 
-    size_t srcLength = src.size();
-    if (!srcLength) return NEW WCFilterNULL();  // Empty string.
+    const size_t srcLength = src.size();
+    if (!srcLength) {
+        return NEW WCFilterNULL();  // Empty string.
+    }
 
     for (size_t i = 0; i < srcLength; i++) {
-        unsigned char c = src[i];
-        if (isspace(c)) continue;
+        const unsigned char c = src[i];
+        if (isspace(c)) {
+            continue;
+        }
         if (c == '(') {  // Parenthesis
-            size_t endp = findNext(src, i);
+            const size_t endp = findNext(src, i);
             if (endp != string::npos) {
-                WCFilterGROUP* g = NEW WCFilterGROUP(Construct(src.substr(i + 1, endp - 1)));
+                auto* g = NEW WCFilterGROUP(Construct(src.substr(i + 1, endp - 1)));
                 if (endp < (srcLength - 1)) {
-                    if (src[endp + 1] == '|')
+                    if (src[endp + 1] == '|') {
                         return NEW WCFilterOR(g, Construct(src.substr(endp + 2)));
-                    else if (src[endp + 1] == '&')
+                    }
+                    if (src[endp + 1] == '&') {
                         return NEW WCFilterAND(g, Construct(src.substr(endp + 2)));
+                    }
                 }
                 return g;
-            } else
-                return NEW WCFilterNULL();
-        } else if (c == '{') {  // Negation
-            size_t endp = findNext(src, i, '{', '}');
+            }
+            return NEW WCFilterNULL();
+        }
+        if (c == '{') {  // Negation
+            const size_t endp = findNext(src, i, '{', '}');
             if (endp != string::npos) {
-                WCFilterNOT* g = NEW WCFilterNOT(Construct(src.substr(i + 1, endp - 1)));
+                auto* g = NEW WCFilterNOT(Construct(src.substr(i + 1, endp - 1)));
                 if (endp < (srcLength - 1)) {
-                    if (src[endp + 1] == '|')
+                    if (src[endp + 1] == '|') {
                         return NEW WCFilterOR(g, Construct(src.substr(endp + 2)));
-                    else if (src[endp + 1] == '&')
+                    }
+                    if (src[endp + 1] == '&') {
                         return NEW WCFilterAND(g, Construct(src.substr(endp + 2)));
+                    }
                 }
                 return g;
-            } else
-                return NEW WCFilterNULL();
-        } else if (c == '&') {  // And
+            }
+            return NEW WCFilterNULL();
+        }
+        if (c == '&') {  // And
             return NEW WCFilterAND(Construct(src.substr(0, i)), Construct(src.substr(i + 1)));
-        } else if (c == '|') {  // Or
+        }
+        if (c == '|') {  // Or
             return NEW WCFilterOR(Construct(src.substr(0, i)), Construct(src.substr(i + 1)));
         }
     }
@@ -72,82 +93,107 @@ WCardFilter* WCFilterFactory::Construct(string src) {
 
 WCardFilter* WCFilterFactory::Leaf(string src) {
     string filter;
-    string whitespaces(" \t\f\v\n\r");
-    size_t x = src.find_first_not_of(whitespaces);
-    if (x != string::npos) src = src.substr(x);
+    const string whitespaces(" \t\f\v\n\r");
+    const size_t x = src.find_first_not_of(whitespaces);
+    if (x != string::npos) {
+        src = src.substr(x);
+    }
 
     for (size_t i = 0; i < src.size(); i++) {
-        unsigned char c = src[i];
-        if (isspace(c)) continue;
+        const unsigned char c = src[i];
+        if (isspace(c)) {
+            continue;
+        }
         if (c == '(') {  // Scan to ')', call Construct.
-            size_t end = src.find(")", i);
+            const size_t end = src.find(')', i);
             if (end != string::npos) {
-                string expr = src.substr(i + 1, i - end);
+                const string expr = src.substr(i + 1, i - end);
                 return NEW WCFilterGROUP(Construct(expr));
             }
         } else if (c == '{') {  // Scan to '}', call Construct.
-            size_t end = src.find("}", i);
+            const size_t end = src.find('}', i);
             if (end != string::npos) {
-                string expr = src.substr(i + 1, i - end);
+                const string expr = src.substr(i + 1, i - end);
                 return NEW WCFilterNOT(Construct(expr));
             }
         } else if (c == ':') {  // Scan ahead to ';', inbetween this is an argument
-            size_t end = src.find(";", i);
-            if (end != string::npos && filter.size()) {
-                string arg = src.substr(i + 1, end - i - 1);
+            const size_t end = src.find(';', i);
+            if (end != string::npos && !filter.empty()) {
+                const string arg = src.substr(i + 1, end - i - 1);
                 return Terminal(filter, arg);
             }
-        } else
+        } else {
             filter += c;
+        }
     }
     return NEW WCFilterNULL();
 }
 
-WCardFilter* WCFilterFactory::Terminal(string src, string arg) {
+WCardFilter* WCFilterFactory::Terminal(string src, const string& arg) {
     string type;
     for (size_t x = 0; x < src.size(); x++) {
-        if (isspace(src[x])) continue;
+        if (isspace(src[x])) {
+            continue;
+        }
         type += src[x];
     }
     std::transform(type.begin(), type.end(), type.begin(), ::tolower);
 
-    if (type == "r" || type == "rarity")
+    if (type == "r" || type == "rarity") {
         return NEW WCFilterRarity(arg);
-    else if (type == "c" || type == "color")
+    }
+    if (type == "c" || type == "color") {
         return NEW WCFilterColor(arg);
-    else if (type == "xc" || type == "xcolor")
+    }
+    if (type == "xc" || type == "xcolor") {
         return NEW WCFilterOnlyColor(arg);
-    else if (type == "s" || type == "set")
+    }
+    if (type == "s" || type == "set") {
         return NEW WCFilterSet(arg);
-    else if (type == "alpha")
+    }
+    if (type == "alpha") {
         return NEW WCFilterLetter(arg);
-    else if (type == "t" || type == "type")
+    }
+    if (type == "t" || type == "type") {
         return NEW WCFilterType(arg);
-    else if (type == "a" || type == "ability")
+    }
+    if (type == "a" || type == "ability") {
         return NEW WCFilterAbility(arg);
-    else if (type == "cmc")
+    }
+    if (type == "cmc") {
         return NEW WCFilterCMC(arg);
-    else if (type == "produces" || type == "ma")
+    }
+    if (type == "produces" || type == "ma") {
         return NEW WCFilterProducesColor(arg);
-    else if (type == "pow" || type == "power")
+    }
+    if (type == "pow" || type == "power") {
         return NEW WCFilterPower(arg);
-    else if (type == "tgh" || type == "tough" || type == "toughness")
+    }
+    if (type == "tgh" || type == "tough" || type == "toughness") {
         return NEW WCFilterToughness(arg);
+    }
 
     return NEW WCFilterNULL();
 }
 // WCFilterLetter
 WCFilterLetter::WCFilterLetter(string arg) {
-    if (!arg.size())
+    if (arg.empty()) {
         alpha = 'a';
-    else
+    } else {
         alpha = tolower(arg[0]);
+    }
 }
 bool WCFilterLetter::isMatch(MTGCard* c) {
-    if (!c || !c->data) return false;
+    if (!c || !c->data) {
+        return false;
+    }
     string s = c->data->getLCName();
-    if (!s.size()) return false;
-    if (s[0] == alpha || (alpha == '#' && (isdigit(s[0]) || ispunct(s[0])))) return true;
+    if (s.empty()) {
+        return false;
+    }
+    if (s[0] == alpha || (alpha == '#' && (isdigit(s[0]) || ispunct(s[0])))) {
+        return true;
+    }
     return false;
 }
 string WCFilterLetter::getCode() {
@@ -156,7 +202,7 @@ string WCFilterLetter::getCode() {
     return buf;
 }
 // WCFilterSet
-WCFilterSet::WCFilterSet(string arg) { setid = setlist.findSet(arg); }
+WCFilterSet::WCFilterSet(string arg) { setid = setlist.findSet(std::move(arg)); }
 
 string WCFilterSet::getCode() {
     char buf[256];
@@ -166,19 +212,22 @@ string WCFilterSet::getCode() {
 
 // WCFilterColor
 bool WCFilterColor::isMatch(MTGCard* c) {
-    if (!c || !c->data) return false;
+    if (!c || !c->data) {
+        return false;
+    }
     return (c->data->hasColor(color));
 }
 string WCFilterColor::getCode() {
     char buf[12];
     char c = '?';
-    if (color < 0 || color >= Constants::NB_Colors) c = Constants::MTGColorChars[color];
+    if (color < 0 || color >= Constants::NB_Colors) {
+        c = Constants::MTGColorChars[color];
+    }
     sprintf(buf, "color:%c;", c);
     return buf;
 };
-WCFilterColor::WCFilterColor(string arg) {
-    color  = -1;
-    char c = tolower(arg[0]);
+WCFilterColor::WCFilterColor(string arg) : color(-1) {
+    const char c = tolower(arg[0]);
     for (int i = 0; i < Constants::NB_Colors; i++) {
         if (Constants::MTGColorChars[i] == c) {
             color = i;
@@ -188,30 +237,42 @@ WCFilterColor::WCFilterColor(string arg) {
 }
 // WCFilterOnlyColor
 bool WCFilterOnlyColor::isMatch(MTGCard* c) {
-    if (!c || !c->data) return false;
+    if (!c || !c->data) {
+        return false;
+    }
     for (int i = 0; i < Constants::NB_Colors; i++) {
-        if (i == color) continue;
-        if (c->data->hasColor(i)) return false;
+        if (i == color) {
+            continue;
+        }
+        if (c->data->hasColor(i)) {
+            return false;
+        }
     }
     return (c->data->hasColor(color));
 }
 string WCFilterOnlyColor::getCode() {
     char buf[12];
     char c = '?';
-    if (color < 0 || color >= Constants::NB_Colors) c = Constants::MTGColorChars[color];
+    if (color < 0 || color >= Constants::NB_Colors) {
+        c = Constants::MTGColorChars[color];
+    }
     sprintf(buf, "xcolor:%c;", c);
     return buf;
 }
 // WCFilterProducesColor
 bool WCFilterProducesColor::isMatch(MTGCard* c) {
     bool bMatch = false;
-    if (!c || !c->data) return false;
+    if (!c || !c->data) {
+        return false;
+    }
 
     // http://code.google.com/p/wagic/issues/detail?id=650
     // Basic lands are not producing their mana through regular abilities anymore,
     // but through a rule that is outside of the primitives. This block is a hack to address this
     const string lands[] = {"dummy(colorless)", "forest", "island", "mountain", "swamp", "plains"};
-    if ((color < (int)(sizeof(lands) / sizeof(lands[0]))) && c->data->hasType(lands[color].c_str())) return true;
+    if ((color < (int)(sizeof(lands) / sizeof(lands[0]))) && c->data->hasType(lands[color].c_str())) {
+        return true;
+    }
 
     // Retrieve non basic Mana abilities
     string s = c->data->magicText;
@@ -232,15 +293,19 @@ bool WCFilterProducesColor::isMatch(MTGCard* c) {
 string WCFilterProducesColor::getCode() {
     char buf[12];
     char c = '?';
-    if (color < 0 || color >= Constants::NB_Colors) c = Constants::MTGColorChars[color];
+    if (color < 0 || color >= Constants::NB_Colors) {
+        c = Constants::MTGColorChars[color];
+    }
     sprintf(buf, "produces:%c;", c);
     return buf;
 }
 // WCFilterNumeric
-WCFilterNumeric::WCFilterNumeric(string arg) { number = atoi(arg.c_str()); }
+WCFilterNumeric::WCFilterNumeric(const string& arg) : number(atoi(arg.c_str())) {}
 // WCFilterCMC
 bool WCFilterCMC::isMatch(MTGCard* c) {
-    if (!c || !c->data) return false;
+    if (!c || !c->data) {
+        return false;
+    }
     ManaCost* mc = c->data->getManaCost();
     return (mc->getConvertedCost() == number);
 }
@@ -252,7 +317,9 @@ string WCFilterCMC::getCode() {
 }
 // WCFilterPower
 bool WCFilterPower::isMatch(MTGCard* c) {
-    if (!c || !c->data) return false;
+    if (!c || !c->data) {
+        return false;
+    }
     return (c->data->getPower() == number);
 }
 string WCFilterPower::getCode() {
@@ -262,7 +329,9 @@ string WCFilterPower::getCode() {
 }
 // WCFilterPower
 bool WCFilterToughness::isMatch(MTGCard* c) {
-    if (!c || !c->data) return false;
+    if (!c || !c->data) {
+        return false;
+    }
     return (c->data->getToughness() == number);
 }
 string WCFilterToughness::getCode() {
@@ -285,8 +354,12 @@ float WCFilterRarity::filterFee() {
     return 0.0f;
 }
 bool WCFilterRarity::isMatch(MTGCard* c) {
-    if (!c || !c->data) return false;
-    if (rarity == 'A') return true;  // A for "Any" or "All"
+    if (!c || !c->data) {
+        return false;
+    }
+    if (rarity == 'A') {
+        return true;  // A for "Any" or "All"
+    }
     return (c->getRarity() == rarity);
 }
 string WCFilterRarity::getCode() {
@@ -319,9 +392,8 @@ string WCFilterRarity::getCode() {
     sprintf(buf, "rarity:%s;", rarities[x]);
     return buf;
 };
-WCFilterRarity::WCFilterRarity(string arg) {
-    rarity = -1;
-    char c = toupper(arg[0]);
+WCFilterRarity::WCFilterRarity(string arg) : rarity(-1) {
+    const char c = toupper(arg[0]);
     switch (c) {
     case 'S':
     case 'M':
@@ -337,7 +409,9 @@ WCFilterRarity::WCFilterRarity(string arg) {
 }
 // WCFilterAbility
 bool WCFilterAbility::isMatch(MTGCard* c) {
-    if (ability < 0) return false;
+    if (ability < 0) {
+        return false;
+    }
 
     return c->data->basicAbilities.test(ability);
 }
@@ -354,7 +428,9 @@ WCFilterAbility::WCFilterAbility(string arg) {
 }
 string WCFilterAbility::getCode() {
     char buf[64];
-    if (ability < 0 || ability >= Constants::NB_BASIC_ABILITIES) return "";
+    if (ability < 0 || ability >= Constants::NB_BASIC_ABILITIES) {
+        return "";
+    }
     sprintf(buf, "ability:%s;", Constants::MTGBasicAbilities[ability]);
     return buf;
 };
@@ -412,9 +488,11 @@ string WCFilterType::getCode() {
 // Misc. filter code
 float WCFilterAND::filterFee() { return lhs->filterFee() + rhs->filterFee(); }
 float WCFilterOR::filterFee() {
-    float lFee = lhs->filterFee();
-    float rFee = rhs->filterFee();
-    if (lFee > rFee) return lFee;
+    const float lFee = lhs->filterFee();
+    const float rFee = rhs->filterFee();
+    if (lFee > rFee) {
+        return lFee;
+    }
     return rFee;
 }
 string WCFilterNOT::getCode() {
@@ -440,7 +518,11 @@ string WCFilterOR::getCode() {
 }
 
 bool WCFilterOR::isMatch(MTGCard* c) {
-    if (lhs->isMatch(c)) return true;
-    if (rhs->isMatch(c)) return true;
+    if (lhs->isMatch(c)) {
+        return true;
+    }
+    if (rhs->isMatch(c)) {
+        return true;
+    }
     return false;
 };

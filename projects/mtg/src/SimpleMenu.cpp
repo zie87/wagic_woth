@@ -26,37 +26,45 @@ JQuadPtr SimpleMenu::spadeR;
 JQuadPtr SimpleMenu::spadeL;
 JQuadPtr SimpleMenu::jewel;
 JQuadPtr SimpleMenu::side;
-JTexture* SimpleMenu::spadeRTex = NULL;
-JTexture* SimpleMenu::spadeLTex = NULL;
-JTexture* SimpleMenu::jewelTex  = NULL;
-JTexture* SimpleMenu::sideTex   = NULL;
+JTexture* SimpleMenu::spadeRTex = nullptr;
+JTexture* SimpleMenu::spadeLTex = nullptr;
+JTexture* SimpleMenu::jewelTex  = nullptr;
+JTexture* SimpleMenu::sideTex   = nullptr;
 
 SimpleMenu::SimpleMenu(JGE* jge, int id, JGuiListener* listener, int fontId, float x, float y, const char* _title,
                        int _maxItems, bool centerHorizontal, bool centerVertical)
-    : JGuiController(jge, id, listener),
-      fontId(fontId),
-      mCenterHorizontal(centerHorizontal),
-      mCenterVertical(centerVertical) {
-    autoTranslate    = true;
-    isMultipleChoice = false;
-    mHeight          = 2 * kVerticalMargin;
-    mWidth           = 0;
-    mX               = x;
-    mY               = y;
-    title            = _(_title);
-    startId          = 0;
-    maxItems         = _maxItems;
-    selectionT       = 0;
-    timeOpen         = 0;
-    mClosed          = false;
-    selectionTargetY = selectionY = y + kVerticalMargin;
+    : JGuiController(jge, id, listener)
+    , mHeight(2 * kVerticalMargin)
+    , mWidth(0)
+    , mX(x)
+    , mY(y)
+    , fontId(fontId)
+    , mClosed(false)
+    , maxItems(_maxItems)
+    , selectionT(0)
+    , startId(0)
+    , timeOpen(0)
+    , mCenterHorizontal(centerHorizontal)
+    , mCenterVertical(centerVertical)
+    , autoTranslate(true)
+    , isMultipleChoice(false)
+    , selectionTargetY(selectionY = y + kVerticalMargin) {
+    title = _(_title);
 
     JRenderer* renderer = JRenderer::GetInstance();
 
-    if (!spadeLTex) spadeLTex = WResourceManager::Instance()->RetrieveTexture("spade_ul.png", RETRIEVE_MANAGE);
-    if (!spadeRTex) spadeRTex = WResourceManager::Instance()->RetrieveTexture("spade_ur.png", RETRIEVE_MANAGE);
-    if (!jewelTex) jewelTex = renderer->CreateTexture(5, 5, TEX_TYPE_USE_VRAM);
-    if (!sideTex) sideTex = WResourceManager::Instance()->RetrieveTexture("menuside.png", RETRIEVE_MANAGE);
+    if (!spadeLTex) {
+        spadeLTex = WResourceManager::Instance()->RetrieveTexture("spade_ul.png", RETRIEVE_MANAGE);
+    }
+    if (!spadeRTex) {
+        spadeRTex = WResourceManager::Instance()->RetrieveTexture("spade_ur.png", RETRIEVE_MANAGE);
+    }
+    if (!jewelTex) {
+        jewelTex = renderer->CreateTexture(5, 5, TEX_TYPE_USE_VRAM);
+    }
+    if (!sideTex) {
+        sideTex = WResourceManager::Instance()->RetrieveTexture("menuside.png", RETRIEVE_MANAGE);
+    }
     spadeL = WResourceManager::Instance()->RetrieveQuad("spade_ul.png", 0, 0, 0, 0, "spade_ul", RETRIEVE_MANAGE);
     spadeR = WResourceManager::Instance()->RetrieveQuad("spade_ur.png", 0, 0, 0, 0, "spade_ur", RETRIEVE_MANAGE);
     jewel.reset(NEW JQuad(jewelTex, 1, 1, 3, 3));
@@ -128,26 +136,35 @@ void SimpleMenu::Render() {
         float sY = mY + kVerticalMargin;
 
         for (int i = 0; i < mCount; ++i) {
-            float width = (static_cast<SimpleMenuItem*>(mObjects[i]))->GetEnlargedWidth() + 15;
-            if (mWidth < width) mWidth = width;
+            const float width = (dynamic_cast<SimpleMenuItem*>(mObjects[i]))->GetEnlargedWidth() + 15;
+            if (mWidth < width) {
+                mWidth = width;
+            }
         }
 
-        float scaleFactor = titleFont->GetScale();
+        const float scaleFactor = titleFont->GetScale();
         titleFont->SetScale(SCALE_NORMAL);
-        if ((!title.empty()) && (mWidth < titleFont->GetStringWidth(title.c_str())))
+        if ((!title.empty()) && (mWidth < titleFont->GetStringWidth(title.c_str()))) {
             mWidth = titleFont->GetStringWidth(title.c_str());
+        }
         titleFont->SetScale(scaleFactor);
         mWidth += 2 * kHorizontalMargin;
 
-        if (mCenterHorizontal) mX = (SCREEN_WIDTH_F - mWidth) / 2;
+        if (mCenterHorizontal) {
+            mX = (SCREEN_WIDTH_F - mWidth) / 2;
+        }
 
-        if (mCenterVertical) mY = (SCREEN_HEIGHT_F - mHeight) / 2;
+        if (mCenterVertical) {
+            mY = (SCREEN_HEIGHT_F - mHeight) / 2;
+        }
 
         for (int i = 0; i < mCount; ++i) {
-            float y             = mY + kVerticalMargin + i * kLineHeight;
-            SimpleMenuItem* smi = static_cast<SimpleMenuItem*>(mObjects[i]);
+            const float y = mY + kVerticalMargin + i * kLineHeight;
+            auto* smi     = dynamic_cast<SimpleMenuItem*>(mObjects[i]);
             smi->Relocate(mX + mWidth / 2, y);
-            if (smi->hasFocus()) sY = y;
+            if (smi->hasFocus()) {
+                sY = y;
+            }
         }
         stars->Fire();
         selectionTargetY = selectionY = sY;
@@ -157,9 +174,11 @@ void SimpleMenu::Render() {
     JRenderer* renderer = JRenderer::GetInstance();
 
     float height = mHeight;
-    if (timeOpen < 1) height *= timeOpen > 0 ? timeOpen : -timeOpen;
+    if (timeOpen < 1) {
+        height *= timeOpen > 0 ? timeOpen : -timeOpen;
+    }
 
-    float heightPadding = kLineHeight / 2;  // this to reduce the bottom padding of the menu
+    const float heightPadding = kLineHeight / 2;  // this to reduce the bottom padding of the menu
     renderer->FillRect(mX, mY, mWidth, height - heightPadding, ARGB(180, 0, 0, 0));
 
     renderer->SetTexBlend(BLEND_SRC_ALPHA, BLEND_ONE_MINUS_SRC_ALPHA);
@@ -178,16 +197,18 @@ void SimpleMenu::Render() {
     renderer->SetTexBlend(BLEND_SRC_ALPHA, BLEND_ONE_MINUS_SRC_ALPHA);
 
     if (!title.empty()) {
-        float scaleFactor = titleFont->GetScale();
+        const float scaleFactor = titleFont->GetScale();
         titleFont->SetScale(SCALE_NORMAL);
         titleFont->DrawString(title.c_str(), mX + mWidth / 2, mY - 3, JGETEXT_CENTER);
         titleFont->SetScale(scaleFactor);
     }
     for (int i = startId; i < startId + maxItems; i++) {
-        if (i > mCount - 1) break;
-        SimpleMenuItem* currentMenuItem = static_cast<SimpleMenuItem*>(mObjects[i]);
-        float currentY                  = currentMenuItem->getY() - kLineHeight * startId;
-        float menuBottomEdge            = mY + height - kLineHeight + 7;
+        if (i > mCount - 1) {
+            break;
+        }
+        auto* currentMenuItem      = dynamic_cast<SimpleMenuItem*>(mObjects[i]);
+        const float currentY       = currentMenuItem->getY() - kLineHeight * startId;
+        const float menuBottomEdge = mY + height - kLineHeight + 7;
         if (currentY < menuBottomEdge) {
             if (currentMenuItem->hasFocus()) {
                 WResourceManager::Instance()
@@ -197,7 +218,7 @@ void SimpleMenu::Render() {
             } else {
                 mFont->SetColor(ARGB(150, 255, 255, 255));
             }
-            (static_cast<SimpleMenuItem*>(mObjects[i]))->RenderWithOffset(-kLineHeight * startId);
+            (dynamic_cast<SimpleMenuItem*>(mObjects[i]))->RenderWithOffset(-kLineHeight * startId);
         }
         mFont->SetScale(SCALE_NORMAL);
     }
@@ -207,7 +228,8 @@ void SimpleMenu::Render() {
 bool SimpleMenu::CheckUserInput(JButton key) {
     // a dude may have clicked somewhere, we're gonna select the closest object from where he clicked
     // since we know we are in a menu, we just need to check one cardinality
-    int x = -1, y = -1;
+    int x = -1;
+    int y = -1;
     int n = mCurr;
 
     if ((key == JGE_BTN_NONE) && mEngine->GetLeftClickCoordinates(x, y)) {
@@ -219,34 +241,41 @@ bool SimpleMenu::CheckUserInput(JButton key) {
             }
         }
 
-        if (mObjects.size()) {
-            float top, left;
-            float menuTopEdge    = mY + kLineHeight;
-            float menuBottomEdge = mY + mHeight - (kLineHeight / 2);
+        if (!mObjects.empty()) {
+            float top;
+            float left;
+            const float menuTopEdge    = mY + kLineHeight;
+            const float menuBottomEdge = mY + mHeight - (kLineHeight / 2);
 
-            if (y < menuTopEdge)
+            if (y < menuTopEdge) {
                 n = (mCurr - 1) > 0 ? mCurr - 1 : 0;
-            else if (y >= menuBottomEdge)
+            } else if (y >= menuBottomEdge) {
                 n = (mCurr + 1) < mCount ? mCurr + 1 : mCurr - 1;
-            else {
+            } else {
                 for (int i = 0; i < mCount; i++) {
                     if (mObjects[i]->getTopLeft(top, left)) {
-                        if ((y > top) && (y <= (top + kLineHeight))) n = i;
+                        if ((y > top) && (y <= (top + kLineHeight))) {
+                            n = i;
+                        }
                     }
                 }
             }
 
             // check bounds of n.
-            if (n < 0) n = 0;
-            if (n >= mCount) n = mCount - 1;
+            if (n < 0) {
+                n = 0;
+            }
+            if (n >= mCount) {
+                n = mCount - 1;
+            }
 
             // check to see if the user clicked
-            if (n != mCurr && mObjects[mCurr] != NULL && mObjects[mCurr]->Leaving(JGE_BTN_DOWN)) {
+            if (n != mCurr && mObjects[mCurr] != nullptr && mObjects[mCurr]->Leaving(JGE_BTN_DOWN)) {
                 mCurr = n;
                 mObjects[mCurr]->Entering();
             }
             // if the same object was selected process click
-            else if (n == mCurr && mObjects[mCurr] != NULL && mObjects[mCurr]->Leaving(JGE_BTN_OK)) {
+            else if (n == mCurr && mObjects[mCurr] != nullptr && mObjects[mCurr]->Leaving(JGE_BTN_OK)) {
                 mObjects[mCurr]->Entering();
             }
 
@@ -255,18 +284,20 @@ bool SimpleMenu::CheckUserInput(JButton key) {
             return true;
         }
         mEngine->LeftClickedProcessed();
-    } else
+    } else {
         return JGuiController::CheckUserInput(key);
+    }
 
     return false;
 }
 
 void SimpleMenu::Update(float dt) {
     JGuiController::Update(dt);
-    if (mCurr > startId + maxItems - 1)
+    if (mCurr > startId + maxItems - 1) {
         startId = mCurr - maxItems + 1;
-    else if (mCurr < startId)
+    } else if (mCurr < startId) {
         startId = mCurr;
+    }
 
     stars->Update(dt);
     selectionT += 3 * dt;
@@ -287,12 +318,14 @@ void SimpleMenu::Update(float dt) {
 }
 
 void SimpleMenu::Add(int id, const char* text, string desc, bool forceFocus) {
-    SimpleMenuItem* smi = NEW SimpleMenuItem(this, id, fontId, text, 0, mY + kVerticalMargin + mCount * kLineHeight,
-                                             (mCount == 0), autoTranslate);
+    auto* smi = NEW SimpleMenuItem(this, id, fontId, text, 0, mY + kVerticalMargin + mCount * kLineHeight,
+                                   (mCount == 0), autoTranslate);
 
     smi->setDescription(desc);
     JGuiController::Add(smi);
-    if (mCount <= maxItems) mHeight += kLineHeight;
+    if (mCount <= maxItems) {
+        mHeight += kLineHeight;
+    }
     if (forceFocus) {
         mObjects[mCurr]->Leaving(JGE_BTN_DOWN);
         mCurr = mCount - 1;

@@ -15,7 +15,7 @@ protected:
 
 public:
     ProxyPlayer(Player* pxPlayer, JNetwork* pxNetwork);
-    static void Serialize(istream& in, ostream& out);
+    static void Serialize(std::istream& in, std::ostream& out);
 };
 
 class RemotePlayer : public Player {
@@ -25,7 +25,7 @@ protected:
 
 public:
     RemotePlayer(JNetwork*);
-    static void Deserialize(istream& in, ostream& out);
+    static void Deserialize(std::istream& in, std::ostream& out);
     bool isLoaded() { return game != NULL; };
 };
 

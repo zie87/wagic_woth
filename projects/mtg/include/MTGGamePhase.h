@@ -1,5 +1,5 @@
-#ifndef _MTGGAMEPHASE_H_
-#define _MTGGAMEPHASE_H_
+#ifndef MTGGAMEPHASE_H
+#define MTGGAMEPHASE_H
 
 #include "ActionElement.h"
 #include "GameObserver.h"
@@ -16,10 +16,10 @@ protected:
 
 public:
     MTGGamePhase(GameObserver* g, int id);
-    virtual void Update(float dt);
-    bool CheckUserInput(JButton key);
-    virtual MTGGamePhase* clone() const;
-    virtual std::ostream& toString(std::ostream& out) const;
+    void Update(float dt) override;
+    bool CheckUserInput(JButton key) override;
+    MTGGamePhase* clone() const override;
+    std::ostream& toString(std::ostream& out) const override;
     bool NextGamePhase();
 };
 

@@ -1,5 +1,5 @@
-#ifndef _SIMPLEMENU_ITEM_H
-#define _SIMPLEMENU_ITEM_H
+#ifndef SIMPLEMENUITEM_H
+#define SIMPLEMENUITEM_H
 
 #include <string>
 #include <JLBFont.h>
@@ -18,13 +18,13 @@ private:
 
 public:
     SimpleMenuItem(int id);
-    SimpleMenuItem(SimpleMenu* _parent, int id, int fontId, std::string text, float x, float y, bool hasFocus = false,
-                   bool autoTranslate = false);
+    SimpleMenuItem(SimpleMenu* _parent, int id, int fontId, const std::string& text, float x, float y,
+                   bool hasFocus = false, bool autoTranslate = false);
 
-    virtual void Entering();
+    void Entering() override;
     virtual void setDescription(const std::string& desc);
     virtual std::string getDescription() const;
-    virtual std::ostream& toString(std::ostream& out) const;
+    std::ostream& toString(std::ostream& out) const override;
 };
 
 #endif

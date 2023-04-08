@@ -8,8 +8,8 @@
 //
 //-------------------------------------------------------------------------------------
 
-#ifndef _MD2MODEL_H
-#define _MD2MODEL_H
+#ifndef JMD2MODEL_H
+#define JMD2MODEL_H
 
 #if defined(PSP)
 #include <pspgu.h>

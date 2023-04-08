@@ -1,10 +1,11 @@
-#ifndef _OPTION_ITEM_H_
-#define _OPTION_ITEM_H_
+#ifndef OPTIONITEM_H
+#define OPTIONITEM_H
 /**
   @file OptionItem.h
   Includes classes and functionality related to the options menu.
 */
 #include <JGui.h>
+#include <utility>
 #include <vector>
 #include <string>
 #include "GameApp.h"
@@ -34,17 +35,17 @@ using std::string;
 class OptionItem : public WGuiItem {
 public:
     OptionItem(int _id, string _displayValue);
-    virtual ~OptionItem(){};
+    ~OptionItem() override{};
 
     /**
       Returns the index into ::options used to store and retrieve this option.
     */
-    virtual int getId() { return id; }
+    int getId() override { return id; }
 
     /**
       Changes the index into ::options used to store and retrieve this option.
     */
-    virtual void setId(int _id) { id = _id; }
+    void setId(int _id) override { id = _id; }
 
 protected:
     int id;
@@ -65,17 +66,21 @@ public:
     OptionInteger(int _id, string _displayValue, int _maxValue = 1, int _increment = 1, int _defV = 0,
                   string _sDef = "", int _minValue = 0);
 
-    virtual void Reload() {
-        if (id != INVALID_OPTION) value = options[id].number;
+    void Reload() override {
+        if (id != INVALID_OPTION) {
+            value = options[id].number;
+        }
     }
 
-    virtual bool Changed() { return value != options[id].number; }
+    bool Changed() override { return value != options[id].number; }
 
-    virtual void Render();
-    virtual void setData();
-    virtual void updateValue() {
+    void Render() override;
+    void setData() override;
+    void updateValue() override {
         value += increment;
-        if (value > maxValue) value = minValue;
+        if (value > maxValue) {
+            value = minValue;
+        }
     }
 };
 
@@ -88,18 +93,20 @@ public:
     vector<string> selections;  ///< Vector containing all possible values.
 
     virtual void addSelection(string s);
-    OptionSelect(int _id, string _displayValue) : OptionItem(_id, _displayValue) { value = 0; };
-    virtual void Reload() { initSelections(); };
-    virtual void Render();
-    virtual bool Selectable();
-    virtual void Entering(JButton key);
-    virtual bool Changed() { return (value != prior_value); }
+    OptionSelect(int _id, string _displayValue) : OptionItem(_id, std::move(_displayValue)), value(0){};
+    void Reload() override { initSelections(); };
+    void Render() override;
+    bool Selectable() override;
+    void Entering(JButton key) override;
+    bool Changed() override { return (value != prior_value); }
 
-    virtual void setData();
+    void setData() override;
     virtual void initSelections();
-    virtual void updateValue() {
+    void updateValue() override {
         value++;
-        if (value > selections.size() - 1) value = 0;
+        if (value > selections.size() - 1) {
+            value = 0;
+        }
     };
 
 protected:
@@ -113,14 +120,14 @@ class OptionLanguage : public OptionSelect {
 public:
     OptionLanguage(string _displayValue);
 
-    virtual void addSelection(string s) { addSelection(s, s); };
+    void addSelection(string s) override { addSelection(s, s); };
     virtual void addSelection(string s, string show);
-    virtual void initSelections();
-    virtual void confirmChange(bool confirmed);
-    virtual void Reload();
-    virtual bool Visible();
-    virtual bool Selectable();
-    virtual void setData();
+    void initSelections() override;
+    void confirmChange(bool confirmed) override;
+    void Reload() override;
+    bool Visible() override;
+    bool Selectable() override;
+    void setData() override;
 
 protected:
     vector<string> actual_data;  ///< An array containing the actual value we set the option to, rather than the display
@@ -132,9 +139,9 @@ protected:
 */
 class OptionThemeStyle : public OptionSelect {
 public:
-    virtual bool Visible();
-    virtual void Reload();
-    virtual void confirmChange(bool confirmed);
+    bool Visible() override;
+    void Reload() override;
+    void confirmChange(bool confirmed) override;
     OptionThemeStyle(string _displayValue);
 };
 
@@ -143,8 +150,8 @@ public:
 */
 class OptionDirectory : public OptionSelect {
 public:
-    virtual void Reload();
-    OptionDirectory(string root, int id, string displayValue, const string type);
+    void Reload() override;
+    OptionDirectory(const string& root, int id, string displayValue, const string& type);
 
 protected:
     const string root;  ///< The root directory to search for subdirectories.
@@ -157,13 +164,13 @@ class OptionTheme : public OptionDirectory {
 private:
     static const string DIRTESTER;  ///< A particular file to look for when building the list of possible directories.
 public:
-    OptionTheme(OptionThemeStyle* style = NULL);
+    OptionTheme(OptionThemeStyle* style = nullptr);
     JQuadPtr getImage();
-    virtual void updateValue();
-    virtual float getHeight();
-    virtual void Render();
-    virtual void confirmChange(bool confirmed);
-    virtual bool Visible();
+    void updateValue() override;
+    float getHeight() override;
+    void Render() override;
+    void confirmChange(bool confirmed) override;
+    bool Visible() override;
 
 protected:
     OptionThemeStyle* ts;  ///< The current theme style.
@@ -180,15 +187,15 @@ private:
     static const string DIRTESTER;  ///< A particular file to look for when building the list of possible directories.
 public:
     OptionProfile(GameApp* _app, JGuiListener* jgl);
-    virtual void addSelection(string s);
-    virtual bool Selectable() { return canSelect; };
-    virtual bool Changed() { return (initialValue != value); };
-    virtual void Entering(JButton key);
-    virtual void Reload();
-    virtual void Render();
-    virtual void initSelections();
-    virtual void confirmChange(bool confirmed);
-    virtual void updateValue();
+    void addSelection(string s) override;
+    bool Selectable() override { return canSelect; };
+    bool Changed() override { return (initialValue != value); };
+    void Entering(JButton key) override;
+    void Reload() override;
+    void Render() override;
+    void initSelections() override;
+    void confirmChange(bool confirmed) override;
+    void updateValue() override;
     void populate();
 
 private:
@@ -207,15 +214,15 @@ public:
     OptionKey(GameStateOptions* g, LocalKeySym, JButton);
     LocalKeySym from;
     JButton to;
-    virtual void Render();
-    virtual void Update(float);
-    virtual void Overlay();
-    virtual bool CheckUserInput(JButton key);
-    virtual void KeyPressed(LocalKeySym key);
-    virtual bool isModal();
-    virtual void ButtonPressed(int controllerId, int controlId);
-    virtual bool Visible();
-    virtual bool Selectable();
+    void Render() override;
+    void Update(float) override;
+    void Overlay() override;
+    bool CheckUserInput(JButton key) override;
+    void KeyPressed(LocalKeySym key) override;
+    bool isModal() override;
+    void ButtonPressed(int controllerId, int controlId) override;
+    bool Visible() override;
+    bool Selectable() override;
 
 protected:
     bool grabbed;

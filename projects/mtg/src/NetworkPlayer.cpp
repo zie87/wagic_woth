@@ -13,7 +13,7 @@ RemotePlayer::RemotePlayer(JNetwork* pxNetwork) : Player("remote", "", NULL), mp
     mpNetwork->sendCommand("GetPlayer");
 }
 
-void RemotePlayer::Deserialize(istream& in, ostream& out) {
+void RemotePlayer::Deserialize(std::istream& in, std::ostream& out) {
     //    istringstream ss(mInstance->mpNetwork->receiveString());
     in >> *mInstance;
 }
@@ -27,4 +27,4 @@ ProxyPlayer::ProxyPlayer(Player* pxPlayer, JNetwork* pxNetwork) : mpPlayer(pxPla
     //  mpNetwork->send(ss.str());
 }
 
-void ProxyPlayer::Serialize(istream& in, ostream& out) { out << *(mInstance->mpPlayer); }
+void ProxyPlayer::Serialize(std::istream& in, std::ostream& out) { out << *(mInstance->mpPlayer); }

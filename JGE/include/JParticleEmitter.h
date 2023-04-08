@@ -8,8 +8,8 @@
 //
 //-------------------------------------------------------------------------------------
 
-#ifndef __PARTICLE_EMITTER_H__
-#define __PARTICLE_EMITTER_H__
+#ifndef JPARTICLEEMITTER_H
+#define JPARTICLEEMITTER_H
 
 #define INIT_PARTICLE_COUNT 32
 #define MAX_PARTICLE_COUNT 256
@@ -85,7 +85,7 @@ public:
     /// @return True if the emitter is done.
     ///
     //////////////////////////////////////////////////////////////////////////
-    bool Done();
+    bool Done() const;
 
     //////////////////////////////////////////////////////////////////////////
     /// Set active flag.

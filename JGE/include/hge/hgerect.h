@@ -6,21 +6,15 @@
 ** hgeRect helper class
 */
 
-#ifndef HGERECT_H
-#define HGERECT_H
+#ifndef HGE_HGERECT_H
+#define HGE_HGERECT_H
 
 class hgeRect {
 public:
     float x1, y1, x2, y2;
 
-    hgeRect(float _x1, float _y1, float _x2, float _y2) {
-        x1     = _x1;
-        y1     = _y1;
-        x2     = _x2;
-        y2     = _y2;
-        bClean = false;
-    }
-    hgeRect() { bClean = true; }
+    hgeRect(float _x1, float _y1, float _x2, float _y2) : x1(_x1), bClean(false), x2(_x2), y1(_y1), y2(_y2) {}
+    hgeRect() : bClean(true) {}
 
     void Clear() { bClean = true; }
     bool IsClean() const { return bClean; }

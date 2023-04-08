@@ -8,8 +8,8 @@
 //
 //-------------------------------------------------------------------------------------
 
-#ifndef _VECTOR2D_H
-#define _VECTOR2D_H
+#ifndef VECTOR2D_H
+#define VECTOR2D_H
 
 #ifdef PSP
 #include <fastmath.h>
@@ -74,7 +74,7 @@ struct Vector2D {
     inline float Length(void) const;
     float Normalize(void);
     Vector2D Direction(void) const;
-    float Angle(const Vector2D& xE);
+    float Angle(const Vector2D& xE) const;
     Vector2D& Rotate(float angle);
     Vector2D& Rotate(const Vector2D& xCentre, float fAngle);
     void Clamp(const Vector2D& min, const Vector2D& max);

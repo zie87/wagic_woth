@@ -7,26 +7,34 @@
 #include "MTGGameZones.h"
 #include "GameObserver.h"
 
-CardDisplay::CardDisplay(GameObserver* game) : PlayGuiObjectController(game), mId(0) {
-    tc                 = NULL;
-    listener           = NULL;
-    nb_displayed_items = 7;
-    start_item         = 0;
-    x                  = 0;
-    y                  = 0;
-    zone               = NULL;
-}
+CardDisplay::CardDisplay(GameObserver* game)
+    : PlayGuiObjectController(game)
+    , mId(0)
+    , listener(nullptr)
+    , nb_displayed_items(7)
+    , start_item(0)
+    , tc(nullptr)
+    , x(0)
+    , y(0)
+    , zone(nullptr) {}
 
 CardDisplay::CardDisplay(int id, GameObserver* game, int _x, int _y, JGuiListener* _listener, TargetChooser* _tc,
                          int _nb_displayed_items)
-    : PlayGuiObjectController(game), mId(id), x(_x), y(_y) {
-    tc                 = _tc;
-    listener           = _listener;
-    nb_displayed_items = _nb_displayed_items;
-    start_item         = 0;
-    if (x + nb_displayed_items * 30 + 25 > SCREEN_WIDTH) x = SCREEN_WIDTH - (nb_displayed_items * 30 + 25);
-    if (y + 55 > SCREEN_HEIGHT) y = SCREEN_HEIGHT - 55;
-    zone = NULL;
+    : PlayGuiObjectController(game)
+    , mId(id)
+    , x(_x)
+    , y(_y)
+    , listener(_listener)
+    , nb_displayed_items(_nb_displayed_items)
+    , start_item(0)
+    , tc(_tc) {
+    if (x + nb_displayed_items * 30 + 25 > SCREEN_WIDTH) {
+        x = SCREEN_WIDTH - (nb_displayed_items * 30 + 25);
+    }
+    if (y + 55 > SCREEN_HEIGHT) {
+        y = SCREEN_HEIGHT - 55;
+    }
+    zone = nullptr;
 }
 
 void CardDisplay::AddCard(MTGCardInstance* _card) {
@@ -38,27 +46,35 @@ void CardDisplay::AddCard(MTGCardInstance* _card) {
 
 void CardDisplay::init(MTGGameZone* zone) {
     resetObjects();
-    if (!zone) return;
+    if (!zone) {
+        return;
+    }
     start_item = 0;
     for (int i = 0; i < zone->nb_cards; i++) {
         AddCard(zone->cards[i]);
     }
-    if (mObjects.size()) mObjects[0]->Entering();
+    if (!mObjects.empty()) {
+        mObjects[0]->Entering();
+    }
 }
 
 void CardDisplay::rotateLeft() {
-    if (start_item == 0) return;
+    if (start_item == 0) {
+        return;
+    }
     for (size_t i = 0; i < mObjects.size(); i++) {
-        CardGui* cardg = (CardGui*)mObjects[i];
+        auto* cardg = dynamic_cast<CardGui*>(mObjects[i]);
         cardg->x += 30;
     }
     start_item--;
 }
 
 void CardDisplay::rotateRight() {
-    if (start_item == (int)(mObjects.size()) - 1) return;
+    if (start_item == (int)(mObjects.size()) - 1) {
+        return;
+    }
     for (size_t i = 0; i < mObjects.size(); i++) {
-        CardGui* cardg = (CardGui*)mObjects[i];
+        auto* cardg = dynamic_cast<CardGui*>(mObjects[i]);
         cardg->x -= 30;
     }
     start_item++;
@@ -68,18 +84,22 @@ void CardDisplay::Update(float dt) {
     bool update = false;
 
     if (zone) {
-        int size = zone->cards.size();
+        const int size = zone->cards.size();
         for (int i = start_item; i < start_item + nb_displayed_items && i < (int)(mObjects.size()); i++) {
             if (i > size - 1) {
                 update = true;
                 break;
             }
-            CardGui* cardg = (CardGui*)mObjects[i];
-            if (cardg->card != zone->cards[i]) update = true;
+            auto* cardg = dynamic_cast<CardGui*>(mObjects[i]);
+            if (cardg->card != zone->cards[i]) {
+                update = true;
+            }
         }
     }
     PlayGuiObjectController::Update(dt);
-    if (update) init(zone);
+    if (update) {
+        init(zone);
+    }
 }
 
 bool CardDisplay::CheckUserInput(JButton key) {
@@ -89,18 +109,21 @@ bool CardDisplay::CheckUserInput(JButton key) {
             return true;
         }
     }
-    if (!mObjects.size()) return false;
+    if (mObjects.empty()) {
+        return false;
+    }
 
     if (mActionButton == key) {
         if (mObjects[mCurr] && mObjects[mCurr]->ButtonPressed()) {
-            CardGui* cardg = (CardGui*)mObjects[mCurr];
+            auto* cardg = dynamic_cast<CardGui*>(mObjects[mCurr]);
             if (tc) {
                 tc->toggleTarget(cardg->card);
                 return true;
-            } else {
-                if (observer) observer->ButtonPressed(cardg);
-                return true;
             }
+            if (observer) {
+                observer->ButtonPressed(cardg);
+            }
+            return true;
         }
         return true;
     }
@@ -116,7 +139,7 @@ bool CardDisplay::CheckUserInput(JButton key) {
                 rotateLeft();
             }
         }
-        if (n != mCurr && mObjects[mCurr] != NULL && mObjects[mCurr]->Leaving(JGE_BTN_LEFT)) {
+        if (n != mCurr && mObjects[mCurr] != nullptr && mObjects[mCurr]->Leaving(JGE_BTN_LEFT)) {
             mCurr = n;
             mObjects[mCurr]->Entering();
         }
@@ -131,7 +154,7 @@ bool CardDisplay::CheckUserInput(JButton key) {
         if (n >= start_item + nb_displayed_items) {
             rotateRight();
         }
-        if (n != mCurr && mObjects[mCurr] != NULL && mObjects[mCurr]->Leaving(JGE_BTN_RIGHT)) {
+        if (n != mCurr && mObjects[mCurr] != nullptr && mObjects[mCurr]->Leaving(JGE_BTN_RIGHT)) {
             mCurr = n;
             mObjects[mCurr]->Entering();
         }
@@ -142,13 +165,15 @@ bool CardDisplay::CheckUserInput(JButton key) {
         unsigned int distance2;
         unsigned int minDistance2 = -1;
         int n                     = mCurr;
-        int x1, y1;
+        int x1;
+        int y1;
         JButton key;
         JGE* jge = observer ? observer->getInput() : JGE::GetInstance();
         if (jge) {
             if (jge->GetLeftClickCoordinates(x1, y1)) {
                 for (size_t i = 0; i < mObjects.size(); i++) {
-                    float top, left;
+                    float top;
+                    float left;
                     if (mObjects[i]->getTopLeft(top, left)) {
                         distance2 = static_cast<unsigned int>((top - y1) * (top - y1) + (left - x1) * (left - x1));
                         if (distance2 < minDistance2) {
@@ -158,21 +183,22 @@ bool CardDisplay::CheckUserInput(JButton key) {
                     }
                 }
 
-                if (n < mCurr)
+                if (n < mCurr) {
                     key = JGE_BTN_LEFT;
-                else
+                } else {
                     key = JGE_BTN_RIGHT;
+                }
 
                 if (n < start_item) {
                     rotateLeft();
-                } else if (n >= (int)(mObjects.size()) && mObjects.size()) {
+                } else if (n >= (int)(mObjects.size()) && !mObjects.empty()) {
                     n = mObjects.size() - 1;
                 }
                 if (n >= start_item + nb_displayed_items) {
                     rotateRight();
                 }
 
-                if (n != mCurr && mObjects[mCurr] != NULL && mObjects[mCurr]->Leaving(key)) {
+                if (n != mCurr && mObjects[mCurr] != nullptr && mObjects[mCurr]->Leaving(key)) {
                     mCurr = n;
                     mObjects[mCurr]->Entering();
                     result = true;
@@ -191,12 +217,14 @@ void CardDisplay::Render() {
     JRenderer* r = JRenderer::GetInstance();
     r->DrawRect(static_cast<float>(x), static_cast<float>(y), static_cast<float>(nb_displayed_items * 30 + 20), 50,
                 ARGB(255, 255, 255, 255));
-    if (!mObjects.size()) return;
+    if (mObjects.empty()) {
+        return;
+    }
     for (int i = start_item; i < start_item + nb_displayed_items && i < (int)(mObjects.size()); i++) {
         if (mObjects[i]) {
             mObjects[i]->Render();
             if (tc) {
-                CardGui* cardg = (CardGui*)mObjects[i];
+                auto* cardg = dynamic_cast<CardGui*>(mObjects[i]);
                 if (tc->alreadyHasTarget(cardg->card)) {
                     r->DrawCircle(cardg->x + 5, cardg->y + 5, 5, ARGB(255, 255, 0, 0));
                 } else if (!tc->canTarget(cardg->card)) {
@@ -207,14 +235,16 @@ void CardDisplay::Render() {
     }
 
     // TODO: CardSelector should handle the graveyard and the library in the future...
-    if (mObjects.size() && mObjects[mCurr] != NULL) {
+    if (!mObjects.empty() && mObjects[mCurr] != nullptr) {
         mObjects[mCurr]->Render();
-        CardGui* cardg = ((CardGui*)mObjects[mCurr]);
+        CardGui* cardg = (dynamic_cast<CardGui*>(mObjects[mCurr]));
         Pos pos        = Pos(CardGui::BigWidth / 2, CardGui::BigHeight / 2 - 10, 1.0, 0.0, 220);
         int drawMode   = DrawMode::kNormal;
         if (observer) {
             pos.actY = 150;
-            if (x < (CardGui::BigWidth / 2)) pos.actX = SCREEN_WIDTH - 10 - CardGui::BigWidth / 2;
+            if (x < (CardGui::BigWidth / 2)) {
+                pos.actX = SCREEN_WIDTH - 10 - CardGui::BigWidth / 2;
+            }
             drawMode = observer->getCardSelector()->GetDrawMode();
         }
 

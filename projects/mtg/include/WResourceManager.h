@@ -1,5 +1,5 @@
-#ifndef _WResourceManager_H_
-#define _WResourceManager_H_
+#ifndef WRESOURCEMANAGER_H
+#define WRESOURCEMANAGER_H
 
 #include "WResource_Fwd.h"
 #include <JResourceManager.h>

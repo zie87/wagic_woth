@@ -17,17 +17,18 @@
 
 SimplePopup::SimplePopup(int id, JGuiListener* listener, const int fontId, const char* _title,
                          DeckMetaData* deckMetaData, MTGAllCards* collection, float cancelX, float cancelY)
-    : JGuiController(JGE::GetInstance(), id, listener), mFontId(fontId), mCollection(collection) {
-    mX        = 19;
-    mY        = 66;
-    mWidth    = 180.0f;
-    mTitle    = _title;
-    mMaxLines = 12;
-
-    mTextFont    = WResourceManager::Instance()->GetWFont(fontId);
+    : JGuiController(JGE::GetInstance(), id, listener)
+    , mMaxLines(12)
+    , mWidth(180.0f)
+    , mX(19)
+    , mY(66)
+    , mFontId(fontId)
+    , mStatsWrapper(nullptr)
+    , mTextFont(WResourceManager::Instance()->GetWFont(fontId))
+    , mTitle(_title)
+    , mCollection(collection) {
     this->mCount = 1;  // a hack to ensure the menus do book keeping correctly.  Since we aren't adding items to the
                        // menu, this is required
-    mStatsWrapper = NULL;
 
     JGuiController::Add(NEW InteractiveButton(this, kDismissButtonId, Fonts::MAIN_FONT, "Detailed Info", cancelX,
                                               cancelY, JGE_BTN_CANCEL),
@@ -38,8 +39,8 @@ SimplePopup::SimplePopup(int id, JGuiListener* listener, const int fontId, const
 void SimplePopup::Render() {
     mClosed = false;
 
-    JRenderer* r               = JRenderer::GetInstance();
-    string detailedInformation = getDetailedInformation(mDeckInformation->getFilename());
+    JRenderer* r                     = JRenderer::GetInstance();
+    const string detailedInformation = getDetailedInformation(mDeckInformation->getFilename());
 
     const float textHeight = mTextFont->GetHeight() * mMaxLines;
     r->FillRoundRect(mX, mY + 2, mWidth + 11, textHeight - 12, 2.0f, ARGB(255, 0, 0, 0));
@@ -56,10 +57,10 @@ void SimplePopup::Render() {
 // draws a bounding box around the popup.
 void SimplePopup::drawBoundingBox(float x, float y, float width, float height) {
     // draw the corners
-    string topCornerImageName     = "top_corner.png";
-    string bottomCornerImageName  = "bottom_corner.png";
-    string verticalBarImageName   = "vert_bar.png";
-    string horizontalBarImageName = "top_bar.png";
+    const string topCornerImageName     = "top_corner.png";
+    const string bottomCornerImageName  = "bottom_corner.png";
+    const string verticalBarImageName   = "vert_bar.png";
+    const string horizontalBarImageName = "top_bar.png";
 
     const float boxWidth  = (width + 15) / 3.0f;
     const float boxHeight = (height + 15) / 3.0f;
@@ -84,7 +85,7 @@ void SimplePopup::Update(DeckMetaData* selectedDeck) {
         mDeckInformation, mCollection, (mDeckInformation->getFilename().find("baka") != string::npos));
 }
 
-string SimplePopup::getDetailedInformation(string filename) {
+string SimplePopup::getDetailedInformation(const string& filename) {
     std::ostringstream oss;
     oss << "------- Deck Summary -----" << std::endl
         << "Cards: " << mStatsWrapper->cardCount << std::endl
@@ -119,9 +120,11 @@ string SimplePopup::getDetailedInformation(string filename) {
         << std::endl
         << "  --- Mana Curve ---  " << std::endl;
 
-    for (int costIdx = 0; costIdx < Constants::STATS_MAX_MANA_COST + 1; ++costIdx)
-        if (mStatsWrapper->countCardsPerCost[costIdx] > 0)
+    for (int costIdx = 0; costIdx < Constants::STATS_MAX_MANA_COST + 1; ++costIdx) {
+        if (mStatsWrapper->countCardsPerCost[costIdx] > 0) {
             oss << costIdx << ": " << std::setw(2) << std::left << mStatsWrapper->countCardsPerCost[costIdx] << "  ";
+        }
+    }
 
     oss << std::endl;
 
@@ -134,15 +137,15 @@ string SimplePopup::getDetailedInformation(string filename) {
 }
 
 void SimplePopup::Update(float dt) {
-    JButton key = mEngine->ReadButton();
+    const JButton key = mEngine->ReadButton();
     CheckUserInput(key);
 }
 
 // drawing routines
-void SimplePopup::drawCorner(string imageName, bool flipX, bool flipY, float x, float y) {
+void SimplePopup::drawCorner(const string& imageName, bool flipX, bool flipY, float x, float y) {
     LOG(" Drawing a Corner! ");
-    JRenderer* r                = JRenderer::GetInstance();
-    JQuadPtr horizontalBarImage = WResourceManager::Instance()->RetrieveTempQuad(imageName, TEXTURE_SUB_5551);
+    JRenderer* r                      = JRenderer::GetInstance();
+    const JQuadPtr horizontalBarImage = WResourceManager::Instance()->RetrieveTempQuad(imageName, TEXTURE_SUB_5551);
     horizontalBarImage->SetHFlip(flipX);
     horizontalBarImage->SetVFlip(flipY);
 
@@ -150,12 +153,12 @@ void SimplePopup::drawCorner(string imageName, bool flipX, bool flipY, float x, 
     LOG(" Done Drawing a Corner! ");
 }
 
-void SimplePopup::drawHorzPole(string imageName, bool flipX = false, bool flipY = false, float x = 0, float y = 0,
-                               float width = SCREEN_WIDTH_F) {
+void SimplePopup::drawHorzPole(const string& imageName, bool flipX = false, bool flipY = false, float x = 0,
+                               float y = 0, float width = SCREEN_WIDTH_F) {
     LOG(" Drawing a horizontal border! ");
-    JRenderer* r                = JRenderer::GetInstance();
-    JQuadPtr horizontalBarImage = WResourceManager::Instance()->RetrieveTempQuad(imageName, TEXTURE_SUB_5551);
-    if (horizontalBarImage != NULL) {
+    JRenderer* r                      = JRenderer::GetInstance();
+    const JQuadPtr horizontalBarImage = WResourceManager::Instance()->RetrieveTempQuad(imageName, TEXTURE_SUB_5551);
+    if (horizontalBarImage != nullptr) {
         horizontalBarImage->SetHFlip(flipX);
         horizontalBarImage->SetVFlip(flipY);
 
@@ -166,12 +169,12 @@ void SimplePopup::drawHorzPole(string imageName, bool flipX = false, bool flipY 
     LOG(" Done Drawing a horizontal border! ");
 }
 
-void SimplePopup::drawVertPole(string imageName, bool flipX = false, bool flipY = false, float x = 0, float y = 0,
-                               float height = SCREEN_HEIGHT_F) {
+void SimplePopup::drawVertPole(const string& imageName, bool flipX = false, bool flipY = false, float x = 0,
+                               float y = 0, float height = SCREEN_HEIGHT_F) {
     LOG(" Drawing a Vertical border! ");
-    JRenderer* r              = JRenderer::GetInstance();
-    JQuadPtr verticalBarImage = WResourceManager::Instance()->RetrieveTempQuad(imageName, TEXTURE_SUB_5551);
-    if (verticalBarImage != NULL) {
+    JRenderer* r                    = JRenderer::GetInstance();
+    const JQuadPtr verticalBarImage = WResourceManager::Instance()->RetrieveTempQuad(imageName, TEXTURE_SUB_5551);
+    if (verticalBarImage != nullptr) {
         verticalBarImage->SetHFlip(flipX);
         verticalBarImage->SetVFlip(flipY);
 
@@ -188,6 +191,6 @@ void SimplePopup::Close() {
 }
 
 SimplePopup::~SimplePopup(void) {
-    mTextFont        = NULL;
-    mDeckInformation = NULL;
+    mTextFont        = nullptr;
+    mDeckInformation = nullptr;
 }

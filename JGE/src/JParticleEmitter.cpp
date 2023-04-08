@@ -16,29 +16,24 @@
 #include "../include/JParticleEmitter.h"
 
 //-------------------------------------------------------------------------------------
-JParticleEmitter::JParticleEmitter(JParticleEffect* parent) {
-    mParent       = parent;
-    mType         = TYPE_POINT;
-    mSrcBlending  = BLEND_SRC_ALPHA;
-    mDestBlending = BLEND_ONE;
-
-    mQuad = NULL;
-
-    mQuadIndex = 0;
-    mWidth     = 8;
-    mHeight    = 8;
-
-    mEmitTimer = 0.0f;
-    mActive    = false;
-
-    mMaxParticleCount = MAX_PARTICLE_COUNT;
-
+JParticleEmitter::JParticleEmitter(JParticleEffect* parent)
+    : mParent(parent)
+    , mActive(false)
+    , mDestBlending(BLEND_ONE)
+    , mEmitTimer(0.0f)
+    , mHeight(8)
+    , mMaxParticleCount(MAX_PARTICLE_COUNT)
+    , mQuad(nullptr)
+    , mQuadIndex(0)
+    , mSrcBlending(BLEND_SRC_ALPHA)
+    , mType(TYPE_POINT)
+    , mWidth(8) {
     mParticles.clear();
     mParticles.reserve(INIT_PARTICLE_COUNT);
 }
 
 JParticleEmitter::~JParticleEmitter() {
-    while (mParticles.size() > 0) {
+    while (!mParticles.empty()) {
         JParticle* par = mParticles.back();
         mParticles.pop_back();
         delete par;
@@ -46,20 +41,22 @@ JParticleEmitter::~JParticleEmitter() {
 }
 
 JParticle* JParticleEmitter::GetIdleParticle() {
-    int size = mParticles.size();
+    const int size = mParticles.size();
     for (int i = 0; i < size; i++) {
-        if (!mParticles[i]->mActive) return mParticles[i];
+        if (!mParticles[i]->mActive) {
+            return mParticles[i];
+        }
     }
 
     if (size < mMaxParticleCount) {
-        JParticle* par = new JParticle();
-        if (par != NULL) {
+        auto* par = new JParticle();
+        if (par != nullptr) {
             mParticles.push_back(par);
             return par;
         }
     }
 
-    return NULL;
+    return nullptr;
 }
 
 void JParticleEmitter::Start() {
@@ -80,8 +77,10 @@ void JParticleEmitter::ReStart() {
     // 		mQuad = particleSys->GetParticleQuad(mQuadIndex);
     // 	}
 
-    int count = (int)mQuantity.mCurr;
-    if (count > 0) EmitParticles(count);
+    const int count = (int)mQuantity.mCurr;
+    if (count > 0) {
+        EmitParticles(count);
+    }
 }
 
 void JParticleEmitter::SetQuad(JQuad* quad) { mQuad = quad; }
@@ -92,8 +91,8 @@ void JParticleEmitter::Update(float dt) {
     mActiveParticleCount = 0;
 
     if (!mParticles.empty()) {
-        int count = 0;
-        int size  = mParticles.size();
+        int count      = 0;
+        const int size = mParticles.size();
         for (int i = 0; i < size; i++) {
             if (mParticles[i]->mActive) {
                 count++;
@@ -104,7 +103,9 @@ void JParticleEmitter::Update(float dt) {
         mActiveParticleCount = count;
     }
 
-    if (!mActive) return;  // don't generate more
+    if (!mActive) {
+        return;  // don't generate more
+    }
 
     mEmitTimer += dt;
     if (mEmitTimer > mLife) {
@@ -120,21 +121,25 @@ void JParticleEmitter::Update(float dt) {
             if (mRepeatCounter > 0) {
                 ReStart();
                 return;
-            } else
-                mActive = false;
+            }
+            mActive = false;
         }
     }
 
-    if (!mActive) return;  // don't generate more
+    if (!mActive) {
+        return;  // don't generate more
+    }
 
     // more particles...
     int count = 0;
 
     if (mQuantity.mCurr != 0.0f) {
-        float timeForOneParticle = 1.0f / mQuantity.mCurr;
+        const float timeForOneParticle = 1.0f / mQuantity.mCurr;
 
-        float potentialParticles = (float)((int)(mEmitTimer / timeForOneParticle));
-        if (potentialParticles >= 1.0f) mEmitTimer -= (potentialParticles * timeForOneParticle);
+        auto potentialParticles = (float)((int)(mEmitTimer / timeForOneParticle));
+        if (potentialParticles >= 1.0f) {
+            mEmitTimer -= (potentialParticles * timeForOneParticle);
+        }
 
         count = (int)potentialParticles;
     }
@@ -152,14 +157,15 @@ void JParticleEmitter::EmitParticles(int count) {
     JParticleData* dataPtr;
     JParticle* particle;
 
-    float x, y;
+    float x;
+    float y;
 
-    float xOrigin = mParent->GetX();
-    float yOrigin = mParent->GetY();
+    const float xOrigin = mParent->GetX();
+    const float yOrigin = mParent->GetY();
 
     for (int i = 0; i < count; i++) {
         particle = GetIdleParticle();
-        if (particle != NULL) {
+        if (particle != nullptr) {
             particle->SetQuad(mQuad);
 
             dataPtr = particle->GetDataPtr();
@@ -197,9 +203,11 @@ void JParticleEmitter::EmitParticles(int count) {
             }
 
             // particle->mSpeed
-            float speed = mSpeedBase + (mSpeedMax - mSpeedBase) * (rand() % 1001) / 1000.0f;
+            const float speed = mSpeedBase + (mSpeedMax - mSpeedBase) * (rand() % 1001) / 1000.0f;
 
-            if (mType != TYPE_CIRCLE) angle = mAngleBase + (mAngleMax - mAngleBase) * (rand() % 1001) / 1000.0f;
+            if (mType != TYPE_CIRCLE) {
+                angle = mAngleBase + (mAngleMax - mAngleBase) * (rand() % 1001) / 1000.0f;
+            }
             // float x = cosf(angle);
             // float y = sinf(angle);
             //  speed itself is not changing
@@ -207,7 +215,7 @@ void JParticleEmitter::EmitParticles(int count) {
 
             particle->SetSize(mSizeBase + (mSizeMax - mSizeBase) * (rand() % 1001) / 1000.0f);
 
-            float life = mLifeBase + (mLifeMax - mLifeBase) * (rand() % 1001) / 1000.0f;
+            const float life = mLifeBase + (mLifeMax - mLifeBase) * (rand() % 1001) / 1000.0f;
             particle->Init(life);
         }
     }
@@ -218,7 +226,7 @@ void JParticleEmitter::Render() {
 
     renderer->SetTexBlend(mSrcBlending, mDestBlending);
 
-    int size = mParticles.size();
+    const int size = mParticles.size();
     for (int i = 0; i < size; i++) {
         if (mParticles[i]->mActive) {
             mParticles[i]->Render();
@@ -233,12 +241,12 @@ void JParticleEmitter::SetBlending(int srcBlend, int destBlend) {
     mDestBlending = destBlend;
 }
 
-bool JParticleEmitter::Done() { return !mActive && mActiveParticleCount == 0; }
+bool JParticleEmitter::Done() const { return !mActive && mActiveParticleCount == 0; }
 
 void JParticleEmitter::SetActive(bool flag) { mActive = flag; }
 
 void JParticleEmitter::MoveAllParticles(float x, float y) {
-    int size = mParticles.size();
+    const int size = mParticles.size();
     for (int i = 0; i < size; i++) {
         if (mParticles[i]->mActive) {
             mParticles[i]->Move(x, y);

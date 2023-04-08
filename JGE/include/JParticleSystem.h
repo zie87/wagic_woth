@@ -8,8 +8,8 @@
 //
 //-------------------------------------------------------------------------------------
 
-#ifndef __PARTICLE_SYSTEM_H__
-#define __PARTICLE_SYSTEM_H__
+#ifndef JPARTICLESYSTEM_H
+#define JPARTICLESYSTEM_H
 
 #include <stdlib.h>
 #include <list>
@@ -81,7 +81,7 @@ public:
     /// @return True if active.
     ///
     //////////////////////////////////////////////////////////////////////////
-    bool IsActive();
+    bool IsActive() const;
 
     //////////////////////////////////////////////////////////////////////////
     /// Set active flag.

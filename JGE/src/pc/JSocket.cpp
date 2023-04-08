@@ -23,7 +23,7 @@
 #define SERVER_PORT 5001
 unsigned char ADRESSE_IP_SERVEUR[4] = {127, 0, 0, 1};
 
-JSocket::JSocket(std::string ipAddr) : state(NOT_AVAILABLE), mfd(-1) {
+JSocket::JSocket(const std::string& ipAddr) : state(NOT_AVAILABLE), mfd(socket(AF_INET, SOCK_STREAM, 0)) {
     int result;
     struct hostent* hostentptr;
 #ifdef WIN32
@@ -41,8 +41,9 @@ JSocket::JSocket(std::string ipAddr) : state(NOT_AVAILABLE), mfd(-1) {
     struct sockaddr_in Adresse_Socket_Server;
 #endif
 
-    mfd = socket(AF_INET, SOCK_STREAM, 0);
-    if (mfd < 0) return;
+    if (mfd < 0) {
+        return;
+    }
     DebugTrace("Connecting " << ipAddr);
 
 #ifdef WIN32
@@ -51,7 +52,7 @@ JSocket::JSocket(std::string ipAddr) : state(NOT_AVAILABLE), mfd(-1) {
 #elif LINUX
     hostentptr = gethostbyname(ipAddr.c_str());
 #endif
-    if (hostentptr == NULL) {
+    if (hostentptr == nullptr) {
         DebugTrace("ERROR, no such host\n");
         return;
     }
@@ -93,7 +94,7 @@ bool JSocket::SetNonBlocking(int sock) {
     return true;
 }
 
-JSocket::JSocket() : state(NOT_AVAILABLE), mfd(-1) {
+JSocket::JSocket() : state(NOT_AVAILABLE), mfd(socket(AF_INET, SOCK_STREAM, 0)) {
     int result;
 #ifdef WIN32
     SOCKADDR_IN Adresse_Socket_Connection;
@@ -110,8 +111,6 @@ JSocket::JSocket() : state(NOT_AVAILABLE), mfd(-1) {
 #elif LINUX
     struct sockaddr_in Adresse_Socket_Connection;
 #endif  // WINDOWS
-
-    mfd = socket(AF_INET, SOCK_STREAM, 0);
 
 #ifdef WIN32
 #elif LINUX
@@ -179,7 +178,7 @@ JSocket* JSocket::Accept() {
     socklen_t Longueur_Adresse;
 #endif  // WINDOWS
 
-    JSocket* socket = NULL;
+    JSocket* socket = nullptr;
 
     while (mfd) {
         fd_set set;
@@ -189,10 +188,10 @@ JSocket* JSocket::Accept() {
         tv.tv_sec  = 0;
         tv.tv_usec = 1000 * 100;
 
-        int result = select(mfd + 1, &set, NULL, NULL, &tv);
+        const int result = select(mfd + 1, &set, nullptr, nullptr, &tv);
         if (result > 0 && FD_ISSET(mfd, &set)) {
             Longueur_Adresse = sizeof(Adresse_Socket_Cliente);
-            int val          = accept(mfd, (struct sockaddr*)&Adresse_Socket_Cliente, &Longueur_Adresse);
+            const int val    = accept(mfd, (struct sockaddr*)&Adresse_Socket_Cliente, &Longueur_Adresse);
             DebugTrace("connection on client port " << ntohs(Adresse_Socket_Cliente.sin_port));
 
             if (val >= 0) {
@@ -215,19 +214,20 @@ int JSocket::Read(char* buff, int size) {
         tv.tv_sec  = 0;
         tv.tv_usec = 1000 * 100;
 
-        int result = select(mfd + 1, &set, NULL, NULL, &tv);
+        const int result = select(mfd + 1, &set, nullptr, nullptr, &tv);
         if (result > 0 && FD_ISSET(mfd, &set)) {
 #ifdef WIN32
             int readbytes = recv(mfd, buff, size, 0);
 #elif LINUX
-            int readbytes = read(mfd, buff, size);
+            const int readbytes = read(mfd, buff, size);
 #endif  // WINDOWS
             if (readbytes < 0) {
                 DebugTrace("Error reading from socket\n");
                 return -1;
-            } else
-                return readbytes;
-        } else if (result < 0) {
+            }
+            return readbytes;
+        }
+        if (result < 0) {
             return -1;
         }
     }
@@ -235,7 +235,7 @@ int JSocket::Read(char* buff, int size) {
 }
 
 int JSocket::Write(char* buff, int size) {
-    int size1 = size;
+    const int size1 = size;
     while (size > 0 && state == CONNECTED) {
         fd_set set;
         FD_ZERO(&set);
@@ -244,9 +244,9 @@ int JSocket::Write(char* buff, int size) {
         tv.tv_sec  = 0;
         tv.tv_usec = 1000 * 100;
 
-        int result = select(mfd + 1, NULL, &set, NULL, &tv);
+        const int result = select(mfd + 1, nullptr, &set, nullptr, &tv);
         if (result > 0 && FD_ISSET(mfd, &set)) {
-            int len = send(mfd, buff, size, 0);
+            const int len = send(mfd, buff, size, 0);
             if (len < 0) {
                 return -1;
             }

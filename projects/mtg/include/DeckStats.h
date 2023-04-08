@@ -1,5 +1,5 @@
-#ifndef _DECKSTATS_H_
-#define _DECKSTATS_H_
+#ifndef DECKSTATS_H
+#define DECKSTATS_H
 
 #include <map>
 #include <string>
@@ -17,7 +17,7 @@ public:
     int nbgames;
     int victories;
     std::string manaColorIndex;
-    int percentVictories();
+    int percentVictories() const;
 };
 
 class DeckStats {
@@ -35,9 +35,9 @@ public:
     void load(const std::string& filename);
 
     ~DeckStats();
-    int percentVictories(std::string opponentsDeckFile);
+    int percentVictories(const std::string& opponentsDeckFile);
     int percentVictories();
-    DeckStat* getDeckStat(std::string opponentsFile);
+    DeckStat* getDeckStat(const std::string& opponentsFile);
 
     // returns the total number of games played with this deck
     int nbGames();
@@ -49,10 +49,10 @@ private:
 
 public:
     StatsWrapper(int deckId);
-    StatsWrapper(std::string filename);
+    StatsWrapper(const std::string& filename);
     ~StatsWrapper();
 
-    void initStatistics(std::string deckstats);
+    void initStatistics(const std::string& deckstats);
 
     // Stats parameters and status
     int mDeckId;
@@ -92,7 +92,7 @@ public:
     int totalColoredSymbols;
 
     std::string getManaColorIndex();
-    void updateStats(std::string filename, MTGAllCards* collection);
+    void updateStats(const std::string& filename, MTGAllCards* collection);
     void updateStats(DeckDataWrapper* mtgDeck);
     int countCardsByType(const char* _type, DeckDataWrapper* myDeck);
     float noLuck(int n, int a, int x);

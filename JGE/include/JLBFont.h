@@ -8,8 +8,8 @@
 //
 //-------------------------------------------------------------------------------------
 
-#ifndef JLBF_H
-#define JLBF_H
+#ifndef JLBFONT_H
+#define JLBFONT_H
 
 #define PRINTF_BUFFER_SIZE 256
 #define MAX_CHAR 256
@@ -52,7 +52,8 @@ public:
     //////////////////////////////////////////////////////////////////////////
     void DrawString(const char* string, float x, float y, int align = JGETEXT_LEFT, float leftOffset = 0,
                     float width = 0);
-    void DrawString(std::string s, float x, float y, int align = JGETEXT_LEFT, float leftOffset = 0, float width = 0);
+    void DrawString(const std::string& s, float x, float y, int align = JGETEXT_LEFT, float leftOffset = 0,
+                    float width = 0);
 
     //////////////////////////////////////////////////////////////////////////
     /// Rendering text to screen with syntax similar to printf of C/C++.

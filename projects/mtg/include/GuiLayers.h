@@ -1,5 +1,5 @@
-#ifndef _GUI_LAYERS_H_
-#define _GUI_LAYERS_H_
+#ifndef GUILAYERS_H
+#define GUILAYERS_H
 
 #define DIR_DOWN 1
 #define DIR_UP 2
@@ -26,7 +26,7 @@ public:
     int modal;
     bool hasFocus;
     virtual void resetObjects();
-    int getMaxId();
+    int getMaxId() const;
     GuiLayer(GameObserver* observer);
     virtual ~GuiLayer();
     virtual void Update(float dt);
@@ -35,8 +35,10 @@ public:
     int getIndexOf(JGuiObject* object);
     JGuiObject* getByIndex(int index);
     virtual void Render();
-    int empty() {
-        if (mObjects.size()) return 0;
+    int empty() const {
+        if (!mObjects.empty()) {
+            return 0;
+        }
         return 1;
     }
 

@@ -1,37 +1,45 @@
 #include "PrecompiledHeader.h"
 
 #include "IconButton.h"
+
+#include <utility>
 #include "WResourceManager.h"
 #include "WFont.h"
 
 #define SCALE_SELECTED 1.2f
 #define SCALE_NORMAL 1.0f
 
-IconButtonsController::IconButtonsController(JGE* jge, float x, float y) : JGuiController(jge, 0, NULL), mX(x), mY(y) {
+IconButtonsController::IconButtonsController(JGE* jge, float x, float y)
+    : JGuiController(jge, 0, nullptr)
+    , mX(x)
+    , mY(y) {
     mListener = this;
 }
 
 void IconButtonsController::SetColor(PIXEL_TYPE color) {
-    for (int i = 0; i < mCount; ++i)
-        if (mObjects[i]) ((IconButton*)mObjects[i])->SetColor(color);
+    for (int i = 0; i < mCount; ++i) {
+        if (mObjects[i]) {
+            (dynamic_cast<IconButton*>(mObjects[i]))->SetColor(color);
+        }
+    }
 }
 
-IconButton::IconButton(int id, IconButtonsController* parent, std::string texture, float x, float y, float scale,
+IconButton::IconButton(int id, IconButtonsController* parent, const std::string& texture, float x, float y, float scale,
                        int fontId, std::string text, float textRelativeX, float textRelativeY, bool hasFocus)
-    : JGuiObject(id) {
-    mQuad = NULL;
-    mTex  = WResourceManager::Instance()->RetrieveTexture(texture, RETRIEVE_LOCK);
+    : JGuiObject(id)
+    , mQuad(nullptr)
+    , mTex(WResourceManager::Instance()->RetrieveTexture(texture, RETRIEVE_LOCK)) {
     if (mTex) {
         mQuad = NEW JQuad(mTex, 0, 0, (float)mTex->mWidth, (float)mTex->mHeight);
     }
-    init(parent, mQuad, x, y, scale, fontId, text, textRelativeX, textRelativeY, hasFocus);
+    init(parent, mQuad, x, y, scale, fontId, std::move(text), textRelativeX, textRelativeY, hasFocus);
 }
 
 IconButton::IconButton(int id, IconButtonsController* parent, JQuad* quad, float x, float y, float scale, int fontId,
                        std::string text, float textRelativeX, float textRelativeY, bool hasFocus)
-    : JGuiObject(id) {
-    mTex = NULL;
-    init(parent, quad, x, y, scale, fontId, text, textRelativeX, textRelativeY, hasFocus);
+    : JGuiObject(id)
+    , mTex(nullptr) {
+    init(parent, quad, x, y, scale, fontId, std::move(text), textRelativeX, textRelativeY, hasFocus);
 }
 
 void IconButton::init(IconButtonsController* parent, JQuad* quad, float x, float y, float scale, int fontId,
@@ -42,7 +50,7 @@ void IconButton::init(IconButtonsController* parent, JQuad* quad, float x, float
     mY             = y;
     mScale         = scale;
     mFontId        = fontId;
-    mText          = text;
+    mText          = std::move(text);
     mTextRelativeX = textRelativeX;
     mTextRelativeY = textRelativeY;
     mHasFocus      = hasFocus;
@@ -54,21 +62,21 @@ void IconButton::init(IconButtonsController* parent, JQuad* quad, float x, float
 
 void IconButton::SetColor(PIXEL_TYPE color) { mColor = color; }
 
-bool IconButton::hasFocus() { return mHasFocus; }
+bool IconButton::hasFocus() const { return mHasFocus; }
 
 void IconButton::Render() {
     JRenderer* r = JRenderer::GetInstance();
 
-    float relX = mX + mParent->mX;
-    float relY = mY + mParent->mY;
+    const float relX = mX + mParent->mX;
+    const float relY = mY + mParent->mY;
 
     if (mQuad) {
         mQuad->SetColor(mColor);
         r->RenderQuad(mQuad, relX, relY, 0, mCurrentScale, mCurrentScale);
     }
-    if (mText.size()) {
-        WFont* mFont      = WResourceManager::Instance()->GetWFont(mFontId);
-        PIXEL_TYPE backup = mFont->GetColor();
+    if (!mText.empty()) {
+        WFont* mFont            = WResourceManager::Instance()->GetWFont(mFontId);
+        PIXEL_TYPE const backup = mFont->GetColor();
         mFont->SetColor(ARGB(255, 0, 0, 0));
         // TODO adapt if mTextRelativeX/Y/align are negative/positive
         mFont->DrawString(mText.c_str(), relX + mTextRelativeX, relY + mTextRelativeY, JGETEXT_CENTER);
@@ -79,10 +87,14 @@ void IconButton::Render() {
 void IconButton::Update(float dt) {
     if (mCurrentScale < mTargetScale) {
         mCurrentScale += 8.0f * dt;
-        if (mCurrentScale > mTargetScale) mCurrentScale = mTargetScale;
+        if (mCurrentScale > mTargetScale) {
+            mCurrentScale = mTargetScale;
+        }
     } else if (mCurrentScale > mTargetScale) {
         mCurrentScale -= 8.0f * dt;
-        if (mCurrentScale < mTargetScale) mCurrentScale = mTargetScale;
+        if (mCurrentScale < mTargetScale) {
+            mCurrentScale = mTargetScale;
+        }
     }
 }
 

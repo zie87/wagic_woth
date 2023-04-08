@@ -1,5 +1,5 @@
-#ifndef _TARGETSLIST_H_
-#define _TARGETSLIST_H_
+#ifndef TARGETSLIST_H
+#define TARGETSLIST_H
 
 class Targetable;
 class MTGCardInstance;
@@ -9,6 +9,7 @@ class Spell;
 class Interruptible;
 class Damage;
 
+#include <utility>
 #include <vector>
 using std::vector;
 
@@ -18,6 +19,7 @@ protected:
     vector<Targetable*> targets;
 
 public:
+    virtual ~TargetsList() = default;
     TargetsList();
     TargetsList(Targetable* _targets[], int nbtargets);
     int alreadyHasTarget(Targetable* target);
@@ -25,15 +27,15 @@ public:
     int toggleTarget(Targetable* _card);
     size_t getNbTargets() { return targets.size(); };
     virtual int addTarget(Targetable* _target);
-    MTGCardInstance* getNextCardTarget(MTGCardInstance* previous = 0);
-    Player* getNextPlayerTarget(Player* previous = 0);
-    Damageable* getNextDamageableTarget(Damageable* previous = 0);
+    MTGCardInstance* getNextCardTarget(MTGCardInstance* previous = nullptr);
+    Player* getNextPlayerTarget(Player* previous = nullptr);
+    Damageable* getNextDamageableTarget(Damageable* previous = nullptr);
     Interruptible* getNextInterruptible(Interruptible* previous, int type);
-    Spell* getNextSpellTarget(Spell* previous = 0);
-    Damage* getNextDamageTarget(Damage* previous = 0);
-    Targetable* getNextTarget(Targetable* previous = 0);
+    Spell* getNextSpellTarget(Spell* previous = nullptr);
+    Damage* getNextDamageTarget(Damage* previous = nullptr);
+    Targetable* getNextTarget(Targetable* previous = nullptr);
     vector<Targetable*> getTargetsFrom() { return targets; }
-    void setTargetsTo(vector<Targetable*> targetTo) { targets = targetTo; }
+    void setTargetsTo(vector<Targetable*> targetTo) { targets = std::move(targetTo); }
     void initTargets() { targets.clear(); };
 };
 

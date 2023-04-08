@@ -1,5 +1,5 @@
-#ifndef _DECKDATAWRAPPER_H_
-#define _DECKDATAWRAPPER_H_
+#ifndef DECKDATAWRAPPER_H
+#define DECKDATAWRAPPER_H
 
 #include "MTGDefinitions.h"
 #include "MTGCard.h"
@@ -16,16 +16,16 @@ class DeckDataWrapper : public WSrcDeck {
 public:
     MTGDeck* parent;
     DeckDataWrapper(MTGDeck* deck);
-    bool next() {
+    bool next() override {
         currentPos++;
         return true;
     };
-    bool prev() {
+    bool prev() override {
         currentPos--;
         return true;
     };
     void save();
-    void save(string filepath, bool useExpandedCardNames, string& deckTitle, string& deckDesc);
+    void save(const string& filepath, bool useExpandedCardNames, string& deckTitle, string& deckDesc);
 };
 
 #endif

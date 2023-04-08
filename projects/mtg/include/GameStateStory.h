@@ -1,5 +1,5 @@
-#ifndef _GAME_STATE_STORY_H_
-#define _GAME_STATE_STORY_H_
+#ifndef GAMESTATESTORY_H
+#define GAMESTATESTORY_H
 
 #include "GameState.h"
 #include <JGui.h>
@@ -19,12 +19,12 @@ private:
 
 public:
     GameStateStory(GameApp* parent);
-    ~GameStateStory();
-    void Start();
-    void End();
-    void Update(float dt);
-    void Render();
-    void ButtonPressed(int controllerId, int controlId);
+    ~GameStateStory() override;
+    void Start() override;
+    void End() override;
+    void Update(float dt) override;
+    void Render() override;
+    void ButtonPressed(int controllerId, int controlId) override;
 };
 
 #endif

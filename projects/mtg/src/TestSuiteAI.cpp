@@ -638,22 +638,22 @@ jge::mutex TestSuiteGame::mMutex;
 TestSuiteGame::~TestSuiteGame() { SAFE_DELETE(observer); }
 
 TestSuiteGame::TestSuiteGame(TestSuite* testsuite)
-    : summoningSickness(0),
-      forceAbility(false),
-      gameType(GAME_TYPE_CLASSIC),
-      timerLimit(0),
-      currentAction(0),
-      observer(0),
-      testsuite(testsuite) {}
+    : summoningSickness(0)
+    , forceAbility(false)
+    , gameType(GAME_TYPE_CLASSIC)
+    , timerLimit(0)
+    , currentAction(0)
+    , observer(0)
+    , testsuite(testsuite) {}
 
 TestSuiteGame::TestSuiteGame(TestSuite* testsuite, string _filename)
-    : summoningSickness(0),
-      forceAbility(false),
-      gameType(GAME_TYPE_CLASSIC),
-      timerLimit(3),
-      currentAction(0),
-      observer(0),
-      testsuite(testsuite) {
+    : summoningSickness(0)
+    , forceAbility(false)
+    , gameType(GAME_TYPE_CLASSIC)
+    , timerLimit(3)
+    , currentAction(0)
+    , observer(0)
+    , testsuite(testsuite) {
     filename = _filename;
     observer = new GameObserver();
 

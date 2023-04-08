@@ -6,8 +6,8 @@
 ** hgeFont helper class header
 */
 
-#ifndef HGEFONT_H
-#define HGEFONT_H
+#ifndef HGE_HGEFONT_H
+#define HGE_HGEFONT_H
 
 #include "../JTypes.h"
 // #include "hge.h"

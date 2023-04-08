@@ -1,5 +1,5 @@
-#ifndef _GUIFRAME_H_
-#define _GUIFRAME_H_
+#ifndef GUIFRAME_H
+#define GUIFRAME_H
 
 #include "GuiLayers.h"
 
@@ -11,9 +11,9 @@ protected:
 
 public:
     GuiFrame(GameObserver* observer);
-    ~GuiFrame();
-    virtual void Render();
-    void Update(float dt);
+    ~GuiFrame() override;
+    void Render() override;
+    void Update(float dt) override;
 };
 
-#endif  // _GUIFRAME_H_
+#endif  // GUIFRAME_H

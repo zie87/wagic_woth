@@ -1,5 +1,5 @@
-#ifndef _ICONBUTTON_H
-#define _ICONBUTTON_H
+#ifndef ICONBUTTON_H
+#define ICONBUTTON_H
 
 #include <string>
 #include <JGui.h>
@@ -28,23 +28,23 @@ private:
     JQuad* mQuad;
 
 public:
-    IconButton(int id, IconButtonsController* parent, std::string texture, float x, float y, float scale, int fontId,
-               std::string text, float textRelativeX, float textRelativeY, bool hasFocus = false);
+    IconButton(int id, IconButtonsController* parent, const std::string& texture, float x, float y, float scale,
+               int fontId, std::string text, float textRelativeX, float textRelativeY, bool hasFocus = false);
     IconButton(int id, IconButtonsController* parent, JQuad* quad, float x, float y, float scale, int fontId,
                std::string text, float textRelativeX, float textRelativeY, bool hasFocus = false);
     void init(IconButtonsController* parent, JQuad* quad, float x, float y, float scale, int fontId, std::string text,
               float textRelativeX, float textRelativeY, bool hasFocus);
-    ~IconButton();
-    std::ostream& toString(std::ostream& out) const;
+    ~IconButton() override;
+    std::ostream& toString(std::ostream& out) const override;
 
-    bool hasFocus();
+    bool hasFocus() const;
 
-    virtual void Render();
-    virtual void Update(float dt);
+    void Render() override;
+    void Update(float dt) override;
 
-    virtual void Entering();
-    virtual bool Leaving(JButton key);
-    virtual bool ButtonPressed();
+    void Entering() override;
+    bool Leaving(JButton key) override;
+    bool ButtonPressed() override;
     void SetColor(PIXEL_TYPE color);
 };
 

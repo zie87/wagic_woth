@@ -6,8 +6,8 @@
 ** hgeParticleSystem helper class header
 */
 
-#ifndef HGEPARTICLE_H
-#define HGEPARTICLE_H
+#ifndef HGE_HGEPARTICLE_H
+#define HGE_HGEPARTICLE_H
 
 // #include "hge.h"
 // #include "hgesprite.h"

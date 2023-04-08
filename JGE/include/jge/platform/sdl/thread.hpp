@@ -5,6 +5,6 @@
 
 namespace jge {
 using thread = std::thread;
-}
+}  // namespace jge
 
 #endif  // JGE_PLATFORM_SDL_THREAD_HPP

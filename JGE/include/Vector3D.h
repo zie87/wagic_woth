@@ -1,5 +1,5 @@
-#ifndef __VECTOR3D_H_
-#define __VECTOR3D_H_
+#ifndef VECTOR3D_H
+#define VECTOR3D_H
 
 #include <math.h>
 
@@ -41,8 +41,8 @@ struct Vector3D {
 
     float& operator[](int index) { return v[index]; }
 
-    float Length() {
-        float length = (float)sqrt(SQUARE(x) + SQUARE(y) + SQUARE(z));
+    float Length() const {
+        auto length = (float)sqrt(SQUARE(x) + SQUARE(y) + SQUARE(z));
         return (length != 0.0f) ? length : 1.0f;
     }
 

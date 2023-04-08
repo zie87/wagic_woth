@@ -12,12 +12,14 @@
 
 #if defined(WIN32) || defined(LINUX)
 #include <time.h>
+
+#include <utility>
 #endif
 //------------------------------
 // Players Game
 //------------------------------
 
-MTGPlayerCards::MTGPlayerCards() : owner(0) { init(); }
+MTGPlayerCards::MTGPlayerCards() : owner(nullptr) { init(); }
 
 MTGPlayerCards::MTGPlayerCards(Player* player, int* idList, int idListSize) : owner(player) {
     init();
@@ -26,13 +28,13 @@ MTGPlayerCards::MTGPlayerCards(Player* player, int* idList, int idListSize) : ow
     for (i = 0; i < idListSize; i++) {
         MTGCard* card = MTGCollection()->getCardById(idList[i]);
         if (card) {
-            MTGCardInstance* newCard = NEW MTGCardInstance(card, this);
+            auto* newCard = NEW MTGCardInstance(card, this);
             library->addCard(newCard);
         }
     }
 }
 
-MTGPlayerCards::MTGPlayerCards(MTGDeck* deck) : owner(0) {
+MTGPlayerCards::MTGPlayerCards(MTGDeck* deck) : owner(nullptr) {
     init();
     initDeck(deck);
 }
@@ -44,7 +46,7 @@ void MTGPlayerCards::initDeck(MTGDeck* deck) {
         MTGCard* card = deck->getCardById(it->first);
         if (card) {
             for (int i = 0; i < it->second; i++) {
-                MTGCardInstance* newCard = NEW MTGCardInstance(card, this);
+                auto* newCard = NEW MTGCardInstance(card, this);
                 library->addCard(newCard);
             }
         }
@@ -91,8 +93,10 @@ void MTGPlayerCards::setOwner(Player* player) {
     temp->setOwner(player);
 }
 
-void MTGPlayerCards::initGame(int shuffle, int draw) {
-    if (shuffle) library->shuffle();
+void MTGPlayerCards::initGame(int shuffle, int draw) const {
+    if (shuffle) {
+        library->shuffle();
+    }
     if (draw) {
         for (int i = 0; i < 7; i++) {
             drawFromLibrary();
@@ -106,7 +110,7 @@ void MTGPlayerCards::OptimizedHand(Player* who, int amount, int lands, int creat
 
     if (!game->players[0]->isAI() && game->players[1]->isAI()) {
         Player* p             = who;
-        MTGCardInstance* card = NULL;
+        MTGCardInstance* card = nullptr;
         MTGGameZone* z        = p->game->library;
 
         int optimizedland       = 0;
@@ -176,7 +180,7 @@ void MTGPlayerCards::OptimizedHand(Player* who, int amount, int lands, int creat
     //----------------------------
 }
 
-void MTGPlayerCards::drawFromLibrary() {
+void MTGPlayerCards::drawFromLibrary() const {
     if (!library->nb_cards) {
         if (inPlay->hasAbility(Constants::CANTLOSE) || inPlay->hasAbility(Constants::CANTMILLLOSE) ||
             owner->opponent()->game->inPlay->hasAbility(Constants::CANTWIN)) {
@@ -204,7 +208,9 @@ void MTGPlayerCards::drawFromLibrary() {
         }
     }
 
-    if (putInZone(toMove, library, hand)) toMove->currentZone = hand;
+    if (putInZone(toMove, library, hand)) {
+        toMove->currentZone = hand;
+    }
 }
 
 void MTGPlayerCards::resetLibrary() {
@@ -229,34 +235,36 @@ void MTGPlayerCards::init() {
     playRestrictions = NEW PlayRestrictions();
 }
 
-void MTGPlayerCards::showHand() { hand->debugPrint(); }
+void MTGPlayerCards::showHand() const { hand->debugPrint(); }
 
 // Moves a card to its owner's graveyard
-MTGCardInstance* MTGPlayerCards::putInGraveyard(MTGCardInstance* card) {
+MTGCardInstance* MTGPlayerCards::putInGraveyard(MTGCardInstance* card) const {
     return putInZone(card, card->currentZone, card->owner->game->graveyard);
 }
 
 // Moves a card to its owner's exile
-MTGCardInstance* MTGPlayerCards::putInExile(MTGCardInstance* card) {
+MTGCardInstance* MTGPlayerCards::putInExile(MTGCardInstance* card) const {
     return putInZone(card, card->currentZone, card->owner->game->exile);
 }
 
 // Moves a card to its owner's library
-MTGCardInstance* MTGPlayerCards::putInLibrary(MTGCardInstance* card) {
+MTGCardInstance* MTGPlayerCards::putInLibrary(MTGCardInstance* card) const {
     return putInZone(card, card->currentZone, card->owner->game->library);
 }
 
 // Moves a card to its *owner's* (not controller!) hand
-MTGCardInstance* MTGPlayerCards::putInHand(MTGCardInstance* card) {
+MTGCardInstance* MTGPlayerCards::putInHand(MTGCardInstance* card) const {
     return putInZone(card, card->currentZone, card->owner->game->hand);
 }
 
 // Moves a card from one zone to another
 // If the card is not actually in the expected "from" zone, does nothing and returns null
-MTGCardInstance* MTGPlayerCards::putInZone(MTGCardInstance* card, MTGGameZone* from, MTGGameZone* to) {
-    MTGCardInstance* copy = NULL;
+MTGCardInstance* MTGPlayerCards::putInZone(MTGCardInstance* card, MTGGameZone* from, MTGGameZone* to) const {
+    MTGCardInstance* copy = nullptr;
     GameObserver* g       = owner->getObserver();
-    if (!from || !to) return card;  // Error check
+    if (!from || !to) {
+        return card;  // Error check
+    }
 
     int doCopy = 1;
     // When a card is moved from inPlay to inPlay (controller change, for example), it is still the same object
@@ -265,7 +273,9 @@ MTGCardInstance* MTGPlayerCards::putInZone(MTGCardInstance* card, MTGGameZone* f
         doCopy = 0;
     }
 
-    if (!(copy = from->removeCard(card, doCopy))) return NULL;  // ERROR
+    if (!(copy = from->removeCard(card, doCopy))) {
+        return nullptr;  // ERROR
+    }
 
     if (options[Options::SFXVOLUME].number > 0) {
         if (to == g->players[0]->game->graveyard || to == g->players[1]->game->graveyard) {
@@ -304,9 +314,11 @@ MTGCardInstance* MTGPlayerCards::putInZone(MTGCardInstance* card, MTGGameZone* f
             MTGCardInstance* previous2 = previous->previous;
             from                       = previous->previousZone;
             copy->previous             = previous2;
-            if (previous2) previous2->next = copy;
-            previous->previous = NULL;
-            previous->next     = NULL;
+            if (previous2) {
+                previous2->next = copy;
+            }
+            previous->previous = nullptr;
+            previous->next     = nullptr;
             SAFE_DELETE(previous);
         }
     }
@@ -317,16 +329,18 @@ MTGCardInstance* MTGPlayerCards::putInZone(MTGCardInstance* card, MTGGameZone* f
     return ret;
 }
 
-void MTGPlayerCards::discardRandom(MTGGameZone* from, MTGCardInstance* source) {
-    if (!from->nb_cards) return;
-    int r              = owner->getObserver()->getRandomGenerator()->random() % (from->nb_cards);
+void MTGPlayerCards::discardRandom(MTGGameZone* from, MTGCardInstance* source) const {
+    if (!from->nb_cards) {
+        return;
+    }
+    const int r        = owner->getObserver()->getRandomGenerator()->random() % (from->nb_cards);
     WEvent* e          = NEW WEventCardDiscard(from->cards[r]);
     GameObserver* game = owner->getObserver();
     game->receiveEvent(e);
     putInZone(from->cards[r], from, graveyard);
 }
 
-int MTGPlayerCards::isInPlay(MTGCardInstance* card) {
+int MTGPlayerCards::isInPlay(MTGCardInstance* card) const {
     if (inPlay->hasCard(card)) {
         return 1;
     }
@@ -342,7 +356,7 @@ int MTGPlayerCards::isInZone(MTGCardInstance* card, MTGGameZone* zone) {
 // Zones specific code
 //--------------------------------------
 
-MTGGameZone::MTGGameZone() : nb_cards(0), lastCardDrawn(NULL), needShuffle(false) {}
+MTGGameZone::MTGGameZone() : nb_cards(0), lastCardDrawn(nullptr), needShuffle(false) {}
 
 MTGGameZone::~MTGGameZone() {
     for (size_t i = 0; i < cards.size(); i++) {
@@ -352,7 +366,7 @@ MTGGameZone::~MTGGameZone() {
     }
     cards.clear();
     cardsMap.clear();
-    owner = NULL;
+    owner = nullptr;
 }
 
 void MTGGameZone::beforeBeginPhase() {
@@ -378,14 +392,16 @@ MTGCardInstance* MTGGameZone::removeCard(MTGCardInstance* card, int createCopy) 
     cardsMap.erase(card);
     for (i = 0; i < (nb_cards); i++) {
         if (cards[i] == card) {
-            card->currentZone = NULL;
+            card->currentZone = nullptr;
             nb_cards--;
             cards.erase(cards.begin() + i);
             MTGCardInstance* copy = card;
             // if (card->isToken) //TODO better than this ?
             //   return card;
             // card->lastController = card->controller();
-            if (!card) return NULL;
+            if (!card) {
+                return nullptr;
+            }
             if (createCopy) {
                 copy                   = card->clone();
                 copy->previous         = card;
@@ -398,8 +414,12 @@ MTGCardInstance* MTGGameZone::removeCard(MTGCardInstance* card, int createCopy) 
                 copy->storedSourceCard = card->storedSourceCard;
 
                 // stupid bug with tokens...
-                if (card->model == card) copy->model = copy;
-                if (card->data == card) copy->data = copy;
+                if (card->model == card) {
+                    copy->model = copy;
+                }
+                if (card->data == card) {
+                    copy->data = copy;
+                }
 
                 card->next = copy;
             }
@@ -407,25 +427,29 @@ MTGCardInstance* MTGGameZone::removeCard(MTGCardInstance* card, int createCopy) 
             return copy;
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 MTGCardInstance* MTGGameZone::hasCard(MTGCardInstance* card) {
-    if (card->currentZone == this) return card;
-    return NULL;
+    if (card->currentZone == this) {
+        return card;
+    }
+    return nullptr;
 }
 
 size_t MTGGameZone::getIndex(MTGCardInstance* card) {
     size_t i;
     for (i = 0; i < cards.size(); i++) {
-        if (cards[i] == card) return i;
+        if (cards[i] == card) {
+            return i;
+        }
     }
     return -1;
 }
 
 unsigned int MTGGameZone::countByType(const char* value) {
-    int result    = 0;
-    int subTypeId = MTGAllCards::findType(value);
+    int result          = 0;
+    const int subTypeId = MTGAllCards::findType(value);
     for (int i = 0; i < (nb_cards); i++) {
         if (cards[i]->hasType(subTypeId)) {
             result++;
@@ -435,7 +459,9 @@ unsigned int MTGGameZone::countByType(const char* value) {
 }
 
 unsigned int MTGGameZone::countByCanTarget(TargetChooser* tc) {
-    if (!tc) return 0;
+    if (!tc) {
+        return 0;
+    }
 
     int result = 0;
     for (int i = 0; i < (nb_cards); i++) {
@@ -445,13 +471,13 @@ unsigned int MTGGameZone::countByCanTarget(TargetChooser* tc) {
     }
     return result;
 }
-MTGCardInstance* MTGGameZone::findByName(string name) {
+MTGCardInstance* MTGGameZone::findByName(const string& name) {
     for (int i = 0; i < (nb_cards); i++) {
         if (cards[i]->name == name || cards[i]->getLCName() /*tokens*/ == name) {
             return cards[i];
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 bool MTGGameZone::hasType(const char* value) {
@@ -500,7 +526,7 @@ bool MTGGameZone::hasTypeButNotType(const char* value, const char* secondvalue) 
     return false;
 }
 
-bool MTGGameZone::hasName(string value) {
+bool MTGGameZone::hasName(const string& value) {
     for (int i = 0; i < (nb_cards); i++) {
         if (cards[i]->name == value) {
             return true;
@@ -539,20 +565,22 @@ bool MTGGameZone::hasAbility(int ability) {
 int MTGGameZone::seenThisTurn(TargetChooser* tc, int castMethod, bool lastTurn) {
     // The following 2 lines modify the passed TargetChooser. Call this function with care :/
     tc->setAllZones();  // This is to allow targetting cards without caring about the actual zone
-    tc->targetter = NULL;
+    tc->targetter = nullptr;
 
     int count = 0;
     if (lastTurn) {
-        for (vector<MTGCardInstance*>::iterator iter = cardsSeenLastTurn.begin(); iter != cardsSeenLastTurn.end();
-             ++iter) {
+        for (auto iter = cardsSeenLastTurn.begin(); iter != cardsSeenLastTurn.end(); ++iter) {
             MTGCardInstance* c = (*iter);
-            if (c && c->matchesCastFilter(castMethod) && tc->canTarget(c)) count++;
+            if (c && c->matchesCastFilter(castMethod) && tc->canTarget(c)) {
+                count++;
+            }
         }
     } else {
-        for (vector<MTGCardInstance*>::iterator iter = cardsSeenThisTurn.begin(); iter != cardsSeenThisTurn.end();
-             ++iter) {
+        for (auto iter = cardsSeenThisTurn.begin(); iter != cardsSeenThisTurn.end(); ++iter) {
             MTGCardInstance* c = (*iter);
-            if (c->matchesCastFilter(castMethod) && tc->canTarget(c)) count++;
+            if (c->matchesCastFilter(castMethod) && tc->canTarget(c)) {
+                count++;
+            }
         }
     }
     return count;
@@ -560,28 +588,32 @@ int MTGGameZone::seenThisTurn(TargetChooser* tc, int castMethod, bool lastTurn) 
 
 int MTGGameZone::seenThisTurn(string targetChooserDefinition, int castMethod) {
     TargetChooserFactory tcf(owner->getObserver());
-    TargetChooser* tc = tcf.createTargetChooser(targetChooserDefinition, NULL);
-    int result        = seenThisTurn(tc, castMethod, false);
+    TargetChooser* tc = tcf.createTargetChooser(std::move(targetChooserDefinition), nullptr);
+    const int result  = seenThisTurn(tc, castMethod, false);
     SAFE_DELETE(tc);
     return result;
 }
 
 int MTGGameZone::seenLastTurn(string targetChooserDefinition, int castMethod) {
     TargetChooserFactory tcf(owner->getObserver());
-    TargetChooser* tc = tcf.createTargetChooser(targetChooserDefinition, NULL);
-    int result        = seenThisTurn(tc, castMethod, true);
+    TargetChooser* tc = tcf.createTargetChooser(std::move(targetChooserDefinition), nullptr);
+    const int result  = seenThisTurn(tc, castMethod, true);
     SAFE_DELETE(tc);
     return result;
 }
 
 void MTGGameZone::cleanupPhase() {
-    for (int i = 0; i < (nb_cards); i++) (cards[i])->cleanup();
+    for (int i = 0; i < (nb_cards); i++) {
+        (cards[i])->cleanup();
+    }
 }
 
 void MTGGameZone::shuffle() { owner->getObserver()->getRandomGenerator()->random_shuffle(cards.begin(), cards.end()); }
 
 void MTGGameZone::addCard(MTGCardInstance* card) {
-    if (!card) return;
+    if (!card) {
+        return;
+    }
     cards.push_back(card);
     cardsSeenThisTurn.push_back(card);
     nb_cards++;
@@ -591,13 +623,15 @@ void MTGGameZone::addCard(MTGCardInstance* card) {
 }
 
 void MTGGameZone::debugPrint() {
-    for (int i = 0; i < nb_cards; i++) std::cerr << cards[i]->getName() << std::endl;
+    for (int i = 0; i < nb_cards; i++) {
+        std::cerr << cards[i]->getName() << std::endl;
+    }
 }
 
 //------------------------------
 MTGCardInstance* MTGInPlay::getNextAttacker(MTGCardInstance* previous) {
     int foundprevious = 0;
-    if (previous == NULL) {
+    if (previous == nullptr) {
         foundprevious = 1;
     }
     for (int i = 0; i < nb_cards; i++) {
@@ -608,7 +642,7 @@ MTGCardInstance* MTGInPlay::getNextAttacker(MTGCardInstance* previous) {
             return current;
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 void MTGInPlay::untapAll() {
@@ -665,7 +699,9 @@ MTGGameZone* MTGGameZone::intToZone(int zoneId, Player* p, Player* p2) {
     case STACK:
         return p->game->stack;
     }
-    if (!p2) return NULL;
+    if (!p2) {
+        return nullptr;
+    }
     switch (zoneId) {
     case TARGET_CONTROLLER_GRAVEYARD:
         return p2->game->graveyard;
@@ -686,17 +722,19 @@ MTGGameZone* MTGGameZone::intToZone(int zoneId, Player* p, Player* p2) {
         return p2->game->stack;
 
     default:
-        return NULL;
+        return nullptr;
     }
 }
 
 MTGGameZone* MTGGameZone::intToZone(GameObserver* g, int zoneId, MTGCardInstance* source, MTGCardInstance* target) {
-    Player *p, *p2;
+    Player* p;
+    Player* p2;
 
-    if (!source)
+    if (!source) {
         p = g->currentlyActing();
-    else
+    } else {
         p = source->controller();
+    }
     if (!target) {
         // TODO source may be NULL, need to handle the case when it is NULL.  method declaration has NULL being default
         // value of source and target.
@@ -710,11 +748,14 @@ MTGGameZone* MTGGameZone::intToZone(GameObserver* g, int zoneId, MTGCardInstance
             p2     = source->controller();
             target = source;
         }
-    } else
+    } else {
         p2 = target->controller();
+    }
 
     MTGGameZone* result = intToZone(zoneId, p, p2);
-    if (result) return result;
+    if (result) {
+        return result;
+    }
     switch (zoneId) {
     case TARGET_OWNER_GRAVEYARD:
         return target->owner->game->graveyard;
@@ -723,20 +764,22 @@ MTGGameZone* MTGGameZone::intToZone(GameObserver* g, int zoneId, MTGCardInstance
     case OWNER_GRAVEYARD:
         return target->owner->game->graveyard;
     case TARGETED_PLAYER_GRAVEYARD:
-        if (source->playerTarget)
+        if (source->playerTarget) {
             return source->playerTarget->game->graveyard;
-        else
+        } else {
             return source->controller()->game->graveyard;
+        }
 
     case TARGET_OWNER_BATTLEFIELD:
         return target->owner->game->inPlay;
     case OWNER_BATTLEFIELD:
         return target->owner->game->inPlay;
     case TARGETED_PLAYER_BATTLEFIELD:
-        if (source->playerTarget)
+        if (source->playerTarget) {
             return source->playerTarget->game->inPlay;
-        else
+        } else {
             return source->controller()->game->inPlay;
+        }
 
     case TARGET_OWNER_HAND:
         return target->owner->game->hand;
@@ -745,10 +788,11 @@ MTGGameZone* MTGGameZone::intToZone(GameObserver* g, int zoneId, MTGCardInstance
     case OWNER_HAND:
         return target->owner->game->hand;
     case TARGETED_PLAYER_HAND:
-        if (source->playerTarget)
+        if (source->playerTarget) {
             return source->playerTarget->game->hand;
-        else
+        } else {
             return source->controller()->game->hand;
+        }
 
     case TARGET_OWNER_EXILE:
         return target->owner->game->removedFromGame;
@@ -757,36 +801,39 @@ MTGGameZone* MTGGameZone::intToZone(GameObserver* g, int zoneId, MTGCardInstance
     case OWNER_EXILE:
         return target->owner->game->removedFromGame;
     case TARGETED_PLAYER_EXILE:
-        if (source->playerTarget)
+        if (source->playerTarget) {
             return source->playerTarget->game->removedFromGame;
-        else
+        } else {
             return source->controller()->game->removedFromGame;
+        }
 
     case TARGET_OWNER_LIBRARY:
         return target->owner->game->library;
     case OWNER_LIBRARY:
         return target->owner->game->library;
     case TARGETED_PLAYER_LIBRARY:
-        if (source->playerTarget)
+        if (source->playerTarget) {
             return source->playerTarget->game->library;
-        else
+        } else {
             return source->controller()->game->library;
+        }
 
     case TARGET_OWNER_STACK:
         return target->owner->game->stack;
     case OWNER_STACK:
         return target->owner->game->stack;
     case TARGETED_PLAYER_STACK:
-        if (source->playerTarget)
+        if (source->playerTarget) {
             return source->playerTarget->game->stack;
-        else
+        } else {
             return source->controller()->game->stack;
+        }
     default:
-        return NULL;
+        return nullptr;
     }
 }
 
-int MTGGameZone::zoneStringToId(string zoneName) {
+int MTGGameZone::zoneStringToId(const string& zoneName) {
     const char* strings[] = {
         "mygraveyard",
         "opponentgraveyard",
@@ -854,83 +901,83 @@ int MTGGameZone::zoneStringToId(string zoneName) {
 
     };
 
-    int values[] = {MY_GRAVEYARD,
-                    OPPONENT_GRAVEYARD,
-                    TARGET_OWNER_GRAVEYARD,
-                    TARGET_CONTROLLER_GRAVEYARD,
-                    OWNER_GRAVEYARD,
-                    GRAVEYARD,
-                    TARGETED_PLAYER_GRAVEYARD,
+    const int values[] = {MY_GRAVEYARD,
+                          OPPONENT_GRAVEYARD,
+                          TARGET_OWNER_GRAVEYARD,
+                          TARGET_CONTROLLER_GRAVEYARD,
+                          OWNER_GRAVEYARD,
+                          GRAVEYARD,
+                          TARGETED_PLAYER_GRAVEYARD,
 
-                    MY_BATTLEFIELD,
-                    OPPONENT_BATTLEFIELD,
-                    TARGET_OWNER_BATTLEFIELD,
-                    TARGET_CONTROLLER_BATTLEFIELD,
-                    OWNER_BATTLEFIELD,
-                    BATTLEFIELD,
-                    TARGETED_PLAYER_BATTLEFIELD,
+                          MY_BATTLEFIELD,
+                          OPPONENT_BATTLEFIELD,
+                          TARGET_OWNER_BATTLEFIELD,
+                          TARGET_CONTROLLER_BATTLEFIELD,
+                          OWNER_BATTLEFIELD,
+                          BATTLEFIELD,
+                          TARGETED_PLAYER_BATTLEFIELD,
 
-                    MY_BATTLEFIELD,
-                    OPPONENT_BATTLEFIELD,
-                    TARGET_OWNER_BATTLEFIELD,
-                    TARGET_CONTROLLER_BATTLEFIELD,
-                    OWNER_BATTLEFIELD,
-                    BATTLEFIELD,
-                    TARGETED_PLAYER_BATTLEFIELD,
+                          MY_BATTLEFIELD,
+                          OPPONENT_BATTLEFIELD,
+                          TARGET_OWNER_BATTLEFIELD,
+                          TARGET_CONTROLLER_BATTLEFIELD,
+                          OWNER_BATTLEFIELD,
+                          BATTLEFIELD,
+                          TARGETED_PLAYER_BATTLEFIELD,
 
-                    MY_HAND,
-                    OPPONENT_HAND,
-                    TARGET_OWNER_HAND,
-                    TARGET_CONTROLLER_HAND,
-                    OWNER_HAND,
-                    HAND,
-                    TARGETED_PLAYER_HAND,
+                          MY_HAND,
+                          OPPONENT_HAND,
+                          TARGET_OWNER_HAND,
+                          TARGET_CONTROLLER_HAND,
+                          OWNER_HAND,
+                          HAND,
+                          TARGETED_PLAYER_HAND,
 
-                    MY_LIBRARY,
-                    OPPONENT_LIBRARY,
-                    TARGET_OWNER_LIBRARY,
-                    TARGET_CONTROLLER_LIBRARY,
-                    OWNER_LIBRARY,
-                    LIBRARY,
-                    TARGETED_PLAYER_LIBRARY,
+                          MY_LIBRARY,
+                          OPPONENT_LIBRARY,
+                          TARGET_OWNER_LIBRARY,
+                          TARGET_CONTROLLER_LIBRARY,
+                          OWNER_LIBRARY,
+                          LIBRARY,
+                          TARGETED_PLAYER_LIBRARY,
 
-                    MY_EXILE,
-                    OPPONENT_EXILE,
-                    TARGET_OWNER_EXILE,
-                    TARGET_CONTROLLER_EXILE,
-                    OWNER_EXILE,
-                    EXILE,
-                    TARGETED_PLAYER_EXILE,
+                          MY_EXILE,
+                          OPPONENT_EXILE,
+                          TARGET_OWNER_EXILE,
+                          TARGET_CONTROLLER_EXILE,
+                          OWNER_EXILE,
+                          EXILE,
+                          TARGETED_PLAYER_EXILE,
 
-                    MY_EXILE,
-                    OPPONENT_EXILE,
-                    TARGET_OWNER_EXILE,
-                    TARGET_CONTROLLER_EXILE,
-                    OWNER_EXILE,
-                    EXILE,
-                    TARGETED_PLAYER_EXILE,
+                          MY_EXILE,
+                          OPPONENT_EXILE,
+                          TARGET_OWNER_EXILE,
+                          TARGET_CONTROLLER_EXILE,
+                          OWNER_EXILE,
+                          EXILE,
+                          TARGETED_PLAYER_EXILE,
 
-                    MY_STACK,
-                    OPPONENT_STACK,
-                    TARGET_OWNER_STACK,
-                    TARGET_CONTROLLER_STACK,
-                    OWNER_STACK,
-                    STACK,
-                    TARGETED_PLAYER_STACK};
+                          MY_STACK,
+                          OPPONENT_STACK,
+                          TARGET_OWNER_STACK,
+                          TARGET_CONTROLLER_STACK,
+                          OWNER_STACK,
+                          STACK,
+                          TARGETED_PLAYER_STACK};
 
-    int max = sizeof(values) / sizeof *(values);
+    const int max = sizeof(values) / sizeof *(values);
 
     for (int i = 0; i < max; ++i) {
-        if (zoneName.compare(strings[i]) == 0) {
+        if (zoneName == strings[i]) {
             return values[i];
         }
     }
     return 0;
 }
 
-MTGGameZone* MTGGameZone::stringToZone(GameObserver* g, string zoneName, MTGCardInstance* source,
+MTGGameZone* MTGGameZone::stringToZone(GameObserver* g, const string& zoneName, MTGCardInstance* source,
                                        MTGCardInstance* target) {
-    return intToZone(g, zoneStringToId(zoneName), source, target);
+    return intToZone(g, zoneStringToId(std::move(zoneName)), source, target);
 }
 
 std::ostream& MTGGameZone::toString(std::ostream& out) const { return out << "Unknown zone"; }
@@ -945,7 +992,9 @@ std::ostream& MTGInPlay::toString(std::ostream& out) const { return out << "InPl
 std::ostream& operator<<(std::ostream& out, const MTGGameZone& z) {
     for (int i = 0; i < z.nb_cards; i++) {
         out << z.cards[i]->getMTGId();
-        if (i < z.nb_cards - 1) out << ",";
+        if (i < z.nb_cards - 1) {
+            out << ",";
+        }
     }
     return out;
 
@@ -963,9 +1012,9 @@ bool MTGGameZone::parseLine(const string& ss) {
     cardsMap.clear();
     nb_cards = 0;
 
-    while (s.size()) {
-        size_t limiter = s.find(",");
-        MTGCard* card  = 0;
+    while (!s.empty()) {
+        const size_t limiter = s.find(',');
+        MTGCard* card        = nullptr;
         string toFind;
         if (limiter != string::npos) {
             toFind = trim(s.substr(0, limiter));
@@ -975,22 +1024,22 @@ bool MTGGameZone::parseLine(const string& ss) {
             s      = "";
         }
 
-        card   = MTGCollection()->getCardByName(toFind);
-        int id = Rules::getMTGId(toFind);
+        card         = MTGCollection()->getCardByName(toFind);
+        const int id = Rules::getMTGId(toFind);
 
         if (card) {
             /* For the moment we add the card directly in the final zone.
                 This is not the normal way and this prevents to resolve spells.
                 We'll need a fusion operation afterward to cast relevant spells */
-            MTGCardInstance* newCard = NEW MTGCardInstance(card, owner->game);
+            auto* newCard = NEW MTGCardInstance(card, owner->game);
             addCard(newCard);
             result = true;
         } else {
-            if (toFind == "*")
+            if (toFind == "*") {
                 nb_cards++;
-            else if (id < 0) {
+            } else if (id < 0) {
                 // For the moment, we create a dummy Token to please the testsuite
-                Token* myToken = new Token(id);
+                auto* myToken = new Token(id);
                 addCard(myToken);
                 result = true;
             } else {
@@ -1003,19 +1052,19 @@ bool MTGGameZone::parseLine(const string& ss) {
 }
 
 std::ostream& operator<<(std::ostream& out, const MTGPlayerCards& z) {
-    if (z.library->cards.size()) {
+    if (!z.library->cards.empty()) {
         out << "library=";
         out << *(z.library) << std::endl;
     }
-    if (z.battlefield->cards.size()) {
+    if (!z.battlefield->cards.empty()) {
         out << "inplay=";
         out << *(z.battlefield) << std::endl;
     }
-    if (z.graveyard->cards.size()) {
+    if (!z.graveyard->cards.empty()) {
         out << "graveyard=";
         out << *(z.graveyard) << std::endl;
     }
-    if (z.hand->cards.size()) {
+    if (!z.hand->cards.empty()) {
         out << "hand=";
         out << *(z.hand) << std::endl;
     }
@@ -1023,22 +1072,27 @@ std::ostream& operator<<(std::ostream& out, const MTGPlayerCards& z) {
     return out;
 }
 
-bool MTGPlayerCards::parseLine(const string& s) {
-    size_t limiter = s.find("=");
-    if (limiter == string::npos) limiter = s.find(":");
+bool MTGPlayerCards::parseLine(const string& s) const {
+    size_t limiter = s.find('=');
+    if (limiter == string::npos) {
+        limiter = s.find(':');
+    }
     string areaS;
     if (limiter != string::npos) {
         areaS = s.substr(0, limiter);
-        if (areaS.compare("graveyard") == 0) {
+        if (areaS == "graveyard") {
             graveyard->parseLine(s.substr(limiter + 1));
             return true;
-        } else if (areaS.compare("library") == 0) {
+        }
+        if (areaS == "library") {
             library->parseLine(s.substr(limiter + 1));
             return true;
-        } else if (areaS.compare("hand") == 0) {
+        }
+        if (areaS == "hand") {
             hand->parseLine(s.substr(limiter + 1));
             return true;
-        } else if (areaS.compare("inplay") == 0 || areaS.compare("battlefield") == 0) {
+        }
+        if (areaS == "inplay" || areaS == "battlefield") {
             battlefield->parseLine(s.substr(limiter + 1));
             return true;
         }

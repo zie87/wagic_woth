@@ -7,8 +7,8 @@ Author: Michael Nguyen
 
 */
 
-#ifndef wagic_Wagic_Version_h
-#define wagic_Wagic_Version_h
+#ifndef WAGIC_VERSION_H
+#define WAGIC_VERSION_H
 
 /* Wagic versions */
 #define WAGIC_VERSION_MAJOR 0

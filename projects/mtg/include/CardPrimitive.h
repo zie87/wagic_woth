@@ -4,8 +4,8 @@
  * As an example, with 16'000 card primitives (the rough number of cards in MTG), adding a simple 16 bytes attribute
  * costs 250kB (2% of the total available ram on the PSP)
  */
-#ifndef _CARDPRIMITIVE_H_
-#define _CARDPRIMITIVE_H_
+#ifndef CARDPRIMITIVE_H
+#define CARDPRIMITIVE_H
 
 #include <string>
 #include <vector>
@@ -69,9 +69,9 @@ public:
     void setColor(int _color, int removeAllOthers = 0);
     void setColor(const std::string& _color, int removeAllOthers = 0);
     void removeColor(int color);
-    int getColor();
-    bool hasColor(int inColor);
-    int countColors();
+    int getColor() const;
+    bool hasColor(int inColor) const;
+    int countColors() const;
 
     static uint8_t ConvertColorToBitMask(int inColor);
 
@@ -81,7 +81,7 @@ public:
     const std::vector<std::string>& getFormattedText();
 
     void addMagicText(std::string value);
-    void addMagicText(std::string value, std::string zone);
+    void addMagicText(std::string value, const std::string& zone);
 
     void setName(const std::string& value);
     const std::string& getName() const;
@@ -106,13 +106,13 @@ public:
     bool isSpell();
 
     void setPower(int _power);
-    int getPower();
+    int getPower() const;
     void setToughness(int _toughness);
-    int getToughness();
+    int getToughness() const;
     void setRestrictions(std::string _restriction);
-    const std::string getRestrictions();
+    std::string getRestrictions();
     void setOtherRestrictions(std::string _restriction);
-    const std::string getOtherRestrictions();
+    std::string getOtherRestrictions();
 };
 
 #endif

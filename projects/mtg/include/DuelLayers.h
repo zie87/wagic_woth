@@ -1,5 +1,5 @@
-#ifndef _DUELLAYERS_H_
-#define _DUELLAYERS_H_
+#ifndef DUELLAYERS_H
+#define DUELLAYERS_H
 
 #include "GuiLayers.h"
 
@@ -31,7 +31,7 @@ protected:
 
 public:
     DuelLayers();
-    ~DuelLayers();
+    virtual ~DuelLayers();
 
     ActionLayer* actionLayer();
     ActionStack* stackLayer();

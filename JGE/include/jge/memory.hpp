@@ -8,6 +8,6 @@ namespace jge {
 template <typename T>
 using shared_ptr = std::shared_ptr<T>;
 
-}
+}  // namespace jge
 
 #endif  // JGE_MEMORY_HPP

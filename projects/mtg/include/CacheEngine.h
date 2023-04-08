@@ -1,14 +1,20 @@
+#ifndef CACHEENGINE_H
+#define CACHEENGINE_H
+
 #include "PrecompiledHeader.h"
 
 #include "Threading.h"
 #include <queue>
 #include <set>
+#include <utility>
 
 struct CacheRequest {
     CacheRequest() {}
 
     CacheRequest(std::string inFilename, int inSubmode, int inCacheID)
-        : filename(inFilename), submode(inSubmode), cacheID(inCacheID) {}
+        : filename(std::move(inFilename))
+        , submode(inSubmode)
+        , cacheID(inCacheID) {}
 
     std::string filename;
     int submode;
@@ -38,12 +44,12 @@ public:
         DebugTrace("Unthreaded version");
     }
 
-    virtual ~UnthreadedCardRetriever() {}
+    ~UnthreadedCardRetriever() override {}
 
     /*
     **  In a non-threaded model, simply pass on the request to the texture cache directly
     */
-    void QueueRequest(const std::string& inFilePath, int inSubmode, int inCacheID) {
+    void QueueRequest(const std::string& inFilePath, int inSubmode, int inCacheID) override {
         mTextureCache.LoadIntoCache(inCacheID, inFilePath, inSubmode);
     }
 };
@@ -58,14 +64,14 @@ public:
         mWorkerThread = jge::thread(ThreadProc, this);
     }
 
-    virtual ~ThreadedCardRetriever() {
+    ~ThreadedCardRetriever() override {
         LOG("Tearing down ThreadedCardRetriever");
         mProcessing = false;
         mWorkerThread.join();
     }
 
-    void QueueRequest(const std::string& inFilePath, int inSubmode, int inCacheID) {
-        jge::mutex::scoped_lock lock(mMutex);
+    void QueueRequest(const std::string& inFilePath, int inSubmode, int inCacheID) override {
+        jge::mutex::scoped_lock const lock(mMutex);
         // mRequestLookup is used to prevent duplicate requests for the same id
         if (mRequestLookup.find(inCacheID) == mRequestLookup.end() &&
             mTextureCache.cache.find(inCacheID) == mTextureCache.cache.end()) {
@@ -98,13 +104,13 @@ protected:
 
     static void ThreadProc(void* inParam) {
         LOG("Entering ThreadedCardRetriever::ThreadProc");
-        ThreadedCardRetriever* instance = reinterpret_cast<ThreadedCardRetriever*>(inParam);
+        auto* instance = reinterpret_cast<ThreadedCardRetriever*>(inParam);
         if (instance) {
             while (instance->mProcessing) {
                 while (!instance->mRequestQueue.empty()) {
                     CacheRequest request;
                     {
-                        jge::mutex::scoped_lock lock(instance->mMutex);
+                        jge::mutex::scoped_lock const lock(instance->mMutex);
                         request = instance->mRequestQueue.front();
                         instance->mRequestQueue.pop();
                     }
@@ -112,7 +118,7 @@ protected:
                     instance->mTextureCache.LoadIntoCache(request.cacheID, request.filename, request.submode);
 
                     {
-                        jge::mutex::scoped_lock lock(instance->mMutex);
+                        jge::mutex::scoped_lock const lock(instance->mMutex);
                         instance->mRequestLookup.erase(request.cacheID);
                     }
 
@@ -142,9 +148,9 @@ public:
     template <class T>
     static void Create(WCache<WCachedTexture, JTexture>& inCache) {
         LOG("Creating Card Retriever instance");
-        sInstance                   = NEW T(inCache);
-        ThreadedCardRetriever* test = dynamic_cast<ThreadedCardRetriever*>(sInstance);
-        sIsThreaded                 = (test != NULL);
+        sInstance   = NEW T(inCache);
+        auto* test  = dynamic_cast<ThreadedCardRetriever*>(sInstance);
+        sIsThreaded = (test != nullptr);
     }
 
     static CardRetrieverBase* Instance() { return sInstance; }
@@ -157,5 +163,7 @@ public:
     static bool sIsThreaded;
 };
 
-CardRetrieverBase* CacheEngine::sInstance = NULL;
+CardRetrieverBase* CacheEngine::sInstance = nullptr;
 bool CacheEngine::sIsThreaded             = false;
+
+#endif

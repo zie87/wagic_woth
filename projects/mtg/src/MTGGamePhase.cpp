@@ -3,15 +3,17 @@
 #include "MTGGamePhase.h"
 #include "GuiPhaseBar.h"
 
-MTGGamePhase::MTGGamePhase(GameObserver* g, int id) : ActionElement(id), observer(g) {
-    animation    = 0;
-    currentState = -1;
-    mFont        = WResourceManager::Instance()->GetWFont(Fonts::MAIN_FONT);
+MTGGamePhase::MTGGamePhase(GameObserver* g, int id)
+    : ActionElement(id)
+    , animation(0)
+    , currentState(-1)
+    , mFont(WResourceManager::Instance()->GetWFont(Fonts::MAIN_FONT))
+    , observer(g) {
     mFont->SetBase(0);  // using 2nd font
 }
 
 void MTGGamePhase::Update(float dt) {
-    int newState = observer->getCurrentGamePhase();
+    const int newState = observer->getCurrentGamePhase();
     if (newState != currentState) {
         activeState  = ACTIVE;
         animation    = 4;
@@ -38,7 +40,7 @@ bool MTGGamePhase::NextGamePhase() {
 }
 
 bool MTGGamePhase::CheckUserInput(JButton key) {
-    JButton trigger = (options[Options::REVERSETRIGGERS].number ? JGE_BTN_NEXT : JGE_BTN_PREV);
+    const JButton trigger = (options[Options::REVERSETRIGGERS].number ? JGE_BTN_NEXT : JGE_BTN_PREV);
     if (trigger == key) {
         return NextGamePhase();
     }

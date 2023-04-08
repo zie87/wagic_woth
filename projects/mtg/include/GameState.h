@@ -1,5 +1,5 @@
-#ifndef _GAME_STATE_H_
-#define _GAME_STATE_H_
+#ifndef GAMESTATE_H
+#define GAMESTATE_H
 
 #define FADING_SPEED 350.0f
 
@@ -63,17 +63,18 @@ public:
 
     // generate the Deck Meta Data and build the menu items of the menu given
     static std::vector<DeckMetaData*> fillDeckMenu(SimpleMenu* _menu, const std::string& path,
-                                                   const std::string& smallDeckPrefix = "", Player* statsPlayer = NULL);
+                                                   const std::string& smallDeckPrefix = "",
+                                                   Player* statsPlayer                = nullptr);
 
     // generate the Deck Meta Data and build the menu items of the menu given
     // Will display up to maxDecks if maxDecks is non 0,all decks in path otherwise
     static std::vector<DeckMetaData*> fillDeckMenu(DeckMenu* _menu, const std::string& path,
-                                                   const std::string& smallDeckPrefix = "", Player* statsPlayer = NULL,
-                                                   int maxDecks = 0);
+                                                   const std::string& smallDeckPrefix = "",
+                                                   Player* statsPlayer = nullptr, int maxDecks = 0);
 
     // build a vector of decks with the information passsed in.
     static std::vector<DeckMetaData*> BuildDeckList(const std::string& path, const std::string& smallDeckPrefix = "",
-                                                    Player* statsPlayer = NULL, int maxDecks = 0);
+                                                    Player* statsPlayer = nullptr, int maxDecks = 0);
 
     // build menu items based on the vector<DeckMetaData *>
     static void renderDeckMenu(SimpleMenu* _menu, const std::vector<DeckMetaData*>& deckMetaDataList);

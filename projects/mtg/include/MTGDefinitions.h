@@ -1,5 +1,5 @@
-#ifndef _MTGDEFINITION_H_
-#define _MTGDEFINITION_H_
+#ifndef MTGDEFINITIONS_H
+#define MTGDEFINITIONS_H
 
 const float DEFAULT_MENU_FONT_SCALE = 1.0f;
 const float DEFAULT_MAIN_FONT_SCALE = 1.0f;
@@ -286,8 +286,8 @@ public:
     static const char* MTGPhaseNames[];
     static const char* MTGPhaseCodeNames[];
 
-    static int GetBasicAbilityIndex(std::string mtgAbility);
-    static int GetColorStringIndex(std::string mtgColor);
+    static int GetBasicAbilityIndex(const std::string& mtgAbility);
+    static int GetColorStringIndex(const std::string& mtgColor);
     static int NB_Colors;
 };
 

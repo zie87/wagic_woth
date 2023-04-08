@@ -5,10 +5,7 @@
 #include "PriceList.h"
 #include "WDataSrc.h"
 
-DeckDataWrapper::DeckDataWrapper(MTGDeck* deck) {
-    parent = deck;
-    loadMatches(deck);
-}
+DeckDataWrapper::DeckDataWrapper(MTGDeck* deck) : parent(deck) { loadMatches(deck); }
 
 void DeckDataWrapper::save() {
     if (parent) {
@@ -17,7 +14,7 @@ void DeckDataWrapper::save() {
     }
 }
 
-void DeckDataWrapper::save(string filepath, bool useExpandedCardNames, string& deckTitle, string& deckDesc) {
+void DeckDataWrapper::save(const string& filepath, bool useExpandedCardNames, string& deckTitle, string& deckDesc) {
     if (parent) {
         Rebuild(parent);
         parent->save(filepath, useExpandedCardNames, deckTitle, deckDesc);

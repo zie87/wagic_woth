@@ -50,19 +50,25 @@ JResourceManager::JResourceManager() {
 JResourceManager::~JResourceManager() { RemoveAll(); }
 
 void JResourceManager::RemoveJLBFonts() {
-    for (std::vector<JLBFont*>::iterator font = mFontList.begin(); font != mFontList.end(); ++font) delete *font;
+    for (auto font = mFontList.begin(); font != mFontList.end(); ++font) {
+        delete *font;
+    }
 
     mFontList.clear();
     mFontMap.clear();
 }
 
 void JResourceManager::RemoveAll() {
-    for (std::vector<JTexture*>::iterator tex = mTextureList.begin(); tex != mTextureList.end(); ++tex) delete *tex;
+    for (auto tex = mTextureList.begin(); tex != mTextureList.end(); ++tex) {
+        delete *tex;
+    }
 
     mTextureList.clear();
     mTextureMap.clear();
 
-    for (std::vector<JQuad*>::iterator quad = mQuadList.begin(); quad != mQuadList.end(); ++quad) delete *quad;
+    for (auto quad = mQuadList.begin(); quad != mQuadList.end(); ++quad) {
+        delete *quad;
+    }
 
     mQuadList.clear();
     mQuadMap.clear();
@@ -71,26 +77,32 @@ void JResourceManager::RemoveAll() {
 }
 
 bool JResourceManager::LoadResource(const std::string& resourceName) {
-    std::string path = /*mResourceRoot + */ resourceName;
+    const std::string& path = /*mResourceRoot + */ resourceName;
 
     JGE* engine = JGE::GetInstance();
-    if (engine == NULL) return false;
+    if (engine == nullptr) {
+        return false;
+    }
 
     JFileSystem* fileSystem = JFileSystem::GetInstance();
-    if (fileSystem == NULL) return false;
+    if (fileSystem == nullptr) {
+        return false;
+    }
 
-    if (!fileSystem->OpenFile(path.c_str())) return false;
+    if (!fileSystem->OpenFile(path)) {
+        return false;
+    }
 
-    int size        = fileSystem->GetFileSize();
+    const int size  = fileSystem->GetFileSize();
     char* xmlBuffer = new char[size];
     fileSystem->ReadFile(xmlBuffer, size);
 
     TiXmlDocument doc;
     doc.Parse(xmlBuffer);
 
-    TiXmlNode* resource   = 0;
-    TiXmlNode* node       = 0;
-    TiXmlElement* element = 0;
+    TiXmlNode* resource   = nullptr;
+    TiXmlNode* node       = nullptr;
+    TiXmlElement* element = nullptr;
 
     resource = doc.FirstChild("resource");
     if (resource) {
@@ -99,43 +111,57 @@ bool JResourceManager::LoadResource(const std::string& resourceName) {
 
         for (node = resource->FirstChild(); node; node = node->NextSibling()) {
             element = node->ToElement();
-            if (element != NULL) {
+            if (element != nullptr) {
                 if (strcmp(element->Value(), "texture") == 0) {
                     CreateTexture(element->Attribute("name"));
                 } else if (strcmp(element->Value(), "quad") == 0) {
-                    std::string quadName    = element->Attribute("name");
-                    std::string textureName = element->Attribute("texture");
-                    float x                 = 0.0f;
-                    float y                 = 0.0f;
-                    float width             = 16.0f;
-                    float height            = 16.0f;
+                    std::string const quadName    = element->Attribute("name");
+                    std::string const textureName = element->Attribute("texture");
+                    float x                       = 0.0f;
+                    float y                       = 0.0f;
+                    float width                   = 16.0f;
+                    float height                  = 16.0f;
                     float value;
                     float hotspotX = 0.0f;
                     float hotspotY = 0.0f;
 
-                    if (element->QueryFloatAttribute("x", &value) == TIXML_SUCCESS) x = value;
+                    if (element->QueryFloatAttribute("x", &value) == TIXML_SUCCESS) {
+                        x = value;
+                    }
 
-                    if (element->QueryFloatAttribute("y", &value) == TIXML_SUCCESS) y = value;
+                    if (element->QueryFloatAttribute("y", &value) == TIXML_SUCCESS) {
+                        y = value;
+                    }
 
-                    if (element->QueryFloatAttribute("width", &value) == TIXML_SUCCESS) width = value;
+                    if (element->QueryFloatAttribute("width", &value) == TIXML_SUCCESS) {
+                        width = value;
+                    }
 
-                    if (element->QueryFloatAttribute("height", &value) == TIXML_SUCCESS) height = value;
+                    if (element->QueryFloatAttribute("height", &value) == TIXML_SUCCESS) {
+                        height = value;
+                    }
 
-                    if (element->QueryFloatAttribute("w", &value) == TIXML_SUCCESS) width = value;
+                    if (element->QueryFloatAttribute("w", &value) == TIXML_SUCCESS) {
+                        width = value;
+                    }
 
-                    if (element->QueryFloatAttribute("h", &value) == TIXML_SUCCESS) height = value;
+                    if (element->QueryFloatAttribute("h", &value) == TIXML_SUCCESS) {
+                        height = value;
+                    }
 
-                    if (element->QueryFloatAttribute("hotspot.x", &value) == TIXML_SUCCESS)
+                    if (element->QueryFloatAttribute("hotspot.x", &value) == TIXML_SUCCESS) {
                         hotspotX = value;
-                    else
+                    } else {
                         hotspotX = width / 2;
+                    }
 
-                    if (element->QueryFloatAttribute("hotspot.y", &value) == TIXML_SUCCESS)
+                    if (element->QueryFloatAttribute("hotspot.y", &value) == TIXML_SUCCESS) {
                         hotspotY = value;
-                    else
+                    } else {
                         hotspotY = height / 2;
+                    }
 
-                    int id = CreateQuad(quadName, textureName, x, y, width, height);
+                    const int id = CreateQuad(quadName, textureName, x, y, width, height);
                     if (id != INVALID_ID) {
                         GetQuad(id)->SetHotSpot(hotspotX, hotspotY);
                     }
@@ -153,93 +179,97 @@ bool JResourceManager::LoadResource(const std::string& resourceName) {
 }
 
 int JResourceManager::CreateTexture(const std::string& textureName) {
-    std::map<std::string, int>::iterator itr = mTextureMap.find(textureName);
+    auto itr = mTextureMap.find(textureName);
 
     if (itr == mTextureMap.end()) {
-        std::string path = /*mResourceRoot + */ textureName;
+        const std::string& path = /*mResourceRoot + */ textureName;
 
         printf("creating texture:%s\n", path.c_str());
 
         JTexture* tex = JRenderer::GetInstance()->LoadTexture(path.c_str());
 
-        if (tex == NULL) return INVALID_ID;
+        if (tex == nullptr) {
+            return INVALID_ID;
+        }
 
-        int id = mTextureList.size();
+        const int id = mTextureList.size();
         mTextureList.push_back(tex);
         mTextureMap[textureName] = id;
 
         return id;
-    } else
-        return itr->second;
+    }
+    return itr->second;
 }
 
 JTexture* JResourceManager::GetTexture(const std::string& textureName) {
-    std::map<std::string, int>::iterator itr = mTextureMap.find(textureName);
+    auto itr = mTextureMap.find(textureName);
 
-    if (itr == mTextureMap.end())
-        return NULL;
-    else
-        return mTextureList[itr->second];
+    if (itr == mTextureMap.end()) {
+        return nullptr;
+    }
+    return mTextureList[itr->second];
 }
 
 JTexture* JResourceManager::GetTexture(int id) {
-    if (id >= 0 && id < (int)mTextureList.size())
+    if (id >= 0 && id < (int)mTextureList.size()) {
         return mTextureList[id];
-    else
-        return NULL;
+    }
+    return nullptr;
 }
 
 int JResourceManager::CreateQuad(const std::string& quadName, const std::string& textureName, float x, float y,
                                  float width, float height) {
-    std::map<std::string, int>::iterator itr = mQuadMap.find(quadName);
+    auto itr = mQuadMap.find(quadName);
 
     if (itr == mQuadMap.end()) {
         JTexture* tex = GetTexture(textureName);
-        if (tex == NULL) {
-            int texId = CreateTexture(textureName);  // load texture if necessary
-            tex       = GetTexture(texId);
+        if (tex == nullptr) {
+            const int texId = CreateTexture(textureName);  // load texture if necessary
+            tex             = GetTexture(texId);
         }
 
-        if (tex == NULL)  // no texture, no quad...
+        if (tex == nullptr) {  // no texture, no quad...
             return INVALID_ID;
+        }
 
         printf("creating quad:%s\n", quadName.c_str());
 
-        int id = mQuadList.size();
+        const int id = mQuadList.size();
         mQuadList.push_back(NEW JQuad(tex, x, y, width, height));
 
         mQuadMap[quadName] = id;
 
         return id;
-
-    } else
-        return itr->second;
+    }
+    return itr->second;
 }
 
 JQuad* JResourceManager::GetQuad(const std::string& quadName) {
-    std::map<std::string, int>::iterator itr = mQuadMap.find(quadName);
+    auto itr = mQuadMap.find(quadName);
 
-    if (itr == mQuadMap.end())
-        return NULL;
-    else
-        return mQuadList[itr->second];
+    if (itr == mQuadMap.end()) {
+        return nullptr;
+    }
+    return mQuadList[itr->second];
 }
 
 JQuad* JResourceManager::GetQuad(int id) {
-    if (id >= 0 && id < (int)mQuadList.size())
+    if (id >= 0 && id < (int)mQuadList.size()) {
         return mQuadList[id];
-    else
-        return NULL;
+    }
+    return nullptr;
 }
 
 JLBFont* JResourceManager::LoadJLBFont(const std::string& fontName, int height) {
-    std::map<std::string, int>::iterator itr = mFontMap.find(fontName);
+    auto itr = mFontMap.find(fontName);
 
-    if (itr != mFontMap.end()) return mFontList[itr->second];
+    if (itr != mFontMap.end()) {
+        return mFontList[itr->second];
+    }
 
-    std::string path = fontName;
+    const std::string& path = fontName;
 
-    int id = mFontList.size();
+    const int id = mFontList.size();
 
     mFontList.push_back(NEW JLBFont(path.c_str(), height, true));
 
@@ -249,19 +279,19 @@ JLBFont* JResourceManager::LoadJLBFont(const std::string& fontName, int height) 
 }
 
 JLBFont* JResourceManager::GetJLBFont(const std::string& fontName) {
-    std::map<std::string, int>::iterator itr = mFontMap.find(fontName);
+    auto itr = mFontMap.find(fontName);
 
-    if (itr == mFontMap.end())
-        return NULL;
-    else
-        return mFontList[itr->second];
+    if (itr == mFontMap.end()) {
+        return nullptr;
+    }
+    return mFontList[itr->second];
 }
 
 JLBFont* JResourceManager::GetJLBFont(int id) {
-    if (id >= 0 && id < (int)mFontList.size())
+    if (id >= 0 && id < (int)mFontList.size()) {
         return mFontList[id];
-    else
-        return NULL;
+    }
+    return nullptr;
 }
 
 //

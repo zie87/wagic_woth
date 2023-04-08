@@ -1,5 +1,5 @@
-#ifndef _MTG_CARD_INSTANCE_H_
-#define _MTG_CARD_INSTANCE_H_
+#ifndef MTGCARDINSTANCE_H
+#define MTGCARDINSTANCE_H
 
 #include "MTGCard.h"
 #include "CardPrimitive.h"
@@ -105,7 +105,7 @@ public:
     bool isDualWielding;
     bool stillNeeded;
     Player* lastController;
-    MTGGameZone* getCurrentZone();
+    MTGGameZone* getCurrentZone() const;
     MTGGameZone* previousZone;
     MTGCardInstance* previous;
     MTGCardInstance* next;
@@ -117,14 +117,14 @@ public:
     ManaCost* getReducedManaCost();
     ManaCost* getIncreasedManaCost();
 
-    bool matchesCastFilter(int castMethod);
+    bool matchesCastFilter(int castMethod) const;
 
     // The recommended method to test for summoning Sickness !
     int hasSummoningSickness();
     MTGCardInstance* changeController(Player* newcontroller);
     Player* owner;
     Counters* counters;
-    const string getDisplayName() const;
+    const string getDisplayName() const override;
     MTGCardInstance* target;
     Player* playerTarget;
     std::vector<Targetable*> backupTargets;
@@ -140,7 +140,7 @@ public:
     // dangerranking is a hint to Ai which creatures are the ones it should be targetting for effects.
     int DangerRanking();
     // Combat
-    bool isBlocked() { return blocked; };  // Blocked this turn or not?
+    bool isBlocked() const { return blocked; };  // Blocked this turn or not?
     MTGCardInstance* defenser;
     std::list<MTGCardInstance*> blockers;
     int attacker;
@@ -154,17 +154,17 @@ public:
     int canBlock();
     int canBlock(MTGCardInstance* opponent);
     int canAttack();
-    int isAttacker();
+    int isAttacker() const;
     Targetable* isAttacking;
     MTGCardInstance* storedCard;
     MTGCardInstance* createSnapShot();
     MTGCardInstance* storedSourceCard;
-    MTGCardInstance* isDefenser();
+    MTGCardInstance* isDefenser() const;
     int initAttackersDefensers();
-    MTGCardInstance* getNextOpponent(MTGCardInstance* previous = NULL);
+    MTGCardInstance* getNextOpponent(MTGCardInstance* previous = nullptr);
     int nbOpponents();
     int stepPower(CombatStep step);
-    int afterDamage();
+    int afterDamage() override;
     int has(int ability);
     int cleanup();
 
@@ -173,9 +173,9 @@ public:
     MTGCardInstance(MTGCard* card, MTGPlayerCards* _belongs_to);
     int regenerate();
     int triggerRegenerate();
-    Player* controller();
+    Player* controller() const;
 
-    virtual ~MTGCardInstance();
+    ~MTGCardInstance() override;
     int bury();
     int destroy();
 
@@ -200,8 +200,8 @@ public:
     void copy(MTGCardInstance* card);
 
     void setUntapping();
-    int isUntapping();
-    int isTapped();
+    int isUntapping() const;
+    int isTapped() const;
     void untap();
     void tap();
     void attemptUntap();
@@ -215,7 +215,7 @@ public:
     int isInPlay(GameObserver* game);
     const string& getSample();
 
-    JQuadPtr getIcon();
+    JQuadPtr getIcon() override;
 
     std::ostream& toString(std::ostream&) const;
 

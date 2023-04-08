@@ -38,24 +38,27 @@ CardGui::CardGui(MTGCardInstance* card, float x, float y) : PlayGuiObject(Height
 CardGui::CardGui(MTGCardInstance* card, const Pos& ref) : PlayGuiObject(Height, ref, 0, false), card(card) {}
 
 float CardView::GetCenterX() {
-    bool largeCard = mHeight == BigHeight;
+    const bool largeCard = mHeight == BigHeight;
 
-    float centerX = x + (largeCard ? BigWidth : Width) * 0.5f * zoom;
+    const float centerX = x + (largeCard ? BigWidth : Width) * 0.5f * zoom;
     return centerX;
 }
 
 float CardView::GetCenterY() {
-    bool largeCard = mHeight == BigHeight;
+    const bool largeCard = mHeight == BigHeight;
 
-    float centerY = y + (largeCard ? BigHeight : Height) * 0.5f * zoom;
+    const float centerY = y + (largeCard ? BigHeight : Height) * 0.5f * zoom;
     return centerY;
 }
 
 CardView::CardView(const SelectorZone owner, MTGCardInstance* card, float x, float y)
-    : CardGui(card, x, y), owner(owner) {
+    : CardGui(card, x, y)
+    , owner(owner) {
     const Pos* ref = card->view;
     while (card) {
-        if (ref == card->view) card->view = this;
+        if (ref == card->view) {
+            card->view = this;
+        }
         card = card->next;
     }
 }
@@ -63,7 +66,9 @@ CardView::CardView(const SelectorZone owner, MTGCardInstance* card, float x, flo
 CardView::CardView(const SelectorZone owner, MTGCardInstance* card, const Pos& ref) : CardGui(card, ref), owner(owner) {
     const Pos* r = card->view;
     while (card) {
-        if (r == card->view) card->view = this;
+        if (r == card->view) {
+            card->view = this;
+        }
         card = card->next;
     }
 }
@@ -72,7 +77,9 @@ CardView::~CardView() {
     if (card) {
         const Pos* r = this;
         while (card) {
-            if (r == card->view) card->view = NULL;
+            if (r == card->view) {
+                card->view = nullptr;
+            }
             card = card->next;
         }
     }
@@ -80,7 +87,7 @@ CardView::~CardView() {
 
 void CardGui::Update(float dt) { PlayGuiObject::Update(dt); }
 
-void CardGui::DrawCard(const Pos& inPosition, int inMode) { DrawCard(card, inPosition, inMode); }
+void CardGui::DrawCard(const Pos& inPosition, int inMode) const { DrawCard(card, inPosition, inMode); }
 
 void CardGui::DrawCard(MTGCard* inCard, const Pos& inPosition, int inMode) {
     switch (inMode) {
@@ -100,9 +107,11 @@ void CardGui::Render() {
     WFont* mFont        = game ? game->getResourceManager()->GetWFont(Fonts::MAIN_FONT)
                                : WResourceManager::Instance()->GetWFont(Fonts::MAIN_FONT);
     JRenderer* renderer = JRenderer::GetInstance();
-    TargetChooser* tc   = NULL;
+    TargetChooser* tc   = nullptr;
 
-    if (game) tc = game->getCurrentTargetChooser();
+    if (game) {
+        tc = game->getCurrentTargetChooser();
+    }
 
     bool alternate = true;
     JQuadPtr quad  = game ? game->getResourceManager()->RetrieveCard(card, CACHE_THUMB)
@@ -111,13 +120,14 @@ void CardGui::Render() {
         MTGCard* fcard = MTGCollection()->getCardByName(card->name);
         quad           = game->getResourceManager()->RetrieveCard(fcard, CACHE_THUMB);
     }
-    if (quad.get())
+    if (quad.get()) {
         alternate = false;
-    else
+    } else {
         quad = AlternateThumbQuad(card);
+    }
 
-    float cardScale = quad ? 40 / quad->mHeight : 1;
-    float scale     = actZ * cardScale;
+    const float cardScale = quad ? 40 / quad->mHeight : 1;
+    const float scale     = actZ * cardScale;
 
     JQuadPtr shadow;
     if (actZ > 1) {
@@ -141,11 +151,11 @@ void CardGui::Render() {
 
     if (game && game->connectRule) {
         // Am I a parent of a selected card, or am I a parent and myself being selected?
-        bool isActiveConnectedParent = mHasFocus && card->childrenCards.size();
+        bool isActiveConnectedParent = mHasFocus && !card->childrenCards.empty();
         if (!isActiveConnectedParent) {
             for (size_t i = 0; i < card->childrenCards.size(); ++i) {
                 MTGCardInstance* child = card->childrenCards[i];
-                if (CardView* cv = dynamic_cast<CardView*>(child->view)) {
+                if (auto* cv = dynamic_cast<CardView*>(child->view)) {
                     if (cv->mHasFocus) {
                         isActiveConnectedParent = true;
                         break;
@@ -154,7 +164,7 @@ void CardGui::Render() {
             }
         }
         if (isActiveConnectedParent) {
-            JQuadPtr white = card->getObserver()->getResourceManager()->GetQuad("white");
+            const JQuadPtr white = card->getObserver()->getResourceManager()->GetQuad("white");
             if (white) {
                 white->SetColor(ARGB(255, 230, 50, 50));
                 renderer->RenderQuad(white.get(), actX, actY, actT, 30 * actZ / 16, 42 * actZ / 16);
@@ -162,11 +172,11 @@ void CardGui::Render() {
         }
 
         // Am I a child of a selected card, or am I a child and myself being selected?
-        bool isActiveConnectedChild = mHasFocus && card->parentCards.size();
+        bool isActiveConnectedChild = mHasFocus && !card->parentCards.empty();
         if (!isActiveConnectedChild) {
             for (size_t i = 0; i < card->parentCards.size(); ++i) {
                 MTGCardInstance* parent = card->parentCards[i];
-                if (CardView* cv = dynamic_cast<CardView*>(parent->view)) {
+                if (auto* cv = dynamic_cast<CardView*>(parent->view)) {
                     if (cv->mHasFocus) {
                         isActiveConnectedChild = true;
                         break;
@@ -175,7 +185,7 @@ void CardGui::Render() {
             }
         }
         if (isActiveConnectedChild) {
-            JQuadPtr white = card->getObserver()->getResourceManager()->GetQuad("white");
+            const JQuadPtr white = card->getObserver()->getResourceManager()->GetQuad("white");
             if (white) {
                 white->SetColor(ARGB(255, 0, 0, 255));
                 renderer->RenderQuad(white.get(), actX, actY, actT, 30 * actZ / 16, 42 * actZ / 16);
@@ -194,20 +204,21 @@ void CardGui::Render() {
         mFont->SetScale(DEFAULT_MAIN_FONT_SCALE);
 
         JQuadPtr icon;
-        if (card->hasSubtype("plains"))
+        if (card->hasSubtype("plains")) {
             icon = game ? game->getResourceManager()->GetQuad("c_white")
                         : WResourceManager::Instance()->GetQuad("c_white");
-        else if (card->hasSubtype("swamp"))
+        } else if (card->hasSubtype("swamp")) {
             icon = game ? game->getResourceManager()->GetQuad("c_black")
                         : WResourceManager::Instance()->GetQuad("c_black");
-        else if (card->hasSubtype("forest"))
+        } else if (card->hasSubtype("forest")) {
             icon = game ? game->getResourceManager()->GetQuad("c_green")
                         : WResourceManager::Instance()->GetQuad("c_green");
-        else if (card->hasSubtype("mountain"))
+        } else if (card->hasSubtype("mountain")) {
             icon = game ? game->getResourceManager()->GetQuad("c_red") : WResourceManager::Instance()->GetQuad("c_red");
-        else if (card->hasSubtype("island"))
+        } else if (card->hasSubtype("island")) {
             icon =
                 game ? game->getResourceManager()->GetQuad("c_blue") : WResourceManager::Instance()->GetQuad("c_blue");
+        }
         if (icon.get()) {
             icon->SetColor(ARGB(static_cast<unsigned char>(actA), 255, 255, 255));
             renderer->RenderQuad(icon.get(), actX, actY, actT);
@@ -240,7 +251,9 @@ void CardGui::Render() {
     if (card->counters->mCount > 0) {
         unsigned c = -1;
         for (int i = 0; i < card->counters->mCount; i++) {
-            if (card->counters->counters[i]->name != "") c = i;
+            if (!card->counters->counters[i]->name.empty()) {
+                c = i;
+            }
             break;
         }
         if (c + 1) {
@@ -255,7 +268,9 @@ void CardGui::Render() {
     }
 
     if (tc && !tc->canTarget(card)) {
-        if (!shadow) shadow = card->getObserver()->getResourceManager()->GetQuad("shadow");
+        if (!shadow) {
+            shadow = card->getObserver()->getResourceManager()->GetQuad("shadow");
+        }
         if (shadow) {
             shadow->SetColor(ARGB(200, 255, 255, 255));
             renderer->RenderQuad(shadow.get(), actX, actY, actT, (28 * actZ + 1) / 16, 40 * actZ / 16);
@@ -263,9 +278,10 @@ void CardGui::Render() {
     }
 
     // Render a mask over the card, if set
-    if (mask && quad)
+    if (mask && quad) {
         JRenderer::GetInstance()->FillRect(actX - (scale * quad->mWidth / 2), actY - (scale * quad->mHeight / 2),
                                            scale * quad->mWidth, scale * quad->mHeight, mask);
+    }
 
     if ((tc && tc->alreadyHasTarget(card)) ||
         (game && card == game->mLayers->actionLayer()->currentActionCard))  // paint targets red.
@@ -298,7 +314,7 @@ JQuadPtr CardGui::AlternateThumbQuad(MTGCard* card) {
     JQuadPtr q;
     vector<ModRulesBackGroundCardGuiItem*> items = gModRules.cardgui.background;
     ModRulesBackGroundCardGuiItem* item;
-    int numItems = (int)items.size();
+    const int numItems = (int)items.size();
     if (card->data->countColors() > 1) {
         item = items[numItems - 1];
     } else {
@@ -307,7 +323,9 @@ JQuadPtr CardGui::AlternateThumbQuad(MTGCard* card) {
 
     q = WResourceManager::Instance()->RetrieveTempQuad(item->mDisplayThumb);
     items.clear();
-    if (q && q->mTex) q->SetHotSpot(static_cast<float>(q->mTex->mWidth / 2), static_cast<float>(q->mTex->mHeight / 2));
+    if (q && q->mTex) {
+        q->SetHotSpot(static_cast<float>(q->mTex->mWidth / 2), static_cast<float>(q->mTex->mHeight / 2));
+    }
     return q;
 }
 
@@ -316,11 +334,11 @@ void CardGui::AlternateRender(MTGCard* card, const Pos& pos) {
     JRenderer* renderer = JRenderer::GetInstance();
     JQuadPtr q;
 
-    float x = pos.actX;
+    const float x = pos.actX;
 
     vector<ModRulesBackGroundCardGuiItem*> items = gModRules.cardgui.background;
     ModRulesBackGroundCardGuiItem* item;
-    int numItems = (int)items.size();
+    const int numItems = (int)items.size();
     if (card->data->countColors() > 1) {
         item = items[numItems - 1];
     } else {
@@ -333,21 +351,21 @@ void CardGui::AlternateRender(MTGCard* card, const Pos& pos) {
     if (q.get() && q->mTex) {
         q->SetHotSpot(static_cast<float>(q->mTex->mWidth / 2), static_cast<float>(q->mTex->mHeight / 2));
 
-        float scale = pos.actZ * 250 / q->mHeight;
+        const float scale = pos.actZ * 250 / q->mHeight;
         q->SetColor(ARGB((int)pos.actA, 255, 255, 255));
         renderer->RenderQuad(q.get(), x, pos.actY, pos.actT, scale, scale);
     }
 
     vector<ModRulesRenderCardGuiItem*> Carditems = gModRules.cardgui.renderbig;
 
-    WFont* font        = WResourceManager::Instance()->GetWFont(Fonts::MAGIC_FONT);
-    float backup_scale = font->GetScale();
+    WFont* font              = WResourceManager::Instance()->GetWFont(Fonts::MAGIC_FONT);
+    const float backup_scale = font->GetScale();
     font->SetColor(ARGB((int)pos.actA, 0, 0, 0));
-    string sFormattedData = "";
+    const string sFormattedData;
 
     for (size_t i = 0; i < Carditems.size(); i++) {
         ModRulesRenderCardGuiItem* Carditem = Carditems[i];
-        if (Carditem->mFilter.length() == 0 || FilterCard(card, Carditem->mFilter.c_str())) {
+        if (Carditem->mFilter.length() == 0 || FilterCard(card, Carditem->mFilter)) {
             if (Carditem->mFont) {
                 font->SetColor(Carditem->mFontColor);
                 font->SetScale(((float)Carditem->mFontSize / 100) * pos.actZ);
@@ -360,31 +378,32 @@ void CardGui::AlternateRender(MTGCard* card, const Pos& pos) {
             if (Carditem->mName == "description") {
                 std::vector<string> txt = card->data->getFormattedText();
 
-                unsigned i = 0;
-                unsigned h = neofont ? 14 : 11;
-                for (std::vector<string>::const_iterator it = txt.begin(); it != txt.end(); ++it, ++i)
+                unsigned i       = 0;
+                const unsigned h = neofont ? 14 : 11;
+                for (auto it = txt.begin(); it != txt.end(); ++it, ++i) {
                     font->DrawString(it->c_str(), x + (Carditem->mPosX - BigWidth / 2) * pos.actZ,
                                      pos.actY + (-BigHeight / 2 + Carditem->mPosY + h * i) * pos.actZ);
+                }
             } else if (Carditem->mName == "mana") {
                 // Mana
                 // Need Create a realy generic struct for mana render
                 ManaCost* manacost = card->data->getManaCost();
                 ManaCostHybrid* h;
                 ExtraCost* e;
-                unsigned int j  = 0;
-                unsigned int z  = 0;
-                unsigned char t = (JGE::GetInstance()->GetTime() / 3) & 0xFF;
-                unsigned char v = t + 127;
-                float yOffset   = (float)Carditem->mPosY;
+                unsigned int j        = 0;
+                unsigned int z        = 0;
+                const unsigned char t = (JGE::GetInstance()->GetTime() / 3) & 0xFF;
+                const unsigned char v = t + 127;
+                auto yOffset          = (float)Carditem->mPosY;
 
-                JQuadPtr quad = WResourceManager::Instance()->RetrieveQuad("menuicons.png", 0, 0, 0, 0, "",
-                                                                           RETRIEVE_NORMAL, TEXTURE_SUB_5551, 1);
-                if (quad.get())
-                    if (quad->mHeight >= 78)
+                const JQuadPtr quad = WResourceManager::Instance()->RetrieveQuad("menuicons.png", 0, 0, 0, 0, "",
+                                                                                 RETRIEVE_NORMAL, TEXTURE_SUB_5551, 1);
+                if (quad.get()) {
+                    if (quad->mHeight >= 78) {
                         while ((e = manacost->getExtraCost(z))) {
                             if (e->mCostRenderString == "Phyrexian Mana") {
-                                float _color        = (float)card->data->getColor() - 1;
-                                JQuadPtr ExtraManas = WResourceManager::Instance()->RetrieveQuad(
+                                const float _color        = (float)card->data->getColor() - 1;
+                                const JQuadPtr ExtraManas = WResourceManager::Instance()->RetrieveQuad(
                                     "menuicons.png", 2 + _color * 36, 76, 32, 32, "c_extra", RETRIEVE_MANAGE);
                                 ExtraManas->SetHotSpot(16, 16);
                                 renderer->RenderQuad(ExtraManas.get(), x + (-12 * j + Carditem->mPosX) * pos.actZ,
@@ -395,10 +414,12 @@ void CardGui::AlternateRender(MTGCard* card, const Pos& pos) {
                             ++j;
                             ++z;
                         }
+                    }
+                }
 
                 z = 0;
                 while ((h = manacost->getHybridCost(z))) {
-                    float scale = pos.actZ * 0.05f * cosf(2 * M_PI * ((float)t) / 256.0f);
+                    const float scale = pos.actZ * 0.05f * cosf(2 * M_PI * ((float)t) / 256.0f);
 
                     if (scale < 0) {
                         renderer->RenderQuad(
@@ -435,12 +456,12 @@ void CardGui::AlternateRender(MTGCard* card, const Pos& pos) {
                     }
                 }
                 // Colorless mana
-                if (int cost = manacost->getCost(0)) {
+                if (const int cost = manacost->getCost(0)) {
                     char buffer[10];
                     sprintf(buffer, "%d", cost);
                     renderer->RenderQuad(manaIcons[0].get(), x + (-12 * j + Carditem->mPosX) * pos.actZ,
                                          pos.actY + (yOffset)*pos.actZ, 0, 0.4f * pos.actZ, 0.4f * pos.actZ);
-                    float w = font->GetStringWidth(buffer);
+                    const float w = font->GetStringWidth(buffer);
                     font->DrawString(buffer, x + (-12 * j + (Carditem->mPosX + 1) - w / 2) * pos.actZ,
                                      pos.actY + (yOffset - 5) * pos.actZ);
                     ++j;
@@ -451,15 +472,15 @@ void CardGui::AlternateRender(MTGCard* card, const Pos& pos) {
                     sprintf(buffer, "X");
                     renderer->RenderQuad(manaIcons[0].get(), x + (-12 * j + Carditem->mPosX) * pos.actZ,
                                          pos.actY + (yOffset)*pos.actZ, 0, 0.4f * pos.actZ, 0.4f * pos.actZ);
-                    float w = font->GetStringWidth(buffer);
+                    const float w = font->GetStringWidth(buffer);
                     font->DrawString(buffer, x + (-12 * j + (Carditem->mPosX + 1) - w / 2) * pos.actZ,
                                      pos.actY + (yOffset - 5) * pos.actZ);
                 }
 
             } else if (Carditem->mName == "icon") {
-                float yOffseticon   = (float)Carditem->mPosY;
-                JQuadPtr ExtraIcons = WResourceManager::Instance()->RetrieveQuad(
-                    Carditem->mFileName.c_str(), 2 + (float)(Carditem->mIconPosX - 1) * 36,
+                auto yOffseticon          = (float)Carditem->mPosY;
+                const JQuadPtr ExtraIcons = WResourceManager::Instance()->RetrieveQuad(
+                    Carditem->mFileName, 2 + (float)(Carditem->mIconPosX - 1) * 36,
                     (float)(Carditem->mIconPosY - 1) * 38, 32, 32, "", RETRIEVE_MANAGE);
                 ExtraIcons->SetHotSpot(16, 16);
                 renderer->RenderQuad(ExtraIcons.get(), x + (Carditem->mPosX) * pos.actZ,
@@ -490,21 +511,20 @@ void CardGui::AlternateRender(MTGCard* card, const Pos& pos) {
 
                 found = Carditem->mName.find("types");  // types
                 if (found != std::string::npos) {
-                    std::string s = "";
+                    std::string s;
                     for (int i = card->data->types.size() - 1; i > 0; --i) {
                         if (card->data
                                 ->basicAbilities[(int)Constants::CHANGELING]) {  // this avoids drawing the list of
                                                                                  // subtypes on changeling cards.
                             s += _("Shapeshifter - ");
                             break;
-                        } else {
-                            s += _(MTGAllCards::findType(card->data->types[i]));
-                            s += _(" - ");
                         }
+                        s += _(MTGAllCards::findType(card->data->types[i]));
+                        s += _(" - ");
                     }
-                    if (card->data->types.size())
+                    if (!card->data->types.empty()) {
                         s += _(MTGAllCards::findType(card->data->types[0]));
-                    else {
+                    } else {
                         DebugTrace("Typeless card: " << setlist[card->setId].c_str() << card->data->getName()
                                                      << card->getId());
                     }
@@ -544,12 +564,14 @@ void CardGui::AlternateRender(MTGCard* card, const Pos& pos) {
 
                 found = Carditem->mName.find("expansion");
                 if (found != string::npos) {
-                    formattedfield = FormattedData(formattedfield, "expansion", setlist[card->setId].c_str());
+                    formattedfield = FormattedData(formattedfield, "expansion", setlist[card->setId]);
                 }
 
                 if (!Carditem->mFont) {
-                    float w = font->GetStringWidth(formattedfield.c_str()) * kWidthScaleFactor * pos.actZ;
-                    if (w > BigWidth - 30) font->SetScale((BigWidth - 30) / w);
+                    const float w = font->GetStringWidth(formattedfield.c_str()) * kWidthScaleFactor * pos.actZ;
+                    if (w > BigWidth - 30) {
+                        font->SetScale((BigWidth - 30) / w);
+                    }
                 }
                 font->DrawString(formattedfield.c_str(), x + (Carditem->mPosX - BigWidth / 2) * pos.actZ,
                                  pos.actY + (Carditem->mPosY - BigHeight / 2) * pos.actZ);
@@ -563,17 +585,19 @@ void CardGui::AlternateRender(MTGCard* card, const Pos& pos) {
 }
 
 void CardGui::TinyCropRender(MTGCard* card, const Pos& pos, JQuad* quad) {
-    if (!quad) return;
+    if (!quad) {
+        return;
+    }
 
     JRenderer* renderer = JRenderer::GetInstance();
     JQuadPtr q;
 
-    float x            = pos.actX;
-    float displayScale = 250 / BigHeight;
+    const float x            = pos.actX;
+    const float displayScale = 250 / BigHeight;
 
     vector<ModRulesBackGroundCardGuiItem*> items = gModRules.cardgui.background;
     ModRulesBackGroundCardGuiItem* item;
-    int numItems = (int)items.size();
+    const int numItems = (int)items.size();
     if (card->data->countColors() > 1) {
         item = items[numItems - 1];
     } else {
@@ -585,13 +609,13 @@ void CardGui::TinyCropRender(MTGCard* card, const Pos& pos, JQuad* quad) {
     if (q.get() && q->mTex) {
         q->SetHotSpot(static_cast<float>(q->mTex->mWidth / 2), static_cast<float>(q->mTex->mHeight / 2));
 
-        float scale = pos.actZ * displayScale * BigHeight / q->mHeight;
+        const float scale = pos.actZ * displayScale * BigHeight / q->mHeight;
         q->SetColor(ARGB((int)pos.actA, 255, 255, 255));
         renderer->RenderQuad(q.get(), x, pos.actY, pos.actT, scale, scale);
     }
 
-    std::vector<string> txt = card->data->getFormattedText();
-    size_t nbTextLines      = txt.size();
+    const std::vector<string> txt = card->data->getFormattedText();
+    const size_t nbTextLines      = txt.size();
 
     // Render the image on top of that
     quad->SetColor(ARGB((int)pos.actA, 255, 255, 255));
@@ -605,12 +629,12 @@ void CardGui::TinyCropRender(MTGCard* card, const Pos& pos, JQuad* quad) {
 
     vector<ModRulesRenderCardGuiItem*> Carditems = gModRules.cardgui.rendertinycrop;
 
-    WFont* font           = WResourceManager::Instance()->GetWFont(Fonts::MAGIC_FONT);
-    float backup_scale    = font->GetScale();
-    string sFormattedData = "";
+    WFont* font              = WResourceManager::Instance()->GetWFont(Fonts::MAGIC_FONT);
+    const float backup_scale = font->GetScale();
+    const string sFormattedData;
     for (size_t i = 0; i < Carditems.size(); i++) {
         ModRulesRenderCardGuiItem* Carditem = Carditems[i];
-        if (Carditem->mFilter.length() == 0 || FilterCard(card, Carditem->mFilter.c_str())) {
+        if (Carditem->mFilter.length() == 0 || FilterCard(card, Carditem->mFilter)) {
             if (Carditem->mFont) {
                 font->SetColor(Carditem->mFontColor);
                 font->SetScale(((float)Carditem->mFontSize / 100) * pos.actZ);
@@ -622,33 +646,34 @@ void CardGui::TinyCropRender(MTGCard* card, const Pos& pos, JQuad* quad) {
 
             if (Carditem->mName == "description") {
                 std::vector<string> txt = card->data->getFormattedText();
-                float imgBottom         = imgY + (imgScale * quad->mHeight / 2);
+                const float imgBottom   = imgY + (imgScale * quad->mHeight / 2);
 
-                unsigned i = 0;
-                unsigned h = neofont ? 14 : 11;
-                for (std::vector<string>::const_iterator it = txt.begin(); it != txt.end(); ++it, ++i)
+                unsigned i       = 0;
+                const unsigned h = neofont ? 14 : 11;
+                for (auto it = txt.begin(); it != txt.end(); ++it, ++i) {
                     font->DrawString(it->c_str(), x + (Carditem->mPosX - BigWidth / 2) * pos.actZ,
                                      imgBottom + (Carditem->mPosY + h * i) * pos.actZ);
+                }
             } else if (Carditem->mName == "mana") {
                 // Mana
                 // Need Create a realy generic struct for mana render
                 ManaCost* manacost = card->data->getManaCost();
                 ManaCostHybrid* h;
                 ExtraCost* e;
-                unsigned int j  = 0;
-                unsigned int z  = 0;
-                unsigned char t = (JGE::GetInstance()->GetTime() / 3) & 0xFF;
-                unsigned char v = t + 127;
-                float yOffset   = (float)Carditem->mPosY;
+                unsigned int j        = 0;
+                unsigned int z        = 0;
+                const unsigned char t = (JGE::GetInstance()->GetTime() / 3) & 0xFF;
+                const unsigned char v = t + 127;
+                auto yOffset          = (float)Carditem->mPosY;
 
-                JQuadPtr quad = WResourceManager::Instance()->RetrieveQuad("menuicons.png", 0, 0, 0, 0, "",
-                                                                           RETRIEVE_NORMAL, TEXTURE_SUB_5551, 1);
-                if (quad.get())
-                    if (quad->mHeight >= 78)
+                const JQuadPtr quad = WResourceManager::Instance()->RetrieveQuad("menuicons.png", 0, 0, 0, 0, "",
+                                                                                 RETRIEVE_NORMAL, TEXTURE_SUB_5551, 1);
+                if (quad.get()) {
+                    if (quad->mHeight >= 78) {
                         while ((e = manacost->getExtraCost(z))) {
                             if (e->mCostRenderString == "Phyrexian Mana") {
-                                float _color        = (float)card->data->getColor() - 1;
-                                JQuadPtr ExtraManas = WResourceManager::Instance()->RetrieveQuad(
+                                const float _color        = (float)card->data->getColor() - 1;
+                                const JQuadPtr ExtraManas = WResourceManager::Instance()->RetrieveQuad(
                                     "menuicons.png", 2 + _color * 36, 76, 32, 32, "c_extra", RETRIEVE_MANAGE);
                                 ExtraManas->SetHotSpot(16, 16);
                                 renderer->RenderQuad(ExtraManas.get(), x + (-12 * j + Carditem->mPosX) * pos.actZ,
@@ -659,10 +684,12 @@ void CardGui::TinyCropRender(MTGCard* card, const Pos& pos, JQuad* quad) {
                             ++j;
                             ++z;
                         }
+                    }
+                }
 
                 z = 0;
                 while ((h = manacost->getHybridCost(z))) {
-                    float scale = pos.actZ * 0.05f * cosf(2 * M_PI * ((float)t) / 256.0f);
+                    const float scale = pos.actZ * 0.05f * cosf(2 * M_PI * ((float)t) / 256.0f);
 
                     if (scale < 0) {
                         renderer->RenderQuad(
@@ -699,12 +726,12 @@ void CardGui::TinyCropRender(MTGCard* card, const Pos& pos, JQuad* quad) {
                     }
                 }
                 // Colorless mana
-                if (int cost = manacost->getCost(0)) {
+                if (const int cost = manacost->getCost(0)) {
                     char buffer[10];
                     sprintf(buffer, "%d", cost);
                     renderer->RenderQuad(manaIcons[0].get(), x + (-12 * j + Carditem->mPosX) * pos.actZ,
                                          pos.actY + (yOffset)*pos.actZ, 0, 0.4f * pos.actZ, 0.4f * pos.actZ);
-                    float w = font->GetStringWidth(buffer);
+                    const float w = font->GetStringWidth(buffer);
                     font->DrawString(buffer, x + (-12 * j + (Carditem->mPosX + 1) - w / 2) * pos.actZ,
                                      pos.actY + (yOffset - 5) * pos.actZ);
                     ++j;
@@ -715,15 +742,15 @@ void CardGui::TinyCropRender(MTGCard* card, const Pos& pos, JQuad* quad) {
                     sprintf(buffer, "X");
                     renderer->RenderQuad(manaIcons[0].get(), x + (-12 * j + Carditem->mPosX) * pos.actZ,
                                          pos.actY + (yOffset)*pos.actZ, 0, 0.4f * pos.actZ, 0.4f * pos.actZ);
-                    float w = font->GetStringWidth(buffer);
+                    const float w = font->GetStringWidth(buffer);
                     font->DrawString(buffer, x + (-12 * j + (Carditem->mPosX + 1) - w / 2) * pos.actZ,
                                      pos.actY + (yOffset - 5) * pos.actZ);
                 }
 
             } else if (Carditem->mName == "icon") {
-                float yOffseticon   = (float)Carditem->mPosY;
-                JQuadPtr ExtraIcons = WResourceManager::Instance()->RetrieveQuad(
-                    Carditem->mFileName.c_str(), 2 + (float)(Carditem->mIconPosX - 1) * 36,
+                auto yOffseticon          = (float)Carditem->mPosY;
+                const JQuadPtr ExtraIcons = WResourceManager::Instance()->RetrieveQuad(
+                    Carditem->mFileName, 2 + (float)(Carditem->mIconPosX - 1) * 36,
                     (float)(Carditem->mIconPosY - 1) * 38, 32, 32, "", RETRIEVE_MANAGE);
                 ExtraIcons->SetHotSpot(16, 16);
                 renderer->RenderQuad(ExtraIcons.get(), x + (Carditem->mPosX) * pos.actZ,
@@ -754,21 +781,20 @@ void CardGui::TinyCropRender(MTGCard* card, const Pos& pos, JQuad* quad) {
 
                 found = Carditem->mName.find("types");  // types
                 if (found != std::string::npos) {
-                    std::string s = "";
+                    std::string s;
                     for (int i = card->data->types.size() - 1; i > 0; --i) {
                         if (card->data
                                 ->basicAbilities[(int)Constants::CHANGELING]) {  // this avoids drawing the list of
                                                                                  // subtypes on changeling cards.
                             s += _("Shapeshifter - ");
                             break;
-                        } else {
-                            s += _(MTGAllCards::findType(card->data->types[i]));
-                            s += _(" - ");
                         }
+                        s += _(MTGAllCards::findType(card->data->types[i]));
+                        s += _(" - ");
                     }
-                    if (card->data->types.size())
+                    if (!card->data->types.empty()) {
                         s += _(MTGAllCards::findType(card->data->types[0]));
-                    else {
+                    } else {
                         DebugTrace("Typeless card: " << setlist[card->setId].c_str() << card->data->getName()
                                                      << card->getId());
                     }
@@ -808,12 +834,14 @@ void CardGui::TinyCropRender(MTGCard* card, const Pos& pos, JQuad* quad) {
 
                 found = Carditem->mName.find("expansion");
                 if (found != string::npos) {
-                    formattedfield = FormattedData(formattedfield, "expansion", setlist[card->setId].c_str());
+                    formattedfield = FormattedData(formattedfield, "expansion", setlist[card->setId]);
                 }
 
                 if (!Carditem->mFont) {
-                    float w = font->GetStringWidth(formattedfield.c_str()) * kWidthScaleFactor * pos.actZ;
-                    if (w > BigWidth - 30) font->SetScale((BigWidth - 30) / w);
+                    const float w = font->GetStringWidth(formattedfield.c_str()) * kWidthScaleFactor * pos.actZ;
+                    if (w > BigWidth - 30) {
+                        font->SetScale((BigWidth - 30) / w);
+                    }
                 }
                 font->DrawString(formattedfield.c_str(), x + (Carditem->mPosX - BigWidth / 2) * pos.actZ,
                                  pos.actY + (Carditem->mPosY - BigHeight / 2) * pos.actZ);
@@ -833,10 +861,10 @@ void CardGui::RenderBig(MTGCard* card, const Pos& pos) {
     // if((MTGCard*)game->mLayers->actionLayer()->currentActionCard != NULL)
     //     card = (MTGCard*)game->mLayers->actionLayer()->currentActionCard;
     // i want this but ai targets cards so quickly that it can crash the game.
-    float x = pos.actX;
+    const float x = pos.actX;
 
-    JQuadPtr quad          = WResourceManager::Instance()->RetrieveCard(card);
-    MTGCardInstance* kcard = dynamic_cast<MTGCardInstance*>(card);
+    JQuadPtr quad = WResourceManager::Instance()->RetrieveCard(card);
+    auto* kcard   = dynamic_cast<MTGCardInstance*>(card);
     if (kcard && !kcard->isToken && kcard->name != kcard->model->data->name) {
         MTGCard* fcard = MTGCollection()->getCardByName(kcard->name);
         quad           = WResourceManager::Instance()->RetrieveCard(fcard);
@@ -846,7 +874,7 @@ void CardGui::RenderBig(MTGCard* card, const Pos& pos) {
             return TinyCropRender(card, pos, quad.get());
         }
         quad->SetColor(ARGB(255, 255, 255, 255));
-        float scale = pos.actZ * 250.f / quad->mHeight;
+        const float scale = pos.actZ * 250.f / quad->mHeight;
         renderer->RenderQuad(quad.get(), x, pos.actY, pos.actT, scale, scale);
         RenderCountersBig(card, pos);
         return;
@@ -858,34 +886,33 @@ void CardGui::RenderBig(MTGCard* card, const Pos& pos) {
     AlternateRender(card, pos);
 }
 
-string CardGui::FormattedData(string data, string replace, string value) {
-    size_t found = data.find(replace.c_str());
+string CardGui::FormattedData(string data, const string& replace, string value) {
+    const size_t found = data.find(replace);
     if (found != string::npos) {
-        size_t len   = replace.length();
-        string teste = data.replace(found, len, value);
+        const size_t len = replace.length();
+        string teste     = data.replace(found, len, value);
         return teste;
-    } else {
-        return value;
     }
+    return value;
 }
 
 bool CardGui::FilterCard(MTGCard* _card, string filter) {
     CardDescriptor cd;
-    MTGCardInstance* card = (MTGCardInstance*)_card->data;
+    auto* card = dynamic_cast<MTGCardInstance*>(_card->data);
     cd.init();
     cd.mode = CD_OR;
-    while (filter.size()) {
+    while (!filter.empty()) {
         string typeName;
         // Advanced cards caracteristics ?
-        size_t found = filter.find("[");
+        size_t found = filter.find('[');
         if (found != string::npos) {
             int nbminuses     = 0;
-            int end           = filter.find("]");
+            const int end     = filter.find(']');
             string attributes = filter.substr(found + 1, end - found - 1);
 
-            while (attributes.size()) {
-                size_t found2   = attributes.find(";");
-                size_t foundAnd = attributes.find("&");
+            while (!attributes.empty()) {
+                const size_t found2   = attributes.find(';');
+                const size_t foundAnd = attributes.find('&');
                 string attribute;
                 if (found2 != string::npos) {
                     cd.mode    = CD_OR;
@@ -905,12 +932,12 @@ bool CardGui::FilterCard(MTGCard* _card, string filter) {
                     nbminuses++;
                     attribute = attribute.substr(1);
                 }
-                int comparisonMode      = COMPARISON_NONE;
-                int comparisonCriterion = 0;
+                int comparisonMode            = COMPARISON_NONE;
+                const int comparisonCriterion = 0;
                 if (attribute.size() > 1) {
-                    size_t operatorPosition = attribute.find("=", 1);
+                    size_t operatorPosition = attribute.find('=', 1);
                     if (operatorPosition != string::npos) {
-                        string numberCD =
+                        const string numberCD =
                             attribute.substr(operatorPosition + 1, attribute.size() - operatorPosition - 1);
 
                         switch (attribute[operatorPosition - 1]) {
@@ -1048,10 +1075,11 @@ bool CardGui::FilterCard(MTGCard* _card, string filter) {
                     for (int cid = 1; cid < Constants::NB_Colors - 1; cid++) {
                         if (attribute.find(Constants::MTGColorStrings[cid]) != string::npos) {
                             attributefound = 1;
-                            if (minus)
+                            if (minus) {
                                 cd.SetExclusionColor(cid);
-                            else
+                            } else {
                                 cd.setColor(cid);
+                            }
                         }
                     }
                     if (!attributefound) {
@@ -1059,10 +1087,11 @@ bool CardGui::FilterCard(MTGCard* _card, string filter) {
                         for (int j = 0; j < Constants::NB_BASIC_ABILITIES; j++) {
                             if (attribute.find(Constants::MTGBasicAbilities[j]) != string::npos) {
                                 attributefound = 1;
-                                if (minus)
+                                if (minus) {
                                     cd.mAbilityExclusions.set(j);
-                                else
+                                } else {
                                     cd.basicAbilities.set(j);
+                                }
                             }
                         }
                     }
@@ -1077,10 +1106,12 @@ bool CardGui::FilterCard(MTGCard* _card, string filter) {
                     }
                 }
             }
-            if (nbminuses) cd.mode = CD_AND;
+            if (nbminuses) {
+                cd.mode = CD_AND;
+            }
             filter = filter.substr(0, found);
         } else {
-            found = filter.find(",");
+            found = filter.find(',');
 
             if (found != string::npos) {
                 cd.mode  = CD_OR;
@@ -1094,16 +1125,24 @@ bool CardGui::FilterCard(MTGCard* _card, string filter) {
             cd.setSubtype(typeName);
         }
     }
-    if (cd.match(card)) return true;
+    if (cd.match(card)) {
+        return true;
+    }
     return false;
 }
 
 void CardGui::RenderCountersBig(MTGCard* mtgcard, const Pos& pos, int drawMode) {
-    MTGCardInstance* card = dynamic_cast<MTGCardInstance*>(mtgcard);
-    if (!card) return;
+    auto* card = dynamic_cast<MTGCardInstance*>(mtgcard);
+    if (!card) {
+        return;
+    }
 
-    if (!card->counters) return;
-    if (!card->counters->mCount) return;
+    if (!card->counters) {
+        return;
+    }
+    if (!card->counters->mCount) {
+        return;
+    }
 
     // Write Named Counters
     WFont* font = WResourceManager::Instance()->GetWFont(Fonts::MAGIC_FONT);
@@ -1112,20 +1151,22 @@ void CardGui::RenderCountersBig(MTGCard* mtgcard, const Pos& pos, int drawMode) 
 
     unsigned i = 0;
     if (drawMode == DrawMode::kText) {
-        std::vector<string> txt = card->data->getFormattedText();
-        i                       = txt.size() + 1;
+        const std::vector<string> txt = card->data->getFormattedText();
+        i                             = txt.size() + 1;
     }
 
     for (size_t t = 0; t < card->counters->counters.size(); t++) {
         Counter* c = card->counters->counters[t];
 
-        if (!c || c->nb <= 0) continue;
+        if (!c || c->nb <= 0) {
+            continue;
+        }
 
         char buf[512];
         bool renderText = true;
-        string gfx      = "";
+        string gfx;
         // TODO cache the gfx fetch results?
-        if (c->name.size()) {
+        if (!c->name.empty()) {
             if (c->nb < 6)  // we only render a counter's specific quad if there are 5 counters of this type or less.
                             // Otherwise we will use the generic one
             {
@@ -1134,11 +1175,15 @@ void CardGui::RenderCountersBig(MTGCard* mtgcard, const Pos& pos, int drawMode) 
                     gfxRelativeName.append(c->name);
                     gfxRelativeName.append(".png");
                     string _gfx = WResourceManager::Instance()->graphicsFile(gfxRelativeName);
-                    if (!fileExists(_gfx.c_str())) _gfx = "";
+                    if (!fileExists(_gfx.c_str())) {
+                        _gfx = "";
+                    }
                     counterGraphics[c->name] = _gfx;
                 }
                 gfx = counterGraphics[c->name];
-                if (gfx.size()) renderText = false;
+                if (!gfx.empty()) {
+                    renderText = false;
+                }
             }
 
             if (renderText) {
@@ -1151,7 +1196,7 @@ void CardGui::RenderCountersBig(MTGCard* mtgcard, const Pos& pos, int drawMode) 
                     ((c->toughness > 0) ? "+" : ""), c->toughness * c->nb);
         }
 
-        if (!gfx.size()) {
+        if (gfx.empty()) {
             gfx = "counters/default.png";
         }
 
@@ -1162,13 +1207,13 @@ void CardGui::RenderCountersBig(MTGCard* mtgcard, const Pos& pos, int drawMode) 
             x += (BigWidth / 2) * pos.actZ;
         }
 
-        if (gfx.size()) {
-            JQuadPtr q = WResourceManager::Instance()->RetrieveTempQuad(gfx);
+        if (!gfx.empty()) {
+            const JQuadPtr q = WResourceManager::Instance()->RetrieveTempQuad(gfx);
 
             if (q.get() && q->mTex) {
-                float scale = 20.f / q->mHeight;
+                const float scale = 20.f / q->mHeight;
                 if (renderText) {
-                    float scaleX = (font->GetStringWidth(buf) + 20) / q->mWidth;
+                    const float scaleX = (font->GetStringWidth(buf) + 20) / q->mWidth;
                     JRenderer::GetInstance()->RenderQuad(q.get(), x, y, 0, scaleX, scale);
                 } else {
                     for (int j = 0; j < c->nb; ++j) {

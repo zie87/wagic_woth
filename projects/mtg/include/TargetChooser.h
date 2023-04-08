@@ -1,5 +1,5 @@
-#ifndef _TARGETCHOOSER_H_
-#define _TARGETCHOOSER_H_
+#ifndef TARGETCHOOSER_H
+#define TARGETCHOOSER_H
 
 #define TARGET_NOK 0
 #define TARGET_OK 1
@@ -29,7 +29,7 @@ public:
     enum { UNSET = 0, OPPONENT = -1, CONTROLLER = 1, TARGET_CONTROLLER = 2, OWNER = 3, TARGETED_PLAYER = 4 };
     bool other;
     bool withoutProtections;
-    TargetChooser(GameObserver* observer, MTGCardInstance* card = NULL, int _maxtargets = UNLITMITED_TARGETS,
+    TargetChooser(GameObserver* observer, MTGCardInstance* card = nullptr, int _maxtargets = UNLITMITED_TARGETS,
                   bool other = false, bool targetMin = false);
     Player* Owner;
     GameObserver* observer;
@@ -47,7 +47,7 @@ public:
     virtual bool targetsZone(MTGGameZone* z, MTGCardInstance* mSource) { return false; };
     int ForceTargetListReady();
     int targetsReadyCheck();
-    virtual int addTarget(Targetable* target);
+    int addTarget(Targetable* target) override;
     virtual bool canTarget(Targetable* _target, bool withoutProtections = false);
 
     // returns true if tc is equivalent to this TargetChooser
@@ -57,12 +57,11 @@ public:
     virtual int full() {
         if ((maxtargets != UNLITMITED_TARGETS && (int(targets.size())) >= maxtargets) || done) {
             return 1;
-        } else {
-            return 0;
         }
+        return 0;
     };
     virtual int ready() { return (int)(targets.size()); };
-    virtual ~TargetChooser(){};
+    ~TargetChooser() override{};
     int targetListSet();
     virtual TargetChooser* clone() const = 0;
 };
@@ -72,7 +71,7 @@ class TargetChooserFactory {
 
 public:
     TargetChooserFactory(GameObserver* observer) : observer(observer){};
-    TargetChooser* createTargetChooser(string s, MTGCardInstance* card, MTGAbility* ability = NULL);
+    TargetChooser* createTargetChooser(string s, MTGCardInstance* card, MTGAbility* ability = nullptr);
     TargetChooser* createTargetChooser(MTGCardInstance* card);
 };
 
@@ -81,17 +80,17 @@ public:
     int zones[15];
     int nbzones;
     int init(int* _zones, int _nbzones);
-    bool targetsZone(MTGGameZone* z);
-    bool targetsZone(MTGGameZone* z, MTGCardInstance* mSource);
+    bool targetsZone(MTGGameZone* z) override;
+    bool targetsZone(MTGGameZone* z, MTGCardInstance* mSource) override;
     bool withoutProtections;
-    TargetZoneChooser(GameObserver* observer, MTGCardInstance* card = NULL, int _maxtargets = 1, bool other = false,
+    TargetZoneChooser(GameObserver* observer, MTGCardInstance* card = nullptr, int _maxtargets = 1, bool other = false,
                       bool targetMin = false);
-    TargetZoneChooser(GameObserver* observer, int* _zones, int _nbzones, MTGCardInstance* card = NULL,
+    TargetZoneChooser(GameObserver* observer, int* _zones, int _nbzones, MTGCardInstance* card = nullptr,
                       int _maxtargets = 1, bool other = false, bool targetMin = false);
-    virtual bool canTarget(Targetable* _card, bool withoutProtections = false);
-    int setAllZones();
-    virtual TargetZoneChooser* clone() const;
-    virtual bool equals(TargetChooser* tc);
+    bool canTarget(Targetable* _card, bool withoutProtections = false) override;
+    int setAllZones() override;
+    TargetZoneChooser* clone() const override;
+    bool equals(TargetChooser* tc) override;
 };
 
 class CardTargetChooser : public TargetZoneChooser {
@@ -100,11 +99,11 @@ protected:
 
 public:
     bool withoutProtections;
-    CardTargetChooser(GameObserver* observer, MTGCardInstance* card, MTGCardInstance* source, int* zones = NULL,
+    CardTargetChooser(GameObserver* observer, MTGCardInstance* card, MTGCardInstance* source, int* zones = nullptr,
                       int nbzones = 0);
-    virtual bool canTarget(Targetable* target, bool withoutProtections = false);
-    virtual CardTargetChooser* clone() const;
-    virtual bool equals(TargetChooser* tc);
+    bool canTarget(Targetable* target, bool withoutProtections = false) override;
+    CardTargetChooser* clone() const override;
+    bool equals(TargetChooser* tc) override;
 };
 
 class TypeTargetChooser : public TargetZoneChooser {
@@ -112,29 +111,29 @@ public:
     int nbtypes;
     int types[10];
     bool withoutProtections;
-    TypeTargetChooser(GameObserver* observer, const char* _type, MTGCardInstance* card = NULL, int _maxtargets = 1,
+    TypeTargetChooser(GameObserver* observer, const char* _type, MTGCardInstance* card = nullptr, int _maxtargets = 1,
                       bool other = false, bool targetMin = false);
-    TypeTargetChooser(GameObserver* observer, const char* _type, int* _zones, int nbzones, MTGCardInstance* card = NULL,
-                      int _maxtargets = 1, bool other = false, bool targetMin = false);
+    TypeTargetChooser(GameObserver* observer, const char* _type, int* _zones, int nbzones,
+                      MTGCardInstance* card = nullptr, int _maxtargets = 1, bool other = false, bool targetMin = false);
     void addType(int type);
     void addType(const char* type);
-    virtual bool canTarget(Targetable* target, bool withoutProtections = false);
-    virtual TypeTargetChooser* clone() const;
-    virtual bool equals(TargetChooser* tc);
+    bool canTarget(Targetable* target, bool withoutProtections = false) override;
+    TypeTargetChooser* clone() const override;
+    bool equals(TargetChooser* tc) override;
 };
 
 class DamageableTargetChooser : public TypeTargetChooser {
 public:
     bool withoutProtections;
-    DamageableTargetChooser(GameObserver* observer, int* _zones, int _nbzones, MTGCardInstance* card = NULL,
+    DamageableTargetChooser(GameObserver* observer, int* _zones, int _nbzones, MTGCardInstance* card = nullptr,
                             int _maxtargets = 1, bool other = false, bool targetMin = false)
         : TypeTargetChooser(observer, "creature", _zones, _nbzones, card, _maxtargets, other, targetMin){};
-    DamageableTargetChooser(GameObserver* observer, MTGCardInstance* card = NULL, int _maxtargets = 1,
+    DamageableTargetChooser(GameObserver* observer, MTGCardInstance* card = nullptr, int _maxtargets = 1,
                             bool other = false, bool targetMin = false)
         : TypeTargetChooser(observer, "creature", card, _maxtargets, other, targetMin){};
-    virtual bool canTarget(Targetable* target, bool withoutProtections = false);
-    virtual DamageableTargetChooser* clone() const;
-    virtual bool equals(TargetChooser* tc);
+    bool canTarget(Targetable* target, bool withoutProtections = false) override;
+    DamageableTargetChooser* clone() const override;
+    bool equals(TargetChooser* tc) override;
 };
 
 class PlayerTargetChooser : public TargetChooser {
@@ -142,47 +141,48 @@ protected:
     Player* p;  // In Case we can only target a specific player
 public:
     bool withoutProtections;
-    PlayerTargetChooser(GameObserver* observer, MTGCardInstance* card = NULL, int _maxtargets = 1, Player* _p = NULL);
-    virtual bool canTarget(Targetable* target, bool withoutProtections = false);
-    virtual PlayerTargetChooser* clone() const;
-    virtual bool equals(TargetChooser* tc);
+    PlayerTargetChooser(GameObserver* observer, MTGCardInstance* card = nullptr, int _maxtargets = 1,
+                        Player* _p = nullptr);
+    bool canTarget(Targetable* target, bool withoutProtections = false) override;
+    PlayerTargetChooser* clone() const override;
+    bool equals(TargetChooser* tc) override;
 };
 
 class DescriptorTargetChooser : public TargetZoneChooser {
 public:
     CardDescriptor* cd;
     bool withoutProtections;
-    DescriptorTargetChooser(GameObserver* observer, CardDescriptor* _cd, MTGCardInstance* card = NULL,
+    DescriptorTargetChooser(GameObserver* observer, CardDescriptor* _cd, MTGCardInstance* card = nullptr,
                             int _maxtargets = 1, bool other = false, bool targetMin = false);
     DescriptorTargetChooser(GameObserver* observer, CardDescriptor* _cd, int* _zones, int nbzones,
-                            MTGCardInstance* card = NULL, int _maxtargets = 1, bool other = false,
+                            MTGCardInstance* card = nullptr, int _maxtargets = 1, bool other = false,
                             bool targetMin = false);
-    virtual bool canTarget(Targetable* target, bool withoutProtections = false);
-    ~DescriptorTargetChooser();
-    virtual DescriptorTargetChooser* clone() const;
-    virtual bool equals(TargetChooser* tc);
+    bool canTarget(Targetable* target, bool withoutProtections = false) override;
+    ~DescriptorTargetChooser() override;
+    DescriptorTargetChooser* clone() const override;
+    bool equals(TargetChooser* tc) override;
 };
 
 class SpellTargetChooser : public TargetChooser {
 public:
     int color;
     bool withoutProtections;
-    SpellTargetChooser(GameObserver* observer, MTGCardInstance* card = NULL, int _color = -1, int _maxtargets = 1,
+    SpellTargetChooser(GameObserver* observer, MTGCardInstance* card = nullptr, int _color = -1, int _maxtargets = 1,
                        bool other = false, bool targetMin = false);
-    virtual bool canTarget(Targetable* target, bool withoutProtections = false);
-    virtual SpellTargetChooser* clone() const;
-    virtual bool equals(TargetChooser* tc);
+    bool canTarget(Targetable* target, bool withoutProtections = false) override;
+    SpellTargetChooser* clone() const override;
+    bool equals(TargetChooser* tc) override;
 };
 
 class SpellOrPermanentTargetChooser : public TargetZoneChooser {
 public:
     int color;
     bool withoutProtections;
-    SpellOrPermanentTargetChooser(GameObserver* observer, MTGCardInstance* card = NULL, int _color = -1,
+    SpellOrPermanentTargetChooser(GameObserver* observer, MTGCardInstance* card = nullptr, int _color = -1,
                                   int _maxtargets = 1, bool other = false, bool targetMin = false);
-    virtual bool canTarget(Targetable* target, bool withoutProtections = false);
-    virtual SpellOrPermanentTargetChooser* clone() const;
-    virtual bool equals(TargetChooser* tc);
+    bool canTarget(Targetable* target, bool withoutProtections = false) override;
+    SpellOrPermanentTargetChooser* clone() const override;
+    bool equals(TargetChooser* tc) override;
 };
 
 class DamageTargetChooser : public TargetChooser {
@@ -190,11 +190,11 @@ public:
     int color;
     int state;
     bool withoutProtections;
-    DamageTargetChooser(GameObserver* observer, MTGCardInstance* card = NULL, int _color = -1, int _maxtargets = 1,
+    DamageTargetChooser(GameObserver* observer, MTGCardInstance* card = nullptr, int _color = -1, int _maxtargets = 1,
                         int state = NOT_RESOLVED);
-    virtual bool canTarget(Targetable* target, bool withoutProtections = false);
-    virtual DamageTargetChooser* clone() const;
-    virtual bool equals(TargetChooser* tc);
+    bool canTarget(Targetable* target, bool withoutProtections = false) override;
+    DamageTargetChooser* clone() const override;
+    bool equals(TargetChooser* tc) override;
 };
 
 // Should only be used for triggered abilities.
@@ -204,52 +204,52 @@ public:
     int triggerTarget;
     bool withoutProtections;
     TriggerTargetChooser(GameObserver* observer, int _triggerTarget);
-    virtual bool targetsZone(MTGGameZone* z);
-    virtual bool canTarget(Targetable* _target, bool withoutProtections = false);
-    virtual TriggerTargetChooser* clone() const;
-    virtual bool equals(TargetChooser* tc);
+    bool targetsZone(MTGGameZone* z) override;
+    bool canTarget(Targetable* _target, bool withoutProtections = false) override;
+    TriggerTargetChooser* clone() const override;
+    bool equals(TargetChooser* tc) override;
 };
 
 class ProliferateChooser : public TypeTargetChooser {
 public:
     bool withoutProtections;
-    ProliferateChooser(GameObserver* observer, int* _zones, int _nbzones, MTGCardInstance* card = NULL,
+    ProliferateChooser(GameObserver* observer, int* _zones, int _nbzones, MTGCardInstance* card = nullptr,
                        int _maxtargets = 1, bool other = false, bool targetMin = false)
         : TypeTargetChooser(observer, "*", _zones, _nbzones, card, _maxtargets, other, targetMin){};
-    ProliferateChooser(GameObserver* observer, MTGCardInstance* card = NULL, int _maxtargets = 1, bool other = false,
+    ProliferateChooser(GameObserver* observer, MTGCardInstance* card = nullptr, int _maxtargets = 1, bool other = false,
                        bool targetMin = false)
         : TypeTargetChooser(observer, "*", card, _maxtargets, other, targetMin){};
-    virtual bool canTarget(Targetable* target, bool withoutProtections = false);
-    virtual ProliferateChooser* clone() const;
-    virtual bool equals(TargetChooser* tc);
+    bool canTarget(Targetable* target, bool withoutProtections = false) override;
+    ProliferateChooser* clone() const override;
+    bool equals(TargetChooser* tc) override;
 };
 
 class BlockableChooser : public TypeTargetChooser {
 public:
     bool withoutProtections;
-    BlockableChooser(GameObserver* observer, int* _zones, int _nbzones, MTGCardInstance* card = NULL,
+    BlockableChooser(GameObserver* observer, int* _zones, int _nbzones, MTGCardInstance* card = nullptr,
                      int _maxtargets = 1, bool other = false, bool targetMin = false)
         : TypeTargetChooser(observer, "creature", _zones, _nbzones, card, _maxtargets, other, targetMin){};
-    BlockableChooser(GameObserver* observer, MTGCardInstance* card = NULL, int _maxtargets = 1, bool other = false,
+    BlockableChooser(GameObserver* observer, MTGCardInstance* card = nullptr, int _maxtargets = 1, bool other = false,
                      bool targetMin = false)
         : TypeTargetChooser(observer, "creature", card, _maxtargets, other, targetMin){};
-    virtual bool canTarget(Targetable* target, bool withoutProtections = false);
-    virtual BlockableChooser* clone() const;
-    virtual bool equals(TargetChooser* tc);
+    bool canTarget(Targetable* target, bool withoutProtections = false) override;
+    BlockableChooser* clone() const override;
+    bool equals(TargetChooser* tc) override;
 };
 
 class myCursesChooser : public TypeTargetChooser {
 public:
     bool withoutProtections;
-    myCursesChooser(GameObserver* observer, int* _zones, int _nbzones, MTGCardInstance* card = NULL,
+    myCursesChooser(GameObserver* observer, int* _zones, int _nbzones, MTGCardInstance* card = nullptr,
                     int _maxtargets = 1, bool other = false, bool targetMin = false)
         : TypeTargetChooser(observer, "*", _zones, _nbzones, card, _maxtargets, other, targetMin){};
-    myCursesChooser(GameObserver* observer, MTGCardInstance* card = NULL, int _maxtargets = 1, bool other = false,
+    myCursesChooser(GameObserver* observer, MTGCardInstance* card = nullptr, int _maxtargets = 1, bool other = false,
                     bool targetMin = false)
         : TypeTargetChooser(observer, "*", card, _maxtargets, other, targetMin){};
-    virtual bool canTarget(Targetable* target, bool withoutProtections = false);
-    virtual myCursesChooser* clone() const;
-    virtual bool equals(TargetChooser* tc);
+    bool canTarget(Targetable* target, bool withoutProtections = false) override;
+    myCursesChooser* clone() const override;
+    bool equals(TargetChooser* tc) override;
 };
 
 class ParentChildChooser : public TypeTargetChooser {
@@ -257,18 +257,20 @@ public:
     bool withoutProtections;
     int type;
     TargetChooser* deeperTargeting;
-    ParentChildChooser(GameObserver* observer, int* _zones, int _nbzones, MTGCardInstance* card = NULL,
-                       int _maxtargets = 1, TargetChooser* deepTc = NULL, int type = 1, bool other = false,
+    ParentChildChooser(GameObserver* observer, int* _zones, int _nbzones, MTGCardInstance* card = nullptr,
+                       int _maxtargets = 1, TargetChooser* deepTc = nullptr, int type = 1, bool other = false,
                        bool targetMin = false)
-        : TypeTargetChooser(observer, "*", _zones, _nbzones, card, _maxtargets, other, targetMin),
-          type(type),
-          deeperTargeting(deepTc){};
-    ParentChildChooser(GameObserver* observer, MTGCardInstance* card = NULL, int _maxtargets = 1,
-                       TargetChooser* deepTc = NULL, int type = 1, bool other = false, bool targetMin = false)
-        : TypeTargetChooser(observer, "*", card, _maxtargets, other, targetMin), type(type), deeperTargeting(deepTc){};
-    virtual bool canTarget(Targetable* target, bool withoutProtections = false);
-    virtual ParentChildChooser* clone() const;
-    virtual bool equals(TargetChooser* tc);
-    ~ParentChildChooser();
+        : TypeTargetChooser(observer, "*", _zones, _nbzones, card, _maxtargets, other, targetMin)
+        , type(type)
+        , deeperTargeting(deepTc){};
+    ParentChildChooser(GameObserver* observer, MTGCardInstance* card = nullptr, int _maxtargets = 1,
+                       TargetChooser* deepTc = nullptr, int type = 1, bool other = false, bool targetMin = false)
+        : TypeTargetChooser(observer, "*", card, _maxtargets, other, targetMin)
+        , type(type)
+        , deeperTargeting(deepTc){};
+    bool canTarget(Targetable* target, bool withoutProtections = false) override;
+    ParentChildChooser* clone() const override;
+    bool equals(TargetChooser* tc) override;
+    ~ParentChildChooser() override;
 };
 #endif

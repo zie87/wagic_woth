@@ -1,14 +1,15 @@
-#ifndef _AIMOMIRPLAYER_H_
-#define _AIMOMIRPLAYER_H_
+#ifndef AIMOMIRPLAYER_H
+#define AIMOMIRPLAYER_H
 
 #include "AIPlayerBaka.h"
 
 class AIMomirPlayer : public AIPlayerBaka {
 public:
-    AIMomirPlayer(GameObserver* observer, string file, string fileSmall, string avatarFile, MTGDeck* deck = NULL);
-    int getEfficiency(OrderedAIAction* action);
+    AIMomirPlayer(GameObserver* observer, const string& file, const string& fileSmall, string avatarFile,
+                  MTGDeck* deck = nullptr);
+    int getEfficiency(OrderedAIAction* action) override;
     int momir();
-    int computeActions();
+    int computeActions() override;
     MTGAbility* momirAbility;
     MTGAbility* getMomirAbility();
 };

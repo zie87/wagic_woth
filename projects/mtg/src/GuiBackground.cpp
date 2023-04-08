@@ -14,7 +14,7 @@ GuiBackground::~GuiBackground() {}
 void GuiBackground::Render() {
     JRenderer* renderer = JRenderer::GetInstance();
     JQuadPtr quad;
-    if (observer && observer->mRules && observer->mRules->bg.size()) {
+    if (observer && observer->mRules && !observer->mRules->bg.empty()) {
         quad = WResourceManager::Instance()->RetrieveTempQuad(observer->mRules->bg);
     }
     if (!quad.get()) {

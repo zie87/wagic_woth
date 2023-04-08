@@ -13,16 +13,21 @@
 #include "WFont.h"
 #include "WResourceManager.h"
 
-SimpleButton::SimpleButton(int id) : JGuiObject(id) { mIsValidSelection = false; }
+SimpleButton::SimpleButton(int id) : JGuiObject(id), mIsValidSelection(false) {}
 
-SimpleButton::SimpleButton(JGuiController* _parent, int id, int fontId, string text, float x, float y, bool hasFocus,
-                           bool autoTranslate)
-    : JGuiObject(id), mX(x), mY(y), parent(_parent), mFontId(fontId) {
-    mYOffset = 0;
-    if (autoTranslate)
+SimpleButton::SimpleButton(JGuiController* _parent, int id, int fontId, const string& text, float x, float y,
+                           bool hasFocus, bool autoTranslate)
+    : JGuiObject(id)
+    , mX(x)
+    , mY(y)
+    , mYOffset(0)
+    , parent(_parent)
+    , mFontId(fontId) {
+    if (autoTranslate) {
         mText = _(text);
-    else
+    } else {
         mText = text;
+    }
 
     mHasFocus = hasFocus;
 
@@ -58,10 +63,14 @@ void SimpleButton::Render() { RenderWithOffset(0); }
 void SimpleButton::Update(float dt) {
     if (mScale < mTargetScale) {
         mScale += 8.0f * dt;
-        if (mScale > mTargetScale) mScale = mTargetScale;
+        if (mScale > mTargetScale) {
+            mScale = mTargetScale;
+        }
     } else if (mScale > mTargetScale) {
         mScale -= 8.0f * dt;
-        if (mScale < mTargetScale) mScale = mTargetScale;
+        if (mScale < mTargetScale) {
+            mScale = mTargetScale;
+        }
     }
 }
 
@@ -109,15 +118,17 @@ void SimpleButton::setFocus(bool value) {
     mHasFocus = value;
 
     if (mHasFocus) {
-        if (mText.size() < 20)
+        if (mText.size() < 20) {
             mTargetScale = (SCALE_SELECTED_LARGE);
-        else
+        } else {
             mTargetScale = (SCALE_SELECTED);
+        }
     } else {
-        if (mText.size() < 20)
+        if (mText.size() < 20) {
             mTargetScale = (SCALE_LARGE_NORMAL);
-        else
+        } else {
             mTargetScale = (SCALE_NORMAL);
+        }
     }
 }
 
@@ -128,20 +139,22 @@ string SimpleButton::getText() const { return mText; }
 void SimpleButton::setText(const string& text) { mText = text; }
 
 float SimpleButton::GetWidth() {
-    WFont* mFont = WResourceManager::Instance()->GetWFont(mFontId);
-    float backup = mFont->GetScale();
+    WFont* mFont       = WResourceManager::Instance()->GetWFont(mFontId);
+    const float backup = mFont->GetScale();
     mFont->SetScale(1.0);
-    float result = mFont->GetStringWidth(mText.c_str());
+    const float result = mFont->GetStringWidth(mText.c_str());
     mFont->SetScale(backup);
     return result;
 }
 
 float SimpleButton::GetEnlargedWidth() {
-    WFont* mFont = WResourceManager::Instance()->GetWFont(mFontId);
-    float backup = mFont->GetScale();
+    WFont* mFont       = WResourceManager::Instance()->GetWFont(mFontId);
+    const float backup = mFont->GetScale();
     mFont->SetScale(SCALE_SELECTED);
-    if (mText.size() < 20) mFont->SetScale(SCALE_SELECTED_LARGE);
-    float result = mFont->GetStringWidth(mText.c_str());
+    if (mText.size() < 20) {
+        mFont->SetScale(SCALE_SELECTED_LARGE);
+    }
+    const float result = mFont->GetStringWidth(mText.c_str());
     mFont->SetScale(backup);
     return result;
 }
