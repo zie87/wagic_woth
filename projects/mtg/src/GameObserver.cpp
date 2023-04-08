@@ -167,7 +167,7 @@ void GameObserver::nextGamePhase() {
 
     // if (currentPlayer != cPhase->player)
     //	nextPlayer();//depreciated; we call this at EOT step now. unsure what the purpose of this was originally.fix for
-    //a bug?
+    // a bug?
 
     // init begin of turn
     if (currentGamePhase == MTG_PHASE_BEFORE_BEGIN) {
@@ -1188,7 +1188,7 @@ ostream& operator<<(ostream& out, const GameObserver& g) {
         return out;
     } else {
         out << "rvalues:";
-        out << g.randomGenerator.saveUsedRandValues(out);
+        g.randomGenerator.saveUsedRandValues(out);
         out << endl;
         out << g.startupGameSerialized;
     }

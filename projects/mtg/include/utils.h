@@ -29,6 +29,18 @@
 
 #include "DebugRoutines.h"
 
+namespace wth {
+
+inline void replace_all(std::string& subject, const std::string& search, const std::string& replace) {
+    size_t pos = 0;
+    while ((pos = subject.find(search, pos)) != std::string::npos) {
+        subject.replace(pos, search.length(), replace);
+        pos += replace.length();
+    }
+}
+
+}  // namespace wth
+
 using std::string;
 
 // string manipulation methods
