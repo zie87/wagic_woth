@@ -90,15 +90,15 @@ bool MenuItem::ButtonPressed() { return true; }
 
 MenuItem::~MenuItem() { SAFE_DELETE(mParticleSys); }
 
-ostream& MenuItem::toString(ostream& out) const {
+std::ostream& MenuItem::toString(std::ostream& out) const {
     return out << "MenuItem ::: mHasFocus : " << mHasFocus << " ; mFont : " << mFont << " ; mText : " << mText
                << " ; mX,mY : " << mX << "," << mY << " ; updatedSinceLastRender : " << updatedSinceLastRender
                << " ; lastDt : " << lastDt << " ; mScale : " << mScale << " ; mTargetScale : " << mTargetScale
                << " ; onQuad : " << onQuad << " ; offQuad : " << offQuad << " ; mParticleSys : " << mParticleSys;
 }
 
-OtherMenuItem::OtherMenuItem(int id, WFont* font, string text, float x, float y, JQuad* _off, JQuad* _on, JButton _key,
-                             bool hasFocus)
+OtherMenuItem::OtherMenuItem(int id, WFont* font, std::string text, float x, float y, JQuad* _off, JQuad* _on,
+                             JButton _key, bool hasFocus)
     : MenuItem(id, font, text, x, y, _off, _on, "", WResourceManager::Instance()->GetQuad("particles").get(), hasFocus),
       mKey(_key),
       mTimeIndex(0) {}

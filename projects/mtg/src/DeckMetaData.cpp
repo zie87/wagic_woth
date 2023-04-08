@@ -23,7 +23,7 @@ DeckMetaData::DeckMetaData(const string& filename, bool isAI)
     // there's a catch 22, as we sort the deck list alphabetically, so we need to open the deck file
     // to get its name.  This means that for the opponent list, we crack open 106 files just to read the deck name
     //, which is the bulk of the remaining 4 second delay we see the first time we try to pick an opponent on the first
-    //match
+    // match
     LoadDeck();
 }
 
@@ -34,7 +34,7 @@ void DeckMetaData::LoadDeck() {
         mDescription = trim(deck.meta_desc);
         mDeckId      = atoi((mFilename.substr(mFilename.find("deck") + 4, mFilename.find(".txt"))).c_str());
 
-        vector<string> requirements = split(deck.meta_unlockRequirements, ',');
+        std::vector<std::string> requirements = split(deck.meta_unlockRequirements, ',');
         for (size_t i = 0; i < requirements.size(); ++i) {
             mUnlockRequirements.push_back(Options::getID(requirements[i]));
         }
@@ -43,7 +43,7 @@ void DeckMetaData::LoadDeck() {
         if (!mIsAI)
             mAvatarFilename = "avatar.jpg";
         else {
-            ostringstream avatarFilename;
+            std::ostringstream avatarFilename;
             avatarFilename << "avatar" << getAvatarId() << ".jpg";
             mAvatarFilename = avatarFilename.str();
         }
@@ -100,11 +100,11 @@ string DeckMetaData::getName() { return mName; }
 
 int DeckMetaData::getDeckId() { return mDeckId; }
 
-vector<int> DeckMetaData::getUnlockRequirements() { return mUnlockRequirements; }
+std::vector<int> DeckMetaData::getUnlockRequirements() { return mUnlockRequirements; }
 
-string DeckMetaData::getAvatarFilename() { return mAvatarFilename; }
+std::string DeckMetaData::getAvatarFilename() { return mAvatarFilename; }
 
-string DeckMetaData::getColorIndex() { return mColorIndex; }
+std::string DeckMetaData::getColorIndex() { return mColorIndex; }
 
 int DeckMetaData::getGamesPlayed() { return mGamesPlayed; }
 
@@ -114,8 +114,8 @@ int DeckMetaData::getVictoryPercentage() { return mPercentVictories; }
 
 int DeckMetaData::getDifficulty() { return mDifficulty; }
 
-string DeckMetaData::getDifficultyString() {
-    string difficultyString = "Normal";
+std::string DeckMetaData::getDifficultyString() {
+    std::string difficultyString = "Normal";
     switch (mDifficulty) {
     case HARD:
         difficultyString = "Hard";
@@ -128,21 +128,21 @@ string DeckMetaData::getDifficultyString() {
     return difficultyString;
 }
 
-string DeckMetaData::getDescription() { return mDescription; }
+std::string DeckMetaData::getDescription() { return mDescription; }
 
-string DeckMetaData::getStatsSummary() {
+std::string DeckMetaData::getStatsSummary() {
     LoadStats();
 
-    ostringstream statsSummary;
-    statsSummary << _("Difficulty: ") << _(getDifficultyString()) << endl
-                 << _("Victory %: ") << getVictoryPercentage() << endl
-                 << _("Games Played: ") << getGamesPlayed() << endl;
+    std::ostringstream statsSummary;
+    statsSummary << _("Difficulty: ") << _(getDifficultyString()) << std::endl
+                 << _("Victory %: ") << getVictoryPercentage() << std::endl
+                 << _("Games Played: ") << getGamesPlayed() << std::endl;
 
     return statsSummary.str();
 }
 
-void DeckMetaData::setColorIndex(const string& colorIndex) { mColorIndex = colorIndex; }
+void DeckMetaData::setColorIndex(const std::string& colorIndex) { mColorIndex = colorIndex; }
 
-void DeckMetaData::setDeckName(const string& newDeckTitle) { mName = newDeckTitle; }
+void DeckMetaData::setDeckName(const std::string& newDeckTitle) { mName = newDeckTitle; }
 
 void DeckMetaData::Invalidate() { mStatsLoaded = false; }

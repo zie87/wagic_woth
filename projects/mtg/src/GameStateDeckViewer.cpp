@@ -7,6 +7,7 @@
 
 #include <math.h>
 #include <iomanip>
+#include <vector>
 
 #include "GameStateDuel.h"
 #include "GameStateDeckViewer.h"
@@ -24,10 +25,10 @@
 
 //!! helper function; this is probably handled somewhere in the code already.
 // If not, should be placed in general library
-void StringExplode(string str, string separator, vector<string>* results) {
+void StringExplode(std::string str, std::string separator, std::vector<std::string>* results) {
     size_t found;
     found = str.find_first_of(separator);
-    while (found != string::npos) {
+    while (found != std::string::npos) {
         if (found > 0) results->push_back(str.substr(0, found));
         str   = str.substr(found + 1);
         found = str.find_first_of(separator);
@@ -176,8 +177,8 @@ void GameStateDeckViewer::updateDecks() {
 }
 
 void GameStateDeckViewer::buildEditorMenu() {
-    ostringstream deckSummaryInformation;
-    deckSummaryInformation << "All changes are final." << endl;
+    std::ostringstream deckSummaryInformation;
+    deckSummaryInformation << "All changes are final." << std::endl;
 
     if (menu) SAFE_DELETE(menu);
     // Build menu.
@@ -299,14 +300,14 @@ void GameStateDeckViewer::saveAsAIDeck(string deckName) {
 
     std::ostringstream oss;
     oss << "deck" << deckId;
-    string aiDeckName = oss.str();
+    std::string aiDeckName = oss.str();
     oss.str("");
     if (myDeck->parent->meta_desc == "")
-        oss << endl << "Can you beat your own creations?" << endl << "User created AI Deck # " << deckId;
+        oss << std::endl << "Can you beat your own creations?" << std::endl << "User created AI Deck # " << deckId;
     else
         oss << myDeck->parent->meta_desc;
-    string deckDesc = oss.str();
-    string filepath = "ai/baka/";
+    std::string deckDesc = oss.str();
+    std::string filepath = "ai/baka/";
     filepath.append(aiDeckName).append(".txt");
     DebugTrace("saving AI deck " << filepath);
     myDeck->save(filepath, true, deckName, deckDesc);
@@ -1277,7 +1278,7 @@ void GameStateDeckViewer::renderCard(int id, float rotation) {
 
     float y = (SCREEN_HEIGHT_F) / 2.0f + SCREEN_HEIGHT_F * mSlide * (scale + 0.2f);
 
-    cardsCoordinates[id] = pair<float, float>(x, y);
+    cardsCoordinates[id] = std::pair<float, float>(x, y);
 
     int alpha = (int)(255 * (scale + 1.0 - max_scale));
 
@@ -1473,9 +1474,9 @@ int GameStateDeckViewer::loadDeck(int deckid) {
 void GameStateDeckViewer::ButtonPressed(int controllerId, int controlId) {
     int deckIdNumber = controlId;
     int deckListSize = 0;
-    string defaultAiName;
+    std::string defaultAiName;
     DeckManager* deckManager = DeckManager::GetInstance();
-    vector<DeckMetaData*>* deckList;
+    std::vector<DeckMetaData*>* deckList;
     switch (controllerId) {
     case MENU_DECK_SELECTION:  // Deck menu
         if (controlId == MENU_ITEM_CANCEL) {

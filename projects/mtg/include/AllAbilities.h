@@ -29,10 +29,10 @@ using std::map;
 class MTGEventText : public MTGAbility {
 public:
     int textAlpha;
-    string text;
+    std::string text;
     void Update(float dt);
     void Render();
-    MTGEventText(GameObserver* observer, int _id, MTGCardInstance* card, string text);
+    MTGEventText(GameObserver* observer, int _id, MTGCardInstance* card, std::string text);
     virtual MTGEventText* clone() const;
 };
 
@@ -48,7 +48,7 @@ public:
     }
 
 private:
-    void init(string s, Spell* spell, MTGCardInstance* card) {
+    void init(std::string s, Spell* spell, MTGCardInstance* card) {
         if (!s.size()) return;
         if (!card) return;
         MTGCardInstance* target = card->target;
@@ -61,8 +61,8 @@ private:
         if (s[0] == '-') {
             s          = s.substr(1);
             multiplier = -1;
-            if (s.find("stored") != string::npos) {
-                string altered = "-";
+            if (s.find("stored") != std::string::npos) {
+                std::string altered = "-";
                 altered.append(s.substr(+6));
                 return init(altered, spell, card->storedCard);
             }
@@ -71,17 +71,17 @@ private:
             // ignore "+" signs....
             s = s.substr(1);
         }
-        if (s.find("stored") != string::npos) {
+        if (s.find("stored") != std::string::npos) {
             return init(s.substr(+6), spell, card->storedCard);
         }
         // rounding values, the words can be written anywhere in the line,
         // they are erased after parsing.
-        if (s.find("halfup") != string::npos) {
+        if (s.find("halfup") != std::string::npos) {
             halfup    = true;
             size_t hU = s.find("halfup");
             s.erase(hU, hU + 6);
         }
-        if (s.find("halfdown") != string::npos) {
+        if (s.find("halfdown") != std::string::npos) {
             halfdown  = true;
             size_t hD = s.find("halfdown");
             s.erase(hD, hD + 8);
@@ -932,15 +932,15 @@ public:
     int who;
     string with;
     string types;
-    list<int> awith;
-    list<int> colors;
-    list<int> typesToAdd;
+    std::list<int> awith;
+    std::list<int> colors;
+    std::list<int> typesToAdd;
 
     AACloner(GameObserver* observer, int _id, MTGCardInstance* _source, MTGCardInstance* _target = NULL,
              ManaCost* _cost = NULL, int who = 0, string abilitiesStringList = "", string typeslist = "");
     int resolve();
     const char* getMenuText();
-    virtual ostream& toString(ostream& out) const;
+    virtual std::ostream& toString(std::ostream& out) const;
     AACloner* clone() const;
     ~AACloner();
 };
@@ -1111,11 +1111,11 @@ class ACastRestriction : public AbilityTP {
 public:
     TargetChooser* restrictionsScope;  // a minimalist TargetChooser object describing the cards impacted by the
                                        // restriction (for example: lands)
-    WParsedInt* value;                           //"maxPerTurn" value
+    WParsedInt* value;                 //"maxPerTurn" value
     MaxPerTurnRestriction* existingRestriction;  // a pointer to the restriction that is being modified or that has been
                                                  // created (for restriction deletion purpose)
-    bool modifyExisting;  // if set to true, means we want to modify an existing restriction, otherwise we create a new
-                          // one
+    bool modifyExisting;   // if set to true, means we want to modify an existing restriction, otherwise we create a new
+                           // one
     int zoneId;            // identifier of the zone id impacted by the restriction
     Player* targetPlayer;  // Reference to the player impacted by the restriction (for restriction deletion purpose)
 
@@ -1200,7 +1200,7 @@ public:
 
     const char* getMenuText() { return Constants::MTGBasicAbilities[ability]; }
 
-    virtual ostream& toString(ostream& out) const {
+    virtual std::ostream& toString(std::ostream& out) const {
         out << "ABasicAbilityModifier ::: modifier : " << modifier << " ; ability : " << ability
             << " ; value_before_modification : " << value_before_modification << " (";
         return MTGAbility::toString(out) << ")";
@@ -1239,7 +1239,7 @@ public:
         return 1;
     }
 
-    virtual ostream& toString(ostream& out) const {
+    virtual std::ostream& toString(std::ostream& out) const {
         out << "ABasicAbilityModifierUntilEOT ::: stateBeforeActivation : " << stateBeforeActivation
             << " ability : " << ability << " (";
         return InstantAbility::toString(out) << ")";
@@ -1336,7 +1336,7 @@ public:
         return 1;
     }
 
-    virtual ostream& toString(ostream& out) const {
+    virtual std::ostream& toString(std::ostream& out) const {
         out << "ASpellCastLife ::: trigger : ? "  // << trigger
             << " ; cost : " << cost << " ; life : " << life << " ; lastUsedOn : " << lastUsedOn
             << " ; lastChecked : " << lastChecked << " (";
@@ -1371,7 +1371,7 @@ public:
         return 1;
     }
 
-    virtual ostream& toString(ostream& out) const {
+    virtual std::ostream& toString(std::ostream& out) const {
         out << "AUnBlocker ::: cost : " << cost << " (";
         return MTGAbility::toString(out) << ")";
     }
@@ -1638,7 +1638,7 @@ public:
 
     ~ACircleOfProtection() { clear(); }
 
-    virtual ostream& toString(ostream& out) const {
+    virtual std::ostream& toString(std::ostream& out) const {
         out << "ACircleOfProtection ::: (";
         return TargetAbility::toString(out) << ")";
     }
@@ -1663,7 +1663,7 @@ public:
 
     const char* getMenuText() { return "Regenerate"; }
 
-    virtual ostream& toString(ostream& out) const {
+    virtual std::ostream& toString(std::ostream& out) const {
         out << "AStandardRegenerate ::: (";
         return ActivatedAbility::toString(out) << ")";
     }
@@ -1695,7 +1695,7 @@ public:
             }
         }
     }
-    virtual ostream& toString(ostream& out) const {
+    virtual std::ostream& toString(std::ostream& out) const {
         out << "ARegularLifeModifierAura ::: life : " << life << " ; phase : " << phase
             << " ; onlyIfTargetTapped : " << onlyIfTargetTapped << " (";
         return MTGAbility::toString(out) << ")";
@@ -2115,9 +2115,9 @@ public:
 
 class ATokenCreator : public ActivatedAbility {
 public:
-    list<int> abilities;
-    list<int> types;
-    list<int> colors;
+    std::list<int> abilities;
+    std::list<int> types;
+    std::list<int> colors;
     int power, toughness;
     int tokenId;
     string name;
@@ -2230,7 +2230,7 @@ public:
                 myToken = NEW MTGCardInstance(card, tokenReciever->game);
             } else {
                 myToken = NEW Token(name, source, power, toughness);
-                list<int>::iterator it;
+                std::list<int>::iterator it;
                 for (it = types.begin(); it != types.end(); it++) {
                     myToken->addType(*it);
                 }
@@ -2316,7 +2316,7 @@ public:
         return menuText;
     }
 
-    virtual ostream& toString(ostream& out) const {
+    virtual std::ostream& toString(std::ostream& out) const {
         out << "ATokenCreator ::: abilities : ?"  // << abilities
             << " ; types : ?"                     // << types
             << " ; colors : ?"                    // << colors
@@ -2932,7 +2932,7 @@ public:
             }
         }
     }
-    virtual ostream& toString(ostream& out) const {
+    virtual std::ostream& toString(std::ostream& out) const {
         out << "ALifeZoneLink ::: phase : " << phase << " ; condition : " << condition << " ; life : " << life
             << " ; controller : " << controller << " ; nbcards : " << nbcards << " (";
         return MTGAbility::toString(out) << ")";
@@ -2963,7 +2963,7 @@ public:
             player->game->putInGraveyard(source);
         }
     }
-    virtual ostream& toString(ostream& out) const {
+    virtual std::ostream& toString(std::ostream& out) const {
         out << "AStrongLandLinkCreature ::: land : " << land << " (";
         return MTGAbility::toString(out) << ")";
     }
@@ -2991,7 +2991,7 @@ public:
         return 1;
     }
 
-    virtual ostream& toString(ostream& out) const {
+    virtual std::ostream& toString(std::ostream& out) const {
         out << "AControlStealAura ::: originalController : " << originalController << " (";
         return MTGAbility::toString(out) << ")";
     }
@@ -3039,11 +3039,11 @@ public:
 //------------------------------------
 class ATransformer : public MTGAbility {
 public:
-    list<int> abilities;
-    list<int> types;
-    list<int> colors;
-    list<int> oldcolors;
-    list<int> oldtypes;
+    std::list<int> abilities;
+    std::list<int> types;
+    std::list<int> colors;
+    std::list<int> oldcolors;
+    std::list<int> oldtypes;
     vector<int> dontremove;
     bool addNewColors;
     bool remove;
@@ -3281,7 +3281,7 @@ public:
     int isReactingToClick(MTGCardInstance* card, ManaCost* mana = NULL);
     int resolve();
     const char* getMenuText();
-    virtual ostream& toString(ostream& out) const;
+    virtual std::ostream& toString(std::ostream& out) const;
     AUpkeep* clone() const;
     ~AUpkeep();
 };
@@ -3422,7 +3422,7 @@ public:
 
     int resolve() { return 1; };
 
-    virtual ostream& toString(ostream& out) const {
+    virtual std::ostream& toString(std::ostream& out) const {
         out << "AAladdinsLamp ::: cd : " << cd << " ; nbcards  : " << nbcards << " ; init : " << init << " (";
         return TargetAbility::toString(out) << ")";
     }
@@ -3469,7 +3469,7 @@ public:
         return 1;
     }
 
-    virtual ostream& toString(ostream& out) const {
+    virtual std::ostream& toString(std::ostream& out) const {
         out << "AArmageddonClock ::: counters : " << counters << " ; cost : " << cost << " (";
         return MTGAbility::toString(out) << ")";
     }
@@ -3541,7 +3541,7 @@ public:
         return 1;
     }
 
-    virtual ostream& toString(ostream& out) const {
+    virtual std::ostream& toString(std::ostream& out) const {
         out << "AConservator ::: canprevent : " << canprevent << " ; cost : " << cost << " (";
         return MTGAbility::toString(out) << ")";
     }
@@ -3582,7 +3582,7 @@ public:
         return 1;
     }
 
-    virtual ostream& toString(ostream& out) const {
+    virtual std::ostream& toString(std::ostream& out) const {
         out << "AFarmstead ::: usedThisTurn : " << usedThisTurn << " (";
         return ActivatedAbility::toString(out) << ")";
     }
@@ -3626,7 +3626,7 @@ public:
         }
     }
 
-    virtual ostream& toString(ostream& out) const {
+    virtual std::ostream& toString(std::ostream& out) const {
         out << "AKjeldoranFrostbeast ::: opponents : " << opponents << " ; nbOpponents : " << nbOpponents << " (";
         return MTGAbility::toString(out) << ")";
     }
@@ -3660,7 +3660,7 @@ public:
         return 1;
     }
 
-    virtual ostream& toString(ostream& out) const {
+    virtual std::ostream& toString(std::ostream& out) const {
         out << "AAnimateDead ::: (";
         return MTGAbility::toString(out) << ")";
     }
@@ -3745,7 +3745,7 @@ public:
         return 1;
     }
 
-    virtual ostream& toString(ostream& out) const { return TriggeredAbility::toString(out) << ")"; }
+    virtual std::ostream& toString(std::ostream& out) const { return TriggeredAbility::toString(out) << ")"; }
     AFastbond* clone() const { return NEW AFastbond(*this); }
 
     ~AFastbond() { delete counter; }
@@ -3770,7 +3770,7 @@ public:
         return 1;
     }
 
-    virtual ostream& toString(ostream& out) const {
+    virtual std::ostream& toString(std::ostream& out) const {
         out << "AJandorsRing ::: (";
         return ActivatedAbility::toString(out) << ")";
     }
@@ -3883,7 +3883,7 @@ public:
         return 1;
     }
 
-    virtual ostream& toString(ostream& out) const {
+    virtual std::ostream& toString(std::ostream& out) const {
         out << "APowerLeak ::: damagesToDealThisTurn : " << damagesToDealThisTurn << " ; cost : " << cost << " (";
         return TriggeredAbility::toString(out) << ")";
     }
@@ -3908,7 +3908,7 @@ public:
         return 1;
     }
 
-    virtual ostream& toString(ostream& out) const {
+    virtual std::ostream& toString(std::ostream& out) const {
         out << "ASacrifice ::: (";
         return InstantAbility::toString(out) << ")";
     }
@@ -3926,7 +3926,7 @@ public:
         }
     }
 
-    virtual ostream& toString(ostream& out) const {
+    virtual std::ostream& toString(std::ostream& out) const {
         out << "AEarthbind ::: (";
         return ABasicAbilityModifier::toString(out) << ")";
     }
@@ -3949,7 +3949,7 @@ public:
         }
     }
 
-    virtual ostream& toString(ostream& out) const {
+    virtual std::ostream& toString(std::ostream& out) const {
         out << "AFireball ::: (";
         return InstantAbility::toString(out) << ")";
     }
@@ -4001,7 +4001,7 @@ public:
         return 1;
     }
 
-    virtual ostream& toString(ostream& out) const {
+    virtual std::ostream& toString(std::ostream& out) const {
         out << "AIslandSanctuary ::: initThisTurn : " << initThisTurn << " (";
         return MTGAbility::toString(out) << ")";
     }
@@ -4163,7 +4163,7 @@ public:
         }
     }
 
-    virtual ostream& toString(ostream& out) const {
+    virtual std::ostream& toString(std::ostream& out) const {
         out << "ABasilik ::: opponents : " << opponents << " ; nbOpponents : " << nbOpponents << " (";
         return MTGAbility::toString(out) << ")";
     }
@@ -4295,7 +4295,7 @@ public:
         return 1;
     }
 
-    virtual ostream& toString(ostream& out) const {
+    virtual std::ostream& toString(std::ostream& out) const {
         out << "AFlankerAbility ::: opponents : " << opponents << " ; nbOpponents : " << nbOpponents << " (";
         return MTGAbility::toString(out) << ")";
     }
@@ -4392,7 +4392,7 @@ public:
         return 1;
     }
 
-    virtual ostream& toString(ostream& out) const {
+    virtual std::ostream& toString(std::ostream& out) const {
         out << "AInstantControlSteal ::: TrueController : " << TrueController
             << " ; TheftController : " << TheftController << " (";
         return InstantAbility::toString(out) << ")";
@@ -4471,8 +4471,8 @@ public:
 };
 // utility functions
 
-void PopulateColorIndexVector(list<int>& colors, const string& colorsString, char delimiter = ',');
-void PopulateAbilityIndexVector(list<int>& abilities, const string& abilitiesString, char delimiter = ',');
-void PopulateSubtypesIndexVector(list<int>& types, const string& subtypesString, char delimiter = ' ');
+void PopulateColorIndexVector(std::list<int>& colors, const string& colorsString, char delimiter = ',');
+void PopulateAbilityIndexVector(std::list<int>& abilities, const string& abilitiesString, char delimiter = ',');
+void PopulateSubtypesIndexVector(std::list<int>& types, const string& subtypesString, char delimiter = ' ');
 
 #endif

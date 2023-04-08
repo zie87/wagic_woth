@@ -33,7 +33,7 @@
 #include <sstream>
 #include "../include/JSocket.h"
 
-map<string, processCmd> JNetwork::sCommandMap;
+std::map<std::string, processCmd> JNetwork::sCommandMap;
 
 bool JNetwork::isConnected() {
     if (connected_to_ap != 1) return false;
@@ -57,8 +57,8 @@ JNetwork::~JNetwork() {
     if (socket) delete socket;
 }
 
-bool JNetwork::sendCommand(string xString) {
-    string aString = xString;
+bool JNetwork::sendCommand(std::string xString) {
+    std::string aString = xString;
     jge::mutex::scoped_lock l(sendMutex);
     if (!socket) {
         DebugTrace("sendCommand failed: no sockeet");
@@ -76,7 +76,7 @@ bool JNetwork::sendCommand(string xString) {
     return true;
 }
 
-void JNetwork::registerCommand(string command, processCmd processCommand, processCmd processResponse) {
+void JNetwork::registerCommand(std::string command, processCmd processCommand, processCmd processResponse) {
     sCommandMap[command + "Command"]  = processCommand;
     sCommandMap[command + "Response"] = processResponse;
 }
@@ -106,8 +106,8 @@ void JNetwork::ThreadProc(void* param) {
             }
             // Checking for some command to execute
             size_t found = pThis->received.str().find("Command");
-            if (found != string::npos) {
-                map<string, processCmd>::iterator ite =
+            if (found != std::string::npos) {
+                std::map<std::string, processCmd>::iterator ite =
                     sCommandMap.find((pThis->received.str()).substr(0, found) + "Command");
                 if (ite != sCommandMap.end()) {
                     DebugTrace("begin of command received : " << pThis->received.str());
@@ -125,15 +125,15 @@ void JNetwork::ThreadProc(void* param) {
             }
             // Checking for some response to execute
             found = pThis->received.str().find("Response");
-            if (found != string::npos) {
-                map<string, processCmd>::iterator ite =
+            if (found != std::string::npos) {
+                std::map<std::string, processCmd>::iterator ite =
                     sCommandMap.find((pThis->received.str()).substr(0, found) + "Response");
                 if (ite != sCommandMap.end()) {
                     DebugTrace("begin of response received : " << pThis->received.str());
                     DebugTrace("begin of response toSend : " << pThis->toSend.str());
 
                     jge::mutex::scoped_lock l(pThis->sendMutex);
-                    string aString;
+                    std::string aString;
                     pThis->received >> aString;
                     processCmd theMethod = (ite)->second;
                     theMethod(pThis->received, pThis->toSend);
@@ -157,7 +157,7 @@ void JNetwork::ThreadProc(void* param) {
 }
 
 #if defined(WIN32) || defined(LINUX)
-int JNetwork::connect(string ip) {
+int JNetwork::connect(std::string ip) {
     if (mpWorkerThread) return 0;
     serverIP       = ip;
     mpWorkerThread = new jge::thread(JNetwork::ThreadProc, this);
@@ -166,7 +166,7 @@ int JNetwork::connect(string ip) {
 
 #else
 
-int JNetwork::connect(string serverIP) {
+int JNetwork::connect(std::string serverIP) {
 #ifdef NETWORK_SUPPORT
     int err;
     char buffer[4096];

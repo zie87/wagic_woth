@@ -34,15 +34,15 @@
 
 #define DEFAULT_DURATION .25
 
-PlayerType GameApp::players[]    = {PLAYER_TYPE_CPU, PLAYER_TYPE_CPU};
-bool GameApp::HasMusic           = true;
-JMusic* GameApp::music           = NULL;
-string GameApp::currentMusicFile = "";
-string GameApp::systemError      = "";
+PlayerType GameApp::players[]         = {PLAYER_TYPE_CPU, PLAYER_TYPE_CPU};
+bool GameApp::HasMusic                = true;
+JMusic* GameApp::music                = NULL;
+std::string GameApp::currentMusicFile = "";
+std::string GameApp::systemError      = "";
 
-vector<JQuadPtr> manaIcons;
+std::vector<JQuadPtr> manaIcons;
 
-GameState::GameState(GameApp* parent, string id) : mParent(parent), mStringID(id) { mEngine = JGE::GetInstance(); }
+GameState::GameState(GameApp* parent, std::string id) : mParent(parent), mStringID(id) { mEngine = JGE::GetInstance(); }
 
 GameApp::GameApp()
     : JApp()
@@ -88,19 +88,19 @@ void GameApp::Create() {
     //_CrtSetBreakAlloc(368);
     LOG("starting Game");
 
-    string systemFolder = "Res/";
-    string foldersRoot  = "";
+    std::string systemFolder = "Res/";
+    std::string foldersRoot  = "";
 
     // Find the Res folder
-    ifstream mfile("Res.txt");
-    string resPath;
+    std::ifstream mfile("Res.txt");
+    std::string resPath;
     if (mfile) {
         bool found = false;
         while (!found && std::getline(mfile, resPath)) {
             if (resPath[resPath.size() - 1] == '\r') resPath.erase(resPath.size() - 1);  // Handle DOS files
-            string testfile = resPath + systemFolder;
+            std::string testfile = resPath + systemFolder;
             testfile.append("graphics/simon.dat");
-            ifstream tempfile(testfile.c_str());
+            std::ifstream tempfile(testfile.c_str());
             if (tempfile) {
                 found = true;
                 tempfile.close();

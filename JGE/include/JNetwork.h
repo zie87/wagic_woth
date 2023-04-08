@@ -7,13 +7,13 @@
 #include "JGE.h"
 #include <string>
 #include <map>
-using namespace std;
-class JSocket;
+
 #include <iostream>
 #include <sstream>
 #include "Threading.h"
 
-typedef void (*processCmd)(istream&, ostream&);
+class JSocket;
+typedef void (*processCmd)(std::istream&, std::ostream&);
 
 class JNetwork {
 private:
@@ -21,23 +21,23 @@ private:
     JSocket* socket;
     jge::mutex sendMutex;
     jge::mutex receiveMutex;
-    stringstream received;
-    stringstream toSend;
-    static map<string, processCmd> sCommandMap;
+    std::stringstream received;
+    std::stringstream toSend;
+    static std::map<std::string, processCmd> sCommandMap;
 
 public:
     JNetwork();
     ~JNetwork();
-    string serverIP;
+    std::string serverIP;
 
-    int connect(string serverIP = "");
+    int connect(std::string serverIP = "");
     bool isConnected();
     static void ThreadProc(void* param);
 #if !defined(WIN32) && !defined(LINUX)
     static int connect_to_apctl(int config);
 #endif
-    bool sendCommand(string command);
-    static void registerCommand(string command, processCmd processCommand, processCmd processResponse);
+    bool sendCommand(std::string command);
+    static void registerCommand(std::string command, processCmd processCommand, processCmd processResponse);
 
 private:
     jge::thread* mpWorkerThread;

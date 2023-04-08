@@ -1799,7 +1799,7 @@ int AACloner::resolve() {
         spell->source->toughness = _target->origtoughness;
         spell->source->life      = _target->origtoughness;
     }
-    list<int>::iterator it;
+    std::list<int>::iterator it;
     for (it = awith.begin(); it != awith.end(); it++) {
         spell->source->basicAbilities[*it] = 1;
     }
@@ -1818,7 +1818,7 @@ const char* AACloner::getMenuText() {
     return "Clone";
 }
 
-ostream& AACloner::toString(ostream& out) const {
+std::ostream& AACloner::toString(std::ostream& out) const {
     out << "AACloner ::: with : ?"  // << abilities
         << " (";
     return ActivatedAbility::toString(out) << ")";
@@ -2856,7 +2856,7 @@ int ATransformer::addToGame() {
     }
     for (size_t j = 0; j < _target->types.size(); ++j) oldtypes.push_back(_target->types[j]);
 
-    list<int>::iterator it;
+    std::list<int>::iterator it;
     for (it = colors.begin(); it != colors.end(); it++) {
         if (!addNewColors) _target->setColor(0, 1);
     }
@@ -2967,7 +2967,7 @@ int ATransformer::destroy() {
     MTGCardInstance* _target = (MTGCardInstance*)target;
     if (_target) {
         while (_target->next) _target = _target->next;
-        list<int>::iterator it;
+        std::list<int>::iterator it;
 
         if (!remove) {
             for (it = types.begin(); it != types.end(); it++) {
@@ -3475,7 +3475,7 @@ int AUpkeep::resolve() {
 
 const char* AUpkeep::getMenuText() { return "Upkeep"; }
 
-ostream& AUpkeep::toString(ostream& out) const {
+std::ostream& AUpkeep::toString(std::ostream& out) const {
     out << "AUpkeep ::: paidThisTurn : " << paidThisTurn << " (";
     return ActivatedAbility::toString(out) << ")";
 }
@@ -4086,7 +4086,7 @@ ATutorialMessage::~ATutorialMessage() {
 // utility functions
 
 // Given a delimited string of abilities, add the ones to the list that are "Basic"  MTG abilities
-void PopulateAbilityIndexVector(list<int>& abilities, const string& abilityStringList, char delimiter) {
+void PopulateAbilityIndexVector(std::list<int>& abilities, const string& abilityStringList, char delimiter) {
     vector<string> abilitiesList = split(abilityStringList, delimiter);
     for (vector<string>::iterator iter = abilitiesList.begin(); iter != abilitiesList.end(); ++iter) {
         int abilityIndex = Constants::GetBasicAbilityIndex(*iter);
@@ -4095,7 +4095,7 @@ void PopulateAbilityIndexVector(list<int>& abilities, const string& abilityStrin
     }
 }
 
-void PopulateColorIndexVector(list<int>& colors, const string& colorStringList, char delimiter) {
+void PopulateColorIndexVector(std::list<int>& colors, const string& colorStringList, char delimiter) {
     vector<string> abilitiesList = split(colorStringList, delimiter);
     for (vector<string>::iterator iter = abilitiesList.begin(); iter != abilitiesList.end(); ++iter) {
         for (int colorIndex = Constants::MTG_COLOR_ARTIFACT; colorIndex < Constants::NB_Colors; ++colorIndex) {
@@ -4107,7 +4107,7 @@ void PopulateColorIndexVector(list<int>& colors, const string& colorStringList, 
     }
 }
 
-void PopulateSubtypesIndexVector(list<int>& types, const string& subTypesStringList, char delimiter) {
+void PopulateSubtypesIndexVector(std::list<int>& types, const string& subTypesStringList, char delimiter) {
     vector<string> subTypesList = split(subTypesStringList, delimiter);
     for (vector<string>::iterator it = subTypesList.begin(); it != subTypesList.end(); ++it) {
         string subtype = *it;

@@ -553,9 +553,9 @@ MTGCardInstance* AIPlayerBaka::chooseCard(TargetChooser* tc, MTGCardInstance* so
 }
 
 bool AIPlayerBaka::payTheManaCost(ManaCost* cost, MTGCardInstance* target, vector<MTGAbility*> gotPayments) {
-    DebugTrace("AIPlayerBaka: AI attempting to pay a mana cost." << endl
+    DebugTrace("AIPlayerBaka: AI attempting to pay a mana cost." << std::endl
                                                                  << "-  Target: " << (target ? target->name : "None")
-                                                                 << endl
+                                                                 << std::endl
                                                                  << "-  Cost: " << (cost ? cost->toString() : "NULL"));
 
     if (!cost) {
@@ -591,7 +591,7 @@ bool AIPlayerBaka::payTheManaCost(ManaCost* cost, MTGCardInstance* target, vecto
     if (gotPayments.size()) {
         DebugTrace("AIPlayerBaka: Ai had a payment in mind.");
         ManaCost* paid = NEW ManaCost();
-        vector<AIAction*> clicks;
+        std::vector<AIAction*> clicks;
 
         for (size_t k = 0; k < gotPayments.size(); ++k) {
             if (AManaProducer* amp = dynamic_cast<AManaProducer*>(gotPayments[k])) {
@@ -1438,7 +1438,7 @@ MTGCardInstance* AIPlayerBaka::FindCardToPlay(ManaCost* pMana, const char* type)
                                                 card->getManaCost()->kicker->getConvertedCost()));
                 if (shouldPlayPercentage <= 10) shouldPlayPercentage = shouldPlayPercentage / 3;
             }
-            DebugTrace("Should I play " << (card ? card->name : "Nothing") << "?" << endl
+            DebugTrace("Should I play " << (card ? card->name : "Nothing") << "?" << std::endl
                                         << "shouldPlayPercentage = " << shouldPlayPercentage);
             if (card->getRestrictions().size()) {
                 AbilityFactory af(observer);
@@ -1460,8 +1460,8 @@ MTGCardInstance* AIPlayerBaka::FindCardToPlay(ManaCost* pMana, const char* type)
         if (!pMana->canAfford(nextCardToPlay->getManaCost()) || nextCardToPlay->getManaCost()->kicker)
             gotPayments = canPayMana(nextCardToPlay, nextCardToPlay->getManaCost());
         DebugTrace(" AI wants to play card."
-                   << endl
-                   << "- Next card to play: " << (nextCardToPlay ? nextCardToPlay->name : "None") << endl);
+                   << std::endl
+                   << "- Next card to play: " << (nextCardToPlay ? nextCardToPlay->name : "None") << std::endl);
     }
     return nextCardToPlay;
 }

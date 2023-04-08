@@ -152,7 +152,7 @@ public:
     virtual int resolve() { return 0; }
 
     virtual MTGAbility* clone() const = 0;
-    virtual ostream& toString(ostream& out) const;
+    virtual std::ostream& toString(std::ostream& out) const;
     virtual int addToGame();
     virtual int removeFromGame();
 
@@ -216,7 +216,7 @@ public:
     int receiveEvent(WEvent* e);
     virtual int resolve()                   = 0;
     virtual TriggeredAbility* clone() const = 0;
-    virtual ostream& toString(ostream& out) const;
+    virtual std::ostream& toString(std::ostream& out) const;
     string castRestriction;
 };
 
@@ -268,7 +268,7 @@ public:
     virtual int resolve() = 0;
     void activateSideEffect();
     virtual ActivatedAbility* clone() const = 0;
-    virtual ostream& toString(ostream& out) const;
+    virtual std::ostream& toString(std::ostream& out) const;
 };
 
 class TargetAbility : public ActivatedAbility, public NestedAbility {
@@ -285,7 +285,7 @@ public:
     virtual void Render();
     virtual int resolve();
     virtual const char* getMenuText();
-    virtual ostream& toString(ostream& out) const;
+    virtual std::ostream& toString(std::ostream& out) const;
 };
 
 class InstantAbility : public MTGAbility {
@@ -299,7 +299,7 @@ public:
     virtual int resolve() { return 0; }
 
     virtual InstantAbility* clone() const = 0;
-    virtual ostream& toString(ostream& out) const;
+    virtual std::ostream& toString(std::ostream& out) const;
 };
 
 /* State based effects. This class works ONLY for InPlay and needs to be extended for other areas of the game !!! */
@@ -332,7 +332,7 @@ public:
 
     virtual int destroy();
     virtual ListMaintainerAbility* clone() const = 0;
-    virtual ostream& toString(ostream& out) const;
+    virtual std::ostream& toString(std::ostream& out) const;
 };
 
 class TriggerAtPhase : public TriggeredAbility {
@@ -367,7 +367,7 @@ public:
 class GenericTriggeredAbility : public TriggeredAbility, public NestedAbility {
 public:
     TriggeredAbility* t;
-    queue<Targetable*> targets;
+    std::queue<Targetable*> targets;
     MTGAbility* destroyCondition;
     GenericTriggeredAbility(GameObserver* observer, int id, MTGCardInstance* _source, TriggeredAbility* _t,
                             MTGAbility* a, MTGAbility* dc = NULL, Targetable* _target = NULL);
@@ -388,9 +388,9 @@ public:
 /* Ability Factory */
 class AbilityFactory {
 private:
-    string storedString;
-    string storedAbilityString;
-    string storedAndAbility;
+    std::string storedString;
+    std::string storedAbilityString;
+    std::string storedAndAbility;
     int countCards(TargetChooser* tc, Player* player = NULL, int option = 0);
     TriggeredAbility* parseTrigger(string s, string magicText, int id, Spell* spell, MTGCardInstance* card,
                                    Targetable* target);

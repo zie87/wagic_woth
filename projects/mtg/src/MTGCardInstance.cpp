@@ -12,8 +12,6 @@
 #include "Counters.h"
 #include "Subtypes.h"
 
-using namespace std;
-
 SUPPORT_OBJECT_ANALYTICS(MTGCardInstance)
 
 MTGCardInstance MTGCardInstance::AnyCard = MTGCardInstance();
@@ -635,8 +633,8 @@ int MTGCardInstance::nbOpponents() {
 }
 
 int MTGCardInstance::raiseBlockerRankOrder(MTGCardInstance* blocker) {
-    list<MTGCardInstance*>::iterator it1 = find(blockers.begin(), blockers.end(), blocker);
-    list<MTGCardInstance*>::iterator it2 = it1;
+    std::list<MTGCardInstance*>::iterator it1 = find(blockers.begin(), blockers.end(), blocker);
+    std::list<MTGCardInstance*>::iterator it2 = it1;
     if (blockers.begin() == it2)
         ++it2;
     else
@@ -654,7 +652,7 @@ int MTGCardInstance::raiseBlockerRankOrder(MTGCardInstance* blocker) {
 
 int MTGCardInstance::getDefenserRank(MTGCardInstance* blocker) {
     int result = 0;
-    for (list<MTGCardInstance*>::iterator it1 = blockers.begin(); it1 != blockers.end(); ++it1) {
+    for (std::list<MTGCardInstance*>::iterator it1 = blockers.begin(); it1 != blockers.end(); ++it1) {
         result++;
         if ((*it1) == blocker) return result;
     }

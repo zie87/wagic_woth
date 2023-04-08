@@ -17,7 +17,7 @@ public:
     void Update(float dt);
     virtual void Render();
     virtual int receiveEventMinus(WEvent* e);
-    virtual ostream& toString(ostream& out) const;
+    virtual std::ostream& toString(std::ostream& out) const;
     virtual void Entering();
     virtual bool Leaving(JButton key);
 };

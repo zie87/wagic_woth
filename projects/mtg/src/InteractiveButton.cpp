@@ -91,7 +91,7 @@ void InteractiveButton::setImage(const JQuadPtr imagePtr) {
 
 /* Accessors */
 
-ostream& InteractiveButton::toString(ostream& out) const {
+std::ostream& InteractiveButton::toString(std::ostream& out) const {
     return out << "InteractiveButton ::: mHasFocus : " << hasFocus() << " ; parent : " << getParent()
                << " ; mText : " << getText() << " ; mScale : " << getScale() << " ; mTargetScale : " << getTargetScale()
                << " ; mX,mY : " << getX() << "," << getY();

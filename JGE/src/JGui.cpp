@@ -29,7 +29,7 @@ int JGuiObject::GetId() { return mId; }
 
 void JGuiObject::Update(float dt __attribute__((unused))) {}
 
-ostream& operator<<(ostream& out, const JGuiObject& j) { return j.toString(out); }
+std::ostream& operator<<(std::ostream& out, const JGuiObject& j) { return j.toString(out); }
 
 JGuiController::JGuiController(JGE* jge, int id, JGuiListener* listener) : mEngine(jge), mId(id), mListener(listener) {
     mBg        = NULL;

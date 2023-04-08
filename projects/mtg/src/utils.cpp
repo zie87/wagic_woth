@@ -32,8 +32,8 @@ int RandomGenerator::random() {
     return result;
 }
 
-ostream& RandomGenerator::saveUsedRandValues(ostream& out) const {
-    list<int>::const_iterator ite;
+std::ostream& RandomGenerator::saveUsedRandValues(std::ostream& out) const {
+    std::list<int>::const_iterator ite;
     for (ite = usedRandomValues.begin(); ite != usedRandomValues.end(); ite++) {
         out << *ite << ",";
     }
@@ -41,8 +41,8 @@ ostream& RandomGenerator::saveUsedRandValues(ostream& out) const {
     return out;
 }
 
-ostream& RandomGenerator::saveLoadedRandValues(ostream& out) {
-    list<int>::iterator ite;
+std::ostream& RandomGenerator::saveLoadedRandValues(std::ostream& out) {
+    std::list<int>::iterator ite;
     for (ite = loadedRandomValues.begin(); ite != loadedRandomValues.end(); ite++) {
         out << *ite << ",";
     }
@@ -50,7 +50,7 @@ ostream& RandomGenerator::saveLoadedRandValues(ostream& out) {
     return out;
 }
 
-void RandomGenerator::loadRandValues(string s) {
+void RandomGenerator::loadRandValues(std::string s) {
     loadedRandomValues.clear();
     usedRandomValues.clear();
 

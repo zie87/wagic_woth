@@ -20,7 +20,7 @@ private:
     IconButtonsController* mParent;
     bool mHasFocus;
     int mFontId;
-    string mText;
+    std::string mText;
     float mScale, mCurrentScale, mTargetScale;
     float mX, mY;
     float mTextRelativeX, mTextRelativeY;
@@ -28,14 +28,14 @@ private:
     JQuad* mQuad;
 
 public:
-    IconButton(int id, IconButtonsController* parent, string texture, float x, float y, float scale, int fontId,
-               string text, float textRelativeX, float textRelativeY, bool hasFocus = false);
+    IconButton(int id, IconButtonsController* parent, std::string texture, float x, float y, float scale, int fontId,
+               std::string text, float textRelativeX, float textRelativeY, bool hasFocus = false);
     IconButton(int id, IconButtonsController* parent, JQuad* quad, float x, float y, float scale, int fontId,
-               string text, float textRelativeX, float textRelativeY, bool hasFocus = false);
-    void init(IconButtonsController* parent, JQuad* quad, float x, float y, float scale, int fontId, string text,
+               std::string text, float textRelativeX, float textRelativeY, bool hasFocus = false);
+    void init(IconButtonsController* parent, JQuad* quad, float x, float y, float scale, int fontId, std::string text,
               float textRelativeX, float textRelativeY, bool hasFocus);
     ~IconButton();
-    ostream& toString(ostream& out) const;
+    std::ostream& toString(std::ostream& out) const;
 
     bool hasFocus();
 

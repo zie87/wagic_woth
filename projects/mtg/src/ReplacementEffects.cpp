@@ -71,7 +71,7 @@ RECountersPrevention::~RECountersPrevention() { SAFE_DELETE(TargetingCards); }
 ReplacementEffects::ReplacementEffects() {}
 
 WEvent* ReplacementEffects::replace(WEvent* e) {
-    list<ReplacementEffect*>::iterator it;
+    std::list<ReplacementEffect*>::iterator it;
 
     for (it = modifiers.begin(); it != modifiers.end(); it++) {
         ReplacementEffect* re = *it;
@@ -93,7 +93,7 @@ int ReplacementEffects::remove(ReplacementEffect* re) {
 }
 
 ReplacementEffects::~ReplacementEffects() {
-    list<ReplacementEffect*>::iterator it;
+    std::list<ReplacementEffect*>::iterator it;
     for (it = modifiers.begin(); it != modifiers.end(); it++) {
         ReplacementEffect* re = *it;
         delete (re);

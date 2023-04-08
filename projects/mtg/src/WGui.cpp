@@ -1611,10 +1611,10 @@ bool WGuiFilters::isAvailable(int type) {
 
 void WGuiFilters::clearArgs() { tempArgs.clear(); }
 
-void WGuiFilters::addArg(string display, string code) {
+void WGuiFilters::addArg(std::string display, std::string code) {
     if (!subMenu || !isAvailableCode(code)) return;
     subMenu->Add((int)tempArgs.size(), display.c_str());
-    tempArgs.push_back(pair<string, string>(display, code));
+    tempArgs.push_back(std::pair<std::string, std::string>(display, code));
 }
 
 // WGuiFilterItem
@@ -1926,14 +1926,14 @@ WGuiBase::CONFIRM_TYPE WGuiKeyBinder::needsConfirm() {
 
     // Check whether any key is bound to two functions.
     confirmingKey = LOCAL_KEY_NONE;
-    for (vector<WGuiBase*>::iterator it = items.begin(); it != items.end(); ++it) {
+    for (std::vector<WGuiBase*>::iterator it = items.begin(); it != items.end(); ++it) {
         if (!(*it)->Visible()) continue;
 
-        vector<JButton> boundFunctionsList;
-        for (vector<WGuiBase*>::iterator jt = it + 1; jt != items.end(); ++jt) {
+        std::vector<JButton> boundFunctionsList;
+        for (std::vector<WGuiBase*>::iterator jt = it + 1; jt != items.end(); ++jt) {
             if (!(*jt)->Visible()) continue;
             if (C(*it)->from == C(*jt)->from)
-                if (confirmedKeys.end() == find(confirmedKeys.begin(), confirmedKeys.end(), C(*it)->from)) {
+                if (confirmedKeys.end() == std::find(confirmedKeys.begin(), confirmedKeys.end(), C(*it)->from)) {
                     confirmingKey = C(*it)->from;
                     if (boundFunctionsList.empty()) boundFunctionsList.push_back(C(*it)->to);
                     boundFunctionsList.push_back(C(*jt)->to);
@@ -1945,9 +1945,9 @@ WGuiBase::CONFIRM_TYPE WGuiKeyBinder::needsConfirm() {
             char s[1024];
             snprintf(s, 1024, _("Warning : the %s key is bound to\n%i different functions:").c_str(),
                      translateKey(confirmingKey).first.c_str(), boundFunctionsList.size());
-            stringstream ss;
+            std::stringstream ss;
             ss << s << "\n";
-            vector<JButton>::iterator jt = boundFunctionsList.begin();
+            std::vector<JButton>::iterator jt = boundFunctionsList.begin();
             ss << translateKey(*jt).first.c_str();
             for (++jt; jt != boundFunctionsList.end(); ++jt) ss << ", " << translateKey(*jt).first.c_str();
             confirmationString = ss.str();
@@ -1963,9 +1963,10 @@ WGuiBase::CONFIRM_TYPE WGuiKeyBinder::needsConfirm() {
     // Check whether any button has no key associated to it.
     confirmingButton = JGE_BTN_NONE;
     for (signed int i = (sizeof(btnToCheck) / sizeof(btnToCheck[0])) - 1; i >= 0; --i) {
-        if (confirmedButtons.end() != find(confirmedButtons.begin(), confirmedButtons.end(), btnToCheck[i])) continue;
+        if (confirmedButtons.end() != std::find(confirmedButtons.begin(), confirmedButtons.end(), btnToCheck[i]))
+            continue;
         bool found = false;
-        for (vector<WGuiBase*>::iterator it = items.begin(); it != items.end(); ++it)
+        for (std::vector<WGuiBase*>::iterator it = items.begin(); it != items.end(); ++it)
             if (btnToCheck[i] == C(*it)->to) {
                 found = true;
                 break;

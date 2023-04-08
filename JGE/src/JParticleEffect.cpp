@@ -135,8 +135,8 @@ bool JParticleEffect::Load(const char* filename) {
                         }
                     }
 
-                    string quadName = element->Attribute("image");
-                    JQuad* quad     = mResourceManager->GetQuad(quadName);
+                    std::string quadName = element->Attribute("image");
+                    JQuad* quad          = mResourceManager->GetQuad(quadName);
                     if (quad != NULL) mParticleEmitters[mEmitterCount]->SetQuad(quad);
 
                     // 					if (element->QueryIntAttribute("image", &int_value) ==

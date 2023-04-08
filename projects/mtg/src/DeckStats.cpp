@@ -9,7 +9,7 @@
 
 DeckStats* DeckStats::mInstance = NULL;
 
-DeckStat::DeckStat(int nbgames, int victories, string manaColorIndex)
+DeckStat::DeckStat(int nbgames, int victories, std::string manaColorIndex)
     : nbgames(nbgames), victories(victories), manaColorIndex(manaColorIndex) {}
 
 int DeckStat::percentVictories() {
@@ -25,11 +25,11 @@ DeckStats* DeckStats::GetInstance() {
 }
 
 DeckStats::~DeckStats() {
-    map<string, map<string, DeckStat*> >::iterator it;
+    std::map<std::string, std::map<std::string, DeckStat*> >::iterator it;
     for (it = masterDeckStats.begin(); it != masterDeckStats.end(); ++it) {
-        string key                      = it->first;
-        map<string, DeckStat*> innerMap = masterDeckStats[key];
-        map<string, DeckStat*>::iterator it2;
+        std::string key                           = it->first;
+        std::map<std::string, DeckStat*> innerMap = masterDeckStats[key];
+        std::map<std::string, DeckStat*>::iterator it2;
         for (it2 = innerMap.begin(); it2 != innerMap.end(); it2++) {
             SAFE_DELETE(it2->second);
         }
@@ -38,9 +38,9 @@ DeckStats::~DeckStats() {
     masterDeckStats.clear();
 }
 
-DeckStat* DeckStats::getDeckStat(string opponentsFile) {
-    map<string, DeckStat*> stats        = masterDeckStats[currentDeck];
-    map<string, DeckStat*>::iterator it = stats.find(opponentsFile);
+DeckStat* DeckStats::getDeckStat(std::string opponentsFile) {
+    std::map<std::string, DeckStat*> stats        = masterDeckStats[currentDeck];
+    std::map<std::string, DeckStat*>::iterator it = stats.find(opponentsFile);
     if (it == stats.end()) {
         return NULL;
     } else {
@@ -49,9 +49,9 @@ DeckStat* DeckStats::getDeckStat(string opponentsFile) {
 }
 
 int DeckStats::nbGames() {
-    int nbgames                  = 0;
-    map<string, DeckStat*> stats = masterDeckStats[currentDeck];
-    map<string, DeckStat*>::iterator it;
+    int nbgames                            = 0;
+    std::map<std::string, DeckStat*> stats = masterDeckStats[currentDeck];
+    std::map<std::string, DeckStat*>::iterator it;
     for (it = stats.begin(); it != stats.end(); it++) {
         DeckStat* d = it->second;
         nbgames += d->nbgames;
@@ -59,9 +59,9 @@ int DeckStats::nbGames() {
     return nbgames;
 }
 
-int DeckStats::percentVictories(string opponentsFile) {
-    map<string, DeckStat*> stats        = masterDeckStats[currentDeck];
-    map<string, DeckStat*>::iterator it = stats.find(opponentsFile);
+int DeckStats::percentVictories(std::string opponentsFile) {
+    std::map<std::string, DeckStat*> stats        = masterDeckStats[currentDeck];
+    std::map<std::string, DeckStat*>::iterator it = stats.find(opponentsFile);
     if (it == stats.end()) {
         return 50;
     } else {
@@ -70,10 +70,10 @@ int DeckStats::percentVictories(string opponentsFile) {
 }
 
 int DeckStats::percentVictories() {
-    int victories                = 0;
-    int nbgames                  = 0;
-    map<string, DeckStat*> stats = masterDeckStats[currentDeck];
-    map<string, DeckStat*>::iterator it;
+    int victories                          = 0;
+    int nbgames                            = 0;
+    std::map<std::string, DeckStat*> stats = masterDeckStats[currentDeck];
+    std::map<std::string, DeckStat*>::iterator it;
     for (it = stats.begin(); it != stats.end(); it++) {
         DeckStat* d = it->second;
         nbgames += d->nbgames;
@@ -140,21 +140,21 @@ void DeckStats::save(const std::string& filename) {
     std::ofstream file;
     if (JFileSystem::GetInstance()->openForWrite(file, filename)) {
         char writer[512];
-        map<string, DeckStat*> stats = masterDeckStats[currentDeck];
-        map<string, DeckStat*>::iterator it;
-        string manaColorIndex = "";
-        int deckId            = atoi(filename.substr(filename.find("_deck") + 5, filename.find(".txt")).c_str());
+        std::map<std::string, DeckStat*> stats = masterDeckStats[currentDeck];
+        std::map<std::string, DeckStat*>::iterator it;
+        std::string manaColorIndex = "";
+        int deckId                 = atoi(filename.substr(filename.find("_deck") + 5, filename.find(".txt")).c_str());
         char buffer[512];
         sprintf(buffer, "deck%i.txt", deckId);
-        string playerDeckFilePath    = options.profileFile(buffer);
-        DeckManager* deckManager     = DeckManager::GetInstance();
-        DeckMetaData* playerDeckMeta = deckManager->getDeckMetaDataByFilename(playerDeckFilePath, false);
+        std::string playerDeckFilePath = options.profileFile(buffer);
+        DeckManager* deckManager       = DeckManager::GetInstance();
+        DeckMetaData* playerDeckMeta   = deckManager->getDeckMetaDataByFilename(playerDeckFilePath, false);
         if (playerDeckMeta && playerDeckMeta->getColorIndex() == "") {
             StatsWrapper* stw = deckManager->getExtendedDeckStats(playerDeckMeta, MTGAllCards::getInstance(), false);
             manaColorIndex    = stw->getManaColorIndex();
             playerDeckMeta->setColorIndex(manaColorIndex);
         }
-        file << "MANA:" << manaColorIndex << endl;
+        file << "MANA:" << manaColorIndex << std::endl;
         for (it = stats.begin(); it != stats.end(); it++) {
             sprintf(writer, "%s\n", it->first.c_str());
             file << writer;
@@ -162,7 +162,7 @@ void DeckStats::save(const std::string& filename) {
             file << writer;
             sprintf(writer, "%i\n", it->second->victories);
             file << writer;
-            file << "MANA:" << it->second->manaColorIndex << endl;
+            file << "MANA:" << it->second->manaColorIndex << std::endl;
         }
         file.close();
         if (playerDeckMeta) playerDeckMeta->Invalidate();
@@ -178,11 +178,11 @@ void DeckStats::saveStats(Player* player, Player* opponent, GameObserver* game) 
         victory = 0;
     }
     load(currentDeck);
-    map<string, DeckStat*>* stats       = &masterDeckStats[currentDeck];
-    map<string, DeckStat*>::iterator it = stats->find(opponent->deckFileSmall);
-    string manaColorIndex               = "";
-    DeckManager* deckManager            = DeckManager::GetInstance();
-    DeckMetaData* aiDeckMeta            = deckManager->getDeckMetaDataByFilename(opponent->deckFile, true);
+    std::map<std::string, DeckStat*>* stats       = &masterDeckStats[currentDeck];
+    std::map<std::string, DeckStat*>::iterator it = stats->find(opponent->deckFileSmall);
+    std::string manaColorIndex                    = "";
+    DeckManager* deckManager                      = DeckManager::GetInstance();
+    DeckMetaData* aiDeckMeta                      = deckManager->getDeckMetaDataByFilename(opponent->deckFile, true);
     StatsWrapper* stw = deckManager->getExtendedDeckStats(aiDeckMeta, MTGAllCards::getInstance(), true);
     manaColorIndex    = stw->getManaColorIndex();
     if (it == stats->end()) {
@@ -244,7 +244,7 @@ StatsWrapper::StatsWrapper(int deckId) {
     mDeckId = deckId;
     char buffer[512];
     sprintf(buffer, "stats/player_deck%i.txt", deckId);
-    string deckstats = options.profileFile(buffer);
+    std::string deckstats = options.profileFile(buffer);
     initStatistics(deckstats);
 }
 
@@ -268,10 +268,10 @@ void StatsWrapper::initStatistics(string deckstats) {
         int nbDecks = 0;
         char buffer[512];
         char smallDeckName[512];
-        ostringstream oss;
+        std::ostringstream oss;
         oss << "deck" << (nbDecks + 1);
-        string bakaDir      = "ai/baka/";
-        string deckFilename = oss.str();
+        std::string bakaDir      = "ai/baka/";
+        std::string deckFilename = oss.str();
         sprintf(buffer, "%s/%s.txt", bakaDir.c_str(), deckFilename.c_str());
         if (fileExists(buffer)) {
             nbDecks++;
@@ -291,7 +291,7 @@ void StatsWrapper::initStatistics(string deckstats) {
 }
 
 string StatsWrapper::getManaColorIndex() {
-    ostringstream oss;
+    std::ostringstream oss;
     for (int i = Constants::MTG_COLOR_ARTIFACT; i < Constants::MTG_COLOR_LAND; ++i)
         if (totalCostPerColor[i] != 0)
             oss << "1";

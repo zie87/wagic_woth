@@ -24,12 +24,12 @@ Subtypes::Subtypes() {
     find("Vanguard");
 }
 
-int Subtypes::find(string value, bool forceAdd) {
+int Subtypes::find(std::string value, bool forceAdd) {
     if (!value.size()) return 0;
 
     if (value[0] >= 97 && value[0] <= 122)
         value[0] -= 32;  // Poor man's camelcase. We assume strings we get are either Camelcased or lowercase
-    map<string, int>::iterator it = values.find(value);
+    std::map<std::string, int>::iterator it = values.find(value);
     if (it != values.end()) return it->second;
     if (!forceAdd) return 0;
     int id        = (int)(valuesById.size() + 1);
@@ -42,7 +42,7 @@ int Subtypes::find(string value, bool forceAdd) {
 // The association can happen only once, a subtype is then definitely associated to its parent type.
 // If you associate "goblin" to "creature", trying to associate "goblin" to "land" afterwards will fail. "goblin" will
 // stay associated to its first parent.
-int Subtypes::add(string value, unsigned int parentType) {
+int Subtypes::add(std::string value, unsigned int parentType) {
     unsigned int subtype = find(value);
     if (parentType && isSubType(subtype)) {
         if ((unsigned int)(subtypesToType.size()) < subtype + 1)
@@ -58,7 +58,7 @@ int Subtypes::add(string value, unsigned int parentType) {
     return subtype;
 }
 
-string Subtypes::find(unsigned int id) {
+std::string Subtypes::find(unsigned int id) {
     if (valuesById.size() < id || !id) return "";
     return valuesById[id - 1];
 }
@@ -81,7 +81,7 @@ bool Subtypes::isType(unsigned int type) {
 
 bool Subtypes::isSubType(unsigned int type) { return (!isSuperType(type) && !isType(type)); }
 
-const vector<string>& Subtypes::getValuesById() { return valuesById; }
+const std::vector<std::string>& Subtypes::getValuesById() { return valuesById; }
 
 void Subtypes::sortSubTypes() {
     sort(subtypesCreature.begin(), subtypesCreature.end());
@@ -89,7 +89,7 @@ void Subtypes::sortSubTypes() {
     return;
 }
 
-const vector<string>& Subtypes::getCreatureValuesById() {
+const std::vector<std::string>& Subtypes::getCreatureValuesById() {
     sort(subtypesCreature.begin(), subtypesCreature.end());
     subtypesCreature.erase(unique(subtypesCreature.begin(), subtypesCreature.end()), subtypesCreature.end());
     return subtypesCreature;

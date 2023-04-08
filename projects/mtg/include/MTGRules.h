@@ -67,7 +67,7 @@ class MTGPutInPlayRule : public PermanentAbility {
 public:
     int isReactingToClick(MTGCardInstance* card, ManaCost* mana = NULL);
     int reactToClick(MTGCardInstance* card);
-    virtual ostream& toString(ostream& out) const;
+    virtual std::ostream& toString(std::ostream& out) const;
     MTGPutInPlayRule(GameObserver* observer, int _id);
     const char* getMenuText() { return "cast card normally"; }
     virtual MTGPutInPlayRule* clone() const;
@@ -77,7 +77,7 @@ class MTGKickerRule : public MTGPutInPlayRule {
 public:
     int isReactingToClick(MTGCardInstance* card, ManaCost* mana = NULL);
     int reactToClick(MTGCardInstance* card);
-    virtual ostream& toString(ostream& out) const;
+    virtual std::ostream& toString(std::ostream& out) const;
     MTGKickerRule(GameObserver* observer, int _id);
     const char* getMenuText() { return "pay kicker"; }
     virtual MTGKickerRule* clone() const;
@@ -92,7 +92,7 @@ protected:
 public:
     int isReactingToClick(MTGCardInstance* card, ManaCost* mana = NULL);
     int reactToClick(MTGCardInstance* card);
-    virtual ostream& toString(ostream& out) const;
+    virtual std::ostream& toString(std::ostream& out) const;
     MTGAlternativeCostRule(GameObserver* observer, int _id);
     const char* getMenuText() {
         if (alternativeName.size()) return alternativeName.c_str();
@@ -105,7 +105,7 @@ class MTGBuyBackRule : public MTGAlternativeCostRule {
 public:
     int isReactingToClick(MTGCardInstance* card, ManaCost* mana = NULL);
     int reactToClick(MTGCardInstance* card);
-    virtual ostream& toString(ostream& out) const;
+    virtual std::ostream& toString(std::ostream& out) const;
     MTGBuyBackRule(GameObserver* observer, int _id);
     const char* getMenuText() { return "cast and buy back"; }
     virtual MTGBuyBackRule* clone() const;
@@ -115,7 +115,7 @@ class MTGFlashBackRule : public MTGAlternativeCostRule {
 public:
     int isReactingToClick(MTGCardInstance* card, ManaCost* mana = NULL);
     int reactToClick(MTGCardInstance* card);
-    virtual ostream& toString(ostream& out) const;
+    virtual std::ostream& toString(std::ostream& out) const;
     MTGFlashBackRule(GameObserver* observer, int _id);
     const char* getMenuText() { return "flash back"; }
     virtual MTGFlashBackRule* clone() const;
@@ -125,7 +125,7 @@ class MTGRetraceRule : public MTGAlternativeCostRule {
 public:
     int isReactingToClick(MTGCardInstance* card, ManaCost* mana = NULL);
     int reactToClick(MTGCardInstance* card);
-    virtual ostream& toString(ostream& out) const;
+    virtual std::ostream& toString(std::ostream& out) const;
     MTGRetraceRule(GameObserver* observer, int _id);
     const char* getMenuText() { return "retrace"; }
     virtual MTGRetraceRule* clone() const;
@@ -135,7 +135,7 @@ class MTGMorphCostRule : public PermanentAbility {
 public:
     int isReactingToClick(MTGCardInstance* card, ManaCost* mana = NULL);
     int reactToClick(MTGCardInstance* card);
-    virtual ostream& toString(ostream& out) const;
+    virtual std::ostream& toString(std::ostream& out) const;
     MTGMorphCostRule(GameObserver* observer, int _id);
     const char* getMenuText() { return "play morphed"; }
     virtual MTGMorphCostRule* clone() const;
@@ -147,7 +147,7 @@ public:
     int receiveEvent(WEvent* e);
     int reactToClick(MTGCardInstance* card);
     string suspendmenu;
-    virtual ostream& toString(ostream& out) const;
+    virtual std::ostream& toString(std::ostream& out) const;
     MTGSuspendRule(GameObserver* observer, int _id);
     const char* getMenuText();
     virtual MTGSuspendRule* clone() const;
@@ -159,7 +159,7 @@ public:
     virtual bool greyout(Target*);
     int isReactingToClick(MTGCardInstance* card, ManaCost* mana = NULL);
     int reactToClick(MTGCardInstance* card);
-    virtual ostream& toString(ostream& out) const;
+    virtual std::ostream& toString(std::ostream& out) const;
     MTGAttackRule(GameObserver* observer, int _id);
     const char* getMenuText() { return "Attacker"; }
     int receiveEvent(WEvent* event);
@@ -191,7 +191,7 @@ class MTGCombatTriggersRule : public PermanentAbility {
 public:
     MTGCombatTriggersRule(GameObserver* observer, int _id);
     int receiveEvent(WEvent* event);
-    virtual ostream& toString(ostream& out) const;
+    virtual std::ostream& toString(std::ostream& out) const;
     virtual MTGCombatTriggersRule* clone() const;
 };
 
@@ -203,7 +203,7 @@ public:
     MTGAbility* blockAbility;
     int isReactingToClick(MTGCardInstance* card, ManaCost* mana = NULL);
     int reactToClick(MTGCardInstance* card);
-    virtual ostream& toString(ostream& out) const;
+    virtual std::ostream& toString(std::ostream& out) const;
     MTGBlockRule(GameObserver* observer, int _id);
     const char* getMenuText();
     virtual MTGBlockRule* clone() const;
@@ -215,7 +215,7 @@ class MTGPersistRule : public PermanentAbility {
 public:
     MTGPersistRule(GameObserver* observer, int _id);
     int receiveEvent(WEvent* event);
-    virtual ostream& toString(ostream& out) const;
+    virtual std::ostream& toString(std::ostream& out) const;
     virtual MTGPersistRule* clone() const;
 };
 /* vampire Rule */
@@ -224,7 +224,7 @@ public:
     MTGVampireRule(GameObserver* observer, int _id);
     map<MTGCardInstance*, vector<MTGCardInstance*> > victims;
     int receiveEvent(WEvent* event);
-    virtual ostream& toString(ostream& out) const;
+    virtual std::ostream& toString(std::ostream& out) const;
     virtual MTGVampireRule* clone() const;
 };
 // unearths destruction if leaves play effect
@@ -232,7 +232,7 @@ class MTGUnearthRule : public PermanentAbility {
 public:
     MTGUnearthRule(GameObserver* observer, int _id);
     int receiveEvent(WEvent* event);
-    virtual ostream& toString(ostream& out) const;
+    virtual std::ostream& toString(std::ostream& out) const;
     virtual MTGUnearthRule* clone() const;
 };
 class MTGTokensCleanup : public PermanentAbility {
@@ -256,7 +256,7 @@ public:
     int added(MTGCardInstance* card);
     int removed(MTGCardInstance* card);
     int testDestroy();
-    virtual ostream& toString(ostream& out) const;
+    virtual std::ostream& toString(std::ostream& out) const;
     virtual MTGLegendRule* clone() const;
 };
 class MTGPlaneWalkerRule : public ListMaintainerAbility {
@@ -266,7 +266,7 @@ public:
     int added(MTGCardInstance* card);
     int removed(MTGCardInstance* card);
     int testDestroy();
-    virtual ostream& toString(ostream& out) const;
+    virtual std::ostream& toString(std::ostream& out) const;
     virtual MTGPlaneWalkerRule* clone() const;
 };
 /* LifeLink */
@@ -298,7 +298,7 @@ public:
     int reactToClick(MTGCardInstance* card);
     int reactToClick(MTGCardInstance* card, int id);
     const char* getMenuText() { return "Momir"; }
-    virtual ostream& toString(ostream& out) const;
+    virtual std::ostream& toString(std::ostream& out) const;
     virtual MTGMomirRule* clone() const;
 };
 
@@ -315,7 +315,7 @@ public:
     MTGStoneHewerRule(GameObserver* observer, int _id, MTGAllCards* _collection);
     int receiveEvent(WEvent* event);
     const char* getMenuText() { return "Stone Hewer"; }
-    virtual ostream& toString(ostream& out) const;
+    virtual std::ostream& toString(std::ostream& out) const;
     virtual MTGStoneHewerRule* clone() const;
 };
 // Hermit Druid avatar mode
@@ -334,7 +334,7 @@ public:
 
     int receiveEvent(WEvent* event);
 
-    virtual ostream& toString(ostream& out) const;
+    virtual std::ostream& toString(std::ostream& out) const;
 
     virtual MTGLifelinkRule* clone() const;
 };
@@ -356,7 +356,7 @@ class ParentChildRule : public PermanentAbility {
 public:
     ParentChildRule(GameObserver* observer, int _id);
     int receiveEvent(WEvent* event);
-    virtual ostream& toString(ostream& out) const;
+    virtual std::ostream& toString(std::ostream& out) const;
     virtual ParentChildRule* clone() const;
 };
 /* HUD Display */
@@ -371,7 +371,7 @@ public:
 
 class HUDDisplay : public PermanentAbility {
 private:
-    list<HUDString*> events;
+    std::list<HUDString*> events;
     float timestamp;
     float popdelay;
     WFont* f;

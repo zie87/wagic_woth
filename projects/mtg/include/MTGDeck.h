@@ -20,19 +20,19 @@ class MTGSetInfo {
 public:
     MTGSetInfo(string _id);
     ~MTGSetInfo();
-    string id;      // Short name: 10E, RAV, etc. Automatic from folder.
-    string author;  // Author of set, for crediting mod makers, etc.
-    string name;    // Long name: Tenth Edition
-    int block;      // For future use by tournament mode, etc.
-    int year;       // The year the set was released.
+    std::string id;      // Short name: 10E, RAV, etc. Automatic from folder.
+    std::string author;  // Author of set, for crediting mod makers, etc.
+    std::string name;    // Long name: Tenth Edition
+    int block;           // For future use by tournament mode, etc.
+    int year;            // The year the set was released.
     // TODO Way to group cards by name, rather than mtgid.
 
     void count(MTGCard* c);
 
     int totalCards();
-    string getName();
-    string getBlock();
-    void processConfLine(string line);
+    std::string getName();
+    std::string getBlock();
+    void processConfLine(std::string line);
 
     enum {
         // For memoized counts
@@ -67,21 +67,21 @@ public:
     ~MTGSets();
 
     int Add(const char* subtype);
-    int findSet(string value);
-    int findBlock(string s);
+    int findSet(std::string value);
+    int findBlock(std::string s);
     int size();
 
     int getSetNum(MTGSetInfo* i);
 
-    int operator[](string id);  // Returns set id index, -1 for failure.
-    string operator[](int id);  // Returns set id name, "" for failure.
+    int operator[](std::string id);  // Returns set id index, -1 for failure.
+    std::string operator[](int id);  // Returns set id name, "" for failure.
 
     MTGSetInfo* getInfo(int setID);
     MTGSetInfo* randomSet(int blockId = -1, int atleast = -1);  // Tries to match, otherwise 100% random unlocked set
 
 protected:
-    vector<string> blocks;
-    vector<MTGSetInfo*> setinfo;
+    std::vector<std::string> blocks;
+    std::vector<MTGSetInfo*> setinfo;
 };
 
 extern MTGSets setlist;
@@ -96,7 +96,7 @@ private:
 
 protected:
     int conf_read_mode;
-    vector<int> colorsCount;
+    std::vector<int> colorsCount;
     int total_cards;
     void init();
     void initCounters();
@@ -109,9 +109,9 @@ public:
         READ_CARD     = 1,
         READ_METADATA = 2,
     };
-    vector<int> ids;
-    map<int, MTGCard*> collection;
-    map<string, CardPrimitive*> primitives;
+    std::vector<int> ids;
+    std::map<int, MTGCard*> collection;
+    std::map<std::string, CardPrimitive*> primitives;
     MTGCard* _(int id);
     MTGCard* getCardById(int id);
 
@@ -128,17 +128,19 @@ public:
     int totalCards();
     int randomCardId();
 
-    static int findType(string subtype, bool forceAdd = true) {
+    static int findType(std::string subtype, bool forceAdd = true) {
         jge::mutex::scoped_lock lock(instance->mMutex);
         return instance->subtypesList.find(subtype, forceAdd);
     };
-    static int add(string value, unsigned int parentType) {
+    static int add(std::string value, unsigned int parentType) {
         jge::mutex::scoped_lock lock(instance->mMutex);
         return instance->subtypesList.add(value, parentType);
     };
-    static string findType(unsigned int id) { return instance->subtypesList.find(id); };
-    static const vector<string>& getValuesById() { return instance->subtypesList.getValuesById(); };
-    static const vector<string>& getCreatureValuesById() { return instance->subtypesList.getCreatureValuesById(); };
+    static std::string findType(unsigned int id) { return instance->subtypesList.find(id); };
+    static const std::vector<std::string>& getValuesById() { return instance->subtypesList.getValuesById(); };
+    static const std::vector<std::string>& getCreatureValuesById() {
+        return instance->subtypesList.getCreatureValuesById();
+    };
     static bool isSubtypeOfType(unsigned int subtype, unsigned int type) {
         return instance->subtypesList.isSubtypeOfType(subtype, type);
     };
@@ -151,7 +153,7 @@ public:
         instance->subtypesList.sortSubTypes();
     }
 
-    static int findSubtypeId(string value) { return instance->subtypesList.find(value, false); }
+    static int findSubtypeId(std::string value) { return instance->subtypesList.find(value, false); }
 
     static void loadInstance();
     static void unloadAll();
@@ -160,8 +162,8 @@ public:
 private:
     jge::mutex mMutex;
     Subtypes subtypesList;
-    map<string, MTGCard*> mtgCardByNameCache;
-    int processConfLine(string& s, MTGCard* card, CardPrimitive* primitive);
+    std::map<std::string, MTGCard*> mtgCardByNameCache;
+    int processConfLine(std::string& s, MTGCard* card, CardPrimitive* primitive);
     bool addCardToCollection(MTGCard* card, int setId);
     CardPrimitive* addPrimitive(CardPrimitive* primitive, MTGCard* card = NULL);
 };
@@ -170,20 +172,20 @@ private:
 
 class MTGDeck {
 private:
-    string getCardBlockText(const string& title, const string& textBlock);
+    std::string getCardBlockText(const std::string& title, const std::string& textBlock);
     void printDetailedDeckText(std::ofstream& file);
 
 protected:
-    string filename;
+    std::string filename;
     int total_cards;
 
 public:
     MTGAllCards* database;
-    map<int, int> cards;
-    string meta_desc;
-    string meta_name;
-    vector<string> meta_AIHints;
-    string meta_unlockRequirements;
+    std::map<int, int> cards;
+    std::string meta_desc;
+    std::string meta_name;
+    std::vector<std::string> meta_AIHints;
+    std::string meta_unlockRequirements;
 
     int meta_id;
     int totalCards();
@@ -199,9 +201,10 @@ public:
     int removeAll();
     int add(MTGCard* card);
     int remove(MTGCard* card);
-    string getFilename();
+    std::string getFilename();
     int save();
-    int save(const string& destFileName, bool useExpandedDescriptions, const string& deckTitle, const string& deckDesc);
+    int save(const std::string& destFileName, bool useExpandedDescriptions, const std::string& deckTitle,
+             const std::string& deckDesc);
     MTGCard* getCardById(int id);
 };
 

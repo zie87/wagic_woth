@@ -25,7 +25,7 @@ void TextScroller::setRandom(int mode) {
     }
 }
 
-void TextScroller::Add(string text) {
+void TextScroller::Add(std::string text) {
     if (!strings.size()) mText = text;
     strings.push_back(text);
 }
@@ -57,7 +57,7 @@ void TextScroller::Render() {
     mFont->DrawString(mText.c_str(), mX, mY, JGETEXT_LEFT, start, mWidth);
 }
 
-ostream& TextScroller::toString(ostream& out) const {
+std::ostream& TextScroller::toString(std::ostream& out) const {
     return out << "TextScroller ::: mText : " << mText << " ; tempText : " << tempText << " ; mWidth : " << mWidth
                << " ; mSpeed : " << mScrollSpeed << " ; mX,mY : " << mX << "," << mY << " ; start : " << start
                << " ; timer : " << timer << " ; strings : ?"
@@ -77,9 +77,9 @@ VerticalTextScroller::VerticalTextScroller(int fontId, float x, float y, float w
     Add("\n");  // initialize the scroller with a blank line
 }
 
-void VerticalTextScroller::Add(string text) {
+void VerticalTextScroller::Add(std::string text) {
     strings.push_back(text);
-    string wrappedText = wordWrap(text, mWidth, fontId);
+    std::string wrappedText = wordWrap(text, mWidth, fontId);
     mText.append(wrappedText);
 }
 
@@ -97,9 +97,9 @@ void VerticalTextScroller::Update(float dt) {
     {
         timer = 0;
         // now readjust mText
-        size_t nbLines             = 1;
-        vector<string> displayText = split(mText, '\n');
-        vector<string> newDisplayText;
+        size_t nbLines                       = 1;
+        std::vector<std::string> displayText = split(mText, '\n');
+        std::vector<std::string> newDisplayText;
         for (size_t i = nbLines; i < displayText.size(); ++i) newDisplayText.push_back(displayText[i]);
         for (size_t i = 0; i < nbLines; ++i) newDisplayText.push_back(displayText[i]);
 

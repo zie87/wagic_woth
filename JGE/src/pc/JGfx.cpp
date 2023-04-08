@@ -1925,25 +1925,25 @@ void JRenderer::Enable2D() {
     checkGlError();
 }
 
-void JRenderer::
-    Enable3D() { /* NOT USED
-                 if (!m3DEnabled)
-                 return;
+void JRenderer::Enable3D() { /* NOT USED
+                             if (!m3DEnabled)
+                             return;
 
-                 if (mCurrentRenderMode == MODE_3D)
-                 return;
+                             if (mCurrentRenderMode == MODE_3D)
+                             return;
 
-                 mCurrentRenderMode = MODE_3D;
+                             mCurrentRenderMode = MODE_3D;
 
-                 glViewport (0, 0, (GLsizei)SCREEN_WIDTH, (GLsizei)SCREEN_HEIGHT);		// Reset The Current
-                 Viewport glMatrixMode (GL_PROJECTION);
-                 // Select The Projection Matrix glLoadIdentity ();
-                 // Reset The Projection Matrix gluPerspective (mFOV, (GLfloat)SCREEN_WIDTH/(GLfloat)SCREEN_HEIGHT,
-                 // Calculate The Aspect Ratio Of The Window 0.5f, 1000.0f); glMatrixMode (GL_MODELVIEW);
-                 // Select The Modelview Matrix glLoadIdentity ();
-                 // Reset The Modelview Matrix
+                             glViewport (0, 0, (GLsizei)SCREEN_WIDTH, (GLsizei)SCREEN_HEIGHT);		// Reset The
+                             Current Viewport glMatrixMode (GL_PROJECTION);
+                             // Select The Projection Matrix glLoadIdentity ();
+                             // Reset The Projection Matrix gluPerspective (mFOV,
+                             (GLfloat)SCREEN_WIDTH/(GLfloat)SCREEN_HEIGHT,
+                             // Calculate The Aspect Ratio Of The Window 0.5f, 1000.0f); glMatrixMode (GL_MODELVIEW);
+                             // Select The Modelview Matrix glLoadIdentity ();
+                             // Reset The Modelview Matrix
 
-                 glEnable (GL_DEPTH_TEST); */
+                             glEnable (GL_DEPTH_TEST); */
 }
 
 void JRenderer::SetClip(int x, int y, int width, int height) {  // NOT USED

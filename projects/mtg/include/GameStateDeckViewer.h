@@ -78,7 +78,7 @@ enum DECK_VIEWER_MENU_ITEMS {
 
 class GameStateDeckViewer : public GameState, public JGuiListener {
 private:
-    vector<JQuadPtr> mIcons;
+    std::vector<JQuadPtr> mIcons;
     JQuadPtr pspIcons[8];
     JTexture* pspIconsTexture;
     float last_user_activity;
@@ -111,18 +111,18 @@ private:
     StatsWrapper* stw;
 
     int hudAlpha;
-    string newDeckname;
+    std::string newDeckname;
     bool isAIDeckSave;
     bool mSwitching;
-    void saveDeck();                     // Saves the deck and additional necessary information
-    void saveAsAIDeck(string deckName);  // saves deck as an AI Deck
+    void saveDeck();                          // Saves the deck and additional necessary information
+    void saveAsAIDeck(std::string deckName);  // saves deck as an AI Deck
     int getCurrentPos();
     void sellCard();
     void setButtonState(bool state);
     bool userPressedButton();
     void RenderButtons();
 
-    pair<float, float> cardsCoordinates[CARDS_DISPLAYED];
+    std::pair<float, float> cardsCoordinates[CARDS_DISPLAYED];
 
 public:
     GameStateDeckViewer(GameApp* parent);

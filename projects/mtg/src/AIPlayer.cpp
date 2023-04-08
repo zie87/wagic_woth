@@ -123,7 +123,7 @@ int AIPlayer::clickMultiTarget(TargetChooser* tc, vector<Targetable*>& potential
                                          // "confirming click".
         {
             clickstream.push(NEW AIAction(this, card));
-            DebugTrace("Ai clicked source as a target: " << (card ? card->name : "None") << endl);
+            DebugTrace("Ai clicked source as a target: " << (card ? card->name : "None") << std::endl);
             ite = potentialTargets.erase(ite);
             continue;
         } else if (Player* pTarget = dynamic_cast<Player*>(*ite)) {
@@ -259,8 +259,9 @@ AIPlayer* AIPlayerFactory::createAIPlayerTest(GameObserver* observer, MTGAllCard
     // AIPlayerBaka will delete MTGDeck when it's time
     AIPlayerBaka* baka = opponent ? NEW AIPlayerBakaB(observer, deckFile, deckFileSmall, avatarFilename,
                                                       NEW MTGDeck(deckFile, collection, 0, deckSetting))
-                                  : NEW AIPlayerBaka(observer, deckFile, deckFileSmall, avatarFilename,
-                                                     NEW MTGDeck(deckFile, collection, 0, deckSetting));
+                                  : NEW
+                                    AIPlayerBaka(observer, deckFile, deckFileSmall, avatarFilename,
+                                                 NEW MTGDeck(deckFile, collection, 0, deckSetting));
     baka->deckId       = deckid;
     baka->setObserver(observer);
     return baka;

@@ -16,32 +16,32 @@ protected:
     ManaPool* manaPool;
     JTexture* mAvatarTex;
     JQuadPtr mAvatar;
-    bool loadAvatar(string file, string resName = "playerAvatar");
+    bool loadAvatar(std::string file, std::string resName = "playerAvatar");
     bool premade;
 
 public:
     enum Mode { MODE_TEST_SUITE, MODE_HUMAN, MODE_AI };
 
     int deckId;
-    string mAvatarName;
+    std::string mAvatarName;
     Mode playMode;
     bool nomaxhandsize;
     MTGPlayerCards* game;
     MTGDeck* mDeck;
-    string deckFile;
-    string deckFileSmall;
-    string deckName;
-    string phaseRing;
+    std::string deckFile;
+    std::string deckFileSmall;
+    std::string deckName;
+    std::string phaseRing;
     int offerInterruptOnPhase;
     int skippingTurn;
     int extraTurn;
-    vector<MTGCardInstance*> curses;
-    Player(GameObserver* observer, string deckFile, string deckFileSmall, MTGDeck* deck = NULL);
+    std::vector<MTGCardInstance*> curses;
+    Player(GameObserver* observer, std::string deckFile, std::string deckFileSmall, MTGDeck* deck = NULL);
     virtual ~Player();
     virtual void setObserver(GameObserver* g);
     virtual void End();
     virtual int displayStack() { return 1; }
-    const string getDisplayName() const;
+    const std::string getDisplayName() const;
 
     int afterDamage();
 
@@ -77,18 +77,18 @@ public:
     ** Returns the path to the stats file of currently selected deck.
     */
     std::string GetCurrentDeckStatsFile();
-    virtual bool parseLine(const string& s);
-    friend ostream& operator<<(ostream&, const Player&);
+    virtual bool parseLine(const std::string& s);
+    friend std::ostream& operator<<(std::ostream&, const Player&);
     bool operator<(Player& aPlayer);
     bool isDead();
 };
 
 class HumanPlayer : public Player {
 public:
-    HumanPlayer(GameObserver* observer, string deckFile, string deckFileSmall, bool premade = false,
+    HumanPlayer(GameObserver* observer, std::string deckFile, std::string deckFileSmall, bool premade = false,
                 MTGDeck* deck = NULL);
     void End();
-    friend ostream& operator<<(ostream&, const HumanPlayer&);
+    friend std::ostream& operator<<(std::ostream&, const HumanPlayer&);
 };
 
 #endif
