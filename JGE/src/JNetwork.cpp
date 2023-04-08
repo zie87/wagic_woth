@@ -59,7 +59,7 @@ JNetwork::~JNetwork() {
 
 bool JNetwork::sendCommand(string xString) {
     string aString = xString;
-    boost::mutex::scoped_lock l(sendMutex);
+    jge::mutex::scoped_lock l(sendMutex);
     if (!socket) {
         DebugTrace("sendCommand failed: no sockeet");
         return false;
@@ -98,7 +98,7 @@ void JNetwork::ThreadProc(void* param) {
     while (pSocket && pSocket->isConnected()) {
         char buff[1024];
         {
-            boost::mutex::scoped_lock l(pThis->receiveMutex);
+            jge::mutex::scoped_lock l(pThis->receiveMutex);
             int len = pSocket->Read(buff, sizeof(buff));
             if (len) {
                 DebugTrace("receiving " << len << " bytes : " << buff);
@@ -113,7 +113,7 @@ void JNetwork::ThreadProc(void* param) {
                     DebugTrace("begin of command received : " << pThis->received.str());
                     DebugTrace("begin of command toSend : " << pThis->toSend.str());
 
-                    boost::mutex::scoped_lock l(pThis->sendMutex);
+                    jge::mutex::scoped_lock l(pThis->sendMutex);
                     pThis->toSend << pThis->received.str().substr(0, found) + "Response ";
                     pThis->received.str("");
                     processCmd theMethod = (ite)->second;
@@ -132,7 +132,7 @@ void JNetwork::ThreadProc(void* param) {
                     DebugTrace("begin of response received : " << pThis->received.str());
                     DebugTrace("begin of response toSend : " << pThis->toSend.str());
 
-                    boost::mutex::scoped_lock l(pThis->sendMutex);
+                    jge::mutex::scoped_lock l(pThis->sendMutex);
                     string aString;
                     pThis->received >> aString;
                     processCmd theMethod = (ite)->second;
@@ -145,7 +145,7 @@ void JNetwork::ThreadProc(void* param) {
             }
         }
 
-        boost::mutex::scoped_lock l(pThis->sendMutex);
+        jge::mutex::scoped_lock l(pThis->sendMutex);
         if (!pThis->toSend.str().empty()) {
             DebugTrace("sending  " << pThis->toSend.str().size() << " bytes : " << pThis->toSend.str());
             pSocket->Write((char*)pThis->toSend.str().c_str(), pThis->toSend.str().size() + 1);
@@ -160,7 +160,7 @@ void JNetwork::ThreadProc(void* param) {
 int JNetwork::connect(string ip) {
     if (mpWorkerThread) return 0;
     serverIP       = ip;
-    mpWorkerThread = new boost::thread(JNetwork::ThreadProc, this);
+    mpWorkerThread = new jge::thread(JNetwork::ThreadProc, this);
     return 42;
 }
 
@@ -235,7 +235,7 @@ int JNetwork::connect_to_apctl(int config) {
             sprintf(buffer, "  connection state %d of 4", state);
             printf(buffer);
             printf("\n");
-            error     = buffer;
+            error = buffer;
             stateLast = state;
         }
         if (state == 4) {

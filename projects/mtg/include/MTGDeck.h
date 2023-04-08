@@ -129,11 +129,11 @@ public:
     int randomCardId();
 
     static int findType(string subtype, bool forceAdd = true) {
-        boost::mutex::scoped_lock lock(instance->mMutex);
+        jge::mutex::scoped_lock lock(instance->mMutex);
         return instance->subtypesList.find(subtype, forceAdd);
     };
     static int add(string value, unsigned int parentType) {
-        boost::mutex::scoped_lock lock(instance->mMutex);
+        jge::mutex::scoped_lock lock(instance->mMutex);
         return instance->subtypesList.add(value, parentType);
     };
     static string findType(unsigned int id) { return instance->subtypesList.find(id); };
@@ -147,7 +147,7 @@ public:
     static bool isSubType(unsigned int type) { return instance->subtypesList.isSubType(type); };
 
     static void sortSubtypeList() {
-        boost::mutex::scoped_lock lock(instance->mMutex);
+        jge::mutex::scoped_lock lock(instance->mMutex);
         instance->subtypesList.sortSubTypes();
     }
 
@@ -158,7 +158,7 @@ public:
     static inline MTGAllCards* getInstance() { return instance; };
 
 private:
-    boost::mutex mMutex;
+    jge::mutex mMutex;
     Subtypes subtypesList;
     map<string, MTGCard*> mtgCardByNameCache;
     int processConfLine(string& s, MTGCard* card, CardPrimitive* primitive);

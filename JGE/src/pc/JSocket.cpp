@@ -12,6 +12,7 @@
 #include <netinet/in.h>
 #include <netdb.h>
 #include <fcntl.h>
+#include <unistd.h>
 #endif  // WINDOWS
 
 #include "../../include/JSocket.h"

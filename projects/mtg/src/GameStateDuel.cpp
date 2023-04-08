@@ -259,7 +259,7 @@ void GameStateDuel::setGamePhase(int newGamePhase) {
 }
 
 #ifdef AI_CHANGE_TESTING
-boost::mutex GameStateDuel::mMutex;
+jge::mutex GameStateDuel::mMutex;
 
 void GameStateDuel::ThreadProc(void* inParam) {
     GameStateDuel* instance = reinterpret_cast<GameStateDuel*>(inParam);
@@ -430,7 +430,7 @@ void GameStateDuel::Update(float dt) {
                         startTime           = JGEGetTime();
 
                         for (size_t i = 0; i < (thread_count); i++)
-                            mWorkerThread.push_back(boost::thread(ThreadProc, this));
+                            mWorkerThread.push_back(jge::thread(ThreadProc, this));
                     }
                 }
             }

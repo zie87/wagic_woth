@@ -21,7 +21,7 @@
 
 #include "GameOptions.h"
 
-#include <boost/shared_ptr.hpp>
+#include "jge/memory.hpp"
 
 #if defined(SDL_CONFIG)
 #define TOUCH_ENABLED
