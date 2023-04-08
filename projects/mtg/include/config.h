@@ -1,5 +1,5 @@
-#ifndef _DEBUG_H_
-#define _DEBUG_H_
+#ifndef CONFIG_H
+#define CONFIG_H
 
 #if defined(WIN32) && defined(_MSC_VER)
 #define snprintf sprintf_s

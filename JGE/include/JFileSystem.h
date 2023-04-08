@@ -1,5 +1,5 @@
-#ifndef _J_FILE_SYSTEM_H_
-#define _J_FILE_SYSTEM_H_
+#ifndef JFILESYSTEM_H
+#define JFILESYSTEM_H
 
 #include "zfsystem.h"
 #include <string>
@@ -50,7 +50,7 @@ public:
     /// @return Status of the attach operation.
     ///
     //////////////////////////////////////////////////////////////////////////
-    bool AttachZipFile(const std::string& zipfile, char* password = NULL);
+    bool AttachZipFile(const std::string& zipfile, char* password = nullptr);
 
     //////////////////////////////////////////////////////////////////////////
     /// Release the attached ZIP archive.
@@ -120,7 +120,7 @@ public:
     bool readIntoString(const std::string& FilePath, std::string& target);
     bool openForWrite(std::ofstream& File, const std::string& FilePath,
                       std::ios_base::openmode mode = std::ios_base::out);
-    bool Rename(std::string from, std::string to);
+    bool Rename(const std::string& from, const std::string& to);
 
     // Returns true if strFilename exists somewhere in the fileSystem
     bool FileExists(const std::string& strFilename);
@@ -141,7 +141,7 @@ public:
     So this call is now super heavy: it checks where the file is, and if it's in a zip, it extracts
     it to the user Filesystem, assuming that whoever called this needs to access the file through its pathname later on
     */
-    std::string GetResourceFile(std::string filename);
+    std::string GetResourceFile(const std::string& filename);
 
 protected:
     JFileSystem(const std::string& userPath, const std::string& systemPath = "");

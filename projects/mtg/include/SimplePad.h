@@ -1,5 +1,5 @@
-#ifndef _SIMPLEPAD_H_
-#define _SIMPLEPAD_H_
+#ifndef SIMPLEPAD_H
+#define SIMPLEPAD_H
 
 #include <string>
 #include <JGui.h>
@@ -67,8 +67,8 @@ public:
 
     string buffer;
     string title;
-    unsigned int cursorPos();
-    bool isActive() { return bActive; };
+    unsigned int cursorPos() const;
+    bool isActive() const { return bActive; };
     void Render();
     void Update(float dt);
     void pressKey(unsigned char id);
@@ -83,7 +83,7 @@ private:
     void linkKeys(int from, int to, int dir);
     SimpleKey* Add(string display, unsigned char id);
     void MoveSelection(unsigned char dir);
-    void Start(string value, string* _dest = NULL);
+    void Start(string value, string* _dest = nullptr);
     string Finish();
 
     bool bActive;

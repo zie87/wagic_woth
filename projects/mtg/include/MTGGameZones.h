@@ -1,5 +1,5 @@
-#ifndef _MTGGAMEZONES_H_
-#define _MTGGAMEZONES_H_
+#ifndef MTGGAMEZONES_H
+#define MTGGAMEZONES_H
 
 #include <map>
 using std::map;
@@ -84,7 +84,7 @@ public:
     vector<MTGCardInstance*> cardsSeenLastTurn;
     int nb_cards;
     MTGGameZone();
-    ~MTGGameZone();
+    virtual ~MTGGameZone();
     void shuffle();
     void addCard(MTGCardInstance* card);
     void debugPrint();
@@ -96,7 +96,7 @@ public:
 
     unsigned int countByType(const char* value);
     unsigned int countByCanTarget(TargetChooser* tc);
-    MTGCardInstance* findByName(string name);
+    MTGCardInstance* findByName(const string& name);
 
     // returns true if one of the cards in the zone has the ability
     bool hasAbility(int ability);
@@ -107,7 +107,7 @@ public:
     bool hasSpecificType(const char* value, const char* secondvalue);
     bool hasPrimaryType(const char* value, const char* secondvalue);
     bool hasTypeButNotType(const char* value, const char* secondvalue);
-    bool hasName(string value);
+    bool hasName(const string& value);
     bool hasColor(int value);
     bool hasX();
 
@@ -118,12 +118,12 @@ public:
 
     void setOwner(Player* player);
     MTGCardInstance* lastCardDrawn;
-    static MTGGameZone* stringToZone(GameObserver* g, string zoneName, MTGCardInstance* source,
+    static MTGGameZone* stringToZone(GameObserver* g, const string& zoneName, MTGCardInstance* source,
                                      MTGCardInstance* target);
-    static int zoneStringToId(string zoneName);
-    static MTGGameZone* intToZone(GameObserver* g, int zoneId, MTGCardInstance* source = NULL,
-                                  MTGCardInstance* target = NULL);
-    static MTGGameZone* intToZone(int zoneId, Player* source, Player* target = NULL);
+    static int zoneStringToId(const string& zoneName);
+    static MTGGameZone* intToZone(GameObserver* g, int zoneId, MTGCardInstance* source = nullptr,
+                                  MTGCardInstance* target = nullptr);
+    static MTGGameZone* intToZone(int zoneId, Player* source, Player* target = nullptr);
     bool needShuffle;
     virtual const char* getName() { return "zone"; };
     virtual std::ostream& toString(std::ostream&) const;
@@ -132,41 +132,47 @@ public:
 
 class MTGLibrary : public MTGGameZone {
 public:
+    ~MTGLibrary() override = default;
     vector<MTGCardInstance*> placeOnTop;
-    virtual std::ostream& toString(std::ostream&) const;
-    const char* getName() { return "library"; }
+    std::ostream& toString(std::ostream&) const override;
+    const char* getName() override { return "library"; }
 };
 
 class MTGGraveyard : public MTGGameZone {
 public:
-    virtual std::ostream& toString(std::ostream&) const;
-    const char* getName() { return "graveyard"; }
+    ~MTGGraveyard() override = default;
+    std::ostream& toString(std::ostream&) const override;
+    const char* getName() override { return "graveyard"; }
 };
 
 class MTGHand : public MTGGameZone {
 public:
-    virtual std::ostream& toString(std::ostream&) const;
-    const char* getName() { return "hand"; }
+    ~MTGHand() override = default;
+    std::ostream& toString(std::ostream&) const override;
+    const char* getName() override { return "hand"; }
 };
 
 class MTGRemovedFromGame : public MTGGameZone {
 public:
-    virtual std::ostream& toString(std::ostream&) const;
-    const char* getName() { return "exile"; }
+    ~MTGRemovedFromGame() override = default;
+    std::ostream& toString(std::ostream&) const override;
+    const char* getName() override { return "exile"; }
 };
 
 class MTGStack : public MTGGameZone {
 public:
-    virtual std::ostream& toString(std::ostream&) const;
-    const char* getName() { return "stack"; }
+    ~MTGStack() override = default;
+    std::ostream& toString(std::ostream&) const override;
+    const char* getName() override { return "stack"; }
 };
 
 class MTGInPlay : public MTGGameZone {
 public:
+    ~MTGInPlay() override = default;
     void untapAll();
     MTGCardInstance* getNextAttacker(MTGCardInstance* previous);
-    virtual std::ostream& toString(std::ostream&) const;
-    const char* getName() { return "battlefield"; }
+    std::ostream& toString(std::ostream&) const override;
+    const char* getName() override { return "battlefield"; }
 };
 
 class MTGPlayerCards {
@@ -193,24 +199,24 @@ public:
     MTGPlayerCards(Player*, int* idList, int idListSize);
     MTGPlayerCards(MTGDeck* deck);
     ~MTGPlayerCards();
-    void initGame(int shuffle = 1, int draw = 1);
+    void initGame(int shuffle = 1, int draw = 1) const;
     void OptimizedHand(Player* who, int amount = 7, int lands = 3, int creatures = 0, int othercards = 4);
     void setOwner(Player* player);
-    void discardRandom(MTGGameZone* from, MTGCardInstance* source);
-    void drawFromLibrary();
-    void showHand();
+    void discardRandom(MTGGameZone* from, MTGCardInstance* source) const;
+    void drawFromLibrary() const;
+    void showHand() const;
     void resetLibrary();
     void initDeck(MTGDeck* deck);
     void beforeBeginPhase();
-    MTGCardInstance* putInGraveyard(MTGCardInstance* card);
-    MTGCardInstance* putInExile(MTGCardInstance* card);
-    MTGCardInstance* putInLibrary(MTGCardInstance* card);
-    MTGCardInstance* putInHand(MTGCardInstance* card);
-    MTGCardInstance* putInZone(MTGCardInstance* card, MTGGameZone* from, MTGGameZone* to);
-    int isInPlay(MTGCardInstance* card);
+    MTGCardInstance* putInGraveyard(MTGCardInstance* card) const;
+    MTGCardInstance* putInExile(MTGCardInstance* card) const;
+    MTGCardInstance* putInLibrary(MTGCardInstance* card) const;
+    MTGCardInstance* putInHand(MTGCardInstance* card) const;
+    MTGCardInstance* putInZone(MTGCardInstance* card, MTGGameZone* from, MTGGameZone* to) const;
+    int isInPlay(MTGCardInstance* card) const;
     int isInGrave(MTGCardInstance* card);
     int isInZone(MTGCardInstance* card, MTGGameZone* zone);
-    bool parseLine(const string& s);
+    bool parseLine(const string& s) const;
 };
 
 std::ostream& operator<<(std::ostream&, const MTGGameZone&);

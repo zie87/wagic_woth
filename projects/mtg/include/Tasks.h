@@ -1,5 +1,5 @@
-#ifndef TASK_H
-#define TASK_H
+#ifndef TASKS_H
+#define TASKS_H
 
 #include <vector>
 
@@ -41,6 +41,7 @@ protected:
     virtual int computeReward() = 0;
 
 public:
+    virtual ~Task() = default;
     // variable to store and method to obtain names of AI decks
     //!! Todo: This should _really_ be handled elsewhere (dedicated class?)
     static vector<string> sAIDeckNames;
@@ -51,15 +52,15 @@ public:
 
     Task(char _type = ' ');
 
-    static Task* createFromStr(const string params, bool rand = false);
+    static Task* createFromStr(const string& params, bool rand = false);
     virtual string toString();
     string getDesc();
     virtual string createDesc()   = 0;
     virtual string getShortDesc() = 0;
-    int getExpiration();
+    int getExpiration() const;
     int getReward();
     virtual bool isDone(GameObserver* observer, GameApp* _app) = 0;
-    bool isExpired();
+    bool isExpired() const;
     void setExpiration(int _expiresIn);
     void passOneDay();
 };
@@ -85,16 +86,16 @@ public:
     };
 
     TaskList(string _fileName = "");
-    int load(string _fileName = "");
-    int save(string _fileName = "");
-    int getState() { return mState; };
-    void addTask(string params, bool rand = false);
+    int load(const string& _fileName = "");
+    int save(const string& _fileName = "");
+    int getState() const { return mState; };
+    void addTask(const string& params, bool rand = false);
     void addTask(Task* task);
     void addRandomTask(int diff = 100);
     void removeTask(Task* task);
     void passOneDay();
     void getDoneTasks(GameObserver* observer, GameApp* _app, vector<Task*>* result);
-    int getTaskCount();
+    int getTaskCount() const;
 
     void Start();
     void End();
@@ -108,111 +109,118 @@ public:
 
 class TaskWinAgainst : public Task {
 protected:
-    virtual int computeReward();
+    int computeReward() override;
 
 public:
+    ~TaskWinAgainst() override = default;
     TaskWinAgainst(int _opponent = 0);
-    virtual string createDesc();
-    virtual string getShortDesc();
-    virtual bool isDone(GameObserver* observer, GameApp* _app);
+    string createDesc() override;
+    string getShortDesc() override;
+    bool isDone(GameObserver* observer, GameApp* _app) override;
 };
 
 class TaskSlaughter : public TaskWinAgainst {
 protected:
     int targetLife;
-    virtual int computeReward();
+    int computeReward() override;
 
 public:
+    ~TaskSlaughter() override = default;
     TaskSlaughter(int _opponent = 0, int _targetLife = -15);
-    virtual string createDesc();
-    virtual string getShortDesc();
-    virtual bool isDone(GameObserver* observer, GameApp* _app);
-    virtual void storeCustomAttribs();
-    virtual void restoreCustomAttribs();
-    virtual void randomize();
+    string createDesc() override;
+    string getShortDesc() override;
+    bool isDone(GameObserver* observer, GameApp* _app) override;
+    void storeCustomAttribs() override;
+    void restoreCustomAttribs() override;
+    void randomize() override;
 };
 
 class TaskDelay : public TaskWinAgainst {
 protected:
     int turn;
     bool afterTurn;
-    virtual int computeReward();
+    int computeReward() override;
 
 public:
+    ~TaskDelay() override = default;
     TaskDelay(int _opponent = 0, int _turn = 20);
-    virtual string createDesc();
-    virtual string getShortDesc();
-    virtual bool isDone(GameObserver* observer, GameApp* _app);
-    virtual void storeCustomAttribs();
-    virtual void restoreCustomAttribs();
-    virtual void randomize();
+    string createDesc() override;
+    string getShortDesc() override;
+    bool isDone(GameObserver* observer, GameApp* _app) override;
+    void storeCustomAttribs() override;
+    void restoreCustomAttribs() override;
+    void randomize() override;
 };
 
 class TaskImmortal : public Task {
 protected:
     int targetLife;
     int level;
-    virtual int computeReward();
+    int computeReward() override;
 
 public:
+    ~TaskImmortal() override = default;
     TaskImmortal(int _targetLife = 20);
 
-    virtual string createDesc();
-    virtual string getShortDesc();
-    virtual bool isDone(GameObserver* observer, GameApp* _app);
-    virtual void storeCustomAttribs();
-    virtual void restoreCustomAttribs();
-    virtual void randomize();
+    string createDesc() override;
+    string getShortDesc() override;
+    bool isDone(GameObserver* observer, GameApp* _app) override;
+    void storeCustomAttribs() override;
+    void restoreCustomAttribs() override;
+    void randomize() override;
 };
 
 class TaskMassiveBurial : public Task {
 protected:
     int color;
     int bodyCount;
-    virtual int computeReward();
+    int computeReward() override;
 
 public:
+    ~TaskMassiveBurial() override = default;
     TaskMassiveBurial(int _color = 0, int _bodyCount = 0);
 
-    virtual string createDesc();
-    virtual string getShortDesc();
-    virtual bool isDone(GameObserver* observer, GameApp* _app);
-    virtual void storeCustomAttribs();
-    virtual void restoreCustomAttribs();
-    virtual void randomize();
+    string createDesc() override;
+    string getShortDesc() override;
+    bool isDone(GameObserver* observer, GameApp* _app) override;
+    void storeCustomAttribs() override;
+    void restoreCustomAttribs() override;
+    void randomize() override;
 };
 
 class TaskWisdom : public Task {
 protected:
     int color;
     int cardCount;
-    virtual int computeReward();
+    int computeReward() override;
 
 public:
+    ~TaskWisdom() override = default;
     TaskWisdom(int _color = 0, int _cardCount = 0);
 
-    virtual string createDesc();
-    virtual string getShortDesc();
-    virtual bool isDone(GameObserver* observer, GameApp* _app);
-    virtual void storeCustomAttribs();
-    virtual void restoreCustomAttribs();
-    virtual void randomize();
+    string createDesc() override;
+    string getShortDesc() override;
+    bool isDone(GameObserver* observer, GameApp* _app) override;
+    void storeCustomAttribs() override;
+    void restoreCustomAttribs() override;
+    void randomize() override;
 };
 
 class TaskPacifism : public Task {
 protected:
-    virtual int computeReward();
+    int computeReward() override;
     int lifeSlashCardMin;
 
 public:
+    ~TaskPacifism() override = default;
     TaskPacifism(int _lifeSlashCardMin = 0);
 
-    virtual string createDesc();
-    virtual string getShortDesc();
-    virtual bool isDone(GameObserver* observer, GameApp* _app);
-    virtual void storeCustomAttribs();
-    virtual void restoreCustomAttribs();
-    virtual void randomize();
+    string createDesc() override;
+    string getShortDesc() override;
+    bool isDone(GameObserver* observer, GameApp* _app) override;
+    void storeCustomAttribs() override;
+    void restoreCustomAttribs() override;
+    void randomize() override;
 };
 
 /* ------------ Task template ------------

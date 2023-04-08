@@ -1,16 +1,22 @@
 #include "PrecompiledHeader.h"
 
 #include "MenuItem.h"
+
+#include <utility>
 #include "Translate.h"
 #include "WResourceManager.h"
 #include "ModRules.h"
 
 MenuItem::MenuItem(int id, WFont* font, string text, float x, float y, JQuad* _off, JQuad* _on, const char* particle,
                    JQuad* particleTex, bool hasFocus)
-    : JGuiObject(id), mFont(font), mX(x), mY(y) {
-    mText                      = _(text);
-    updatedSinceLastRender     = 1;
-    mParticleSys               = NULL;
+    : JGuiObject(id)
+    , mFont(font)
+    , mX(x)
+    , mY(y)
+    , mParticleSys(nullptr)
+    , updatedSinceLastRender(1) {
+    mText = _(std::move(text));
+
     hgeParticleSystemInfo* psi = WResourceManager::Instance()->RetrievePSI(particle, particleTex);
     if (psi) {
         mParticleSys = NEW hgeParticleSystem(psi);
@@ -25,15 +31,19 @@ MenuItem::MenuItem(int id, WFont* font, string text, float x, float y, JQuad* _o
     onQuad  = _on;
     offQuad = _off;
 
-    if (hasFocus) Entering();
+    if (hasFocus) {
+        Entering();
+    }
 }
 
 void MenuItem::Render() {
     JRenderer* renderer = JRenderer::GetInstance();
 
     if (mHasFocus) {
-        PIXEL_TYPE start = ARGB(46, 255, 255, 200);
-        if (mParticleSys) start = mParticleSys->info.colColorStart.GetHWColor();
+        auto start = ARGB(46, 255, 255, 200);
+        if (mParticleSys) {
+            start = mParticleSys->info.colColorStart.GetHWColor();
+        }
         PIXEL_TYPE colors[] = {
             ARGB(0, 0, 0, 0),
             start,
@@ -64,23 +74,33 @@ void MenuItem::Update(float dt) {
     lastDt                 = dt;
     if (mScale < mTargetScale) {
         mScale += 8.0f * dt;
-        if (mScale > mTargetScale) mScale = mTargetScale;
+        if (mScale > mTargetScale) {
+            mScale = mTargetScale;
+        }
     } else if (mScale > mTargetScale) {
         mScale -= 8.0f * dt;
-        if (mScale < mTargetScale) mScale = mTargetScale;
+        if (mScale < mTargetScale) {
+            mScale = mTargetScale;
+        }
     }
 
-    if (mParticleSys) mParticleSys->Update(dt);
+    if (mParticleSys) {
+        mParticleSys->Update(dt);
+    }
 }
 
 void MenuItem::Entering() {
-    if (mParticleSys) mParticleSys->Fire();
+    if (mParticleSys) {
+        mParticleSys->Fire();
+    }
     mHasFocus    = true;
     mTargetScale = 1.3f;
 }
 
 bool MenuItem::Leaving(JButton key) {
-    if (mParticleSys) mParticleSys->Stop(true);
+    if (mParticleSys) {
+        mParticleSys->Stop(true);
+    }
     mHasFocus    = false;
     mTargetScale = 1.0f;
     return true;
@@ -99,20 +119,23 @@ std::ostream& MenuItem::toString(std::ostream& out) const {
 
 OtherMenuItem::OtherMenuItem(int id, WFont* font, std::string text, float x, float y, JQuad* _off, JQuad* _on,
                              JButton _key, bool hasFocus)
-    : MenuItem(id, font, text, x, y, _off, _on, "", WResourceManager::Instance()->GetQuad("particles").get(), hasFocus),
-      mKey(_key),
-      mTimeIndex(0) {}
+    : MenuItem(id, font, std::move(text), x, y, _off, _on, "", WResourceManager::Instance()->GetQuad("particles").get(),
+               hasFocus)
+    , mKey(_key)
+    , mTimeIndex(0) {}
 
 OtherMenuItem::~OtherMenuItem() {}
 
 void OtherMenuItem::Render() {
     int alpha = 255;
-    if (GetId() == MENUITEM_TROPHIES && options.newAward()) alpha = (int)(sin(mTimeIndex) * 255);
+    if (GetId() == MENUITEM_TROPHIES && options.newAward()) {
+        alpha = (int)(sin(mTimeIndex) * 255);
+    }
 
-    float olds     = mFont->GetScale();
-    float xPos     = SCREEN_WIDTH - 64;
-    float xTextPos = xPos + 54;
-    int textAlign  = JGETEXT_RIGHT;
+    const float olds = mFont->GetScale();
+    float xPos       = SCREEN_WIDTH - 64;
+    float xTextPos   = xPos + 54;
+    int textAlign    = JGETEXT_RIGHT;
     onQuad->SetHFlip(false);
 
     switch (mKey) {

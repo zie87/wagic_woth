@@ -6,8 +6,8 @@
 //  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
 //
 
-#ifndef wagic_SimpleButton_h
-#define wagic_SimpleButton_h
+#ifndef SIMPLEBUTTON_H
+#define SIMPLEBUTTON_H
 
 #include <string>
 #include <JLBFont.h>
@@ -39,8 +39,8 @@ protected:
 
 public:
     SimpleButton(int id);
-    SimpleButton(JGuiController* _parent, int id, int fontId, string text, float x, float y, bool hasFocus = false,
-                 bool autoTranslate = false);
+    SimpleButton(JGuiController* _parent, int id, int fontId, const string& text, float x, float y,
+                 bool hasFocus = false, bool autoTranslate = false);
 
     virtual float getScale() const;
     virtual float getTargetScale() const;
@@ -67,14 +67,14 @@ public:
     virtual void Relocate(float x, float y);
 
     virtual void RenderWithOffset(float yOffset);
-    virtual void Render();
-    virtual void Update(float dt);
+    void Render() override;
+    void Update(float dt) override;
 
-    virtual void Entering();
-    virtual bool Leaving(JButton key);
-    virtual bool ButtonPressed();
-    virtual std::ostream& toString(std::ostream& out) const;
-    virtual bool getTopLeft(float& top, float& left) {
+    void Entering() override;
+    bool Leaving(JButton key) override;
+    bool ButtonPressed() override;
+    std::ostream& toString(std::ostream& out) const override;
+    bool getTopLeft(float& top, float& left) override {
         top  = mY + mYOffset;
         left = mX;
         return true;

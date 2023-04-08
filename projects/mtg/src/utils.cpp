@@ -7,6 +7,8 @@
 #include "WFont.h"
 #include <sys/stat.h>
 
+#include <utility>
+
 #ifdef PSP
 #include "pspsdk.h"
 #endif
@@ -22,13 +24,15 @@ using std::vector;
 
 int RandomGenerator::random() {
     int result;
-    if (!loadedRandomValues.size() || !log) {
+    if (loadedRandomValues.empty() || !log) {
         result = rand();
     } else {
         result = loadedRandomValues.front();
         loadedRandomValues.pop_front();
     }
-    if (log) usedRandomValues.push_back(result);
+    if (log) {
+        usedRandomValues.push_back(result);
+    }
     return result;
 }
 
@@ -54,9 +58,9 @@ void RandomGenerator::loadRandValues(std::string s) {
     loadedRandomValues.clear();
     usedRandomValues.clear();
 
-    while (s.size()) {
+    while (!s.empty()) {
         unsigned int value;
-        size_t limiter = s.find(",");
+        const size_t limiter = s.find(',');
         if (limiter != string::npos) {
             value = atoi(s.substr(0, limiter).c_str());
             s     = s.substr(limiter + 1);
@@ -64,7 +68,9 @@ void RandomGenerator::loadRandValues(std::string s) {
             value = atoi(s.c_str());
             s     = "";
         }
-        if (value) loadedRandomValues.push_back(value);
+        if (value) {
+            loadedRandomValues.push_back(value);
+        }
     }
 }
 
@@ -96,7 +102,8 @@ free(tab);
 // *** FUNCTIONS ***
 
 u32 ramAvailableLineareMax(void) {
-    u32 size, sizeblock;
+    u32 size;
+    u32 sizeblock;
     u8* ram;
 
     // Init variables
@@ -122,8 +129,9 @@ u32 ramAvailableLineareMax(void) {
 
             // Size block / 2
             sizeblock >>= 1;
-        } else
+        } else {
             free(ram);
+        }
     }
 
 #ifdef PSP
@@ -134,11 +142,14 @@ u32 ramAvailableLineareMax(void) {
 }
 
 u32 ramAvailable(void) {
-    u8 **ram, **temp;
-    u32 size, count, x;
+    u8** ram;
+    u8** temp;
+    u32 size;
+    u32 count;
+    u32 x;
 
     // Init variables
-    ram   = NULL;
+    ram   = nullptr;
     size  = 0;
     count = 0;
 
@@ -152,7 +163,9 @@ u32 ramAvailable(void) {
         if (!(count % 10)) {
             // Allocate more entries if needed
             temp = (u8**)realloc(ram, sizeof(u8*) * (count + 10));
-            if (!(temp)) break;
+            if (!(temp)) {
+                break;
+            }
 
             // Update entries and size (size contains also size of entries)
             ram = temp;
@@ -161,11 +174,15 @@ u32 ramAvailable(void) {
 
         // Find max lineare size available
         x = ramAvailableLineareMax();
-        if (!(x)) break;
+        if (!(x)) {
+            break;
+        }
 
         // Allocate ram
         ram[count] = (u8*)malloc(x);
-        if (!(ram[count])) break;
+        if (!(ram[count])) {
+            break;
+        }
 
         // Update variables
         size += x;
@@ -174,7 +191,9 @@ u32 ramAvailable(void) {
 
     // Free ram
     if (ram) {
-        for (x = 0; x < count; x++) free(ram[x]);
+        for (x = 0; x < count; x++) {
+            free(ram[x]);
+        }
         free(ram);
     }
 
@@ -210,9 +229,9 @@ std::vector<std::string>& split(const std::string& s, char delim, std::vector<st
     return elems;
 }
 
-std::string join(vector<string>& v, string delim) {
+std::string join(vector<string>& v, const string& delim) {
     std::string retVal;
-    for (vector<string>::iterator it = v.begin(); it != v.end(); ++it) {
+    for (auto it = v.begin(); it != v.end(); ++it) {
         retVal.append(*it);
         retVal.append(delim);
     }
@@ -225,14 +244,18 @@ std::vector<std::string> split(const std::string& s, char delim) {
     return split(s, delim, elems);
 }
 
-std::vector<std::string>& parseBetween(const std::string& s, string start, string stop, bool stopRequired,
+std::vector<std::string>& parseBetween(const std::string& s, const string& start, const string& stop, bool stopRequired,
                                        std::vector<std::string>& elems) {
-    size_t found = s.find(start);
-    if (found == string::npos) return elems;
+    const size_t found = s.find(start);
+    if (found == string::npos) {
+        return elems;
+    }
 
-    size_t offset = found + start.size();
-    size_t end    = s.find(stop, offset);
-    if (end == string::npos && stopRequired) return elems;
+    const size_t offset = found + start.size();
+    const size_t end    = s.find(stop, offset);
+    if (end == string::npos && stopRequired) {
+        return elems;
+    }
 
     elems.push_back(s.substr(0, found));
     if (end != string::npos) {
@@ -240,46 +263,53 @@ std::vector<std::string>& parseBetween(const std::string& s, string start, strin
         elems.push_back(s.substr(end + 1));
     } else {
         elems.push_back(s.substr(offset));
-        elems.push_back("");
+        elems.emplace_back("");
     }
 
     return elems;
 }
 
-std::vector<std::string> parseBetween(const std::string& s, string start, string stop, bool stopRequired) {
+std::vector<std::string> parseBetween(const std::string& s, const string& start, const string& stop,
+                                      bool stopRequired) {
     std::vector<std::string> elems;
-    return parseBetween(s, start, stop, stopRequired, elems);
+    return parseBetween(s, std::move(start), std::move(stop), stopRequired, elems);
 }
 
 // This is a customized word wrap based on pixel width.  It tries it's best
 // to wrap strings using spaces as delimiters.
 // Not sure how this translates into non-english fonts.
 std::string wordWrap(const std::string& sentence, float width, int fontId) {
-    WFont* mFont    = WResourceManager::Instance()->GetWFont(fontId);
-    float lineWidth = mFont->GetStringWidth(sentence.c_str());
-    string retVal   = sentence;
-    if (lineWidth < width) return sentence;
+    WFont* mFont          = WResourceManager::Instance()->GetWFont(fontId);
+    const float lineWidth = mFont->GetStringWidth(sentence.c_str());
+    string retVal         = sentence;
+    if (lineWidth < width) {
+        return sentence;
+    }
 
     int numLines = 1;
     int breakIdx = 0;
     for (size_t idx = 0; idx < sentence.length(); idx++) {
         if (sentence[idx] == ' ') {
-            string currentSentence = sentence.substr(breakIdx, idx - breakIdx);
-            float stringLength     = mFont->GetStringWidth(currentSentence.c_str());
+            const string currentSentence = sentence.substr(breakIdx, idx - breakIdx);
+            const float stringLength     = mFont->GetStringWidth(currentSentence.c_str());
             if (stringLength >= width) {
                 if (stringLength > width) {
-                    while (sentence[idx - 1] != ' ') idx--;
+                    while (sentence[idx - 1] != ' ') {
+                        idx--;
+                    }
                 }
                 retVal[idx - 1] = '\n';
                 breakIdx        = idx;
                 numLines++;
             }
         } else if (sentence[idx] == '\n') {
-            string currentSentence = sentence.substr(breakIdx, idx - breakIdx);
-            float stringLength     = mFont->GetStringWidth(currentSentence.c_str());
+            const string currentSentence = sentence.substr(breakIdx, idx - breakIdx);
+            const float stringLength     = mFont->GetStringWidth(currentSentence.c_str());
             if (stringLength >= width) {
                 if (stringLength > width) {
-                    while (sentence[idx - 1] != ' ') idx--;
+                    while (sentence[idx - 1] != ' ') {
+                        idx--;
+                    }
                     retVal[idx - 1] = '\n';
                 }
                 numLines++;
@@ -296,13 +326,15 @@ unsigned long hash_djb2(const char* str) {
     unsigned long hash = 5381;
     int c;
 
-    while ((c = *str++)) hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
+    while ((c = *str++)) {
+        hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
+    }
 
     return hash;
 }
 
 std::string buildFilePath(const vector<string>& folders, const string& filename) {
-    string result = "";
+    string result;
     for (size_t i = 0; i < folders.size(); ++i) {
         result.append(folders[i]);
         if (result[result.length() - 1] != '/') {
@@ -314,7 +346,9 @@ std::string buildFilePath(const vector<string>& folders, const string& filename)
     return result;
 }
 std::string ensureFolder(const std::string& folderName) {
-    if (!folderName.size()) return "";
+    if (folderName.empty()) {
+        return "";
+    }
 
     string result = folderName;
     if (result[result.length() - 1] != '/') {

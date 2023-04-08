@@ -1,5 +1,5 @@
-#ifndef _GAME_STATE_TRANSITIONS_H_
-#define _GAME_STATE_TRANSITIONS_H_
+#ifndef GAMESTATETRANSITIONS_H
+#define GAMESTATETRANSITIONS_H
 
 #include <JGE.h>
 #include <JGui.h>
@@ -8,14 +8,14 @@
 class TransitionBase : public GameState, public JGuiListener {
 public:
     TransitionBase(GameApp* parent, GameState* _from, GameState* _to, float duration);
-    ~TransitionBase();
-    virtual void Start();
-    virtual void End();
+    ~TransitionBase() override;
+    void Start() override;
+    void End() override;
 
     virtual bool Finished() { return (mElapsed >= mDuration); };
-    virtual void Update(float dt);
-    virtual void Render() = 0;
-    virtual void ButtonPressed(int controllerId, int controlId);
+    void Update(float dt) override;
+    void Render() override = 0;
+    void ButtonPressed(int controllerId, int controlId) override;
 
     float mElapsed;
     float mDuration;
@@ -27,7 +27,7 @@ public:
 class TransitionFade : public TransitionBase {
 public:
     TransitionFade(GameApp* p, GameState* f, GameState* t, float dur, bool reversed);
-    virtual void Render();
+    void Render() override;
     bool mReversed;
 };
 

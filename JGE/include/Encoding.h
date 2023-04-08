@@ -8,8 +8,8 @@
 //
 //-------------------------------------------------------------------------------------
 
-#ifndef _ENCODING_H
-#define _ENCODING_H
+#ifndef ENCODING_H
+#define ENCODING_H
 
 #include "../../JGE/include/JGE.h"
 

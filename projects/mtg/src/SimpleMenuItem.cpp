@@ -1,23 +1,24 @@
 #include "PrecompiledHeader.h"
 
 #include "SimpleMenuItem.h"
+
+#include <utility>
 #include "Translate.h"
 #include "WResourceManager.h"
 
 SimpleMenuItem::SimpleMenuItem(int id) : SimpleButton(id) {}
 
-SimpleMenuItem::SimpleMenuItem(SimpleMenu* _parent, int id, int fontId, std::string text, float x, float y,
+SimpleMenuItem::SimpleMenuItem(SimpleMenu* _parent, int id, int fontId, const std::string& text, float x, float y,
                                bool hasFocus, bool autoTranslate)
-    : SimpleButton(_parent, id, fontId, text, x, y, hasFocus, autoTranslate) {
-    parent       = (SimpleMenu*)_parent;
-    mDescription = "";
+    : SimpleButton(_parent, id, fontId, std::move(text), x, y, hasFocus, autoTranslate) {
+    parent = (SimpleMenu*)_parent;
 }
 
 void SimpleMenuItem::Entering() {
     checkUserClick();
     setFocus(true);
-    if (getParent() != NULL) {
-        SimpleMenu* menu       = (SimpleMenu*)parent;
+    if (getParent() != nullptr) {
+        auto* menu             = dynamic_cast<SimpleMenu*>(parent);
         menu->selectionTargetY = getY();
     }
 }

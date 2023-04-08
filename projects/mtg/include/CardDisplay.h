@@ -1,5 +1,5 @@
-#ifndef _CARD_DISPLAY_H_
-#define _CARD_DISPLAY_H_
+#ifndef CARDDISPLAY_H
+#define CARDDISPLAY_H
 
 #include "PlayGuiObjectController.h"
 
@@ -16,14 +16,14 @@ public:
     TargetChooser* tc;
     JGuiListener* listener;
     CardDisplay(GameObserver* game);
-    CardDisplay(int id, GameObserver* game, int x, int y, JGuiListener* listener = NULL, TargetChooser* tc = NULL,
+    CardDisplay(int id, GameObserver* game, int x, int y, JGuiListener* listener = nullptr, TargetChooser* tc = nullptr,
                 int nb_displayed_items = 7);
     void AddCard(MTGCardInstance* _card);
     void rotateLeft();
     void rotateRight();
-    bool CheckUserInput(JButton key);
-    virtual void Update(float dt);
-    void Render();
+    bool CheckUserInput(JButton key) override;
+    void Update(float dt) override;
+    void Render() override;
     void init(MTGGameZone* zone);
     virtual std::ostream& toString(std::ostream& out) const;
 };

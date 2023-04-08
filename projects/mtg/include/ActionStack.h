@@ -4,8 +4,8 @@
  *  http://wololo.net/wagic/
  */
 
-#ifndef _SPELLSTACK_H_
-#define _SPELLSTACK_H_
+#ifndef ACTIONSTACK_H
+#define ACTIONSTACK_H
 
 #define MAX_SPELL_TARGETS 10
 
@@ -50,28 +50,28 @@ public:
 
     int state, display;
     MTGCardInstance* source;
-    virtual void Entering() { mHasFocus = true; }
+    void Entering() override { mHasFocus = true; }
 
-    virtual bool Leaving(JButton key) {
+    bool Leaving(JButton key) override {
         mHasFocus = false;
         return true;
     }
 
-    virtual bool ButtonPressed() { return true; }
+    bool ButtonPressed() override { return true; }
 
     virtual int resolve() { return 0; }
 
-    virtual void Render() {}
+    void Render() override {}
 
     Interruptible(GameObserver* observer, int inID = 0, bool hasFocus = false)
-        : PlayGuiObject(40, x, y, inID, hasFocus),
-          Targetable(observer),
-          state(NOT_RESOLVED),
-          display(0),
-          source(NULL) {}
+        : PlayGuiObject(40, x, y, inID, hasFocus)
+        , Targetable(observer)
+        , state(NOT_RESOLVED)
+        , display(0)
+        , source(nullptr) {}
 
-    virtual const string getDisplayName() const;
-    void Render(MTGCardInstance* source, JQuad* targetQuad, string alt1, string alt2, string action,
+    const string getDisplayName() const override;
+    void Render(MTGCardInstance* source, JQuad* targetQuad, const string& alt1, const string& alt2, string action,
                 bool bigQuad = false);
 
     virtual int receiveEvent(WEvent* event) { return 0; }
@@ -84,11 +84,11 @@ protected:
 
 class NextGamePhase : public Interruptible {
 public:
-    int resolve();
+    int resolve() override;
     bool extraDamagePhase();
-    void Render();
-    virtual std::ostream& toString(std::ostream& out) const;
-    virtual const string getDisplayName() const;
+    void Render() override;
+    std::ostream& toString(std::ostream& out) const override;
+    const string getDisplayName() const override;
     NextGamePhase(GameObserver* observer, int id);
 };
 
@@ -99,32 +99,32 @@ public:
     TargetChooser* tc;
     ManaCost* cost;
     int payResult;
-    int computeX(MTGCardInstance* card);
+    int computeX(MTGCardInstance* card) const;
     Spell(GameObserver* observer, MTGCardInstance* _source);
     Spell(GameObserver* observer, int id, MTGCardInstance* _source, TargetChooser* _tc, ManaCost* _cost, int payResult);
-    ~Spell();
-    int resolve();
-    void Render();
-    bool FullfilledAlternateCost(const int& costType);
-    const string getDisplayName() const;
-    virtual std::ostream& toString(std::ostream& out) const;
-    MTGCardInstance* getNextCardTarget(MTGCardInstance* previous = 0);
-    Player* getNextPlayerTarget(Player* previous = 0);
-    Damageable* getNextDamageableTarget(Damageable* previous = 0);
-    Interruptible* getNextInterruptible(Interruptible* previous, int type);
-    Spell* getNextSpellTarget(Spell* previous = 0);
-    Damage* getNextDamageTarget(Damage* previous = 0);
-    Targetable* getNextTarget(Targetable* previous = 0);
-    int getNbTargets();
+    ~Spell() override;
+    int resolve() override;
+    void Render() override;
+    bool FullfilledAlternateCost(const int& costType) const;
+    const string getDisplayName() const override;
+    std::ostream& toString(std::ostream& out) const override;
+    MTGCardInstance* getNextCardTarget(MTGCardInstance* previous = nullptr) const;
+    Player* getNextPlayerTarget(Player* previous = nullptr) const;
+    Damageable* getNextDamageableTarget(Damageable* previous = nullptr) const;
+    Interruptible* getNextInterruptible(Interruptible* previous, int type) const;
+    Spell* getNextSpellTarget(Spell* previous = nullptr) const;
+    Damage* getNextDamageTarget(Damage* previous = nullptr) const;
+    Targetable* getNextTarget(Targetable* previous = nullptr) const;
+    int getNbTargets() const;
 };
 
 class StackAbility : public Interruptible {
 public:
     MTGAbility* ability;
-    int resolve();
-    void Render();
-    virtual std::ostream& toString(std::ostream& out) const;
-    virtual const string getDisplayName() const;
+    int resolve() override;
+    void Render() override;
+    std::ostream& toString(std::ostream& out) const override;
+    const string getDisplayName() const override;
     StackAbility(GameObserver* observer, int id, MTGAbility* _ability);
 };
 
@@ -132,9 +132,9 @@ class PutInGraveyard : public Interruptible {
 public:
     MTGCardInstance* card;
     int removeFromGame;
-    int resolve();
-    void Render();
-    virtual std::ostream& toString(std::ostream& out) const;
+    int resolve() override;
+    void Render() override;
+    std::ostream& toString(std::ostream& out) const override;
     PutInGraveyard(GameObserver* observer, int id, MTGCardInstance* _card);
 };
 
@@ -142,9 +142,9 @@ class DrawAction : public Interruptible {
 public:
     int nbcards;
     Player* player;
-    int resolve();
-    void Render();
-    virtual std::ostream& toString(std::ostream& out) const;
+    int resolve() override;
+    void Render() override;
+    std::ostream& toString(std::ostream& out) const override;
     DrawAction(GameObserver* observer, int id, Player* _player, int _nbcards);
 };
 
@@ -153,9 +153,9 @@ class LifeAction : public Interruptible {
 public:
     int amount;
     Damageable* target;
-    int resolve();
-    void Render();
-    virtual std::ostream& toString(std::ostream& out) const;
+    int resolve() override;
+    void Render() override;
+    std::ostream& toString(std::ostream& out) const override;
     LifeAction(GameObserver* observer, int id, Damageable* _target, int amount);
 };
 
@@ -173,7 +173,7 @@ protected:
     ATutorialMessage* currentTutorial;
     int interruptBtnXOffset, noBtnXOffset, noToAllBtnXOffset, interruptDialogWidth;
 
-    JButton handleInterruptRequest(JButton inputKey, int& x, int& y);
+    JButton handleInterruptRequest(JButton inputKey, int& x, int& y) const;
 
 public:
     Player* lastActionController;
@@ -200,14 +200,14 @@ public:
     int addLife(Damageable* _target, int amount = 0);
     int addDamage(MTGCardInstance* _source, Damageable* target, int _damage);
     int addAbility(MTGAbility* ability);
-    void Update(float dt);
-    bool CheckUserInput(JButton key);
-    virtual void Render();
+    void Update(float dt) override;
+    bool CheckUserInput(JButton key) override;
+    void Render() override;
     ActionStack(GameObserver* game);
     int resolve();
     int has(Interruptible* action);
     int has(MTGAbility* ability);
-    int receiveEventPlus(WEvent* event);
+    int receiveEventPlus(WEvent* event) override;
     void Dump();
     void setCurrentTutorial(ATutorialMessage* message) { currentTutorial = message; };
     ATutorialMessage* getCurrentTutorial() { return currentTutorial; };

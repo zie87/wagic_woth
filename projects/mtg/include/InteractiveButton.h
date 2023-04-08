@@ -5,8 +5,8 @@
 //  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
 //
 
-#ifndef wagic_InteractiveButton_h
-#define wagic_InteractiveButton_h
+#ifndef INTERACTIVEBUTTON_H
+#define INTERACTIVEBUTTON_H
 
 #include <string>
 #include <JLBFont.h>
@@ -35,15 +35,15 @@ private:
     JButton mActionKey;
 
 public:
-    InteractiveButton(JGuiController* _parent, int id, int fontId, string text, float x, float y, JButton actionKey,
-                      bool hasFocus = false, bool autoTranslate = false);
+    InteractiveButton(JGuiController* _parent, int id, int fontId, const string& text, float x, float y,
+                      JButton actionKey, bool hasFocus = false, bool autoTranslate = false);
 
-    virtual void Entering();
-    virtual bool ButtonPressed();
+    void Entering() override;
+    bool ButtonPressed() override;
     virtual void setImage(const JQuadPtr imagePtr);
-    virtual void checkUserClick();
-    virtual void Render();
-    virtual std::ostream& toString(std::ostream& out) const;
+    void checkUserClick() override;
+    void Render() override;
+    std::ostream& toString(std::ostream& out) const override;
 };
 
 #endif

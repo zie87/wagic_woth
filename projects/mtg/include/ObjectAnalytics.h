@@ -38,11 +38,15 @@ template <typename T>
 class InstanceCounter {
 public:
     InstanceCounter() {
-        if (sHighWaterMark < ++sInstanceCount) sHighWaterMark = sInstanceCount;
+        if (sHighWaterMark < ++sInstanceCount) {
+            sHighWaterMark = sInstanceCount;
+        }
     }
 
     InstanceCounter(const InstanceCounter&) {
-        if (sHighWaterMark < ++sInstanceCount) sHighWaterMark = sInstanceCount;
+        if (sHighWaterMark < ++sInstanceCount) {
+            sHighWaterMark = sInstanceCount;
+        }
     }
     InstanceCounter& operator=(const InstanceCounter&) {}
 

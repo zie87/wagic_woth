@@ -6,8 +6,7 @@
 
 int PriceList::randomKey = 0;
 
-PriceList::PriceList(const char* _filename, MTGAllCards* _collection) : collection(_collection) {
-    filename = _filename;
+PriceList::PriceList(const char* _filename, MTGAllCards* _collection) : collection(_collection), filename(_filename) {
     std::string contents;
     if (JFileSystem::GetInstance()->readIntoString(filename, contents)) {
         std::stringstream stream(contents);
@@ -18,7 +17,9 @@ PriceList::PriceList(const char* _filename, MTGAllCards* _collection) : collecti
             prices[atoi(cardid.c_str())] = atoi(price.c_str());
         }
     }
-    if (randomKey == 0) randomKey = rand();
+    if (randomKey == 0) {
+        randomKey = rand();
+    }
 }
 
 PriceList::~PriceList() {}
@@ -27,7 +28,7 @@ int PriceList::save() {
     std::ofstream file;
     if (JFileSystem::GetInstance()->openForWrite(file, filename)) {
         char writer[20];
-        map<int, int>::iterator it = prices.begin();
+        auto it = prices.begin();
         while (it != prices.end()) {
             sprintf(writer, "%i\n%i\n", (*it).first, (*it).second);
             it++;
@@ -39,10 +40,12 @@ int PriceList::save() {
     return 1;
 }
 int PriceList::getPrice(int cardId) {
-    map<int, int>::iterator it = prices.find(cardId);
-    if (it != prices.end()) return (*it).second;
+    auto it = prices.find(cardId);
+    if (it != prices.end()) {
+        return (*it).second;
+    }
 
-    char rarity = collection->getCardById(cardId)->getRarity();
+    const char rarity = collection->getCardById(cardId)->getRarity();
     switch (rarity) {
     case Constants::RARITY_M:
         return Constants::PRICE_1M;
@@ -93,19 +96,24 @@ float PriceList::difficultyScalar(float price, int cardid) {
         return price * badluck;
         break;  // Price from .25x to 2.25x, randomly.
     }
-    if (badluck > 1)
+    if (badluck > 1) {
         badluck = 1;
-    else if (badluck < -1)
+    } else if (badluck < -1) {
         badluck = -1;
+    }
     return (price + price * badluck);
 }
 int PriceList::getPurchasePrice(int cardid) {
     float p = difficultyScalar((float)getPrice(cardid), cardid);
-    if (p < 2) p = 2;  // Prevents "Sell for 0 credits"
+    if (p < 2) {
+        p = 2;  // Prevents "Sell for 0 credits"
+    }
     return (int)p;
 }
 int PriceList::getOtherPrice(int amt) {
     float p = difficultyScalar((float)amt, 0);
-    if (p < 2) p = 2;
+    if (p < 2) {
+        p = 2;
+    }
     return (int)p;
 }

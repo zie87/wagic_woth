@@ -117,8 +117,9 @@ inline std::ostream& writevar(std::ostream& File, const T& Var, const std::strea
 
     T TmpVar = Var;
 
-    for (std::streamsize i = 0; i < NbBytes; ++i)
+    for (std::streamsize i = 0; i < NbBytes; ++i) {
         File.write(reinterpret_cast<const char*>(&(TmpVar >>= (CHAR_BIT * i))), 1);
+    }
 
     return File;
 }
@@ -128,21 +129,21 @@ inline std::ostream& writevar(std::ostream& File, const T& Var, const std::strea
 //////////////////////////////////////////////////////////////////////
 
 inline search_iterator::search_iterator()
-    : m_Valid(false),
+    : m_Valid(false)
 #if defined WIN32
-      m_hFiles(-1)
+    , m_hFiles(-1)
 #else
-      m_Directory(NULL)
+    , m_Directory(nullptr)
 #endif
 {
 }
 
 inline search_iterator::search_iterator(const char* FileSpec)
-    : m_Valid(false),
+    : m_Valid(false)
 #if defined WIN32
-      m_hFiles(-1)
+    , m_hFiles(-1)
 #else
-      m_Directory(NULL)
+    , m_Directory(nullptr)
 #endif
 {
     begin(FileSpec);
@@ -152,7 +153,9 @@ inline search_iterator::~search_iterator() {
 #if defined WIN32
     if (m_hFiles != -1) _findclose(m_hFiles);
 #else
-    if (m_Directory != NULL) closedir(m_Directory);
+    if (m_Directory != nullptr) {
+        closedir(m_Directory);
+    }
 #endif
 }
 
@@ -167,22 +170,30 @@ inline search_iterator& search_iterator::begin(const char* FileSpec) {
 #else
     std::string DirectoryName;
 
-    if (m_Directory != NULL) closedir(m_Directory);
+    if (m_Directory != nullptr) {
+        closedir(m_Directory);
+    }
 
     int i;
-    for (i = strlen(FileSpec); i >= 0; --i)
-        if (FileSpec[i] == '/') break;
+    for (i = strlen(FileSpec); i >= 0; --i) {
+        if (FileSpec[i] == '/') {
+            break;
+        }
+    }
 
-    if (i < 0)
+    if (i < 0) {
         DirectoryName = ".";
-    else
+    } else {
         DirectoryName.assign(FileSpec + 0, FileSpec + i++);
+    }
 
     m_Extension = FileSpec + i + 1;
     std::transform(m_Extension.begin(), m_Extension.end(), m_Extension.begin(), ::tolower);
-    m_Valid = ((m_Directory = opendir(DirectoryName.c_str())) != NULL);
+    m_Valid = ((m_Directory = opendir(DirectoryName.c_str())) != nullptr);
 
-    if (!m_Valid) return (*this);
+    if (!m_Valid) {
+        return (*this);
+    }
 
     next();
 #endif
@@ -198,19 +209,22 @@ inline search_iterator& search_iterator::next() {
 #else
     bool Found = false;
     while (!Found) {
-        m_Valid = ((m_DirectoryEntry = readdir(m_Directory)) != NULL);
+        m_Valid = ((m_DirectoryEntry = readdir(m_Directory)) != nullptr);
         if (m_Valid) {
             std::string FileName = m_DirectoryEntry->d_name;
-            if (FileName[0] == '.')
+            if (FileName[0] == '.') {
                 Found = false;
-            else if (FileName.size() <= m_Extension.size())
+            } else if (FileName.size() <= m_Extension.size()) {
                 Found = false;
-            else {
+            } else {
                 std::transform(FileName.begin(), FileName.end(), FileName.begin(), ::tolower);
-                if (std::equal(m_Extension.rbegin(), m_Extension.rend(), FileName.rbegin())) Found = true;
+                if (std::equal(m_Extension.rbegin(), m_Extension.rend(), FileName.rbegin())) {
+                    Found = true;
+                }
             }
-        } else
+        } else {
             break;
+        }
     }
 #endif
 

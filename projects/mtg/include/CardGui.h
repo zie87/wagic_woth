@@ -1,7 +1,7 @@
 /* Graphical representation of a Card Instance, used in game */
 
-#ifndef _CARD_GUI_H_
-#define _CARD_GUI_H_
+#ifndef CARDGUI_H
+#define CARDGUI_H
 
 #include <hge/hgeparticle.h>
 #include <JGui.h>
@@ -30,7 +30,7 @@ protected:
     static void RenderCountersBig(MTGCard* card, const Pos& pos, int drawMode = DrawMode::kNormal);
     static void AlternateRender(MTGCard* card, const Pos& pos);
     static void TinyCropRender(MTGCard* card, const Pos& pos, JQuad* quad);
-    static std::string FormattedData(std::string data, std::string replace, std::string value);
+    static std::string FormattedData(std::string data, const std::string& replace, std::string value);
     static bool FilterCard(MTGCard* card, std::string filter);
 
 public:
@@ -44,14 +44,14 @@ public:
     MTGCardInstance* card;
     CardGui(MTGCardInstance* card, float x, float y);
     CardGui(MTGCardInstance* card, const Pos& ref);
-    virtual void Render();
-    virtual void Update(float dt);
+    void Render() override;
+    void Update(float dt) override;
 
-    void DrawCard(const Pos& inPosition, int inMode = DrawMode::kNormal);
+    void DrawCard(const Pos& inPosition, int inMode = DrawMode::kNormal) const;
     static void DrawCard(MTGCard* inCard, const Pos& inPosition, int inMode = DrawMode::kNormal);
 
     static JQuadPtr AlternateThumbQuad(MTGCard* card);
-    virtual std::ostream& toString(std::ostream&) const;
+    std::ostream& toString(std::ostream&) const override;
 };
 
 class CardView : public CardGui {
@@ -63,13 +63,13 @@ public:
     MTGCardInstance* getCard();  // remove this when possible
     CardView(const SelectorZone, MTGCardInstance* card, float x, float y);
     CardView(const SelectorZone, MTGCardInstance* card, const Pos& ref);
-    virtual ~CardView();
+    ~CardView() override;
 
-    void Render() { CardGui::Render(); }
+    void Render() override { CardGui::Render(); }
 
     void Render(JQuad* q) { Pos::Render(q); }
 
-    virtual std::ostream& toString(std::ostream&) const;
+    std::ostream& toString(std::ostream&) const override;
 
     float GetCenterX();
     float GetCenterY();
@@ -83,6 +83,7 @@ public:
 
 class SimpleCardEffect {
 public:
+    virtual ~SimpleCardEffect()        = default;
     virtual void doEffect(Pos* card)   = 0;
     virtual void undoEffect(Pos* card) = 0;
 };
@@ -92,9 +93,10 @@ protected:
     float mRotation;
 
 public:
+    ~SimpleCardEffectRotate() override = default;
     SimpleCardEffectRotate(float rotation);
-    void doEffect(Pos* card);
-    void undoEffect(Pos* card);
+    void doEffect(Pos* card) override;
+    void undoEffect(Pos* card) override;
 };
 
 class SimpleCardEffectMask : public SimpleCardEffect {
@@ -102,9 +104,10 @@ protected:
     PIXEL_TYPE mMask;
 
 public:
+    ~SimpleCardEffectMask() override = default;
     SimpleCardEffectMask(PIXEL_TYPE mask);
-    void doEffect(Pos* card);
-    void undoEffect(Pos* card);
+    void doEffect(Pos* card) override;
+    void undoEffect(Pos* card) override;
 };
 
 #endif

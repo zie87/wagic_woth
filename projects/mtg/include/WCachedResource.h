@@ -1,5 +1,5 @@
-#ifndef _WCACHEDRESOURCE_H_
-#define _WCACHEDRESOURCE_H_
+#ifndef WCACHEDRESOURCE_H
+#define WCACHEDRESOURCE_H
 #include <hge/hgeparticle.h>
 
 #if defined WIN32 || defined LINUX
@@ -26,9 +26,9 @@ public:
     virtual void lock();                      // Lock it.
     virtual void unlock(bool force = false);  // Unlock it. Forcing a lock will also remove "permanent" status.
 
-    bool isPermanent();  // Is the resource permanent?
-    void deadbolt();     // Make it permanent.
-    void hit();          // Update resource's last used time.
+    bool isPermanent() const;  // Is the resource permanent?
+    void deadbolt();           // Make it permanent.
+    void hit();                // Update resource's last used time.
 
 protected:
     int loadedMode;         // What submode settings were we loaded with? (For refresh)
@@ -42,7 +42,7 @@ public:
     template <class cacheItem, class cacheActual>
     friend class WCache;
 
-    virtual ~WCachedResource();
+    ~WCachedResource() override;
 
     string mFilename;
     virtual void Refresh()           = 0;  // Basically calls Attempt(filename) and remaps in situ.
@@ -57,13 +57,13 @@ public:
     friend class WCache;
 
     WCachedTexture();
-    ~WCachedTexture();
+    ~WCachedTexture() override;
 
-    void Refresh();
-    unsigned long size();
-    bool isGood();
-    bool isLocked();  // Is the resource locked?
-    bool Attempt(const string& filename, int submode, int& error);
+    void Refresh() override;
+    unsigned long size() override;
+    bool isGood() override;
+    bool isLocked() override;  // Is the resource locked?
+    bool Attempt(const string& filename, int submode, int& error) override;
     bool compare(JTexture* t) { return (t == texture); }
 
     JTexture* Actual();  // Return this texture as is. Does not make a new one.
@@ -85,12 +85,12 @@ public:
     template <class cacheItem, class cacheActual>
     friend class WCache;
     WCachedParticles();
-    ~WCachedParticles();
-    void Refresh();
-    unsigned long size();
+    ~WCachedParticles() override;
+    void Refresh() override;
+    unsigned long size() override;
 
-    bool isGood();
-    bool Attempt(const string& filename, int submode, int& error);
+    bool isGood() override;
+    bool Attempt(const string& filename, int submode, int& error) override;
     bool compare(hgeParticleSystemInfo* p) { return (p == particles); }
 
     hgeParticleSystemInfo* Actual();
@@ -106,14 +106,14 @@ public:
     friend class WCache;
 
     WCachedSample();
-    ~WCachedSample();
+    ~WCachedSample() override;
 
     bool compare(JSample* s) { return (s == sample); }
 
-    unsigned long size();
-    bool isGood();
-    void Refresh();
-    bool Attempt(const string& filename, int submode, int& error);
+    unsigned long size() override;
+    bool isGood() override;
+    void Refresh() override;
+    bool Attempt(const string& filename, int submode, int& error) override;
 
     JSample* Actual();  // Return this sample.
 protected:

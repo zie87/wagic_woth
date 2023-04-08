@@ -18,9 +18,15 @@
 #endif
 
 void hgeColorHSV::SetHWColor(DWORD col) {
-    float r, g, b;
-    float minv, maxv, delta;
-    float del_R, del_G, del_B;
+    float r;
+    float g;
+    float b;
+    float minv;
+    float maxv;
+    float delta;
+    float del_R;
+    float del_G;
+    float del_B;
 
     a = (col >> 24) / 255.0f;
     r = ((col >> 16) & 0xFF) / 255.0f;
@@ -50,14 +56,24 @@ void hgeColorHSV::SetHWColor(DWORD col) {
             h = (2 / 3) + del_G - del_R;
         }
 
-        if (h < 0) h += 1;
-        if (h > 1) h -= 1;
+        if (h < 0) {
+            h += 1;
+        }
+        if (h > 1) {
+            h -= 1;
+        }
     }
 }
 
 DWORD hgeColorHSV::GetHWColor() const {
-    float r, g, b;
-    float xh, i, p1, p2, p3;
+    float r;
+    float g;
+    float b;
+    float xh;
+    float i;
+    float p1;
+    float p2;
+    float p3;
 
     if (s == 0) {
         r = v;
@@ -65,7 +81,9 @@ DWORD hgeColorHSV::GetHWColor() const {
         b = v;
     } else {
         xh = h * 6;
-        if (xh == 6) xh = 0;
+        if (xh == 6) {
+            xh = 0;
+        }
         i  = floorf(xh);
         p1 = v * (1 - s);
         p2 = v * (1 - s * (xh - i));

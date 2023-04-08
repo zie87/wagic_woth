@@ -1,5 +1,5 @@
-#ifndef _PRICELIST_H_
-#define _PRICELIST_H_
+#ifndef PRICELIST_H
+#define PRICELIST_H
 
 #include <string>
 #include "MTGDefinitions.h"

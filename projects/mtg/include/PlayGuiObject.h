@@ -2,8 +2,8 @@
  A class for all interactive objects in the play area (cards, avatars, etc...)
  */
 
-#ifndef _PLAYGUIOBJECT_H_
-#define _PLAYGUIOBJECT_H_
+#ifndef PLAYGUIOBJECT_H
+#define PLAYGUIOBJECT_H
 
 #define GUI_AVATAR 1
 #define GUI_CARD 2
@@ -24,31 +24,31 @@ public:
     float defaultHeight;
     bool mHasFocus;
     int type;
-    virtual void Entering() {
+    void Entering() override {
         mHasFocus = true;
         zoom      = 1.4f;
     };
-    virtual bool Leaving(JButton key) {
+    bool Leaving(JButton key) override {
         mHasFocus = false;
         zoom      = 1.0;
         return true;
     };
     virtual bool CheckUserInput(JButton key) { return false; };
-    virtual bool ButtonPressed() { return true; };
-    virtual void Render();
-    virtual void Update(float dt);
+    bool ButtonPressed() override { return true; };
+    void Render() override;
+    void Update(float dt) override;
 
     PlayGuiObject(float desiredHeight, float x, float y, int inID, bool hasFocus);
 
     PlayGuiObject(float desiredHeight, const Pos& ref, int inID, bool hasFocus);
 
-    virtual void ButtonPressed(int controllerId, int controlId) {}
-    virtual bool getTopLeft(float& top, float& left) {
+    void ButtonPressed(int controllerId, int controlId) override {}
+    bool getTopLeft(float& top, float& left) override {
         top  = actY;
         left = actX;
         return true;
     };
-    virtual ~PlayGuiObject(){};
+    ~PlayGuiObject() override{};
     std::vector<Effect*> effects;
 };
 

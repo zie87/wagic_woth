@@ -14,10 +14,12 @@ static std::map<const JButton, KeyRep> slimtable;
 const KeyRep& translateKey(LocalKeySym key) {
     {
         std::map<const LocalKeySym, KeyRep>::iterator res;
-        if ((res = fattable.find(key)) != fattable.end()) return res->second;
+        if ((res = fattable.find(key)) != fattable.end()) {
+            return res->second;
+        }
     }
 
-    char* str = NULL;
+    char* str = nullptr;
 
     str = (char*)SDL_GetKeyName(key);
     if (!str) {
@@ -26,7 +28,7 @@ const KeyRep& translateKey(LocalKeySym key) {
                 (long unsigned int)key);  // TODO: Wagic is not supposed to know that a key actually is an unsingned
                                           // long, so this part should probably be platform specific (move to JGE ?)
     }
-    const KeyRep k = std::make_pair(str, static_cast<JQuad*>(NULL));
+    const KeyRep k = std::make_pair(str, static_cast<JQuad*>(nullptr));
     fattable[key]  = k;
     return fattable[key];
 }
@@ -160,24 +162,24 @@ const KeyRep& translateKey(JButton key) {
     std::map<const JButton, KeyRep>::iterator res;
     if ((res = slimtable.find(key)) == slimtable.end()) {
         if (slimtable.end() == slimtable.find(JGE_BTN_CTRL)) {
-            slimtable[JGE_BTN_NONE]       = std::make_pair(_("Delete this binding"), static_cast<JQuad*>(NULL));
-            slimtable[JGE_BTN_CTRL]       = std::make_pair(_("Select"), static_cast<JQuad*>(NULL));
-            slimtable[JGE_BTN_MENU]       = std::make_pair(_("Start"), static_cast<JQuad*>(NULL));
-            slimtable[JGE_BTN_UP]         = std::make_pair(_("Up"), static_cast<JQuad*>(NULL));
-            slimtable[JGE_BTN_RIGHT]      = std::make_pair(_("Right"), static_cast<JQuad*>(NULL));
-            slimtable[JGE_BTN_DOWN]       = std::make_pair(_("Down"), static_cast<JQuad*>(NULL));
-            slimtable[JGE_BTN_LEFT]       = std::make_pair(_("Left"), static_cast<JQuad*>(NULL));
-            slimtable[JGE_BTN_PREV]       = std::make_pair(_("Left trigger"), static_cast<JQuad*>(NULL));
-            slimtable[JGE_BTN_NEXT]       = std::make_pair(_("Right trigger"), static_cast<JQuad*>(NULL));
-            slimtable[JGE_BTN_CANCEL]     = std::make_pair(_("Triangle"), static_cast<JQuad*>(NULL));
-            slimtable[JGE_BTN_OK]         = std::make_pair(_("Circle"), static_cast<JQuad*>(NULL));
-            slimtable[JGE_BTN_SEC]        = std::make_pair(_("Cross"), static_cast<JQuad*>(NULL));
-            slimtable[JGE_BTN_PRI]        = std::make_pair(_("Square"), static_cast<JQuad*>(NULL));
-            slimtable[JGE_BTN_FULLSCREEN] = std::make_pair(_("Fullscreen"), static_cast<JQuad*>(NULL));
+            slimtable[JGE_BTN_NONE]       = std::make_pair(_("Delete this binding"), static_cast<JQuad*>(nullptr));
+            slimtable[JGE_BTN_CTRL]       = std::make_pair(_("Select"), static_cast<JQuad*>(nullptr));
+            slimtable[JGE_BTN_MENU]       = std::make_pair(_("Start"), static_cast<JQuad*>(nullptr));
+            slimtable[JGE_BTN_UP]         = std::make_pair(_("Up"), static_cast<JQuad*>(nullptr));
+            slimtable[JGE_BTN_RIGHT]      = std::make_pair(_("Right"), static_cast<JQuad*>(nullptr));
+            slimtable[JGE_BTN_DOWN]       = std::make_pair(_("Down"), static_cast<JQuad*>(nullptr));
+            slimtable[JGE_BTN_LEFT]       = std::make_pair(_("Left"), static_cast<JQuad*>(nullptr));
+            slimtable[JGE_BTN_PREV]       = std::make_pair(_("Left trigger"), static_cast<JQuad*>(nullptr));
+            slimtable[JGE_BTN_NEXT]       = std::make_pair(_("Right trigger"), static_cast<JQuad*>(nullptr));
+            slimtable[JGE_BTN_CANCEL]     = std::make_pair(_("Triangle"), static_cast<JQuad*>(nullptr));
+            slimtable[JGE_BTN_OK]         = std::make_pair(_("Circle"), static_cast<JQuad*>(nullptr));
+            slimtable[JGE_BTN_SEC]        = std::make_pair(_("Cross"), static_cast<JQuad*>(nullptr));
+            slimtable[JGE_BTN_PRI]        = std::make_pair(_("Square"), static_cast<JQuad*>(nullptr));
+            slimtable[JGE_BTN_FULLSCREEN] = std::make_pair(_("Fullscreen"), static_cast<JQuad*>(nullptr));
         } else {
             char* str = NEW char[11];
             sprintf(str, "%d", key);
-            slimtable[key] = std::make_pair(str, static_cast<JQuad*>(static_cast<JQuad*>(NULL)));
+            slimtable[key] = std::make_pair(str, static_cast<JQuad*>(nullptr));
         }
         res = slimtable.find(key);
     }

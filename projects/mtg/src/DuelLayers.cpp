@@ -40,9 +40,12 @@ void DuelLayers::init(GameObserver* go) {
 
 void DuelLayers::CheckUserInput(int isAI) {
     JButton key;
-    int x, y;
+    int x;
+    int y;
     JGE* jge = observer->getInput();
-    if (!jge) return;
+    if (!jge) {
+        return;
+    }
 
     while ((key = jge->ReadButton()) || jge->GetLeftClickCoordinates(x, y)) {
         if ((!isAI) && ((0 != key) || jge->GetLeftClickCoordinates(x, y))) {
@@ -76,10 +79,14 @@ void DuelLayers::CheckUserInput(int isAI) {
 }
 
 void DuelLayers::Update(float dt, Player* currentPlayer) {
-    for (int i = 0; i < nbitems; ++i) objects[i]->Update(dt);
+    for (int i = 0; i < nbitems; ++i) {
+        objects[i]->Update(dt);
+    }
 
-    int isAI = currentPlayer->isAI();
-    if (isAI && !currentPlayer->getObserver()->isLoading()) currentPlayer->Act(dt);
+    const int isAI = currentPlayer->isAI();
+    if (isAI && !currentPlayer->getObserver()->isLoading()) {
+        currentPlayer->Act(dt);
+    }
 
     CheckUserInput(isAI);
 }
@@ -95,16 +102,18 @@ GuiAvatars* DuelLayers::GetAvatars() { return avatars; }
 DuelLayers::DuelLayers() : nbitems(0) {}
 
 DuelLayers::~DuelLayers() {
-    int _nbitems = nbitems;
-    nbitems      = 0;
+    const int _nbitems = nbitems;
+    nbitems            = 0;
     for (int i = 0; i < _nbitems; ++i) {
         if (objects[i] != mCardSelector) {
             SAFE_DELETE(objects[i]);
-            objects[i] = NULL;
+            objects[i] = nullptr;
         }
     }
 
-    for (size_t i = 0; i < waiters.size(); ++i) delete (waiters[i]);
+    for (size_t i = 0; i < waiters.size(); ++i) {
+        delete (waiters[i]);
+    }
     observer->mTrash->cleanup();
 
     SAFE_DELETE(mCardSelector);
@@ -121,9 +130,13 @@ void DuelLayers::Render() {
     bool focusMakesItThrough = true;
     for (int i = 0; i < nbitems; ++i) {
         objects[i]->hasFocus = focusMakesItThrough;
-        if (objects[i]->modal) focusMakesItThrough = false;
+        if (objects[i]->modal) {
+            focusMakesItThrough = false;
+        }
     }
-    for (int i = nbitems - 1; i >= 0; --i) objects[i]->Render();
+    for (int i = nbitems - 1; i >= 0; --i) {
+        objects[i]->Render();
+    }
 }
 
 int DuelLayers::receiveEvent(WEvent* e) {
@@ -149,26 +162,36 @@ int DuelLayers::receiveEvent(WEvent* e) {
 #endif
 
     int used = 0;
-    for (int i = 0; i < nbitems; ++i) used |= objects[i]->receiveEventPlus(e);
+    for (int i = 0; i < nbitems; ++i) {
+        used |= objects[i]->receiveEventPlus(e);
+    }
     if (!used) {
         Pos* p;
-        if (WEventZoneChange* event = dynamic_cast<WEventZoneChange*>(e)) {
+        if (auto* event = dynamic_cast<WEventZoneChange*>(e)) {
             MTGCardInstance* card = event->card;
-            if (card->view)
+            if (card->view) {
                 waiters.push_back(p = NEW Pos(*(card->view)));
-            else
+            } else {
                 waiters.push_back(p = NEW Pos(0, 0, 0, 0, 255));
+            }
             const Pos* ref = card->view;
             while (card) {
-                if (ref == card->view) card->view = p;
+                if (ref == card->view) {
+                    card->view = p;
+                }
                 card = card->next;
             }
         }
     }
-    for (int i = 0; i < nbitems; ++i) objects[i]->receiveEventMinus(e);
+    for (int i = 0; i < nbitems; ++i) {
+        objects[i]->receiveEventMinus(e);
+    }
 
-    if (WEventPhaseChange* event = dynamic_cast<WEventPhaseChange*>(e))
-        if (MTG_PHASE_BEFORE_BEGIN == event->to->id) observer->mTrash->cleanup();
+    if (auto* event = dynamic_cast<WEventPhaseChange*>(e)) {
+        if (MTG_PHASE_BEFORE_BEGIN == event->to->id) {
+            observer->mTrash->cleanup();
+        }
+    }
 
     return 1;
 }

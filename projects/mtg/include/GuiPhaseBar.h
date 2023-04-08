@@ -1,5 +1,5 @@
-#ifndef _GUIPHASEBAR_H_
-#define _GUIPHASEBAR_H_
+#ifndef GUIPHASEBAR_H
+#define GUIPHASEBAR_H
 
 #include "GuiLayers.h"
 #include "PhaseRing.h"
@@ -13,13 +13,13 @@ protected:
 
 public:
     GuiPhaseBar(GameObserver* observer);
-    ~GuiPhaseBar();
-    void Update(float dt);
-    virtual void Render();
-    virtual int receiveEventMinus(WEvent* e);
-    virtual std::ostream& toString(std::ostream& out) const;
-    virtual void Entering();
-    virtual bool Leaving(JButton key);
+    ~GuiPhaseBar() override;
+    void Update(float dt) override;
+    void Render() override;
+    int receiveEventMinus(WEvent* e) override;
+    std::ostream& toString(std::ostream& out) const override;
+    void Entering() override;
+    bool Leaving(JButton key) override;
 };
 
-#endif  // _GUIPHASEBAR_H_
+#endif  // GUIPHASEBAR_H

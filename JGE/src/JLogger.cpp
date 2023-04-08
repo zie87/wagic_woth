@@ -4,14 +4,14 @@
 
 #include <fstream>
 
-std::string JLogger::lastLog = "";
-int JLogger::lastTime        = 0;
+std::string JLogger::lastLog;
+int JLogger::lastTime = 0;
 
 void JLogger::Log(const char* text) {
 #ifdef DOLOG
     std::ofstream file(LOG_FILE, std::ios_base::app);
     std::stringstream out;
-    int newTime = JGEGetTime();
+    const int newTime = JGEGetTime();
     out << newTime << "(+" << newTime - lastTime << ") :" << text;
     if (file) {
         file << out.str();
@@ -25,7 +25,7 @@ void JLogger::Log(const char* text) {
     lastLog = text;
 }
 
-void JLogger::Log(std::string text) { Log(text.c_str()); }
+void JLogger::Log(const std::string& text) { Log(text.c_str()); }
 
 JLogger::JLogger(const char* text) : mText(text) {
 #ifdef DOLOG

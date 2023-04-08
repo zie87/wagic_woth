@@ -1,3 +1,6 @@
+#ifndef GUIMANA_H
+#define GUIMANA_H
+
 #include "string.h"
 #include <vector>
 #include <hge/hgeparticle.h>
@@ -21,12 +24,12 @@ public:
     enum { ALIVE, WITHERING, DROPPING, DEAD } mode;
 
     int color;
-    void Render();
+    void Render() override;
     void Update(float dt, float shift);
     void Wither();
     void Drop();
     ManaIcon(int color, float x, float y, float destx, float desty);
-    ~ManaIcon();
+    ~ManaIcon() override;
 };
 
 class GuiMana : public GuiLayer {
@@ -38,9 +41,11 @@ protected:
 
 public:
     GuiMana(float x, float y, Player* p);
-    ~GuiMana();
-    virtual void Render();
-    virtual void Update(float dt);
-    virtual int receiveEventPlus(WEvent* e);
-    virtual int receiveEventMinus(WEvent* e);
+    ~GuiMana() override;
+    void Render() override;
+    void Update(float dt) override;
+    int receiveEventPlus(WEvent* e) override;
+    int receiveEventMinus(WEvent* e) override;
 };
+
+#endif

@@ -1,5 +1,5 @@
-#ifndef _JLOGGER_H_
-#define _JLOGGER_H_
+#ifndef JLOGGER_H
+#define JLOGGER_H
 // logging facility
 // #define DOLOG
 
@@ -19,7 +19,7 @@
 class JLogger {
 public:
     static void Log(const char* text);
-    static void Log(std::string text);
+    static void Log(const std::string& text);
 
     JLogger(const char* text);
     ~JLogger();

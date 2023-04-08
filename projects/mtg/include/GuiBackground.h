@@ -1,5 +1,5 @@
-#ifndef _GUIBACKGROUND_H_
-#define _GUIBACKGROUND_H_
+#ifndef GUIBACKGROUND_H
+#define GUIBACKGROUND_H
 
 #include "GuiLayers.h"
 #include "WEvent.h"
@@ -10,8 +10,8 @@ protected:
 
 public:
     GuiBackground(GameObserver* observer);
-    ~GuiBackground();
-    virtual void Render();
+    ~GuiBackground() override;
+    void Render() override;
 };
 
-#endif  // _GUIBACKGROUND_H_
+#endif  // GUIBACKGROUND_H

@@ -8,8 +8,8 @@
 //
 //-------------------------------------------------------------------------------------
 
-#ifndef __PARTICLE_H__
-#define __PARTICLE_H__
+#ifndef JPARTICLE_H
+#define JPARTICLE_H
 
 #include "JApp.h"
 #include "JRenderer.h"

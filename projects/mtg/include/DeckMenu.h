@@ -1,8 +1,8 @@
 /*
  A class for menus with a fixed layout
  */
-#ifndef _DeckMenu_H_
-#define _DeckMenu_H_
+#ifndef DECKMENU_H
+#define DECKMENU_H
 
 #include <string>
 #include "WFont.h"
@@ -62,9 +62,9 @@ public:
     JQuadPtr pspIcons[8];
     JTexture* pspIconsTexture;
 
-    DeckMenu(int id, JGuiListener* listener, int fontId, const string _title = "", const int& startIndex = 0,
+    DeckMenu(int id, JGuiListener* listener, int fontId, const string& _title = "", const int& startIndex = 0,
              bool alwaysShowDetailsButton = false);
-    ~DeckMenu();
+    ~DeckMenu() override;
 
     DeckMetaData* getSelectedDeck();
     void enableDisplayDetailsOverride();
@@ -72,12 +72,12 @@ public:
 
     virtual bool isClosed() const { return mClosed; }
 
-    virtual void Render();
-    virtual void Update(float dt);
+    void Render() override;
+    void Update(float dt) override;
     virtual void Add(int id, const char* Text, string desc = "", bool forceFocus = false,
-                     DeckMetaData* deckMetaData = NULL);
+                     DeckMetaData* deckMetaData = nullptr);
     virtual void Close();
-    void updateScroller();
+    void updateScroller() const;
     void RenderBackground();
     void RenderDeckManaColors();
 

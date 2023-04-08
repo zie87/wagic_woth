@@ -17,8 +17,8 @@
 //////////////////////////////////////////////////////////////////////////
 JMusic::JMusic()
 #ifdef USE_PHONON
-    : mOutput(0),
-      mMediaObject(0)
+    : mOutput(0)
+    , mMediaObject(0)
 #endif
 {
 }
@@ -41,8 +41,8 @@ void JMusic::seekAtTheBegining() { mMediaObject->seek(0); }
 //////////////////////////////////////////////////////////////////////////
 JSample::JSample()
 #ifdef USE_PHONON
-    : mOutput(0),
-      mMediaObject(0)
+    : mOutput(0)
+    , mMediaObject(0)
 #endif
 {
 }
@@ -57,10 +57,10 @@ JSample::~JSample() {
 unsigned long JSample::fileSize() { return 0; }
 
 //////////////////////////////////////////////////////////////////////////
-JSoundSystem* JSoundSystem::mInstance = NULL;
+JSoundSystem* JSoundSystem::mInstance = nullptr;
 
 JSoundSystem* JSoundSystem::GetInstance() {
-    if (mInstance == NULL) {
+    if (mInstance == nullptr) {
         mInstance = new JSoundSystem();
         mInstance->InitSoundSystem();
     }
@@ -71,14 +71,11 @@ void JSoundSystem::Destroy() {
     if (mInstance) {
         mInstance->DestroySoundSystem();
         delete mInstance;
-        mInstance = NULL;
+        mInstance = nullptr;
     }
 }
 
-JSoundSystem::JSoundSystem() {
-    mVolume       = 0;
-    mSampleVolume = 0;
-}
+JSoundSystem::JSoundSystem() : mVolume(0), mSampleVolume(0) {}
 
 JSoundSystem::~JSoundSystem() {}
 
@@ -99,7 +96,7 @@ JMusic* JSoundSystem::LoadMusic(const char* fileName) {
     }
     return music;
 #else
-    return NULL;
+    return nullptr;
 #endif
 }
 
@@ -153,7 +150,7 @@ JSample* JSoundSystem::LoadSample(const char* fileName) {
     }
     return sample;
 #else
-    return NULL;
+    return nullptr;
 #endif
 }
 

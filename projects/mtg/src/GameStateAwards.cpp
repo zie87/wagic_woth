@@ -35,7 +35,9 @@ void GameStateAwards::End() {
     SAFE_DELETE(listview);
     SAFE_DELETE(setSrc);
 
-    if (saveMe) options.save();
+    if (saveMe) {
+        options.save();
+    }
 }
 void GameStateAwards::Start() {
     mParent->DoAnimation(TRANSITION_FADE_IN);
@@ -43,25 +45,24 @@ void GameStateAwards::Start() {
     mState = STATE_LISTVIEW;
     options.checkProfile();
 
-    menu   = NULL;
+    menu   = nullptr;
     saveMe = options.newAward();
 
     listview = NEW WGuiList("Listview");
     listview->setX(210);
     listview->setWidth(SCREEN_WIDTH - 220);
-    detailview = NULL;
+    detailview = nullptr;
     WGuiAward* aw;
     WGuiButton* btn;
 
-    WGuiHeader* wgh = NEW WGuiHeader("Achievements");
+    auto* wgh = NEW WGuiHeader("Achievements");
     listview->Add(wgh);
 
     aw  = NEW WGuiAward(Options::DIFFICULTY_MODE_UNLOCKED, "Difficulty Modes", "Achieved a 66% victory ratio.");
     btn = NEW WGuiButton(aw, GUI_AWARD_BUTTON, Options::DIFFICULTY_MODE_UNLOCKED, this);
     listview->Add(btn);
 
-    for (map<string, Unlockable*>::iterator it = Unlockable::unlockables.begin(); it != Unlockable::unlockables.end();
-         ++it) {
+    for (auto it = Unlockable::unlockables.begin(); it != Unlockable::unlockables.end(); ++it) {
         Unlockable* award = it->second;
         aw  = NEW WGuiAward(award->getValue("id"), award->getValue("name"), award->getValue("trophyroom_text"));
         btn = NEW WGuiButton(aw, GUI_AWARD_BUTTON, 0, this);
@@ -87,35 +88,39 @@ void GameStateAwards::Start() {
     int locked = 0;
     for (int i = 0; i < setlist.size(); i++) {
         MTGSetInfo* si = setlist.getInfo(i);
-        if (!si) continue;
+        if (!si) {
+            continue;
+        }
         if (!options[Options::optionSet(i)].number) {
             locked++;
             continue;
         }
 
-        if (!si->author.size())
+        if (si->author.empty()) {
             sprintf(buf, _("%i cards.").c_str(), si->totalCards());
-        else if (si->year > 0)
+        } else if (si->year > 0) {
             sprintf(buf, _("%s (%i): %i cards").c_str(), si->author.c_str(), si->year, si->totalCards());
-        else
+        } else {
             sprintf(buf, _("%s: %i cards.").c_str(), si->author.c_str(), si->totalCards());
+        }
 
         aw         = NEW WGuiAward(Options::optionSet(i), si->getName(), buf, "Card Spoiler");
         aw->mFlags = WGuiItem::NO_TRANSLATE;
         btn        = NEW WGuiButton(aw, GUI_AWARD_BUTTON, Options::optionSet(i), this);
         listview->Add(btn);
     }
-    if (locked)
+    if (locked) {
         sprintf(buf, _("%i locked sets remain.").c_str(), locked);
-    else
+    } else {
         sprintf(buf, _("Unlocked all %i sets.").c_str(), setlist.size());
+    }
 
     wgh->setDisplay(buf);
     wgh->mFlags = WGuiItem::NO_TRANSLATE;
 
     listview->Entering(JGE_BTN_NONE);
-    detailview = NULL;
-    setSrc     = NULL;
+    detailview = nullptr;
+    setSrc     = nullptr;
     showMenu   = false;
 }
 
@@ -126,24 +131,33 @@ void GameStateAwards::Render() {
     JRenderer* r = JRenderer::GetInstance();
     r->ClearScreen(ARGB(0, 0, 0, 0));
 
-    JQuadPtr background = WResourceManager::Instance()->RetrieveTempQuad("awardback.jpg", TEXTURE_SUB_5551);
-    if (background.get()) r->RenderQuad(background.get(), 0, 0);
+    const JQuadPtr background = WResourceManager::Instance()->RetrieveTempQuad("awardback.jpg", TEXTURE_SUB_5551);
+    if (background.get()) {
+        r->RenderQuad(background.get(), 0, 0);
+    }
 
     switch (mState) {
     case STATE_LISTVIEW:
-        if (listview) listview->Render();
+        if (listview) {
+            listview->Render();
+        }
         break;
     case STATE_DETAILS:
-        if (detailview) detailview->Render();
+        if (detailview) {
+            detailview->Render();
+        }
         break;
     }
 
-    if (showMenu && menu) menu->Render();
+    if (showMenu && menu) {
+        menu->Render();
+    }
 }
 
 void GameStateAwards::Update(float dt) {
-    if (mEngine->GetButtonClick(JGE_BTN_CANCEL))
+    if (mEngine->GetButtonClick(JGE_BTN_CANCEL)) {
         options[Options::DISABLECARDS].number = !options[Options::DISABLECARDS].number;
+    }
 
     if (showMenu) {
         menu->Update(dt);
@@ -156,7 +170,9 @@ void GameStateAwards::Update(float dt) {
                 showMenu = true;
                 SAFE_DELETE(menu);
                 menu = NEW SimpleMenu(JGE::GetInstance(), EXIT_AWARDS_MENU, this, Fonts::MENU_FONT, 50, 170);
-                if (mState == STATE_DETAILS) menu->Add(kBackToTrophiesID, "Back to Trophies");
+                if (mState == STATE_DETAILS) {
+                    menu->Add(kBackToTrophiesID, "Back to Trophies");
+                }
                 menu->Add(kBackToMainMenuID, "Back to Main Menu");
                 menu->Add(kCancelMenuID, "Cancel");
                 break;
@@ -164,9 +180,9 @@ void GameStateAwards::Update(float dt) {
                 mParent->DoTransition(TRANSITION_FADE, GAME_STATE_MENU);
                 break;
             case JGE_BTN_SEC:
-                if (mState == STATE_LISTVIEW)
+                if (mState == STATE_LISTVIEW) {
                     mParent->DoTransition(TRANSITION_FADE, GAME_STATE_MENU);
-                else {
+                } else {
                     mState = STATE_LISTVIEW;
                     SAFE_DELETE(detailview);
                 }
@@ -183,14 +199,18 @@ void GameStateAwards::Update(float dt) {
             }
         }
     }
-    if (setSrc) setSrc->Update(dt);
+    if (setSrc) {
+        setSrc->Update(dt);
+    }
 }
 
 bool GameStateAwards::enterSet(int setid) {
     MTGSetInfo* si = setlist.getInfo(setid);
-    map<int, MTGCard*>::iterator it;
+    const map<int, MTGCard*>::iterator it;
 
-    if (!si) return false;
+    if (!si) {
+        return false;
+    }
 
     SAFE_DELETE(detailview);
     SAFE_DELETE(setSrc);
@@ -203,16 +223,18 @@ bool GameStateAwards::enterSet(int setid) {
 
     detailview = NEW WGuiMenu(JGE_BTN_DOWN, JGE_BTN_UP);
 
-    WGuiList* spoiler = NEW WGuiList("Spoiler", setSrc);
+    auto* spoiler = NEW WGuiList("Spoiler", setSrc);
     spoiler->setX(210);
     spoiler->setWidth(SCREEN_WIDTH - 220);
     for (int t = 0; t < setSrc->Size(); t++) {
         MTGCard* c = setSrc->getCard(t);
-        if (c) spoiler->Add(NEW WGuiItem(c->data->name));
+        if (c) {
+            spoiler->Add(NEW WGuiItem(c->data->name));
+        }
     }
     setSrc->setOffset(0);
     spoiler->Entering(JGE_BTN_NONE);
-    WGuiCardImage* wi = NEW WGuiCardImage(setSrc);
+    auto* wi = NEW WGuiCardImage(setSrc);
     wi->setX(105);
     wi->setY(137);
     detailview->Add(wi);
@@ -221,10 +243,13 @@ bool GameStateAwards::enterSet(int setid) {
     return true;
 }
 bool GameStateAwards::enterStats(int option) {
-    if (option != Options::AWARD_COLLECTOR) return false;
-    DeckDataWrapper* ddw =
-        NEW DeckDataWrapper(NEW MTGDeck(options.profileFile(PLAYER_COLLECTION).c_str(), MTGCollection()));
-    if (!ddw) return false;
+    if (option != Options::AWARD_COLLECTOR) {
+        return false;
+    }
+    auto* ddw = NEW DeckDataWrapper(NEW MTGDeck(options.profileFile(PLAYER_COLLECTION).c_str(), MTGCollection()));
+    if (!ddw) {
+        return false;
+    }
 
     SAFE_DELETE(detailview);
     detailview = NEW WGuiList("Details");
@@ -237,31 +262,39 @@ bool GameStateAwards::enterStats(int option) {
         int* counts     = (int*)calloc(setlist.size(), sizeof(int));
         int setid       = -1;
         int dupes       = 0;
-        MTGCard* many   = NULL;
-        MTGCard* costly = NULL;
-        MTGCard* strong = NULL;
-        MTGCard* tough  = NULL;
+        MTGCard* many   = nullptr;
+        MTGCard* costly = nullptr;
+        MTGCard* strong = nullptr;
+        MTGCard* tough  = nullptr;
 
         for (int t = 0; t < ddw->Size(); t++) {
             MTGCard* c = ddw->getCard(t);
-            if (!c) continue;
-            int count = ddw->count(c);
-            if (!c->data->isLand() && (many == NULL || count > dupes)) {
+            if (!c) {
+                continue;
+            }
+            const int count = ddw->count(c);
+            if (!c->data->isLand() && (many == nullptr || count > dupes)) {
                 many  = c;
                 dupes = count;
             }
             counts[c->setId] += count;
-            if (costly == NULL ||
-                c->data->getManaCost()->getConvertedCost() > costly->data->getManaCost()->getConvertedCost())
+            if (costly == nullptr ||
+                c->data->getManaCost()->getConvertedCost() > costly->data->getManaCost()->getConvertedCost()) {
                 costly = c;
+            }
 
-            if (c->data->isCreature() && (strong == NULL || c->data->getPower() > strong->data->getPower())) strong = c;
+            if (c->data->isCreature() && (strong == nullptr || c->data->getPower() > strong->data->getPower())) {
+                strong = c;
+            }
 
-            if (c->data->isCreature() && (tough == NULL || c->data->getToughness() > tough->data->getToughness()))
+            if (c->data->isCreature() && (tough == nullptr || c->data->getToughness() > tough->data->getToughness())) {
                 tough = c;
+            }
         }
         for (int i = 0; i < setlist.size(); i++) {
-            if (setid < 0 || counts[i] > counts[setid]) setid = i;
+            if (setid < 0 || counts[i] > counts[setid]) {
+                setid = i;
+            }
         }
         free(counts);
 
@@ -304,7 +337,8 @@ bool GameStateAwards::enterStats(int option) {
     return true;
 }
 void GameStateAwards::ButtonPressed(int controllerId, int controlId) {
-    if (controllerId == EXIT_AWARDS_MENU) switch (controlId) {
+    if (controllerId == EXIT_AWARDS_MENU) {
+        switch (controlId) {
         case kBackToMainMenuID:
             mParent->DoTransition(TRANSITION_FADE, GAME_STATE_MENU);
             showMenu = false;
@@ -318,8 +352,8 @@ void GameStateAwards::ButtonPressed(int controllerId, int controlId) {
             showMenu = false;
             break;
         }
-    else if (controllerId == GUI_AWARD_BUTTON) {
-        int setid = controlId - Options::SET_UNLOCKS;
+    } else if (controllerId == GUI_AWARD_BUTTON) {
+        const int setid = controlId - Options::SET_UNLOCKS;
 
         if (controlId >= Options::SET_UNLOCKS && enterSet(setid)) {
             mState      = STATE_DETAILS;
@@ -333,8 +367,8 @@ void GameStateAwards::ButtonPressed(int controllerId, int controlId) {
 
 void GameStateAwards::OnScroll(int inXVelocity, int inYVelocity) {
     if (abs(inYVelocity) > 300) {
-        bool flickUpwards = (inYVelocity < 0);
-        int velocity      = (inYVelocity < 0) ? (-1 * inYVelocity) : inYVelocity;
+        const bool flickUpwards = (inYVelocity < 0);
+        int velocity            = (inYVelocity < 0) ? (-1 * inYVelocity) : inYVelocity;
         while (velocity > 0) {
             mEngine->HoldKey_NoRepeat(flickUpwards ? JGE_BTN_DOWN : JGE_BTN_UP);
             velocity -= 100;

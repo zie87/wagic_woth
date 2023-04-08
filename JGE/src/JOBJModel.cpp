@@ -13,22 +13,27 @@
 #include "../include/JRenderer.h"
 #include "../include/JOBJModel.h"
 
-JOBJModel::JOBJModel() {
-    mPolygons = NULL;
-    mTexture  = NULL;
-}
+JOBJModel::JOBJModel() : mPolygons(nullptr), mTexture(nullptr) {}
 
 JOBJModel::~JOBJModel() {
-    if (mPolygons) delete[] mPolygons;
+    if (mPolygons) {
+        delete[] mPolygons;
+    }
 
-    if (mTexture) delete mTexture;
+    if (mTexture) {
+        delete mTexture;
+    }
 }
 
 int JOBJModel::ReadLine(char* output, const char* buffer, int start, int size) {
     int index = 0;
-    while (start < size && buffer[start] != '\n' && buffer[start] != '\r') output[index++] = buffer[start++];
+    while (start < size && buffer[start] != '\n' && buffer[start] != '\r') {
+        output[index++] = buffer[start++];
+    }
 
-    while ((start < size && buffer[start] == '\n') || buffer[start] == '\r') start++;
+    while ((start < size && buffer[start] == '\n') || buffer[start] == '\r') {
+        start++;
+    }
 
     output[index] = 0;
 
@@ -37,10 +42,12 @@ int JOBJModel::ReadLine(char* output, const char* buffer, int start, int size) {
 
 bool JOBJModel::Load(const char* modelName, const char* textureName) {
     JFileSystem* fileSys = JFileSystem::GetInstance();
-    if (!fileSys->OpenFile(modelName)) return false;
+    if (!fileSys->OpenFile(modelName)) {
+        return false;
+    }
 
-    int size     = fileSys->GetFileSize();
-    char* buffer = new char[size];
+    const int size = fileSys->GetFileSize();
+    char* buffer   = new char[size];
 
     fileSys->ReadFile(buffer, size);
     fileSys->CloseFile();
@@ -72,14 +79,17 @@ bool JOBJModel::Load(const char* modelName, const char* textureName) {
                 count = sscanf(tmpLine, "%s  %f %f %f", s1, &vert.x, &vert.y, &vert.z);
 
                 if (count == 4) {
-                    if (strcmp(s1, "vn") == 0)
+                    if (strcmp(s1, "vn") == 0) {
                         normalList.push_back(vert);
-                    else if (strcmp(s1, "vt") == 0)
+                    } else if (strcmp(s1, "vt") == 0) {
                         texList.push_back(vert);
-                    else if (strcmp(s1, "v") == 0)
+                    } else if (strcmp(s1, "v") == 0) {
                         vertList.push_back(vert);
+                    }
                 } else if (count == 3) {
-                    if (strcmp(s1, "vt") == 0) texList.push_back(vert);
+                    if (strcmp(s1, "vt") == 0) {
+                        texList.push_back(vert);
+                    }
                 }
 
             } else if (tmpLine[0] == 'f') {
@@ -87,12 +97,16 @@ bool JOBJModel::Load(const char* modelName, const char* textureName) {
                 face.mVertCount = 0;
 
                 char* p     = strchr(tmpLine, ' ');
-                char* pNext = NULL;
+                char* pNext = nullptr;
 
-                int vertIdx, texIdx, norIdx;
+                int vertIdx;
+                int texIdx;
+                int norIdx;
 
-                while (p != NULL) {
-                    while (((*p) == ' ') || ((*p) == '\n') || ((*p) == '\t')) ++p;
+                while (p != nullptr) {
+                    while (((*p) == ' ') || ((*p) == '\n') || ((*p) == '\t')) {
+                        ++p;
+                    }
                     strcpy(s1, p);
                     count = sscanf(s1, "%d/%d/%d", &vertIdx, &texIdx, &norIdx);
                     if (count == 3) {
@@ -122,8 +136,9 @@ bool JOBJModel::Load(const char* modelName, const char* textureName) {
                     p     = pNext;
                 }
 
-                if (face.mVertCount == 3)  // we do triangles only ;)
+                if (face.mVertCount == 3) {  // we do triangles only ;)
                     faceList.push_back(face);
+                }
             } else if (tmpLine[0] == 'g') {
             } else if (tmpLine[0] == 'u') {
             }
@@ -166,7 +181,9 @@ bool JOBJModel::Load(const char* modelName, const char* textureName) {
         */
     }
 
-    if (textureName != NULL) mTexture = JRenderer::GetInstance()->LoadTexture(textureName);
+    if (textureName != nullptr) {
+        mTexture = JRenderer::GetInstance()->LoadTexture(textureName);
+    }
 
     return true;
 }

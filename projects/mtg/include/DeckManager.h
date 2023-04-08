@@ -1,3 +1,6 @@
+#ifndef DECKMANAGER_H
+#define DECKMANAGER_H
+
 #include <string>
 #include <vector>
 
@@ -38,3 +41,5 @@ public:
 
     ~DeckManager();
 };
+
+#endif

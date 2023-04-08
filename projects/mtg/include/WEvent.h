@@ -1,5 +1,5 @@
-#ifndef _WEVENT_H_
-#define _WEVENT_H_
+#ifndef WEVENT_H
+#define WEVENT_H
 
 #include <iostream>
 #include "PhaseRing.h"
@@ -32,7 +32,7 @@ public:
     virtual ~WEvent(){};
     virtual std::ostream& toString(std::ostream& out) const;
     virtual int getValue() { return 0; };
-    virtual Targetable* getTarget(int target) { return 0; };
+    virtual Targetable* getTarget(int target) { return nullptr; };
 };
 
 struct WEventZoneChange : public WEvent {
@@ -40,17 +40,17 @@ struct WEventZoneChange : public WEvent {
     MTGGameZone* from;
     MTGGameZone* to;
     WEventZoneChange(MTGCardInstance* card, MTGGameZone* from, MTGGameZone* to);
-    virtual ~WEventZoneChange(){};
-    virtual std::ostream& toString(std::ostream& out) const;
-    virtual Targetable* getTarget(int target);
+    ~WEventZoneChange() override{};
+    std::ostream& toString(std::ostream& out) const override;
+    Targetable* getTarget(int target) override;
 };
 
 struct WEventDamage : public WEvent {
     Damage* damage;
     WEventDamage(Damage* damage);
-    virtual std::ostream& toString(std::ostream& out) const;
-    virtual int getValue();
-    virtual Targetable* getTarget(int target);
+    std::ostream& toString(std::ostream& out) const override;
+    int getValue() override;
+    Targetable* getTarget(int target) override;
 };
 
 struct WEventCounters : public WEvent {
@@ -69,7 +69,7 @@ struct WEventLife : public WEvent {
     Player* player;
     int amount;
     WEventLife(Player* player, int amount);
-    virtual Targetable* getTarget(int target);
+    Targetable* getTarget(int target) override;
 };
 
 struct WEventDamageStackResolved : public WEvent {
@@ -100,7 +100,7 @@ struct WEventVampire : public WEventCardUpdate {
     MTGCardInstance* source;
     MTGCardInstance* victem;
     WEventVampire(MTGCardInstance* card, MTGCardInstance* source, MTGCardInstance* victem);
-    virtual Targetable* getTarget(int target);
+    Targetable* getTarget(int target) override;
 };
 
 // creature became the target of a spell or ability
@@ -108,7 +108,7 @@ struct WEventTarget : public WEventCardUpdate {
     MTGCardInstance* card;
     MTGCardInstance* source;
     WEventTarget(MTGCardInstance* card, MTGCardInstance* source);
-    virtual Targetable* getTarget(int target);
+    Targetable* getTarget(int target) override;
 };
 
 // Event when a card gains/looses types
@@ -124,14 +124,14 @@ struct WEventCardTap : public WEventCardUpdate {
     bool before;
     bool after;
     WEventCardTap(MTGCardInstance* card, bool before, bool after);
-    virtual Targetable* getTarget(int target);
+    Targetable* getTarget(int target) override;
 };
 
 struct WEventCardTappedForMana : public WEventCardUpdate {
     bool before;
     bool after;
     WEventCardTappedForMana(MTGCardInstance* card, bool before, bool after);
-    virtual Targetable* getTarget(int target);
+    Targetable* getTarget(int target) override;
 };
 
 // Event when a card's "attacker" status changes
@@ -146,52 +146,52 @@ struct WEventCreatureAttacker : public WEventCardUpdate {
 // event when card attacks.
 struct WEventCardAttacked : public WEventCardUpdate {
     WEventCardAttacked(MTGCardInstance* card);
-    virtual Targetable* getTarget(int target);
+    Targetable* getTarget(int target) override;
 };
 
 // event when card attacks alone.
 struct WEventCardAttackedAlone : public WEventCardUpdate {
     WEventCardAttackedAlone(MTGCardInstance* card);
-    virtual Targetable* getTarget(int target);
+    Targetable* getTarget(int target) override;
 };
 
 // event when card attacks but is not blocked.
 struct WEventCardAttackedNotBlocked : public WEventCardUpdate {
     WEventCardAttackedNotBlocked(MTGCardInstance* card);
-    virtual Targetable* getTarget(int target);
+    Targetable* getTarget(int target) override;
 };
 
 // event when card attacks but is blocked.
 struct WEventCardAttackedBlocked : public WEventCardUpdate {
     WEventCardAttackedBlocked(MTGCardInstance* card, MTGCardInstance* opponent);
     MTGCardInstance* opponent;
-    virtual Targetable* getTarget(int target);
+    Targetable* getTarget(int target) override;
 };
 
 // event when card blocked.
 struct WEventCardBlocked : public WEventCardUpdate {
     WEventCardBlocked(MTGCardInstance* card, MTGCardInstance* opponent);
     MTGCardInstance* opponent;
-    virtual Targetable* getTarget(int target);
+    Targetable* getTarget(int target) override;
 };
 
 // event when card is sacrificed.
 struct WEventCardSacrifice : public WEventCardUpdate {
     MTGCardInstance* cardAfter;
     WEventCardSacrifice(MTGCardInstance* card, MTGCardInstance* afterCard);
-    virtual Targetable* getTarget(int target);
+    Targetable* getTarget(int target) override;
 };
 
 // event when card is discarded.
 struct WEventCardDiscard : public WEventCardUpdate {
     WEventCardDiscard(MTGCardInstance* card);
-    virtual Targetable* getTarget(int target);
+    Targetable* getTarget(int target) override;
 };
 
 // event when card is cycled.
 struct WEventCardCycle : public WEventCardUpdate {
     WEventCardCycle(MTGCardInstance* card);
-    virtual Targetable* getTarget(int target);
+    Targetable* getTarget(int target) override;
 };
 
 // Event when a card's "defenser" status changes

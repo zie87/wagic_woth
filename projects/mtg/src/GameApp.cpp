@@ -7,6 +7,8 @@
 #include <pspfpu.h>
 #else
 #include <time.h>
+
+#include <utility>
 #endif
 
 #include "WResourceManager.h"
@@ -34,51 +36,53 @@
 
 #define DEFAULT_DURATION .25
 
-PlayerType GameApp::players[]         = {PLAYER_TYPE_CPU, PLAYER_TYPE_CPU};
-bool GameApp::HasMusic                = true;
-JMusic* GameApp::music                = NULL;
-std::string GameApp::currentMusicFile = "";
-std::string GameApp::systemError      = "";
+PlayerType GameApp::players[] = {PLAYER_TYPE_CPU, PLAYER_TYPE_CPU};
+bool GameApp::HasMusic        = true;
+JMusic* GameApp::music        = nullptr;
+std::string GameApp::currentMusicFile;
+std::string GameApp::systemError;
 
 std::vector<JQuadPtr> manaIcons;
 
-GameState::GameState(GameApp* parent, std::string id) : mParent(parent), mStringID(id) { mEngine = JGE::GetInstance(); }
+GameState::GameState(GameApp* parent, std::string id)
+    : mParent(parent)
+    , mEngine(JGE::GetInstance())
+    , mStringID(std::move(id)) {}
 
 GameApp::GameApp()
-    : JApp()
+    : mScreenShotCount(0)
+#ifdef DEBUG
+    , nbUpdates(0)
+    , totalFPS(0)
+#endif
 #ifdef NETWORK_SUPPORT
-      ,
-      mpNetwork(NULL)
+    , mpNetwork(NULL)
 #endif  // NETWORK_SUPPORT
 {
-#ifdef DEBUG
-    nbUpdates = 0;
-    totalFPS  = 0;
-#endif
 
 #ifdef DOLOG
     remove(LOG_FILE);
 #endif
 
-    mScreenShotCount = 0;
-
-    for (int i = 0; i < GAME_STATE_MAX; i++) mGameStates[i] = NULL;
+    for (int i = 0; i < GAME_STATE_MAX; i++) {
+        mGameStates[i] = nullptr;
+    }
 
     mShowDebugInfo = false;
     players[0]     = PLAYER_TYPE_CPU;
     players[1]     = PLAYER_TYPE_CPU;
     gameType       = GAME_TYPE_CLASSIC;
 
-    mCurrentState = NULL;
-    mNextState    = NULL;
+    mCurrentState = nullptr;
+    mNextState    = nullptr;
 
-    music = NULL;
+    music = nullptr;
 }
 
 GameApp::~GameApp() { WResourceManager::Terminate(); }
 
 void GameApp::Create() {
-    srand((unsigned int)time(0));  // initialize random
+    srand((unsigned int)time(nullptr));  // initialize random
 #if defined(WIN32) && defined(_MSC_VER)
     _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #elif defined(PSP)
@@ -88,8 +92,8 @@ void GameApp::Create() {
     //_CrtSetBreakAlloc(368);
     LOG("starting Game");
 
-    std::string systemFolder = "Res/";
-    std::string foldersRoot  = "";
+    std::string const systemFolder = "Res/";
+    std::string foldersRoot;
 
     // Find the Res folder
     std::ifstream mfile("Res.txt");
@@ -97,7 +101,9 @@ void GameApp::Create() {
     if (mfile) {
         bool found = false;
         while (!found && std::getline(mfile, resPath)) {
-            if (resPath[resPath.size() - 1] == '\r') resPath.erase(resPath.size() - 1);  // Handle DOS files
+            if (resPath[resPath.size() - 1] == '\r') {
+                resPath.erase(resPath.size() - 1);  // Handle DOS files
+            }
             std::string testfile = resPath + systemFolder;
             testfile.append("graphics/simon.dat");
             std::ifstream tempfile(testfile.c_str());
@@ -173,13 +179,18 @@ void GameApp::Create() {
 
     items.erase(items.begin(), items.end());
 
-    for (int i = manaIcons.size() - 1; i >= 0; --i)
-        if (manaIcons[i].get()) manaIcons[i]->SetHotSpot(16, 16);
+    for (int i = manaIcons.size() - 1; i >= 0; --i) {
+        if (manaIcons[i].get()) {
+            manaIcons[i]->SetHotSpot(16, 16);
+        }
+    }
 
     LOG("--Loading back.jpg");
     WResourceManager::Instance()->RetrieveTexture("back.jpg", RETRIEVE_MANAGE);
     JQuadPtr jq = WResourceManager::Instance()->RetrieveQuad("back.jpg", 0, 0, 0, 0, kGenericCardID, RETRIEVE_MANAGE);
-    if (jq.get()) jq->SetHotSpot(jq->mWidth / 2, jq->mHeight / 2);
+    if (jq.get()) {
+        jq->SetHotSpot(jq->mWidth / 2, jq->mHeight / 2);
+    }
 
     WResourceManager::Instance()->RetrieveTexture("back_thumb.jpg", RETRIEVE_MANAGE);
     WResourceManager::Instance()->RetrieveQuad("back_thumb.jpg", 0, 0, MTG_MINIIMAGE_WIDTH, MTG_MINIIMAGE_HEIGHT,
@@ -188,9 +199,13 @@ void GameApp::Create() {
     LOG("--Loading particles.png");
     WResourceManager::Instance()->RetrieveTexture("particles.png", RETRIEVE_MANAGE);
     jq = WResourceManager::Instance()->RetrieveQuad("particles.png", 0, 0, 32, 32, "particles", RETRIEVE_MANAGE);
-    if (jq) jq->SetHotSpot(16, 16);
+    if (jq) {
+        jq->SetHotSpot(16, 16);
+    }
     jq = WResourceManager::Instance()->RetrieveQuad("particles.png", 64, 0, 32, 32, "stars", RETRIEVE_MANAGE);
-    if (jq) jq->SetHotSpot(16, 16);
+    if (jq) {
+        jq->SetHotSpot(16, 16);
+    }
 
     LOG("--Loading fonts");
     string lang = options[Options::LANG].str;
@@ -211,11 +226,17 @@ void GameApp::Create() {
     WResourceManager::Instance()->RetrieveTexture("shadows.png", RETRIEVE_MANAGE);
 
     jq = WResourceManager::Instance()->RetrieveQuad("shadows.png", 2, 2, 16, 16, "white", RETRIEVE_MANAGE);
-    if (jq) jq->SetHotSpot(8, 8);
+    if (jq) {
+        jq->SetHotSpot(8, 8);
+    }
     jq = WResourceManager::Instance()->RetrieveQuad("shadows.png", 20, 2, 16, 16, "shadow", RETRIEVE_MANAGE);
-    if (jq) jq->SetHotSpot(8, 8);
+    if (jq) {
+        jq->SetHotSpot(8, 8);
+    }
     jq = WResourceManager::Instance()->RetrieveQuad("shadows.png", 38, 2, 16, 16, "extracostshadow", RETRIEVE_MANAGE);
-    if (jq) jq->SetHotSpot(8, 8);
+    if (jq) {
+        jq->SetHotSpot(8, 8);
+    }
 
     jq = WResourceManager::Instance()->RetrieveQuad("phasebar.png", 0, 0, 0, 0, "phasebar", RETRIEVE_MANAGE);
 
@@ -241,9 +262,9 @@ void GameApp::Create() {
     mGameStates[GAME_STATE_STORY] = NEW GameStateStory(this);
     mGameStates[GAME_STATE_STORY]->Create();
 
-    mGameStates[GAME_STATE_TRANSITION] = NULL;
+    mGameStates[GAME_STATE_TRANSITION] = nullptr;
 
-    mCurrentState = NULL;
+    mCurrentState = nullptr;
     mNextState    = mGameStates[GAME_STATE_MENU];
 
     // Set Audio volume
@@ -288,7 +309,7 @@ void GameApp::Destroy() {
     DeckMenu::destroy();
     DeckEditorMenu::destroy();
 
-    options.theGame = NULL;
+    options.theGame = nullptr;
     Unlockable::Destroy();
 
     AutoLineMacro::Destroy();
@@ -302,7 +323,9 @@ void GameApp::Destroy() {
 }
 
 void GameApp::Update() {
-    if (systemError.size()) return;
+    if (!systemError.empty()) {
+        return;
+    }
     JGE* mEngine = JGE::GetInstance();
 #if defined(PSP)
     if (mEngine->GetButtonState(JGE_BTN_MENU) && mEngine->GetButtonClick(JGE_BTN_CANCEL)) {
@@ -321,19 +344,21 @@ void GameApp::Update() {
 #endif  // PSP
 
     float dt = mEngine->GetDelta();
-    if (dt > 35.0f)  // min 30 FPS ;)
+    if (dt > 35.0f) {  // min 30 FPS ;)
         dt = 35.0f;
+    }
 
-    TransitionBase* mTrans = NULL;
+    TransitionBase* mTrans = nullptr;
     if (mCurrentState) {
         mCurrentState->Update(dt);
-        if (mGameStates[GAME_STATE_TRANSITION] == mCurrentState)
-            mTrans = (TransitionBase*)mGameStates[GAME_STATE_TRANSITION];
+        if (mGameStates[GAME_STATE_TRANSITION] == mCurrentState) {
+            mTrans = dynamic_cast<TransitionBase*>(mGameStates[GAME_STATE_TRANSITION]);
+        }
     }
     // Check for finished transitions.
     if (mTrans && mTrans->Finished()) {
         mTrans->End();
-        if (mTrans->to != NULL && !mTrans->bAnimationOnly) {
+        if (mTrans->to != nullptr && !mTrans->bAnimationOnly) {
             SetCurrentState(mTrans->to);
             SAFE_DELETE(mGameStates[GAME_STATE_TRANSITION]);
             mCurrentState->Start();
@@ -342,8 +367,10 @@ void GameApp::Update() {
             SAFE_DELETE(mGameStates[GAME_STATE_TRANSITION]);
         }
     }
-    if (mNextState != NULL) {
-        if (mCurrentState != NULL) mCurrentState->End();
+    if (mNextState != nullptr) {
+        if (mCurrentState != nullptr) {
+            mCurrentState->End();
+        }
 
         SetCurrentState(mNextState);
 
@@ -357,30 +384,34 @@ void GameApp::Update() {
          */
 #endif
         mCurrentState->Start();
-        mNextState = NULL;
+        mNextState = nullptr;
     }
 }
 
 void GameApp::Render() {
-    if (systemError.size()) {
+    if (!systemError.empty()) {
         fprintf(stderr, "%s", systemError.c_str());
         WFont* mFont = WResourceManager::Instance()->GetWFont(Fonts::MAIN_FONT);
-        if (mFont) mFont->DrawString(systemError.c_str(), 1, 1);
+        if (mFont) {
+            mFont->DrawString(systemError.c_str(), 1, 1);
+        }
         return;
     }
 
     JRenderer* renderer = JRenderer::GetInstance();
     renderer->ClearScreen(ARGB(0, 0, 0, 0));
 
-    if (mCurrentState) mCurrentState->Render();
+    if (mCurrentState) {
+        mCurrentState->Render();
+    }
 
 #ifdef DEBUG_CACHE
     WResourceManager::Instance()->DebugRender();
 #endif
 
 #if defined(DEBUG)
-    JGE* mEngine = JGE::GetInstance();
-    float fps    = mEngine->GetFPS();
+    JGE* mEngine    = JGE::GetInstance();
+    const float fps = mEngine->GetFPS();
     totalFPS += fps;
     nbUpdates += 1;
     WFont* mFont = WResourceManager::Instance()->GetWFont(Fonts::MAIN_FONT);
@@ -394,7 +425,7 @@ void GameApp::Render() {
 }
 
 void GameApp::OnScroll(int inXVelocity, int inYVelocity) {
-    if (mCurrentState != NULL) {
+    if (mCurrentState != nullptr) {
         mCurrentState->OnScroll(inXVelocity, inYVelocity);
     }
 }
@@ -402,7 +433,9 @@ void GameApp::OnScroll(int inXVelocity, int inYVelocity) {
 void GameApp::SetNextState(int state) { mNextState = mGameStates[state]; }
 
 void GameApp::SetCurrentState(GameState* state) {
-    if (mCurrentState == state) return;
+    if (mCurrentState == state) {
+        return;
+    }
     mCurrentState = state;
 }
 
@@ -411,22 +444,30 @@ void GameApp::Pause() { pauseMusic(); }
 void GameApp::Resume() { resumeMusic(); }
 
 void GameApp::DoTransition(int trans, int tostate, float dur, bool animonly) {
-    TransitionBase* tb = NULL;
-    GameState* toState = NULL;
+    TransitionBase* tb = nullptr;
+    GameState* toState = nullptr;
     if (options[Options::TRANSITIONS].number != 0) {
-        if (tostate != GAME_STATE_NONE) SetNextState(tostate);
+        if (tostate != GAME_STATE_NONE) {
+            SetNextState(tostate);
+        }
         return;
     }
 
-    if (tostate > GAME_STATE_NONE && tostate < GAME_STATE_MAX) toState = mGameStates[tostate];
+    if (tostate > GAME_STATE_NONE && tostate < GAME_STATE_MAX) {
+        toState = mGameStates[tostate];
+    }
 
     if (mGameStates[GAME_STATE_TRANSITION]) {
-        tb = (TransitionBase*)mGameStates[GAME_STATE_TRANSITION];
-        if (toState) tb->to = toState;  // Additional calls to transition merely update the destination.
+        tb = dynamic_cast<TransitionBase*>(mGameStates[GAME_STATE_TRANSITION]);
+        if (toState) {
+            tb->to = toState;  // Additional calls to transition merely update the destination.
+        }
         return;
     }
 
-    if (dur < 0) dur = DEFAULT_DURATION;  // Default to this value.
+    if (dur < 0) {
+        dur = DEFAULT_DURATION;  // Default to this value.
+    }
     switch (trans) {
     case TRANSITION_FADE_IN:
         tb = NEW TransitionFade(this, mCurrentState, toState, dur, true);
@@ -448,9 +489,13 @@ void GameApp::DoTransition(int trans, int tostate, float dur, bool animonly) {
 void GameApp::DoAnimation(int trans, float dur) { DoTransition(trans, GAME_STATE_NONE, dur, true); }
 
 void GameApp::playMusic(string filename, bool loop) {
-    if (filename == "") filename = currentMusicFile;
+    if (filename.empty()) {
+        filename = currentMusicFile;
+    }
 
-    if (filename.compare(currentMusicFile) == 0 && music) return;
+    if (filename == currentMusicFile && music) {
+        return;
+    }
 
     if (music) {
         JSoundSystem::GetInstance()->StopMusic(music);
@@ -459,25 +504,27 @@ void GameApp::playMusic(string filename, bool loop) {
 
     if (HasMusic && options[Options::MUSICVOLUME].number > 0) {
         music = WResourceManager::Instance()->ssLoadMusic(filename.c_str());
-        if (music) JSoundSystem::GetInstance()->PlayMusic(music, loop);
+        if (music) {
+            JSoundSystem::GetInstance()->PlayMusic(music, loop);
+        }
         currentMusicFile = filename;
     }
 }
 
 void GameApp::pauseMusic() {
-    if (music && currentMusicFile != "") {
+    if (music && !currentMusicFile.empty()) {
         JSoundSystem::GetInstance()->PauseMusic(music);
     }
 }
 
 void GameApp::resumeMusic() {
-    if (music && currentMusicFile != "") {
+    if (music && !currentMusicFile.empty()) {
         JSoundSystem::GetInstance()->ResumeMusic(music);
     }
 }
 
 void GameApp::stopMusic() {
-    if (music && currentMusicFile != "") {
+    if (music && !currentMusicFile.empty()) {
         JSoundSystem::GetInstance()->StopMusic(music);
         SAFE_DELETE(music);
     }

@@ -1,5 +1,5 @@
-#ifndef _GUIHAND_H_
-#define _GUIHAND_H_
+#ifndef GUIHAND_H
+#define GUIHAND_H
 
 #include "GuiLayers.h"
 #include "WEvent.h"
@@ -10,9 +10,10 @@
 class GuiHand;
 
 struct HandLimitor : public Limitor {
+    ~HandLimitor() override = default;
     GuiHand* hand;
-    virtual bool select(Target*);
-    virtual bool greyout(Target*);
+    bool select(Target*) override;
+    bool greyout(Target*) override;
 
     HandLimitor(GuiHand* hand);
 };
@@ -35,8 +36,8 @@ protected:
 
 public:
     GuiHand(GameObserver* observer, MTGHand* hand);
-    ~GuiHand();
-    void Update(float dt);
+    ~GuiHand() override;
+    void Update(float dt) override;
     bool isInHand(CardView*);
 
     friend struct HandLimitor;
@@ -45,9 +46,9 @@ public:
 class GuiHandOpponent : public GuiHand {
 public:
     GuiHandOpponent(GameObserver* observer, MTGHand* hand);
-    virtual void Render();
-    virtual int receiveEventPlus(WEvent* e);
-    virtual int receiveEventMinus(WEvent* e);
+    void Render() override;
+    int receiveEventPlus(WEvent* e) override;
+    int receiveEventMinus(WEvent* e) override;
 };
 
 class GuiHandSelf : public GuiHand {
@@ -58,14 +59,14 @@ protected:
 
 public:
     GuiHandSelf(GameObserver* observer, MTGHand* hand);
-    ~GuiHandSelf();
-    virtual int receiveEventPlus(WEvent* e);
-    virtual int receiveEventMinus(WEvent* e);
+    ~GuiHandSelf() override;
+    int receiveEventPlus(WEvent* e) override;
+    int receiveEventMinus(WEvent* e) override;
 
     void Repos();
-    bool CheckUserInput(JButton key);
-    virtual void Render();
-    void Update(float dt);
+    bool CheckUserInput(JButton key) override;
+    void Render() override;
+    void Update(float dt) override;
     float LeftBoundary();
 
     HandState GetState() { return state; }
@@ -73,4 +74,4 @@ public:
     HandLimitor* limitor;
 };
 
-#endif  // _GUIHAND_H_
+#endif  // GUIHAND_H

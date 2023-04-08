@@ -1,5 +1,5 @@
-#ifndef _GAME_OPTIONS_H_
-#define _GAME_OPTIONS_H_
+#ifndef GAMEOPTIONS_H
+#define GAMEOPTIONS_H
 
 #include <map>
 #include <string>
@@ -112,7 +112,7 @@ public:
     virtual bool read(std::string input);
 
     GameOption(int value = 0);
-    GameOption(std::string);
+    GameOption(const std::string&);
     GameOption(int, std::string);
 };
 
@@ -125,18 +125,18 @@ struct EnumDefinition {
 
 class GameOptionEnum : public GameOption {
 public:
-    virtual std::string menuStr();
-    virtual bool write(std::ofstream* file, std::string name);
-    virtual bool read(std::string input);
+    std::string menuStr() override;
+    bool write(std::ofstream* file, std::string name) override;
+    bool read(std::string input) override;
     EnumDefinition* def;
 };
 
 class GameOptionAward : public GameOption {
 public:
     GameOptionAward();
-    virtual std::string menuStr();
-    virtual bool write(std::ofstream* file, std::string name);
-    virtual bool read(std::string input);
+    std::string menuStr() override;
+    bool write(std::ofstream* file, std::string name) override;
+    bool read(std::string input) override;
     virtual bool giveAward();  // Returns false if already awarded
     virtual bool isViewed();
 
@@ -148,8 +148,8 @@ private:
 };
 
 class GameOptionKeyBindings : public GameOption {
-    virtual bool read(std::string input);
-    virtual bool write(std::ofstream*, std::string);
+    bool read(std::string input) override;
+    bool write(std::ofstream*, std::string) override;
 };
 
 class OptionVolume : public EnumDefinition {
@@ -266,16 +266,16 @@ public:
     int load();
 
     GameOption* get(int);
-    GameOption* get(std::string optionName);
+    GameOption* get(const std::string& optionName);
     GameOption& operator[](int);
-    GameOption& operator[](std::string);
+    GameOption& operator[](const std::string&);
     GameOptions(std::string filename);
     ~GameOptions();
 
 private:
     std::vector<GameOption*> values;
     std::map<std::string, GameOption*> unknownMap;
-    GameOption* factorNewGameOption(std::string optionName, std::string value = "");
+    GameOption* factorNewGameOption(const std::string& optionName, const std::string& value = "");
 };
 
 class GameSettings {
@@ -286,14 +286,16 @@ public:
     ~GameSettings();
     int save();
 
-    SimplePad* keypadStart(std::string input, std::string* _dest = NULL, bool _cancel = true, bool _numpad = false,
+    SimplePad* keypadStart(std::string input, std::string* _dest = nullptr, bool _cancel = true, bool _numpad = false,
                            float _x = SCREEN_WIDTH_F / 2, float _y = SCREEN_HEIGHT_F / 2);
     std::string keypadFinish();
     void keypadShutdown();
     void keypadTitle(std::string set);
 
     bool keypadActive() {
-        if (keypad) return keypad->isActive();
+        if (keypad) {
+            { return keypad->isActive(); }
+        }
 
         return false;
     }
@@ -321,27 +323,32 @@ public:
     }
 
     void keypadUpdate(float dt) {
-        if (keypad) keypad->Update(dt);
+        if (keypad) {
+            { keypad->Update(dt); }
+        }
     }
 
     void keypadRender() {
-        if (keypad) keypad->Render();
+        if (keypad) {
+            { keypad->Render(); }
+        }
     }
 
-    bool newAward();
+    bool newAward() const;
 
     // These return a filepath accurate to the current mode/profile/theme, and can
     // optionally fallback to a file within a certain directory.
     // The sanity=false option returns the adjusted path even if the file doesn't exist.
-    std::string profileFile(std::string filename = "", std::string fallback = "", bool sanity = false);
+    std::string profileFile(const std::string& filename = "", const std::string& fallback = "",
+                            bool sanity = false) const;
 
     void reloadProfile();  // Reloads profile using current options[ACTIVE_PROFILE]
     void checkProfile();   // Confirms that a profile is loaded and contains a collection.
     void createUsersFirstDeck(int setId);
 
-    GameOption* get(int);
-    GameOption& operator[](int);
-    GameOption& operator[](std::string);
+    GameOption* get(int) const;
+    GameOption& operator[](int) const;
+    GameOption& operator[](const std::string&) const;
 
     GameOptions* profileOptions;
     GameOptions* globalOptions;
@@ -357,7 +364,7 @@ private:
     SimplePad* keypad;
 
     StyleManager* styleMan;
-    void createProfileFolders();
+    void createProfileFolders() const;
 };
 
 extern GameSettings options;

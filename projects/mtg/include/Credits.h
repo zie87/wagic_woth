@@ -1,5 +1,5 @@
-#ifndef _CREDITS_H_
-#define _CREDITS_H_
+#ifndef CREDITS_H
+#define CREDITS_H
 
 #include <vector>
 #include <string>
@@ -17,8 +17,8 @@ private:
 
 public:
     Unlockable();
-    void setValue(std::string, std::string);
-    std::string getValue(std::string);
+    void setValue(const std::string&, std::string);
+    std::string getValue(const std::string&);
     bool isUnlocked();
     bool tryToUnlock(GameObserver* game);
     static void load();
@@ -31,18 +31,18 @@ public:
     int value;
     std::string text;
     CreditBonus(int _value, std::string _text);
-    void Render(float x, float y, WFont* font);
+    void Render(float x, float y, WFont* font) const;
 };
 
 class Credits {
 private:
     time_t gameLength;
     int isDifficultyUnlocked(DeckStats* stats);
-    int isEvilTwinUnlocked();
-    int isRandomDeckUnlocked();
+    int isEvilTwinUnlocked() const;
+    int isRandomDeckUnlocked() const;
     int IsMoreAIDecksUnlocked(DeckStats* stats);
     std::string unlockedTextureName;
-    JQuadPtr GetUnlockedQuad(std::string texturename);
+    JQuadPtr GetUnlockedQuad(const std::string& texturename);
 
 public:
     int value;

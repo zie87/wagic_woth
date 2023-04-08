@@ -59,7 +59,7 @@ namespace zip_file_system {
 // Base buffer class
 class zbuffer : public std::streambuf {
 public:
-    virtual ~zbuffer() {}
+    ~zbuffer() override {}
 
     virtual zbuffer* open(const char* Filename, std::streamoff Offset, std::streamoff Size) = 0;
     virtual zbuffer* close()                                                                = 0;
@@ -88,16 +88,16 @@ protected:
 // Buffer class for stored compression method.
 class zbuffer_stored : public zbuffer {
 public:
-    virtual ~zbuffer_stored() { close(); }
+    ~zbuffer_stored() override { close(); }
 
-    virtual zbuffer_stored* open(const char* Filename, std::streamoff Offset, std::streamoff Size);
-    virtual zbuffer_stored* close();
+    zbuffer_stored* open(const char* Filename, std::streamoff Offset, std::streamoff Size) override;
+    zbuffer_stored* close() override;
 
-    virtual int overflow(int c = EOF);
-    virtual int underflow();
-    virtual int sync();
+    int overflow(int c = EOF) override;
+    int underflow() override;
+    int sync() override;
     virtual std::streambuf* setbuf(char* pr, int nLength);
-    virtual std::streampos seekoff(std::streamoff, std::ios::seekdir, std::ios::openmode);
+    std::streampos seekoff(std::streamoff, std::ios::seekdir, std::ios::openmode) override;
 
     //	Default Implementation is enough
     //	virtual streampos seekpos(streampos, int);
@@ -106,16 +106,16 @@ public:
 // Buffer class for deflated compression method.
 class zbuffer_deflated : public zbuffer {
 public:
-    virtual ~zbuffer_deflated() { close(); }
+    ~zbuffer_deflated() override { close(); }
 
-    virtual zbuffer_deflated* open(const char* Filename, std::streamoff Offset, std::streamoff Size);
-    virtual zbuffer_deflated* close();
+    zbuffer_deflated* open(const char* Filename, std::streamoff Offset, std::streamoff Size) override;
+    zbuffer_deflated* close() override;
 
-    virtual int overflow(int c = EOF);
-    virtual int underflow();
-    virtual int sync();
+    int overflow(int c = EOF) override;
+    int underflow() override;
+    int sync() override;
     virtual std::streambuf* setbuf(char* pr, int nLength);
-    virtual std::streampos seekoff(std::streamoff, std::ios::seekdir, std::ios::openmode);
+    std::streampos seekoff(std::streamoff, std::ios::seekdir, std::ios::openmode) override;
 
     //	Default Implementation is enough
     //	virtual streampos seekpos(streampos, int);
@@ -130,8 +130,8 @@ protected:
 // main istream class for reading zipped files
 class izstream : public std::istream {
 public:
-    izstream() : std::istream(NULL), m_CompMethod(-1) { setstate(std::ios::badbit); }
-    virtual ~izstream() {
+    izstream() : std::istream(nullptr), m_CompMethod(-1) { setstate(std::ios::badbit); }
+    ~izstream() override {
 #ifdef USE_ZBUFFER_POOL
         rdbuf(NULL);  // This doesn't delete the buffer, deletion is handled by zfsystem;
 #else
@@ -153,7 +153,9 @@ protected:
     void SetCompMethod(int CompMethod) {
         delete rdbuf(GetRightBuffer(m_CompMethod = CompMethod));
 
-        if (rdbuf() == NULL) setstate(std::ios::badbit);
+        if (rdbuf() == nullptr) {
+            setstate(std::ios::badbit);
+        }
     }
 
     int m_CompMethod;

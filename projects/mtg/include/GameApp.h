@@ -4,8 +4,8 @@
  *  http://wololo.net/wagic/
  */
 
-#ifndef _GAMEAPP_H_
-#define _GAMEAPP_H_
+#ifndef GAMEAPP_H
+#define GAMEAPP_H
 
 #include <JApp.h>
 #include <JGE.h>
@@ -53,16 +53,16 @@ public:
 #endif  // NETWORK_SUPPORT
 
     GameApp();
-    virtual ~GameApp();
+    ~GameApp() override;
 
-    virtual void Create();
-    virtual void Destroy();
-    virtual void Update();
-    virtual void Render();
-    virtual void Pause();
-    virtual void Resume();
+    void Create() override;
+    void Destroy() override;
+    void Update() override;
+    void Render() override;
+    void Pause() override;
+    void Resume() override;
 
-    virtual void OnScroll(int inXVelocity, int inYVelocity);
+    void OnScroll(int inXVelocity, int inYVelocity) override;
 
     void LoadGameStates();
     void SetNextState(int state);

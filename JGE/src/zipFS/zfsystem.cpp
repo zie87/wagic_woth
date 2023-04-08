@@ -31,10 +31,10 @@ using namespace std;
 // Static variables initialization
 //////////////////////////////////////////////////////////////////////
 
-filesystem* izfstream::pDefaultFS = NULL;
-string filesystem::CurrentZipName = "";
+filesystem* izfstream::pDefaultFS = nullptr;
+string filesystem::CurrentZipName;
 ifstream filesystem::CurrentZipFile;
-filesystem* filesystem::pCurrentFS = NULL;
+filesystem* filesystem::pCurrentFS = nullptr;
 std::vector<filesystem::pooledBuffer*> filesystem::m_Buffers;
 
 static const int STORED   = 0;
@@ -45,14 +45,17 @@ static const int DEFLATED = 8;
 //////////////////////////////////////////////////////////////////////
 
 filesystem::filesystem(const char* BasePath, const char* FileExt, bool DefaultFS)
-    : m_BasePath(BasePath), m_FileExt(FileExt) {
+    : m_BasePath(BasePath)
+    , m_FileExt(FileExt) {
     using io_facilities::search_iterator;
 
     // Init m_BasePath and be sure the base path finish with a '/' or a '\'
     if (!m_BasePath.empty()) {
         string::iterator c = m_BasePath.end();
         c--;
-        if ((*c != '/') && (*c != '\\')) m_BasePath += '/';
+        if ((*c != '/') && (*c != '\\')) {
+            m_BasePath += '/';
+        }
     }
 
     // Search all *.zip files (or whatever the ZipExt specify as the file extension)
@@ -61,17 +64,21 @@ filesystem::filesystem(const char* BasePath, const char* FileExt, bool DefaultFS
     // insensitive Being case sensitive would lead to weird bugs on these systems.
     vector<string> ZipFiles;
 
-    for (search_iterator ZSrch = (m_BasePath + "*." + m_FileExt).c_str(); ZSrch != ZSrch.end(); ++ZSrch)
+    for (search_iterator ZSrch = (m_BasePath + "*." + m_FileExt).c_str(); ZSrch != ZSrch.end(); ++ZSrch) {
         ZipFiles.push_back(ZSrch.Name());
+    }
 
     // Open each zip files that have been found, in alphabetic order
     sort(ZipFiles.begin(), ZipFiles.end());
 
-    for (vector<string>::const_iterator ZipIt = ZipFiles.begin(); ZipIt != ZipFiles.end(); ++ZipIt)
+    for (auto ZipIt = ZipFiles.begin(); ZipIt != ZipFiles.end(); ++ZipIt) {
         InsertZip(ZipIt->c_str(), ZipIt - ZipFiles.begin());
+    }
 
     // Should we make this the default File System for ifile?
-    if (DefaultFS) MakeDefault();
+    if (DefaultFS) {
+        MakeDefault();
+    }
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -82,7 +89,9 @@ zbuffer* filesystem::getValidBuffer(const std::string& filename, const std::stri
                                     std::streamoff Offset, std::streamoff Size) {
     // if exists filename in pool and is not in use, return that
     for (size_t i = 0; i < m_Buffers.size(); ++i) {
-        if (m_Buffers[i]->filename != filename) continue;
+        if (m_Buffers[i]->filename != filename) {
+            continue;
+        }
         zbuffer* buffer = m_Buffers[i]->buffer;
         if (buffer && !buffer->is_used()) {
             buffer->use(Offset, Size);
@@ -103,10 +112,12 @@ zbuffer* filesystem::getValidBuffer(const std::string& filename, const std::stri
     }
 
     // No possiblility to open more files for now
-    if (m_Buffers.size() > 3) return NULL;
+    if (m_Buffers.size() > 3) {
+        return nullptr;
+    }
 
     // create a new buffer object, add it to the pool, and return that
-    pooledBuffer* pb = new pooledBuffer(filename, externalFilename);
+    auto* pb = new pooledBuffer(filename, externalFilename);
 
     zbuffer* buffer = new zbuffer_stored();
     buffer->open(filename.c_str(), Offset, Size);
@@ -133,10 +144,12 @@ void filesystem::unuse(izfstream& File) {
     File.setstate(std::ios::badbit);
 
     if (!File.Zipped()) {
-        delete (File.rdbuf(NULL));
+        delete (File.rdbuf(nullptr));
     } else {
-        zbuffer* buffer = static_cast<zbuffer*>(File.rdbuf());
-        if (buffer) buffer->unuse();
+        auto* buffer = dynamic_cast<zbuffer*>(File.rdbuf());
+        if (buffer) {
+            buffer->unuse();
+        }
     }
 }
 
@@ -146,12 +159,12 @@ void filesystem::Open(izfstream& File, const char* Filename) {
     File.setFS(this);
 
     // Generate the path and see if the file is zipped or not
-    string FullPath = m_BasePath + Filename;
+    const string FullPath = m_BasePath + Filename;
 
     // File is not zipped
     if (FileNotZipped(FullPath.c_str())) {
         // Link the izfile object with an opened filebuf
-        filebuf* FileBuf = new filebuf;
+        auto* FileBuf = new filebuf;
         FileBuf->open(FullPath.c_str(), ios::binary | ios::in);
 
         if (FileBuf->is_open()) {
@@ -175,30 +188,30 @@ void filesystem::Open(izfstream& File, const char* Filename) {
         if (FindFile(Filename, &FileInfo) && (!FileInfo.m_Directory) &&
             (!((ZipPath = FindZip(FileInfo.m_PackID)).empty()))) {
             // Get the position of the compressed data
-            if (CurrentZipName.size()) {
-                if ((pCurrentFS != this) || (CurrentZipName.compare(ZipPath) != 0)) {
+            if (!CurrentZipName.empty()) {
+                if ((pCurrentFS != this) || (CurrentZipName != ZipPath)) {
                     CurrentZipFile.close();
                     CurrentZipName = "";
-                    pCurrentFS     = NULL;
+                    pCurrentFS     = nullptr;
                 }
             }
-            if (!CurrentZipName.size()) {
-                CurrentZipName = ZipPath;
-                string zipName = m_BasePath + CurrentZipName;
+            if (CurrentZipName.empty()) {
+                CurrentZipName       = ZipPath;
+                const string zipName = m_BasePath + CurrentZipName;
                 CurrentZipFile.open(zipName.c_str(), ios::binary);
                 pCurrentFS = this;
             }
 
             if (!CurrentZipFile) {
                 CurrentZipName = "";
-                pCurrentFS     = NULL;
+                pCurrentFS     = nullptr;
                 return;
             }
 
-            streamoff DataPos = SkipLFHdr(CurrentZipFile, streamoff(FileInfo.m_Offset));
+            const streamoff DataPos = SkipLFHdr(CurrentZipFile, streamoff(FileInfo.m_Offset));
 
             if (DataPos != streamoff(-1)) {
-                string zipName = m_BasePath + CurrentZipName;
+                const string zipName = m_BasePath + CurrentZipName;
                 // Open the file at the right position
 
 #ifdef USE_ZBUFFER_POOL
@@ -231,10 +244,12 @@ bool filesystem::DirExists(const std::string& folderName) {
     file_info FileInfo;
 
     // Check whether the file is zipped, whether the file is a directory and try to open.
-    if (FindFile(folderName.c_str(), &FileInfo) && (FileInfo.m_Directory)) return true;
+    if (FindFile(folderName.c_str(), &FileInfo) && (FileInfo.m_Directory)) {
+        return true;
+    }
 
     // check real folder
-    string FullPath = m_BasePath + folderName;
+    const string FullPath = m_BasePath + folderName;
 
 #if defined(WIN32)
     struct _stat statBuffer;
@@ -243,7 +258,9 @@ bool filesystem::DirExists(const std::string& folderName) {
         return true;
 #else
     struct stat st;
-    if (stat(FullPath.c_str(), &st) == 0) return true;
+    if (stat(FullPath.c_str(), &st) == 0) {
+        return true;
+    }
 #endif
 
     // Neither in real folder nor in zip
@@ -251,15 +268,19 @@ bool filesystem::DirExists(const std::string& folderName) {
 }
 
 bool filesystem::FileExists(const std::string& fileName) {
-    if (fileName.length() < 1) return false;
+    if (fileName.length() < 1) {
+        return false;
+    }
     // Check in zip
     file_info FileInfo;
 
     // Check whether the file is zipped, whether the file is a directory and try to open.
-    if (FindFile(fileName.c_str(), &FileInfo) && (!FileInfo.m_Directory)) return true;
+    if (FindFile(fileName.c_str(), &FileInfo) && (!FileInfo.m_Directory)) {
+        return true;
+    }
 
     // check real folder
-    string FullPath = m_BasePath + fileName;
+    const string FullPath = m_BasePath + fileName;
 
 #if defined(WIN32)
     struct _stat statBuffer;
@@ -267,7 +288,9 @@ bool filesystem::FileExists(const std::string& fileName) {
         return true;
 #else
     struct stat st;
-    if (stat(FullPath.c_str(), &st) == 0) return true;
+    if (stat(FullPath.c_str(), &st) == 0) {
+        return true;
+    }
 #endif
 
     // Neither in real folder nor in zip
@@ -276,25 +299,29 @@ bool filesystem::FileExists(const std::string& fileName) {
 
 // Note: this doesn't scan the folders outside of the zip...should we add that here ?
 std::vector<std::string>& filesystem::scanfolder(const std::string& folderName, std::vector<std::string>& results) {
-    filemap_const_iterator folderPos = m_Files.find(folderName);
+    auto folderPos = m_Files.find(folderName);
 
-    if (folderPos == m_Files.end()) return results;
+    if (folderPos == m_Files.end()) {
+        return results;
+    }
 
-    filemap_const_iterator It = folderPos;
+    auto It = folderPos;
 
     string folderNameLC = folderName;
     std::transform(folderNameLC.begin(), folderNameLC.end(), folderNameLC.begin(), ::tolower);
-    size_t length = folderNameLC.length();
+    const size_t length = folderNameLC.length();
 
     while (++It != m_Files.end()) {
-        string currentFile   = (*It).first;
-        string currentFileLC = currentFile;
+        const string currentFile = (*It).first;
+        string currentFileLC     = currentFile;
         std::transform(currentFileLC.begin(), currentFileLC.end(), currentFileLC.begin(), ::tolower);
         if (currentFileLC.find(folderNameLC) == 0) {
-            string relativePath = currentFile.substr(length);
-            size_t pos          = relativePath.find_first_of("/\\");
+            const string relativePath = currentFile.substr(length);
+            const size_t pos          = relativePath.find_first_of("/\\");
             // Only add direct children, no recursive browse
-            if (pos == string::npos || pos == (relativePath.length() - 1)) results.push_back(relativePath);
+            if (pos == string::npos || pos == (relativePath.length() - 1)) {
+                results.push_back(relativePath);
+            }
         } else {
             break;
             // We know other files will not belong to that folder because of the order of the map
@@ -311,17 +338,21 @@ std::vector<std::string>& filesystem::scanfolder(const std::string& folderName, 
 bool filesystem::FileNotZipped(const char* FilePath) const {
     // return io_facilities::search_iterator(FilePath);
     //  follow new search_iterator implementation
-    std::ifstream File(FilePath);
+    std::ifstream const File(FilePath);
 
-    if (!File) return false;
+    if (!File) {
+        return false;
+    }
 
     return true;
 }
 
 bool filesystem::FindFile(const char* Filename, file_info* FileInfo) const {
-    filemap_const_iterator It = m_Files.find(Filename);
+    auto It = m_Files.find(Filename);
 
-    if (It == m_Files.end()) return false;  // File not found
+    if (It == m_Files.end()) {
+        return false;  // File not found
+    }
 
     *FileInfo = (*It).second;
     return true;
@@ -330,9 +361,11 @@ bool filesystem::FindFile(const char* Filename, file_info* FileInfo) const {
 const string& filesystem::FindZip(size_t PackID) const {
     static const string EmptyString;
 
-    zipmap_const_iterator It = m_Zips.find(PackID);
+    auto It = m_Zips.find(PackID);
 
-    if (It == m_Zips.end()) return EmptyString;  // PackID not valid
+    if (It == m_Zips.end()) {
+        return EmptyString;  // PackID not valid
+    }
 
     return (*It).second.m_Filename;
 }
@@ -341,14 +374,16 @@ void filesystem::InsertZip(const char* Filename, const size_t PackID) {
     zipfile_info ZipInfo;
 
     // Get full path to the zip file and prepare ZipInfo
-    ZipInfo.m_Filename = Filename;
-    string ZipPath     = m_BasePath + Filename;
+    ZipInfo.m_Filename   = Filename;
+    const string ZipPath = m_BasePath + Filename;
 
     // Open zip
     LOG(("opening zip:" + ZipPath).c_str());
     ifstream File(ZipPath.c_str(), ios::binary);
 
-    if (!File) return;
+    if (!File) {
+        return;
+    }
 
     // Find the start of the central directory
     if (!File.seekg(CentralDir(File))) {
@@ -383,23 +418,27 @@ void filesystem::InsertZip(const char* Filename, const size_t PackID) {
     File.close();
 
     // Add zip file to Zips data base (only if not empty)
-    if (ZipInfo.m_NbEntries != 0) m_Zips[PackID] = ZipInfo;
+    if (ZipInfo.m_NbEntries != 0) {
+        m_Zips[PackID] = ZipInfo;
+    }
 
     LOG("--zip file loading DONE");
 }
 
 bool filesystem::PreloadZip(const char* Filename, map<string, limited_file_info>& target) {
-    zipfile_info ZipInfo;
+    const zipfile_info ZipInfo;
 
     // Open zip
     izfstream File;
     File.open(Filename, this);
 
-    if (!File) return false;
+    if (!File) {
+        return false;
+    }
 
     // Find the start of the central directory
     if (File.Zipped()) {
-        streamoff realBeginOfFile = SkipLFHdr(CurrentZipFile, File.getOffset());
+        const streamoff realBeginOfFile = SkipLFHdr(CurrentZipFile, File.getOffset());
         if (!CurrentZipFile.seekg(CentralDirZipped(CurrentZipFile, realBeginOfFile, File.getCompSize()))) {
             File.close();
             return false;
@@ -413,7 +452,9 @@ bool filesystem::PreloadZip(const char* Filename, map<string, limited_file_info>
             const char* Name = &(*FileHdr.m_Filename.begin());
             if (FileHdr.m_FilenameSize != 0) {
                 // The zip in zip method only supports stored Zips because of JFileSystem limitations
-                if ((FileHdr.m_UncompSize != FileHdr.m_CompSize) || FileHdr.m_CompMethod != STORED) continue;
+                if ((FileHdr.m_UncompSize != FileHdr.m_CompSize) || FileHdr.m_CompMethod != STORED) {
+                    continue;
+                }
 
                 target[Name] =
                     limited_file_info(realBeginOfFile + FileHdr.m_RelOffset,  // "Local File" header offset position
@@ -423,32 +464,33 @@ bool filesystem::PreloadZip(const char* Filename, map<string, limited_file_info>
         }
 
         File.close();
-        return (target.size() ? true : false);
-    } else {
-        if (!File.seekg(CentralDir(File))) {
-            File.close();
-            return false;
-        }
-
-        // Check every headers within the zip file
-        file_header FileHdr;
-
-        while ((NextHeader(File) == FILE) && (FileHdr.ReadHeader(File))) {
-            // Include files into Files map
-            const char* Name = &(*FileHdr.m_Filename.begin());
-            if (FileHdr.m_FilenameSize != 0) {
-                // The zip in zip method only supports stored Zips because of JFileSystem limitations
-                if ((FileHdr.m_UncompSize != FileHdr.m_CompSize) || FileHdr.m_CompMethod != STORED) continue;
-
-                target[Name] = limited_file_info(FileHdr.m_RelOffset,  // "Local File" header offset position
-                                                 FileHdr.m_UncompSize  // File Size
-                );
-            }
-        }
-
-        File.close();
-        return (target.size() ? true : false);
+        return (!target.empty() ? true : false);
     }
+    if (!File.seekg(CentralDir(File))) {
+        File.close();
+        return false;
+    }
+
+    // Check every headers within the zip file
+    file_header FileHdr;
+
+    while ((NextHeader(File) == FILE) && (FileHdr.ReadHeader(File))) {
+        // Include files into Files map
+        const char* Name = &(*FileHdr.m_Filename.begin());
+        if (FileHdr.m_FilenameSize != 0) {
+            // The zip in zip method only supports stored Zips because of JFileSystem limitations
+            if ((FileHdr.m_UncompSize != FileHdr.m_CompSize) || FileHdr.m_CompMethod != STORED) {
+                continue;
+            }
+
+            target[Name] = limited_file_info(FileHdr.m_RelOffset,  // "Local File" header offset position
+                                             FileHdr.m_UncompSize  // File Size
+            );
+        }
+    }
+
+    File.close();
+    return (!target.empty() ? true : false);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -459,7 +501,7 @@ ostream& operator<<(ostream& Out, const filesystem& FS) {
     size_t NbFiles = 0;
     filesystem::zipfile_info AllZipsInfo;
 
-    for (filesystem::zipmap_const_iterator It = FS.m_Zips.begin(); It != FS.m_Zips.end(); ++It) {
+    for (auto It = FS.m_Zips.begin(); It != FS.m_Zips.end(); ++It) {
         const filesystem::zipfile_info& ZInfo = (*It).second;
 
         // Print zip filename
@@ -496,15 +538,17 @@ bool filesystem::lt_path::operator()(const string& s1, const string& s2) const {
     const char* B = s2.c_str();
 
     for (size_t i = 0;; ++i) {
-        if ((A[i] == '\0') && (B[i] == '\0')) return false;
+        if ((A[i] == '\0') && (B[i] == '\0')) {
+            return false;
+        }
 
         // '/' is the same as '\'
         if (!((A[i] == B[i]) || ((A[i] == '\\') && (B[i] == '/')) || ((A[i] == '/') && (B[i] == '\\')))) {
             // This line puts uppercases first
-            if ((A[i] == '\0') || (A[i] < B[i]))
+            if ((A[i] == '\0') || (A[i] < B[i])) {
                 return true;
-            else
-                return false;
+            }
+            return false;
         }
     }
 }
@@ -516,29 +560,36 @@ bool filesystem::lt_path::operator()(const string& s1, const string& s2) const {
 streamoff filesystem::CentralDirZipped(std::istream& File, std::streamoff begin, std::size_t size) const {
     using io_facilities::readvar;
 
-    std::streamoff eof = begin + size;
+    std::streamoff const eof = begin + size;
 
     // Look for the "end of central dir" header. Start minimum 22 bytes before end.
-    if (!File.seekg(eof - 22, ios::beg)) return -1;
+    if (!File.seekg(eof - 22, ios::beg)) {
+        return -1;
+    }
 
     streamoff EndPos;
-    streamoff StartPos = File.tellg();
+    const streamoff StartPos = File.tellg();
 
-    if (StartPos == streamoff(0)) return -1;
+    if (StartPos == streamoff(0)) {
+        return -1;
+    }
 
-    if (StartPos <= begin + streamoff(65536))
+    if (StartPos <= begin + streamoff(65536)) {
         EndPos = 1;
-    else
+    } else {
         EndPos = StartPos - streamoff(65536);
+    }
 
     // Start the scan
     do {
         unsigned int RawSignature;
 
-        if (!readvar(File, RawSignature, 4)) return -1;
+        if (!readvar(File, RawSignature, 4)) {
+            return -1;
+        }
 
         eofcd_header Header;
-        streampos Pos = File.tellg();
+        const streampos Pos = File.tellg();
 
         // Found a potential "eofcd" header?
         if ((RawSignature == ENDOFDIR) && (File.seekg(-4, ios::cur)) && (Header.ReadHeader(File))) {
@@ -546,12 +597,20 @@ streamoff filesystem::CentralDirZipped(std::istream& File, std::streamoff begin,
             if ((Header.m_NbDisks == 0) && (0 == Header.m_DirDisk) &&
                 (Header.m_LocalEntries == Header.m_TotalEntries)) {
                 // Check comment ends at eof
-                if (!File.seekg(eof - 1, ios::beg)) return -1;
+                if (!File.seekg(eof - 1, ios::beg)) {
+                    return -1;
+                }
                 if ((File.tellg() + streamoff(1)) == (Pos + streamoff(Header.m_CommentSize + 22 - 4))) {
                     // Check the start offset leads to a correct directory/file header;
-                    if (!File.seekg(begin + Header.m_Offset)) return -1;
-                    if (!readvar(File, RawSignature, 4)) return -1;
-                    if (RawSignature == FILE) return begin + Header.m_Offset;
+                    if (!File.seekg(begin + Header.m_Offset)) {
+                        return -1;
+                    }
+                    if (!readvar(File, RawSignature, 4)) {
+                        return -1;
+                    }
+                    if (RawSignature == FILE) {
+                        return begin + Header.m_Offset;
+                    }
                 }
             }
         }
@@ -567,26 +626,33 @@ streamoff filesystem::CentralDir(istream& File) const {
     using io_facilities::readvar;
 
     // Look for the "end of central dir" header. Start minimum 22 bytes before end.
-    if (!File.seekg(-22, ios::end)) return -1;
+    if (!File.seekg(-22, ios::end)) {
+        return -1;
+    }
 
     streamoff EndPos;
-    streamoff StartPos = File.tellg();
+    const streamoff StartPos = File.tellg();
 
-    if (StartPos == streamoff(0)) return -1;
+    if (StartPos == streamoff(0)) {
+        return -1;
+    }
 
-    if (StartPos <= streamoff(65536))
+    if (StartPos <= streamoff(65536)) {
         EndPos = 1;
-    else
+    } else {
         EndPos = StartPos - streamoff(65536);
+    }
 
     // Start the scan
     do {
         unsigned int RawSignature;
 
-        if (!readvar(File, RawSignature, 4)) return -1;
+        if (!readvar(File, RawSignature, 4)) {
+            return -1;
+        }
 
         eofcd_header Header;
-        streampos Pos = File.tellg();
+        const streampos Pos = File.tellg();
 
         // Found a potential "eofcd" header?
         if ((RawSignature == ENDOFDIR) && (File.seekg(-4, ios::cur)) && (Header.ReadHeader(File))) {
@@ -594,12 +660,20 @@ streamoff filesystem::CentralDir(istream& File) const {
             if ((Header.m_NbDisks == 0) && (0 == Header.m_DirDisk) &&
                 (Header.m_LocalEntries == Header.m_TotalEntries)) {
                 // Check comment ends at eof
-                if (!File.seekg(-1, ios::end)) return -1;
+                if (!File.seekg(-1, ios::end)) {
+                    return -1;
+                }
                 if ((File.tellg() + streamoff(1)) == (Pos + streamoff(Header.m_CommentSize + 22 - 4))) {
                     // Check the start offset leads to a correct directory/file header;
-                    if (!File.seekg(Header.m_Offset)) return -1;
-                    if (!readvar(File, RawSignature, 4)) return -1;
-                    if (RawSignature == FILE) return Header.m_Offset;
+                    if (!File.seekg(Header.m_Offset)) {
+                        return -1;
+                    }
+                    if (!readvar(File, RawSignature, 4)) {
+                        return -1;
+                    }
+                    if (RawSignature == FILE) {
+                        return Header.m_Offset;
+                    }
                 }
             }
         }
@@ -619,17 +693,31 @@ streamoff filesystem::SkipLFHdr(istream& File, streamoff LFHdrPos) {
     unsigned int RawSignature;
 
     // verify it's a local header
-    if (!File.seekg(LFHdrPos)) return -1;
-    if (!readvar(File, RawSignature, 4)) return -1;
-    if (RawSignature != LOCALFILE) return -1;
+    if (!File.seekg(LFHdrPos)) {
+        return -1;
+    }
+    if (!readvar(File, RawSignature, 4)) {
+        return -1;
+    }
+    if (RawSignature != LOCALFILE) {
+        return -1;
+    }
 
     // Skip and go directly to comment/field size
-    if (!File.seekg(22, ios::cur)) return -1;
-    if (!readvar(File, NameSize, 2)) return -1;
-    if (!readvar(File, FieldSize, 2)) return -1;
+    if (!File.seekg(22, ios::cur)) {
+        return -1;
+    }
+    if (!readvar(File, NameSize, 2)) {
+        return -1;
+    }
+    if (!readvar(File, FieldSize, 2)) {
+        return -1;
+    }
 
     // Skip comment and extra field
-    if (!File.seekg(NameSize + FieldSize, ios::cur)) return -1;
+    if (!File.seekg(NameSize + FieldSize, ios::cur)) {
+        return -1;
+    }
 
     // Now we are at the compressed data position
     return (File.tellg());
@@ -640,11 +728,15 @@ headerid filesystem::NextHeader(istream& File) const {
 
     unsigned int RawSignature;
 
-    if (!readvar(File, RawSignature, 4)) return READERROR;
+    if (!readvar(File, RawSignature, 4)) {
+        return READERROR;
+    }
 
-    if (!File.seekg(-4, ios::cur)) return READERROR;
+    if (!File.seekg(-4, ios::cur)) {
+        return READERROR;
+    }
 
-    headerid Signature = headerid(RawSignature);
+    auto Signature = headerid(RawSignature);
 
     switch (Signature) {
     case FILE:

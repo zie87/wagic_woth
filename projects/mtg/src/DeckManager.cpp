@@ -22,25 +22,26 @@ std::vector<DeckMetaData*>* DeckManager::getAIDeckOrderList() { return &aiDeckOr
 struct DeckIDMatch {
     DeckIDMatch(int id) : mID(id) {}
 
-    bool operator()(DeckMetaData* inPtr) { return inPtr->getDeckId() == mID; }
+    bool operator()(DeckMetaData* inPtr) const { return inPtr->getDeckId() == mID; }
 
     int mID;
 };
 
 DeckMetaData* DeckManager::getDeckMetaDataById(int deckId, bool isAI) {
-    DeckMetaData* deck                   = NULL;
+    DeckMetaData* deck                   = nullptr;
     std::vector<DeckMetaData*>& deckList = isAI ? aiDeckOrderList : playerDeckOrderList;
 
-    std::vector<DeckMetaData*>::iterator pos = find_if(deckList.begin(), deckList.end(), DeckIDMatch(deckId));
+    auto pos = find_if(deckList.begin(), deckList.end(), DeckIDMatch(deckId));
     if (pos != deckList.end()) {
         deck = *pos;
     } else {
         std::ostringstream deckFilename;
         std::string filepath;
-        if (isAI)
+        if (isAI) {
             filepath = options.profileFile("ai/baka/");
-        else
+        } else {
             filepath = options.profileFile("");
+        }
 
         deckFilename << filepath << "/deck" << deckId << ".txt";
         AddMetaData(deckFilename.str(), isAI);
@@ -55,17 +56,16 @@ DeckMetaData* DeckManager::getDeckMetaDataById(int deckId, bool isAI) {
 struct DeckFilenameMatch {
     DeckFilenameMatch(const std::string& filename) : mFilename(filename) {}
 
-    bool operator()(DeckMetaData* inPtr) { return inPtr->getFilename() == mFilename; }
+    bool operator()(DeckMetaData* inPtr) const { return inPtr->getFilename() == mFilename; }
 
     std::string mFilename;
 };
 
 DeckMetaData* DeckManager::getDeckMetaDataByFilename(const std::string& filename, bool isAI) {
-    DeckMetaData* deck                   = NULL;
+    DeckMetaData* deck                   = nullptr;
     std::vector<DeckMetaData*>& deckList = isAI ? aiDeckOrderList : playerDeckOrderList;
 
-    std::vector<DeckMetaData*>::iterator pos =
-        std::find_if(deckList.begin(), deckList.end(), DeckFilenameMatch(filename));
+    auto pos = std::find_if(deckList.begin(), deckList.end(), DeckFilenameMatch(filename));
     if (pos != deckList.end()) {
         deck = *pos;
     } else {
@@ -127,11 +127,11 @@ void DeckManager::DeleteMetaData(const string& filename, bool isAI) {
 
 StatsWrapper* DeckManager::getExtendedStatsForDeckId(int deckId, MTGAllCards* collection, bool isAI) {
     DeckMetaData* selectedDeck = getDeckMetaDataById(deckId, isAI);
-    if (selectedDeck == NULL) {
+    if (selectedDeck == nullptr) {
         std::ostringstream deckName;
         deckName << options.profileFile() << "/deck" << deckId << ".txt";
         std::map<std::string, StatsWrapper*>* statsMap = isAI ? &aiDeckStatsMap : &playerDeckStatsMap;
-        StatsWrapper* stats                            = NEW StatsWrapper(deckId);
+        auto* stats                                    = NEW StatsWrapper(deckId);
         statsMap->insert(make_pair(deckName.str(), stats));
         return stats;
     }
@@ -139,10 +139,10 @@ StatsWrapper* DeckManager::getExtendedStatsForDeckId(int deckId, MTGAllCards* co
 }
 
 StatsWrapper* DeckManager::getExtendedDeckStats(DeckMetaData* selectedDeck, MTGAllCards* collection, bool isAI) {
-    StatsWrapper* stats = NULL;
+    StatsWrapper* stats = nullptr;
 
-    string deckName = selectedDeck ? selectedDeck->getFilename() : "";
-    int deckId      = selectedDeck ? selectedDeck->getDeckId() : 0;
+    const string deckName = selectedDeck ? selectedDeck->getFilename() : "";
+    const int deckId      = selectedDeck ? selectedDeck->getDeckId() : 0;
 
     map<string, StatsWrapper*>* statsMap = isAI ? &aiDeckStatsMap : &playerDeckStatsMap;
     if (statsMap->find(deckName) == statsMap->end()) {
@@ -151,12 +151,14 @@ StatsWrapper* DeckManager::getExtendedDeckStats(DeckMetaData* selectedDeck, MTGA
         statsMap->insert(make_pair(deckName, stats));
     } else {
         stats = statsMap->find(deckName)->second;
-        if (stats->needUpdate) stats->updateStats(deckName, collection);
+        if (stats->needUpdate) {
+            stats->updateStats(deckName, collection);
+        }
     }
     return stats;
 }
 
-DeckManager* DeckManager::mInstance = NULL;
+DeckManager* DeckManager::mInstance = nullptr;
 
 void DeckManager::EndInstance() { SAFE_DELETE(mInstance); }
 
@@ -171,11 +173,11 @@ DeckManager* DeckManager::GetInstance() {
 //  p1 is assumed to be the player you want stats for
 //  p2 is the opponent
 int DeckManager::getDifficultyRating(Player* statsPlayer, Player* player) {
-    if (player->deckFile != "") {
+    if (!player->deckFile.empty()) {
         DeckMetaData* meta = getDeckMetaDataByFilename(player->deckFile, (player->isAI() == 1));
         return meta->getDifficulty();
-    } else
-        return EASY;
+    }
+    return EASY;
 }
 
 DeckManager::~DeckManager() {

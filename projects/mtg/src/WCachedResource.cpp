@@ -11,38 +11,41 @@ const std::string kPlaceholderID("placeholder");
 // WResource
 WResource::~WResource() {}
 
-WResource::WResource() {
-    locks      = WRES_UNLOCKED;
-    lastTime   = WResourceManager::Instance()->nowTime();
-    loadedMode = 0;
-}
+WResource::WResource() : locks(WRES_UNLOCKED), lastTime(WResourceManager::Instance()->nowTime()), loadedMode(0) {}
 
 bool WResource::isLocked() { return (locks != WRES_UNLOCKED); }
 
-bool WResource::isPermanent() { return (locks == WRES_PERMANENT); }
+bool WResource::isPermanent() const { return (locks == WRES_PERMANENT); }
 
 void WResource::deadbolt() {
-    if (locks <= WRES_MAX_LOCK) locks = WRES_PERMANENT;
+    if (locks <= WRES_MAX_LOCK) {
+        locks = WRES_PERMANENT;
+    }
 }
 
 void WResource::lock() {
-    if (locks < WRES_MAX_LOCK) locks++;
+    if (locks < WRES_MAX_LOCK) {
+        locks++;
+    }
     // watch out for this - if the lock count increases beyond a reasonable threshold,
     // someone is probably not releasing the texture correctly
     assert(locks < 50);
 }
 
 void WResource::unlock(bool force) {
-    if (force)
+    if (force) {
         locks = 0;
-    else if (locks > WRES_UNLOCKED) {
-        if (locks <= WRES_MAX_LOCK) locks--;
-    } else
+    } else if (locks > WRES_UNLOCKED) {
+        if (locks <= WRES_MAX_LOCK) {
+            locks--;
+        }
+    } else {
 #ifdef DEBUG_CACHE
         locks = WRES_UNDERLOCKED;
 #else
         locks = 0;
 #endif
+    }
 }
 
 void WResource::hit() { lastTime = WResourceManager::Instance()->nowTime(); }
@@ -50,10 +53,12 @@ void WResource::hit() { lastTime = WResourceManager::Instance()->nowTime(); }
 WCachedResource::~WCachedResource() { DebugTrace("Destroying WCachedResource: " << mFilename); }
 
 // WCachedTexture
-WCachedTexture::WCachedTexture() { texture = NULL; }
+WCachedTexture::WCachedTexture() : texture(nullptr) {}
 
 WCachedTexture::~WCachedTexture() {
-    if (texture) SAFE_DELETE(texture);
+    if (texture) {
+        SAFE_DELETE(texture);
+    }
 }
 
 JTexture* WCachedTexture::Actual() { return texture; }
@@ -61,10 +66,16 @@ JTexture* WCachedTexture::Actual() { return texture; }
 bool WCachedTexture::isLocked() { return (locks != WRES_UNLOCKED); }
 
 JQuadPtr WCachedTexture::GetQuad(float offX, float offY, float width, float height, const string& resname) {
-    if (!texture) return JQuadPtr();
+    if (!texture) {
+        return JQuadPtr();
+    }
 
-    if (width == 0.0f || width > static_cast<float>(texture->mWidth)) width = static_cast<float>(texture->mWidth);
-    if (height == 0.0f || height > static_cast<float>(texture->mHeight)) height = static_cast<float>(texture->mHeight);
+    if (width == 0.0f || width > static_cast<float>(texture->mWidth)) {
+        width = static_cast<float>(texture->mWidth);
+    }
+    if (height == 0.0f || height > static_cast<float>(texture->mHeight)) {
+        height = static_cast<float>(texture->mHeight);
+    }
 
     // If we're fetching a card resource, but it's not available yet, we'll be attempting to get the Quad from the
     // temporary back image. If that's the case, don't stash a separate tracked quad entry for each card name in the the
@@ -74,11 +85,15 @@ JQuadPtr WCachedTexture::GetQuad(float offX, float offY, float width, float heig
         // if we're the back or thumb_back file, but we've been asked for a card ID, then assign it
         // a placeholder ID.  Reason being, hotspots on quads are different (ie centered) for card images, so we'll
         // store a separate quad for cards
-        if (resname != kGenericCardID && resname != kGenericCardThumbnailID) resource = kPlaceholderID;
+        if (resname != kGenericCardID && resname != kGenericCardThumbnailID) {
+            resource = kPlaceholderID;
+        }
     }
 
-    std::map<string, JQuadPtr>::iterator iter = mTrackedQuads.find(resource);
-    if (iter != mTrackedQuads.end()) return iter->second;
+    auto iter = mTrackedQuads.find(resource);
+    if (iter != mTrackedQuads.end()) {
+        return iter->second;
+    }
 
     JQuadPtr quad(NEW JQuad(texture, offX, offY, width, height));
 
@@ -90,47 +105,59 @@ JQuadPtr WCachedTexture::GetQuad(float offX, float offY, float width, float heig
 
 JQuadPtr WCachedTexture::GetQuad(const string& resname) {
     JQuadPtr result;
-    std::map<string, JQuadPtr>::iterator iter = mTrackedQuads.find(resname);
-    if (iter != mTrackedQuads.end()) result = iter->second;
+    auto iter = mTrackedQuads.find(resname);
+    if (iter != mTrackedQuads.end()) {
+        result = iter->second;
+    }
 
     return result;
 }
 
 JQuadPtr WCachedTexture::GetCard(float offX, float offY, float width, float height, const string& resname) {
     JQuadPtr jq = GetQuad(offX, offY, width, height, resname);
-    if (jq.get()) jq->SetHotSpot(static_cast<float>(jq->mTex->mWidth / 2), static_cast<float>(jq->mTex->mHeight / 2));
+    if (jq.get()) {
+        jq->SetHotSpot(static_cast<float>(jq->mTex->mWidth / 2), static_cast<float>(jq->mTex->mHeight / 2));
+    }
 
     return jq;
 }
 
 unsigned long WCachedTexture::size() {
-    if (!texture) return 0;
+    if (!texture) {
+        return 0;
+    }
 
-    unsigned int pixel_size = 4;
 #if defined(PSP)
-    pixel_size = JRenderer::GetInstance()->PixelSize(texture->mTextureFormat);
+    const unsigned int pixel_size = JRenderer::GetInstance()->PixelSize(texture->mTextureFormat);
+#else
+    const unsigned int pixel_size = 4;
 #endif
     return texture->mTexHeight * texture->mTexWidth * pixel_size;
 }
 
-bool WCachedTexture::isGood() { return (texture != NULL); }
+bool WCachedTexture::isGood() { return (texture != nullptr); }
 
 void WCachedTexture::Refresh() {
     int error     = 0;
     JTexture* old = texture;
-    texture       = NULL;
+    texture       = nullptr;
 
-    if (!Attempt(mFilename, loadedMode, error)) SAFE_DELETE(texture);
+    if (!Attempt(mFilename, loadedMode, error)) {
+        SAFE_DELETE(texture);
+    }
 
-    if (!texture)
+    if (!texture) {
         texture = old;
-    else
+    } else {
         SAFE_DELETE(old);
+    }
 
     JRenderer::GetInstance()->TransferTextureToGLContext(*texture);
 
-    for (map<string, JQuadPtr>::iterator it = mTrackedQuads.begin(); it != mTrackedQuads.end(); ++it) {
-        if (it->second.get()) it->second->mTex = texture;
+    for (auto it = mTrackedQuads.begin(); it != mTrackedQuads.end(); ++it) {
+        if (it->second.get()) {
+            it->second->mTex = texture;
+        }
     }
 }
 
@@ -152,18 +179,23 @@ bool WCachedTexture::Attempt(const string& filename, int submode, int& error) {
         }
         realname = WResourceManager::Instance()->cardFile(realname);
     } else {
-        if (submode & TEXTURE_SUB_THUMB) realname.insert(0, "thumbnails/");
+        if (submode & TEXTURE_SUB_THUMB) {
+            realname.insert(0, "thumbnails/");
+        }
 
-        if (submode & TEXTURE_SUB_AVATAR)
+        if (submode & TEXTURE_SUB_AVATAR) {
             realname = WResourceManager::Instance()->avatarFile(realname);
-        else
+        } else {
             realname = WResourceManager::Instance()->graphicsFile(realname);
+        }
     }
 
     // Apply pixel mode
-    if (submode & TEXTURE_SUB_5551) format = GU_PSM_5551;
+    if (submode & TEXTURE_SUB_5551) {
+        format = GU_PSM_5551;
+    }
 
-    if (!realname.size()) {
+    if (realname.empty()) {
         error = CACHE_ERROR_404;
         return false;
     }
@@ -173,7 +205,9 @@ bool WCachedTexture::Attempt(const string& filename, int submode, int& error) {
     // Failure.
     if (!texture) {
         error = CACHE_ERROR_BAD;
-        if (!fileExists(realname.c_str())) error = CACHE_ERROR_404;
+        if (!fileExists(realname.c_str())) {
+            error = CACHE_ERROR_404;
+        }
         return false;
     }
 
@@ -182,36 +216,41 @@ bool WCachedTexture::Attempt(const string& filename, int submode, int& error) {
 }
 
 // WCachedSample
-WCachedSample::WCachedSample() { sample = NULL; }
+WCachedSample::WCachedSample() : sample(nullptr) {}
 
 WCachedSample::~WCachedSample() { SAFE_DELETE(sample); }
 
 JSample* WCachedSample::Actual() { return sample; }
 
 unsigned long WCachedSample::size() {
-    if (!sample || !sample->mSample) return 0;
+    if (!sample || !sample->mSample) {
+        return 0;
+    }
     return sample->fileSize();
 }
 
 bool WCachedSample::isGood() {
-    if (!sample || !sample->mSample) return false;
+    if (!sample || !sample->mSample) {
+        return false;
+    }
 
     return true;
 }
 
-void WCachedSample::Refresh() { return; }
+void WCachedSample::Refresh() {}
 
 bool WCachedSample::Attempt(const string& filename, int submode, int& error) {
-    loadedMode     = submode;
-    string sfxFile = WResourceManager::Instance()->sfxFile(filename);
-    sample         = JSoundSystem::GetInstance()->LoadSample(sfxFile.c_str());
+    loadedMode           = submode;
+    const string sfxFile = WResourceManager::Instance()->sfxFile(filename);
+    sample               = JSoundSystem::GetInstance()->LoadSample(sfxFile.c_str());
 
     if (!isGood()) {
         SAFE_DELETE(sample);
-        if (!fileExists(filename.c_str()))
+        if (!fileExists(filename.c_str())) {
             error = CACHE_ERROR_404;
-        else
+        } else {
             error = CACHE_ERROR_BAD;
+        }
         return false;
     }
 
@@ -222,12 +261,16 @@ bool WCachedSample::Attempt(const string& filename, int submode, int& error) {
 // WCachedParticles
 
 bool WCachedParticles::isGood() {
-    if (!particles) return false;
+    if (!particles) {
+        return false;
+    }
     return true;
 }
 
 unsigned long WCachedParticles::size() {
-    if (!particles) return 0;  // Sizeof(pointer)
+    if (!particles) {
+        return 0;  // Sizeof(pointer)
+    }
 
     return sizeof(hgeParticleSystemInfo);
 }
@@ -239,14 +282,12 @@ void WCachedParticles::Refresh() {
     int error = 0;
     Attempt(mFilename, loadedMode, error);
 
-    if (isGood())
+    if (isGood()) {
         SAFE_DELETE(old);
-    else {
+    } else {
         SAFE_DELETE(particles);
         particles = old;
     }
-
-    return;
 }
 
 bool WCachedParticles::Attempt(const string& filename, int submode, int& error) {
@@ -269,12 +310,12 @@ bool WCachedParticles::Attempt(const string& filename, int submode, int& error) 
     fileSys->ReadFile(&(particles->nEmission), sizeof(hgeParticleSystemInfo) - sizeof(void*));
     fileSys->CloseFile();
 
-    particles->sprite = NULL;
+    particles->sprite = nullptr;
     error             = CACHE_ERROR_NONE;
     return true;
 }
 
 hgeParticleSystemInfo* WCachedParticles::Actual() { return particles; }
 
-WCachedParticles::WCachedParticles() { particles = NULL; }
+WCachedParticles::WCachedParticles() : particles(nullptr) {}
 WCachedParticles::~WCachedParticles() { SAFE_DELETE(particles); }

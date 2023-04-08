@@ -1,5 +1,5 @@
-#ifndef _TEXTSCROLLER_H_
-#define _TEXTSCROLLER_H_
+#ifndef TEXTSCROLLER_H
+#define TEXTSCROLLER_H
 
 class JLBFont;
 #include <JGui.h>
@@ -25,12 +25,12 @@ protected:
 
 public:
     TextScroller(int fontId, float x, float y, float width, float speed = 30);
-    void Add(std::string text);
+    void Add(const std::string& text);
     void Reset();
     void setRandom(int mode = 1);
-    void Render();
-    void Update(float dt);
-    virtual std::ostream& toString(std::ostream& out) const;
+    void Render() override;
+    void Update(float dt) override;
+    std::ostream& toString(std::ostream& out) const override;
 };
 
 class VerticalTextScroller : public TextScroller {
@@ -46,8 +46,8 @@ private:
 public:
     VerticalTextScroller(int fontId, float x, float y, float width, float height, float scrollSpeed = 30,
                          size_t _minimumItems = 1);
-    void Render();
-    void Update(float dt);
-    void Add(std::string text);
+    void Render() override;
+    void Update(float dt) override;
+    void Add(const std::string& text);
 };
 #endif

@@ -1,5 +1,5 @@
-#ifndef _GAME_STATE_DECK_VIEWER_H_
-#define _GAME_STATE_DECK_VIEWER_H_
+#ifndef GAMESTATEDECKVIEWER_H
+#define GAMESTATEDECKVIEWER_H
 
 #include <math.h>
 #include <iostream>
@@ -126,31 +126,31 @@ private:
 
 public:
     GameStateDeckViewer(GameApp* parent);
-    virtual ~GameStateDeckViewer();
+    ~GameStateDeckViewer() override;
     void updateDecks();
     void rotateCards(int direction);
     void loadIndexes();
     void updateFilters();
     void rebuildFilters();
     void switchDisplay();
-    void Start();
-    virtual void End();
+    void Start() override;
+    void End() override;
     void addRemove(MTGCard* card);
-    virtual void Update(float dt);
+    void Update(float dt) override;
     void renderOnScreenBasicInfo();
     void renderSlideBar();
     void renderDeckBackground();
     void renderOnScreenMenu();
     virtual void renderCard(int id, float rotation);
     virtual void renderCard(int id);
-    virtual void Render();
+    void Render() override;
     int loadDeck(int deckid);
     void LoadDeckStatistics(int deckId);
 
-    void OnScroll(int inXVelocity, int inYVelocity);
+    void OnScroll(int inXVelocity, int inYVelocity) override;
 
     void buildEditorMenu();
-    virtual void ButtonPressed(int controllerId, int controlId);
+    void ButtonPressed(int controllerId, int controlId) override;
 };
 
 #endif

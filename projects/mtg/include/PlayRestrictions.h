@@ -1,5 +1,5 @@
-#ifndef _PLAY_RESTRICTIONS_H_
-#define _PLAY_RESTRICTIONS_H_
+#ifndef PLAYRESTRICTIONS_H
+#define PLAYRESTRICTIONS_H
 
 class TargetChooser;
 class MTGCardInstance;
@@ -14,18 +14,19 @@ public:
     virtual int canPutIntoZone(MTGCardInstance* card, MTGGameZone* destZone) = 0;
 
     PlayRestriction(TargetChooser* tc);
-    ~PlayRestriction();
+    virtual ~PlayRestriction();
 };
 
 class MaxPerTurnRestriction : public PlayRestriction {
 public:
+    ~MaxPerTurnRestriction() override = default;
     enum {
         NO_MAX = -1,
     };
     int maxPerTurn;
     MTGGameZone* zone;
     MaxPerTurnRestriction(TargetChooser* tc, int maxPerTurn, MTGGameZone* zone);
-    int canPutIntoZone(MTGCardInstance* card, MTGGameZone* destZone);
+    int canPutIntoZone(MTGCardInstance* card, MTGGameZone* destZone) override;
 };
 
 class PlayRestrictions {

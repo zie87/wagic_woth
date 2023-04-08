@@ -8,8 +8,8 @@
 //
 //-------------------------------------------------------------------------------------
 
-#ifndef _JGAME_OBJECT_H_
-#define _JGAME_OBJECT_H_
+#ifndef JGAMEOBJECT_H
+#define JGAMEOBJECT_H
 
 #include "JTypes.h"
 #include "JRenderer.h"
@@ -42,7 +42,7 @@ public:
     //////////////////////////////////////////////////////////////////////////
     JGameObject(JTexture* tex, float x, float y, float width, float height);
 
-    virtual ~JGameObject();
+    ~JGameObject() override;
 
     //////////////////////////////////////////////////////////////////////////
     /// Update function.
@@ -50,13 +50,13 @@ public:
     /// @param dt - Delta time since last update (in second).
     ///
     //////////////////////////////////////////////////////////////////////////
-    virtual void Update(float dt);
+    void Update(float dt) override;
 
     //////////////////////////////////////////////////////////////////////////
     /// Render current frame.
     ///
     //////////////////////////////////////////////////////////////////////////
-    virtual void Render();
+    void Render() override;
 
     //////////////////////////////////////////////////////////////////////////
     /// Function to handle collision.
@@ -88,7 +88,7 @@ public:
     /// @return height - Height of the bounding box.
     ///
     //////////////////////////////////////////////////////////////////////////
-    void GetBBox(float x, float y, float* xNow, float* yNow, float* width, float* height);
+    void GetBBox(float x, float y, float* xNow, float* yNow, float* width, float* height) const;
 
     //////////////////////////////////////////////////////////////////////////
     /// Set up a circle for collision detection. All the following collision
@@ -136,7 +136,7 @@ public:
     ///
     /// @return Damage point.
     //////////////////////////////////////////////////////////////////////////
-    int GetHitPoint();
+    int GetHitPoint() const;
 
     //////////////////////////////////////////////////////////////////////////
     /// Set blood of this object.
@@ -150,7 +150,7 @@ public:
     ///
     /// @return Blood value.
     //////////////////////////////////////////////////////////////////////////
-    int GetBlood();
+    int GetBlood() const;
 
     //////////////////////////////////////////////////////////////////////////
     /// Enable alpha animation during update.
@@ -205,7 +205,7 @@ public:
     /// @return Flashing status.
     ///
     //////////////////////////////////////////////////////////////////////////
-    bool IsFlashing();
+    bool IsFlashing() const;
 
 private:
     u32 mRenderFlags;

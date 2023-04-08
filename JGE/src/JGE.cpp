@@ -41,14 +41,22 @@ u8 JGE::GetAnalogY() {
 #include <sys/time.h>
 
 u8 JGE::GetAnalogX() {
-    if (GetButtonState(JGE_BTN_LEFT)) return 0;
-    if (GetButtonState(JGE_BTN_RIGHT)) return 0xff;
+    if (GetButtonState(JGE_BTN_LEFT)) {
+        return 0;
+    }
+    if (GetButtonState(JGE_BTN_RIGHT)) {
+        return 0xff;
+    }
     return 0x80;
 }
 
 u8 JGE::GetAnalogY() {
-    if (GetButtonState(JGE_BTN_UP)) return 0;
-    if (GetButtonState(JGE_BTN_DOWN)) return 0xff;
+    if (GetButtonState(JGE_BTN_UP)) {
+        return 0;
+    }
+    if (GetButtonState(JGE_BTN_DOWN)) {
+        return 0xff;
+    }
     return 0x80;
 }
 
@@ -69,43 +77,52 @@ static inline std::pair<std::pair<LocalKeySym, JButton>, bool> triplet(std::pair
 
 void JGE::PressKey(const LocalKeySym sym) {
     const std::pair<keycodes_it, keycodes_it> rng = keyBinds.equal_range(sym);
-    if (rng.first == rng.second)
+    if (rng.first == rng.second) {
         keyBuffer.push(triplet(sym, JGE_BTN_NONE, false));
-    else
+    } else {
         for (keycodes_it it = rng.first; it != rng.second; ++it) {
 #if defined(WIN32) || defined(LINUX)
-            if (JGE_BTN_FULLSCREEN == it->second) JGEToggleFullscreen();
+            if (JGE_BTN_FULLSCREEN == it->second) {
+                JGEToggleFullscreen();
+            }
 #endif
             keyBuffer.push(triplet(*it, held(it->second)));
         }
+    }
 }
 void JGE::PressKey(const JButton sym) {
 #if defined(WIN32) || defined(LINUX)
-    if (sym == JGE_BTN_FULLSCREEN) JGEToggleFullscreen();
+    if (sym == JGE_BTN_FULLSCREEN) {
+        JGEToggleFullscreen();
+    }
 #endif
     keyBuffer.push(triplet(LOCAL_KEY_NONE, sym, held(sym)));
 }
 void JGE::HoldKey(const LocalKeySym sym) {
     const std::pair<keycodes_it, keycodes_it> rng = keyBinds.equal_range(sym);
-    if (rng.first == rng.second)
+    if (rng.first == rng.second) {
         keyBuffer.push(triplet(sym, JGE_BTN_NONE, false));
-    else
+    } else {
         for (keycodes_it it = rng.first; it != rng.second; ++it) {
 #if defined(WIN32) || defined(LINUX)
-            if (JGE_BTN_FULLSCREEN == it->second) JGEToggleFullscreen();
+            if (JGE_BTN_FULLSCREEN == it->second) {
+                JGEToggleFullscreen();
+            }
 #endif
             if (!held(it->second)) {
                 keyBuffer.push(triplet(*it, false));
                 holds[it->second] = REPEAT_DELAY;
-            } else
+            } else {
                 keyBuffer.push(triplet(*it, true));
+            }
         }
+    }
 }
 void JGE::HoldKey_NoRepeat(const LocalKeySym sym) {
     const std::pair<keycodes_it, keycodes_it> rng = keyBinds.equal_range(sym);
-    if (rng.first == rng.second)
+    if (rng.first == rng.second) {
         keyBuffer.push(triplet(sym, JGE_BTN_NONE, false));
-    else
+    } else {
         for (keycodes_it it = rng.first; it != rng.second; ++it) {
 #if defined(WIN32) || defined(LINUX)
             if (JGE_BTN_FULLSCREEN == it->second) {
@@ -114,25 +131,35 @@ void JGE::HoldKey_NoRepeat(const LocalKeySym sym) {
             }
 #endif
             keyBuffer.push(triplet(*it, true));
-            if (!held(it->second)) holds[it->second] = std::numeric_limits<float>::quiet_NaN();
+            if (!held(it->second)) {
+                holds[it->second] = std::numeric_limits<float>::quiet_NaN();
+            }
         }
+    }
 }
 void JGE::HoldKey(const JButton sym) {
 #if defined(WIN32) || defined(LINUX)
-    if (JGE_BTN_FULLSCREEN == sym) JGEToggleFullscreen();
+    if (JGE_BTN_FULLSCREEN == sym) {
+        JGEToggleFullscreen();
+    }
 #endif
     if (!held(sym)) {
         keyBuffer.push(triplet(LOCAL_KEY_NONE, sym, false));
         holds[sym] = REPEAT_DELAY;
-    } else
+    } else {
         keyBuffer.push(triplet(LOCAL_KEY_NONE, sym, true));
+    }
 }
 void JGE::HoldKey_NoRepeat(const JButton sym) {
 #if defined(WIN32) || defined(LINUX)
-    if (JGE_BTN_FULLSCREEN == sym) JGEToggleFullscreen();
+    if (JGE_BTN_FULLSCREEN == sym) {
+        JGEToggleFullscreen();
+    }
 #endif
     keyBuffer.push(triplet(LOCAL_KEY_NONE, sym, true));
-    if (!held(sym)) holds[sym] = std::numeric_limits<float>::quiet_NaN();
+    if (!held(sym)) {
+        holds[sym] = std::numeric_limits<float>::quiet_NaN();
+    }
 }
 void JGE::ReleaseKey(const LocalKeySym sym) {
     std::set<JButton> s;
@@ -144,9 +171,11 @@ void JGE::ReleaseKey(const LocalKeySym sym) {
 
     std::queue<std::pair<std::pair<LocalKeySym, JButton>, bool> > r;
     while (!keyBuffer.empty()) {
-        std::pair<std::pair<LocalKeySym, JButton>, bool> q = keyBuffer.front();
+        const std::pair<std::pair<LocalKeySym, JButton>, bool> q = keyBuffer.front();
         keyBuffer.pop();
-        if ((!q.second) || (s.end() == s.find(q.first.second))) r.push(q);
+        if ((!q.second) || (s.end() == s.find(q.first.second))) {
+            r.push(q);
+        }
     }
     keyBuffer = r;
 }
@@ -154,14 +183,16 @@ void JGE::ReleaseKey(const JButton sym) {
     holds.erase(sym);
     std::queue<std::pair<std::pair<LocalKeySym, JButton>, bool> > r;
     while (!keyBuffer.empty()) {
-        std::pair<std::pair<LocalKeySym, JButton>, bool> q = keyBuffer.front();
+        const std::pair<std::pair<LocalKeySym, JButton>, bool> q = keyBuffer.front();
         keyBuffer.pop();
-        if ((!q.second) || (q.first.second != sym)) r.push(q);
+        if ((!q.second) || (q.first.second != sym)) {
+            r.push(q);
+        }
     }
     keyBuffer = r;
 }
 void JGE::Update(float dt) {
-    for (std::map<JButton, float>::iterator it = holds.begin(); it != holds.end(); ++it) {
+    for (auto it = holds.begin(); it != holds.end(); ++it) {
         if (it->second < 0) {
             keyBuffer.push(triplet(LOCAL_KEY_NONE, it->first, true));
             it->second = REPEAT_PERIOD;
@@ -169,7 +200,9 @@ void JGE::Update(float dt) {
         it->second -= dt;
     }
 
-    if (mApp != NULL) mApp->Update();
+    if (mApp != nullptr) {
+        mApp->Update();
+    }
 
     oldHolds = holds;
 }
@@ -181,15 +214,19 @@ bool JGE::GetButtonClick(JButton button) {
 }
 
 JButton JGE::ReadButton() {
-    if (keyBuffer.empty()) return JGE_BTN_NONE;
-    JButton val = keyBuffer.front().first.second;
+    if (keyBuffer.empty()) {
+        return JGE_BTN_NONE;
+    }
+    const JButton val = keyBuffer.front().first.second;
     keyBuffer.pop();
     return val;
 }
 
 LocalKeySym JGE::ReadLocalKey() {
-    if (keyBuffer.empty()) return LOCAL_KEY_NONE;
-    LocalKeySym val = keyBuffer.front().first.first;
+    if (keyBuffer.empty()) {
+        return LOCAL_KEY_NONE;
+    }
+    const LocalKeySym val = keyBuffer.front().first.first;
     keyBuffer.pop();
     return val;
 }
@@ -200,18 +237,20 @@ u32 JGE::BindKey(LocalKeySym sym, JButton button) {
 }
 
 u32 JGE::UnbindKey(LocalKeySym sym, JButton button) {
-    for (keycodes_it it = keyBinds.begin(); it != keyBinds.end();)
+    for (auto it = keyBinds.begin(); it != keyBinds.end();) {
         if (sym == it->first && button == it->second) {
-            keycodes_it er = it;
+            auto er = it;
             ++it;
             keyBinds.erase(er);
-        } else
+        } else {
             ++it;
+        }
+    }
     return keyBinds.size();
 }
 
 u32 JGE::UnbindKey(LocalKeySym sym) {
-    std::pair<keycodes_it, keycodes_it> rng = keyBinds.equal_range(sym);
+    const std::pair<keycodes_it, keycodes_it> rng = keyBinds.equal_range(sym);
     keyBinds.erase(rng.first, rng.second);
     return keyBinds.size();
 }
@@ -228,7 +267,9 @@ JGE::keybindings_it JGE::KeyBindings_begin() { return keyBinds.begin(); }
 JGE::keybindings_it JGE::KeyBindings_end() { return keyBinds.end(); }
 
 void JGE::ResetInput() {
-    while (!keyBuffer.empty()) keyBuffer.pop();
+    while (!keyBuffer.empty()) {
+        keyBuffer.pop();
+    }
     holds.clear();
     LeftClickedProcessed();
 }
@@ -243,7 +284,7 @@ void JGE::LeftClickedProcessed() {
     mlastLeftClickY = -1;
 }
 
-bool JGE::GetLeftClickCoordinates(int& x, int& y) {
+bool JGE::GetLeftClickCoordinates(int& x, int& y) const {
     if (mLastLeftClickX != -1 || mlastLeftClickY != -1) {
         x = mLastLeftClickX;
         y = mlastLeftClickY;
@@ -252,11 +293,14 @@ bool JGE::GetLeftClickCoordinates(int& x, int& y) {
     return false;
 }
 
-JGE::JGE() {
-    mApp = NULL;
+JGE::JGE()
+    : mApp(nullptr)
+#if defined(WIN32) || defined(LINUX)
+    , mCurrentMusic(nullptr)
+#endif
+{
 #if defined(WIN32) || defined(LINUX)
     strcpy(mDebuggingMsg, "");
-    mCurrentMusic = NULL;
 #endif
 
     Init();
@@ -369,32 +413,34 @@ void JGE::Init() {
 #endif  ///// Non PSP  code
 
 //////////////////////////////////////////////////////////////////////////
-JGE* JGE::mInstance = NULL;
+JGE* JGE::mInstance = nullptr;
 
 // returns number of milliseconds since game started
 int JGE::GetTime() { return JGEGetTime(); }
 
 void JGE::SetDelta(float delta) { mDeltaTime = delta; }
 
-float JGE::GetDelta() { return mDeltaTime; }
+float JGE::GetDelta() const { return mDeltaTime; }
 
-float JGE::GetFPS() { return mDeltaTime > 0 ? 1.0f / mDeltaTime : 0; }
+float JGE::GetFPS() const { return mDeltaTime > 0 ? 1.0f / mDeltaTime : 0; }
 
 JGE* JGE::GetInstance() {
-    if (mInstance == NULL) mInstance = new JGE();
+    if (mInstance == nullptr) {
+        mInstance = new JGE();
+    }
     return mInstance;
 }
 
 void JGE::Destroy() {
     if (mInstance) {
         delete mInstance;
-        mInstance = NULL;
+        mInstance = nullptr;
     }
 }
 
 void JGE::SetARGV(int argc, char* argv[]) {
     for (int i = 0; i < argc; ++i) {
-        std::string s = argv[i];
+        std::string const s = argv[i];
         mArgv.push_back(s);
     }
 }
@@ -407,7 +453,9 @@ void JGE::Render() {
     JRenderer* renderer = JRenderer::GetInstance();
 
     renderer->BeginScene();
-    if (mApp != NULL) mApp->Render();
+    if (mApp != nullptr) {
+        mApp->Render();
+    }
     renderer->EndScene();
 }
 
@@ -422,10 +470,14 @@ void JGE::printf(const char* format, ...) {
 }
 
 void JGE::Pause() {
-    if (mPaused) return;
+    if (mPaused) {
+        return;
+    }
 
     mPaused = true;
-    if (mApp != NULL) mApp->Pause();
+    if (mApp != nullptr) {
+        mApp->Pause();
+    }
 
     JFileSystem::GetInstance()->Pause();
 }
@@ -433,7 +485,9 @@ void JGE::Pause() {
 void JGE::Resume() {
     if (mPaused) {
         mPaused = false;
-        if (mApp != NULL) mApp->Resume();
+        if (mApp != nullptr) {
+            mApp->Resume();
+        }
     }
 }
 
@@ -444,7 +498,7 @@ void JGE::Assert(const char* filename, long lineNumber) {
 }
 
 void JGE::Scroll(int inXVelocity, int inYVelocity) {
-    if (mApp != NULL) {
+    if (mApp != nullptr) {
         mApp->OnScroll(inXVelocity, inYVelocity);
     }
 }

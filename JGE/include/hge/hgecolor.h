@@ -6,8 +6,8 @@
 ** hgeColor*** helper classes
 */
 
-#ifndef HGECOLOR_H
-#define HGECOLOR_H
+#ifndef HGE_HGECOLOR_H
+#define HGE_HGECOLOR_H
 
 // #include "hge.h"
 
@@ -16,20 +16,19 @@
 #define hgeColor hgeColorRGB
 
 inline void ColorClamp(float& x) {
-    if (x < 0.0f) x = 0.0f;
-    if (x > 1.0f) x = 1.0f;
+    if (x < 0.0f) {
+        { x = 0.0f; }
+    }
+    if (x > 1.0f) {
+        { x = 1.0f; }
+    }
 }
 
 class hgeColorRGB {
 public:
     float r, g, b, a;
 
-    hgeColorRGB(float _r, float _g, float _b, float _a) {
-        r = _r;
-        g = _g;
-        b = _b;
-        a = _a;
-    }
+    hgeColorRGB(float _r, float _g, float _b, float _a) : r(_r), a(_a), b(_b), g(_g) {}
     hgeColorRGB(DWORD col) { SetHWColor(col); }
     hgeColorRGB() { r = g = b = a = 0; }
 
@@ -90,12 +89,7 @@ class hgeColorHSV {
 public:
     float h, s, v, a;
 
-    hgeColorHSV(float _h, float _s, float _v, float _a) {
-        h = _h;
-        s = _s;
-        v = _v;
-        a = _a;
-    }
+    hgeColorHSV(float _h, float _s, float _v, float _a) : h(_h), a(_a), s(_s), v(_v) {}
     hgeColorHSV(DWORD col) { SetHWColor(col); }
     hgeColorHSV() { h = s = v = a = 0; }
 

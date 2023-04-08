@@ -1,5 +1,5 @@
-#ifndef _TESTSUITE_AI_H_
-#define _TESTSUITE_AI_H_
+#ifndef TESTSUITEAI_H
+#define TESTSUITEAI_H
 
 #ifdef TESTSUITE
 

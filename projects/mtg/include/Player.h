@@ -1,5 +1,5 @@
-#ifndef _PLAYER_H_
-#define _PLAYER_H_
+#ifndef PLAYER_H
+#define PLAYER_H
 
 #include "JGE.h"
 #include "MTGGameZones.h"
@@ -16,7 +16,7 @@ protected:
     ManaPool* manaPool;
     JTexture* mAvatarTex;
     JQuadPtr mAvatar;
-    bool loadAvatar(std::string file, std::string resName = "playerAvatar");
+    bool loadAvatar(const std::string& file, std::string resName = "playerAvatar");
     bool premade;
 
 public:
@@ -36,38 +36,38 @@ public:
     int skippingTurn;
     int extraTurn;
     std::vector<MTGCardInstance*> curses;
-    Player(GameObserver* observer, std::string deckFile, std::string deckFileSmall, MTGDeck* deck = NULL);
-    virtual ~Player();
-    virtual void setObserver(GameObserver* g);
+    Player(GameObserver* observer, const std::string& deckFile, std::string deckFileSmall, MTGDeck* deck = nullptr);
+    ~Player() override;
+    void setObserver(GameObserver* g) override;
     virtual void End();
     virtual int displayStack() { return 1; }
-    const std::string getDisplayName() const;
+    const std::string getDisplayName() const override;
 
-    int afterDamage();
+    int afterDamage() override;
 
     int gainLife(int value);
     int loseLife(int value);
     int gainOrLoseLife(int value);
 
     bool isPoisoned() { return (poisonCount > 0); }
-    int poisoned();
+    int poisoned() override;
     int damaged();
-    int prevented();
+    int prevented() override;
     void unTapPhase();
-    MTGInPlay* inPlay();
+    MTGInPlay* inPlay() const;
     ManaPool* getManaPool();
-    void takeMulligan();
+    void takeMulligan() const;
 
-    void cleanupPhase();
+    void cleanupPhase() const;
     virtual int Act(float dt) { return 0; }
 
     virtual int isAI() { return 0; }
 
-    bool isHuman() { return (playMode == MODE_HUMAN); }
+    bool isHuman() const { return (playMode == MODE_HUMAN); }
 
     Player* opponent();
     int getId();
-    JQuadPtr getIcon();
+    JQuadPtr getIcon() override;
 
     virtual int receiveEvent(WEvent* event) { return 0; }
 
@@ -76,7 +76,7 @@ public:
     /**
     ** Returns the path to the stats file of currently selected deck.
     */
-    std::string GetCurrentDeckStatsFile();
+    std::string GetCurrentDeckStatsFile() const;
     virtual bool parseLine(const std::string& s);
     friend std::ostream& operator<<(std::ostream&, const Player&);
     bool operator<(Player& aPlayer);
@@ -85,9 +85,9 @@ public:
 
 class HumanPlayer : public Player {
 public:
-    HumanPlayer(GameObserver* observer, std::string deckFile, std::string deckFileSmall, bool premade = false,
-                MTGDeck* deck = NULL);
-    void End();
+    HumanPlayer(GameObserver* observer, const std::string& deckFile, std::string deckFileSmall, bool premade = false,
+                MTGDeck* deck = nullptr);
+    void End() override;
     friend std::ostream& operator<<(std::ostream&, const HumanPlayer&);
 };
 

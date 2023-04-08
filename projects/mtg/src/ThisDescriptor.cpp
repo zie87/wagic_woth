@@ -1,6 +1,8 @@
 #include "PrecompiledHeader.h"
 
 #include "ThisDescriptor.h"
+
+#include <utility>
 #include "Counters.h"
 #include "MTGCardInstance.h"
 #include "CardDescriptor.h"
@@ -11,7 +13,7 @@ ThisDescriptor::~ThisDescriptor() {
 }
 
 // Returns the amount by which a value passes the comparison.
-int ThisDescriptor::matchValue(int value) {
+int ThisDescriptor::matchValue(int value) const {
     switch (comparisonMode) {
     case COMPARISON_AT_MOST:
         return (comparisonCriterion - value + 1);
@@ -32,19 +34,21 @@ int ThisDescriptor::matchValue(int value) {
 ThisDescriptor* ThisDescriptorFactory::createThisDescriptor(GameObserver* observer, string s) {
     size_t found;
 
-    string whitespaces(" \t\f\v\n\r");
+    const string whitespaces(" \t\f\v\n\r");
 
     found = s.find_last_not_of(whitespaces);
-    if (found != string::npos)
+    if (found != string::npos) {
         s.erase(found + 1);
-    else
-        return NULL;
+    } else {
+        return nullptr;
+    }
 
     found = s.find_first_not_of(whitespaces);
-    if (found != string::npos)
+    if (found != string::npos) {
         s.erase(0, found);
-    else
-        return NULL;
+    } else {
+        return nullptr;
+    }
 
     // set comparison mode
     // equal, greater, and less must remain above the others, otherwise the others may never be used.
@@ -52,19 +56,19 @@ ThisDescriptor* ThisDescriptorFactory::createThisDescriptor(GameObserver* observ
     size_t found2 = string::npos;
     int opLength  = 0;
 
-    found = s.find("=");
+    found = s.find('=');
     if (found != string::npos) {
         mode     = COMPARISON_EQUAL;
         found2   = found + 1;
         opLength = 1;
     }
-    found = s.find(">");
+    found = s.find('>');
     if (found != string::npos) {
         mode     = COMPARISON_GREATER;
         found2   = found + 1;
         opLength = 1;
     }
-    found = s.find("<");
+    found = s.find('<');
     if (found != string::npos) {
         mode     = COMPARISON_LESS;
         found2   = found + 1;
@@ -88,7 +92,9 @@ ThisDescriptor* ThisDescriptorFactory::createThisDescriptor(GameObserver* observ
         found2   = found + 2;
         opLength = 2;
     }
-    if (!mode) mode = COMPARISON_AT_LEAST;
+    if (!mode) {
+        mode = COMPARISON_AT_LEAST;
+    }
 
     // get comparison criterion
     int criterionFound = 0;
@@ -97,242 +103,245 @@ ThisDescriptor* ThisDescriptorFactory::createThisDescriptor(GameObserver* observ
         criterion      = atoi(s.substr(found2).c_str());
         criterionFound = 1;
     }
-    if (found2 != string::npos) s.erase(found2 - opLength);
+    if (found2 != string::npos) {
+        s.erase(found2 - opLength);
+    }
 
     // counters
     found = s.find("counter{");
     if (found != string::npos) {
-        size_t start         = s.find("{");
-        size_t end           = s.find("}");
-        string counterString = s.substr(start + 1, end - start - 1);
+        const size_t start         = s.find('{');
+        const size_t end           = s.find('}');
+        const string counterString = s.substr(start + 1, end - start - 1);
         AbilityFactory abf(observer);
-        Counter* counter = abf.parseCounter(counterString, NULL);
+        Counter* counter = abf.parseCounter(counterString, nullptr);
         if (counter) {
-            if (criterionFound) counter->nb = criterion;
-            ThisCounter* td = NEW ThisCounter(counter);
+            if (criterionFound) {
+                counter->nb = criterion;
+            }
+            auto* td = NEW ThisCounter(counter);
             if (td) {
                 td->comparisonMode = mode;
                 return td;
             }
         }
-        return NULL;
+        return nullptr;
     }
 
     // any counter
     found = s.find("counters");
     if (found != string::npos) {
-        ThisCounterAny* td = NEW ThisCounterAny(criterion);
+        auto* td = NEW ThisCounterAny(criterion);
         if (td) {
             td->comparisonMode = mode;
             return td;
         }
-        return NULL;
+        return nullptr;
     }
 
     // equips and auras
     found = s.find("gear");  // still same meaning, better wording to word conflict with MTGAbility equip.
     if (found != string::npos) {
-        ThisEquip* td = NEW ThisEquip(criterion);
+        auto* td = NEW ThisEquip(criterion);
         if (td) {
             td->comparisonMode = mode;
             return td;
         }
-        return NULL;
+        return nullptr;
     }
     found = s.find("auras");
     if (found != string::npos) {
-        ThisAuras* td = NEW ThisAuras(criterion);
+        auto* td = NEW ThisAuras(criterion);
         if (td) {
             td->comparisonMode = mode;
             return td;
         }
-        return NULL;
+        return nullptr;
     }
     // opponent damage count
     found = s.find("opponentdamagecount");
     if (found != string::npos) {
-        ThisOpponentDamageAmount* td = NEW ThisOpponentDamageAmount(criterion);
+        auto* td = NEW ThisOpponentDamageAmount(criterion);
         if (td) {
             td->comparisonMode = mode;
             return td;
         }
-        return NULL;
+        return nullptr;
     }
     // untapped status
     found = s.find("untapped");
     if (found != string::npos) {
-        ThisUntapped* td = NEW ThisUntapped(criterion);
+        auto* td = NEW ThisUntapped(criterion);
         if (td) {
             td->comparisonMode = mode;
             return td;
         }
-        return NULL;
+        return nullptr;
     }
     found = s.find("tapped");
     if (found != string::npos) {
-        ThisTapped* td = NEW ThisTapped(criterion);
+        auto* td = NEW ThisTapped(criterion);
         if (td) {
             td->comparisonMode = mode;
             return td;
         }
-        return NULL;
+        return nullptr;
     }
     // whenever this creature attacks do effect
     found = s.find("attacking");
     if (found != string::npos) {
-        ThisAttacked* td = NEW ThisAttacked(criterion);
+        auto* td = NEW ThisAttacked(criterion);
         if (td) {
             td->comparisonMode = mode;
             return td;
         }
-        return NULL;
+        return nullptr;
     }
     // whenever this creature blocks do effect
     found = s.find("blocking");
     if (found != string::npos) {
-        ThisBlocked* td = NEW ThisBlocked(criterion);
+        auto* td = NEW ThisBlocked(criterion);
         if (td) {
             td->comparisonMode = mode;
             return td;
         }
-        return NULL;
+        return nullptr;
     }
 
     // whenever this creature attacks do effect
     found = s.find("notblocked");
     if (found != string::npos) {
-        ThisNotBlocked* td = NEW ThisNotBlocked(criterion);
+        auto* td = NEW ThisNotBlocked(criterion);
         if (td) {
             td->comparisonMode = mode;
             return td;
         }
-        return NULL;
+        return nullptr;
     }
 
     // this creature was dealt damage this turn
     found = s.find("damaged");
     if (found != string::npos) {
-        ThisDamaged* td = NEW ThisDamaged(criterion);
+        auto* td = NEW ThisDamaged(criterion);
         if (td) {
             td->comparisonMode = mode;
             return td;
         }
-        return NULL;
+        return nullptr;
     }
 
     // this creature has 2 of the same weapons in its children vector
     found = s.find("dualwielding");
     if (found != string::npos) {
-        ThisDualWield* td = NEW ThisDualWield(criterion);
+        auto* td = NEW ThisDualWield(criterion);
         if (td) {
             td->comparisonMode = mode;
             return td;
         }
-        return NULL;
+        return nullptr;
     }
 
     // controller life
     found = s.find("opponentlife");
     if (found != string::npos) {
-        ThisOpponentlife* td = NEW ThisOpponentlife(criterion);
+        auto* td = NEW ThisOpponentlife(criterion);
         if (td) {
             td->comparisonMode = mode;
             return td;
         }
-        return NULL;
+        return nullptr;
     }
 
     // controller life
     found = s.find("controllerlife");
     if (found != string::npos) {
-        ThisControllerlife* td = NEW ThisControllerlife(criterion);
+        auto* td = NEW ThisControllerlife(criterion);
         if (td) {
             td->comparisonMode = mode;
             return td;
         }
-        return NULL;
+        return nullptr;
     }
 
     // power
     found = s.find("power");
     if (found != string::npos) {
-        ThisPower* td = NEW ThisPower(criterion);
+        auto* td = NEW ThisPower(criterion);
         if (td) {
             td->comparisonMode = mode;
             return td;
         }
-        return NULL;
+        return nullptr;
     }
 
     // toughness
     found = s.find("toughness");
     if (found != string::npos) {
-        ThisToughness* td = NEW ThisToughness(criterion);
+        auto* td = NEW ThisToughness(criterion);
         if (td) {
             td->comparisonMode = mode;
             return td;
         }
-        return NULL;
+        return nullptr;
     }
 
     // X
-    found = s.find("x");
+    found = s.find('x');
     if (found != string::npos) {
-        ThisX* td = NEW ThisX(criterion);
+        auto* td = NEW ThisX(criterion);
         if (td) {
             td->comparisonMode = mode;
             return td;
         }
-        return NULL;
+        return nullptr;
     }
 
     // this Variable
     vector<string> splitVComparison = parseBetween(s, "variable{", "}", false);
-    if (splitVComparison.size()) {
-        ThisVariable* td = NEW ThisVariable(criterion, splitVComparison[1]);
+    if (!splitVComparison.empty()) {
+        auto* td = NEW ThisVariable(criterion, splitVComparison[1]);
         if (td) {
             td->comparisonMode = mode;
             return td;
         }
-        return NULL;
+        return nullptr;
     }
 
     vector<string> splitTargetComparison = parseBetween(s, "cantargetcard(", ")", false);
-    if (splitTargetComparison.size()) {
+    if (!splitTargetComparison.empty()) {
         TargetChooserFactory tf(observer);
-        TargetChooser* tcc    = tf.createTargetChooser(splitTargetComparison[1], NULL);
-        ThisTargetCompare* td = NEW ThisTargetCompare(tcc);
+        TargetChooser* tcc = tf.createTargetChooser(splitTargetComparison[1], nullptr);
+        auto* td           = NEW ThisTargetCompare(tcc);
         if (td) {
             return td;
         }
-        return NULL;
+        return nullptr;
     }
 
-    return NULL;
+    return nullptr;
 }
 
-ThisTargetCompare::ThisTargetCompare(TargetChooser* _tcc) { targetComp = _tcc; }
+ThisTargetCompare::ThisTargetCompare(TargetChooser* _tcc) : targetComp(_tcc) {}
 
 int ThisTargetCompare::match(MTGCardInstance* card) {
-    if (targetComp->canTarget(card)) return 1;
+    if (targetComp->canTarget(card)) {
+        return 1;
+    }
     return 0;
 }
 
 ThisTargetCompare::~ThisTargetCompare() { SAFE_DELETE(targetComp); }
 
 ThisTargetCompare* ThisTargetCompare::clone() const {
-    ThisTargetCompare* a = NEW ThisTargetCompare(*this);
+    auto* a = NEW ThisTargetCompare(*this);
 
     return a;
 }
 
-ThisCounter::ThisCounter(Counter* _counter) {
-    counter             = _counter;
-    comparisonCriterion = counter->nb;
-}
+ThisCounter::ThisCounter(Counter* _counter) : counter(_counter) { comparisonCriterion = counter->nb; }
 
-ThisCounter::ThisCounter(int power, int toughness, int nb, const char* name) {
-    counter             = NEW Counter(NULL, name, power, toughness);
+ThisCounter::ThisCounter(int power, int toughness, int nb, const char* name)
+    : counter(NEW Counter(nullptr, name, power, toughness)) {
     comparisonCriterion = nb;
 }
 
@@ -340,33 +349,34 @@ int ThisCounter::match(MTGCardInstance* card) {
     Counter* targetCounter = card->counters->hasCounter(counter->name.c_str(), counter->power, counter->toughness);
     if (targetCounter) {
         return matchValue(targetCounter->nb);
-    } else {
-        switch (comparisonMode) {
-        case COMPARISON_LESS:
-            return comparisonCriterion;
-        case COMPARISON_AT_MOST:
-            return comparisonCriterion + 1;
-        case COMPARISON_UNEQUAL:
-            if (comparisonCriterion)
-                return 1;
-            else
-                return 0;
-        case COMPARISON_EQUAL:
-            if (comparisonCriterion)
-                return 0;
-            else
-                return 1;
-        default:
+    }
+    switch (comparisonMode) {
+    case COMPARISON_LESS:
+        return comparisonCriterion;
+    case COMPARISON_AT_MOST:
+        return comparisonCriterion + 1;
+    case COMPARISON_UNEQUAL:
+        if (comparisonCriterion) {
+            return 1;
+        } else {
             return 0;
         }
+    case COMPARISON_EQUAL:
+        if (comparisonCriterion) {
+            return 0;
+        } else {
+            return 1;
+        }
+    default:
+        return 0;
     }
 }
 
 ThisCounter::~ThisCounter() { SAFE_DELETE(counter); }
 
 ThisCounter* ThisCounter::clone() const {
-    ThisCounter* a = NEW ThisCounter(*this);
-    a->counter     = NEW Counter(NULL, counter->name.c_str(), counter->power, counter->toughness);
+    auto* a    = NEW ThisCounter(*this);
+    a->counter = NEW Counter(nullptr, counter->name.c_str(), counter->power, counter->toughness);
     return a;
 }
 
@@ -437,7 +447,9 @@ ThisDamaged::ThisDamaged(int wasDealtDamage) { comparisonCriterion = wasDealtDam
 
 int ThisDamaged::match(MTGCardInstance* card) {
     int result = 0;
-    if (card->wasDealtDamage) result = 1;
+    if (card->wasDealtDamage) {
+        result = 1;
+    }
     return matchValue(result);
 }
 
@@ -447,7 +459,9 @@ ThisDualWield::ThisDualWield(int dualWield) { comparisonCriterion = dualWield; }
 
 int ThisDualWield::match(MTGCardInstance* card) {
     int result = 0;
-    if (card->isDualWielding) result = 1;
+    if (card->isDualWielding) {
+        result = 1;
+    }
     return matchValue(result);
 }
 
@@ -478,15 +492,12 @@ int ThisX::match(MTGCardInstance* card) { return matchValue(card->X); }
 ThisX* ThisX::clone() const { return NEW ThisX(*this); }
 
 //
-ThisVariable::ThisVariable(int comp, string _vWord) {
-    vWord               = _vWord;
-    comparisonCriterion = comp;
-}
+ThisVariable::ThisVariable(int comp, string _vWord) : vWord(std::move(_vWord)) { comparisonCriterion = comp; }
 
 int ThisVariable::match(MTGCardInstance* card) {
-    int result      = 0;
-    WParsedInt* res = NEW WParsedInt(vWord, NULL, card);
-    result          = res->getValue();
+    int result = 0;
+    auto* res  = NEW WParsedInt(vWord, nullptr, card);
+    result     = res->getValue();
     SAFE_DELETE(res);
     return matchValue(result);
 }

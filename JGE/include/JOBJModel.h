@@ -8,8 +8,8 @@
 //
 //-------------------------------------------------------------------------------------
 
-#ifndef _OBJMODEL_H
-#define _OBJMODEL_H
+#ifndef JOBJMODEL_H
+#define JOBJMODEL_H
 
 #include <vector>
 

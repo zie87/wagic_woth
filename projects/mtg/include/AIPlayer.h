@@ -13,13 +13,14 @@
 
  */
 
-#ifndef _IAPLAYER_H
-#define _IAPLAYER_H
+#ifndef AIPLAYER_H
+#define AIPLAYER_H
 
 #include "Player.h"
 #include "config.h"
 
 #include <queue>
+#include <utility>
 using std::queue;
 
 class AIStats;
@@ -38,21 +39,40 @@ public:
     Targetable* playerAbilityTarget;
     // player targeting through abilities is handled completely seperate from spell targeting.
 
-    AIAction(AIPlayer* owner, MTGAbility* a, MTGCardInstance* c, MTGCardInstance* t = NULL)
-        : owner(owner), ability(a), player(NULL), click(c), target(t), playerAbilityTarget(NULL){};
+    AIAction(AIPlayer* owner, MTGAbility* a, MTGCardInstance* c, MTGCardInstance* t = nullptr)
+        : owner(owner)
+        , ability(a)
+        , player(nullptr)
+        , click(c)
+        , target(t)
+        , playerAbilityTarget(nullptr){};
 
-    AIAction(AIPlayer* owner, MTGCardInstance* c, MTGCardInstance* t = NULL);
+    AIAction(AIPlayer* owner, MTGCardInstance* c, MTGCardInstance* t = nullptr);
 
     AIAction(AIPlayer* owner, Player* p)  // player targeting through spells
-        : owner(owner), ability(NULL), player(p), click(NULL), target(NULL), playerAbilityTarget(NULL){};
+        : owner(owner)
+        , ability(nullptr)
+        , player(p)
+        , click(nullptr)
+        , target(nullptr)
+        , playerAbilityTarget(nullptr){};
 
     AIAction(AIPlayer* owner, MTGAbility* a, MTGCardInstance* c, vector<Targetable*> targetCards)
-        : owner(owner), ability(a), player(NULL), click(c), mAbilityTargets(targetCards), playerAbilityTarget(NULL){};
+        : owner(owner)
+        , ability(a)
+        , player(nullptr)
+        , click(c)
+        , mAbilityTargets(std::move(targetCards))
+        , playerAbilityTarget(nullptr){};
 
     AIAction(AIPlayer* owner, MTGAbility* a, Player* p, MTGCardInstance* c)  // player targeting through abilities.
-        : owner(owner), ability(a), click(c), target(NULL), playerAbilityTarget(p){};
+        : owner(owner)
+        , ability(a)
+        , click(c)
+        , target(nullptr)
+        , playerAbilityTarget(p){};
     int Act();
-    int clickMultiAct(vector<Targetable*>& actionTargets);
+    int clickMultiAct(vector<Targetable*>& actionTargets) const;
 };
 
 class AIPlayer : public Player {
@@ -66,7 +86,7 @@ protected:
     queue<AIAction*> clickstream;
     int clickMultiTarget(TargetChooser* tc, vector<Targetable*>& potentialTargets);
     int clickSingleTarget(TargetChooser* tc, vector<Targetable*>& potentialTargets,
-                          MTGCardInstance* Choosencard = NULL);
+                          MTGCardInstance* Choosencard = nullptr);
     RandomGenerator randomGenerator;
 
 public:
@@ -74,25 +94,25 @@ public:
     int agressivity;
     bool forceBestAbilityUse;
 
-    void End(){};
-    virtual int displayStack() { return 0; };
-    virtual int receiveEvent(WEvent* event);
-    virtual void Render();
+    void End() override{};
+    int displayStack() override { return 0; };
+    int receiveEvent(WEvent* event) override;
+    void Render() override;
 
-    AIPlayer(GameObserver* observer, string deckFile, string deckFileSmall, MTGDeck* deck = NULL);
-    virtual ~AIPlayer();
+    AIPlayer(GameObserver* observer, const string& deckFile, string deckFileSmall, MTGDeck* deck = nullptr);
+    ~AIPlayer() override;
 
-    virtual int chooseTarget(TargetChooser* tc = NULL, Player* forceTarget = NULL, MTGCardInstance* Chosencard = NULL,
-                             bool checkonly = false) = 0;
-    virtual int affectCombatDamages(CombatStep)      = 0;
-    virtual int Act(float dt)                        = 0;
+    virtual int chooseTarget(TargetChooser* tc = nullptr, Player* forceTarget = nullptr,
+                             MTGCardInstance* Chosencard = nullptr, bool checkonly = false) = 0;
+    virtual int affectCombatDamages(CombatStep)                                             = 0;
+    int Act(float dt) override                                                              = 0;
 
-    int isAI() { return 1; };
+    int isAI() override { return 1; };
 
     void setFastTimerMode(bool mode = true) { mFastTimerMode = mode; };
     RandomGenerator* getRandomGenerator() { return &randomGenerator; };
 
-    bool parseLine(const string& s);
+    bool parseLine(const string& s) override;
 
     static int getTotalAIDecks();
     static void invalidateTotalAIDecks();

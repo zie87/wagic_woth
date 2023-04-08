@@ -1,11 +1,12 @@
-#ifndef _TARGETABLE_H_
-#define _TARGETABLE_H_
+#ifndef TARGETABLE_H
+#define TARGETABLE_H
 
 class Targetable {
 protected:
     GameObserver* observer;
 
 public:
+    virtual ~Targetable() = default;
     Targetable(GameObserver* observer) : observer(observer){};
     virtual const string getDisplayName() const = 0;
     inline GameObserver* getObserver() { return observer; };

@@ -11,7 +11,7 @@ class mutex {
 public:
     using scoped_lock = ::jge::unique_lock<mutex>;
 
-    mutex() noexcept : m_mutex{} {}
+    mutex() noexcept {}
 
     mutex(const mutex&)            = delete;
     mutex& operator=(const mutex&) = delete;
@@ -25,4 +25,4 @@ private:
 
 }  // namespace jge
 
-#endif  // JGE_PLATFORM_SDL_THREAD_HPP
+#endif  // JGE_PLATFORM_SDL_MUTEX_HPP

@@ -1,9 +1,10 @@
-#ifndef _POS_H_
-#define _POS_H_
+#ifndef POS_H
+#define POS_H
 
 #include "JGE.h"
 
 struct Pos {
+    virtual ~Pos() = default;
     float actX, actY, actZ, actT, actA;
     float x, y, zoom, t, alpha;
     float width, height;
@@ -15,4 +16,4 @@ struct Pos {
     void Render(JQuad*);
 };
 
-#endif  // _POS_H_
+#endif  // POS_H

@@ -1,5 +1,5 @@
-#ifndef _GAME_STATE_SHOP_H_
-#define _GAME_STATE_SHOP_H_
+#ifndef GAMESTATESHOP_H
+#define GAMESTATESHOP_H
 
 #include <JGE.h>
 #include "GameState.h"
@@ -32,9 +32,9 @@ class MTGPacks;
 
 class BoosterDisplay : public CardDisplay {
 public:
-    BoosterDisplay(int id, GameObserver* game, int x, int y, JGuiListener* listener = NULL, TargetChooser* tc = NULL,
-                   int nb_displayed_items = 7);
-    bool CheckUserInput(JButton key);
+    BoosterDisplay(int id, GameObserver* game, int x, int y, JGuiListener* listener = nullptr,
+                   TargetChooser* tc = nullptr, int nb_displayed_items = 7);
+    bool CheckUserInput(JButton key) override;
 };
 
 class ShopBooster {
@@ -110,15 +110,15 @@ private:
 
 public:
     GameStateShop(GameApp* parent);
-    virtual ~GameStateShop();
-    virtual void Start();
-    virtual void End();
-    virtual void Create();
-    virtual void Destroy();
-    virtual void Update(float dt);
-    virtual void Render();
-    virtual void ButtonPressed(int controllerId, int controlId);
-    virtual void OnScroll(int inXVelocity, int inYVelocity);
+    ~GameStateShop() override;
+    void Start() override;
+    void End() override;
+    void Create() override;
+    void Destroy() override;
+    void Update(float dt) override;
+    void Render() override;
+    void ButtonPressed(int controllerId, int controlId) override;
+    void OnScroll(int inXVelocity, int inYVelocity) override;
     static float _x1[], _y1[], _x2[], _y2[], _x3[], _y3[], _x4[], _y4[];
 };
 

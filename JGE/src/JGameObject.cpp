@@ -16,34 +16,29 @@
 // JRenderer* JGameObject::mRenderer = NULL;
 
 JGameObject::JGameObject(JTexture* tex, float x, float y, float width, float height)
-    : JSprite(tex, x, y, width, height) {
+    : JSprite(tex, x, y, width, height)
+    , mAlphaDelta(0.0f)
+    , mBlood(1)
+    , mCollided(false)
+    , mCollisionTarget(nullptr)
+    , mDoAlpha(false)
+    , mDoRotation(false)
+    , mDoScaling(false)
+    , mFlashing(false)
+    , mHitPoint(1)
+    , mOriginalBlood(1)
+    , mRenderFlags(0)
+    , mRotationDelta(0.0f)
+    , mScaleDelta(0.0f) {
     // mRenderer = JRenderer::GetInstance();
 
     // mX = 0.0f;
     // mY = 0.0f;
 
-    mRenderFlags = 0;
     // mSize = 1.0f;
     // mAngle = 0.0f;
 
-    mOriginalBlood = 1;
-    mBlood         = 1;
-    mHitPoint      = 1;
-
-    mCollided        = false;
-    mCollisionTarget = NULL;
-    mFlashing        = false;
-
     // mActive = false;
-
-    mRotationDelta = 0.0f;
-    mDoRotation    = false;
-
-    mAlphaDelta = 0.0f;
-    mDoAlpha    = false;
-
-    mDoScaling  = false;
-    mScaleDelta = 0.0f;
 
     SetBBox(x, y, width, height);
 }
@@ -60,7 +55,9 @@ void JGameObject::Update(float dt) {
         if (mFlashTimer > FLASH_TIME) {
             mFlashTimer = 0;
             mFlashCounter++;
-            if (mFlashCounter > FLASHING_COUNT) mFlashing = false;
+            if (mFlashCounter > FLASHING_COUNT) {
+                mFlashing = false;
+            }
         }
     }
 
@@ -68,7 +65,9 @@ void JGameObject::Update(float dt) {
         mAlpha += mAlphaDelta * dt;
         if (mAlpha < 0.0f) {
             mAlpha = 0.0f;
-            if (mAnimationType == ANIMATION_TYPE_ONCE_AND_GONE) mActive = false;
+            if (mAnimationType == ANIMATION_TYPE_ONCE_AND_GONE) {
+                mActive = false;
+            }
         } else if (mAlpha > 255.0f) {
             mAlpha = 255.0f;
         }
@@ -106,11 +105,17 @@ void JGameObject::Render() {
     }
     */
 
-    if (!mActive) return;
+    if (!mActive) {
+        return;
+    }
 
-    if ((mRenderFlags & RENDER_FLAG_ANGLE) == RENDER_FLAG_ANGLE) mRotation = mDirection;
+    if ((mRenderFlags & RENDER_FLAG_ANGLE) == RENDER_FLAG_ANGLE) {
+        mRotation = mDirection;
+    }
 
-    if (mFlashing && (mFlashCounter & 1) == 0) mRenderer->SetTexBlend(BLEND_SRC_ALPHA, BLEND_ONE);
+    if (mFlashing && (mFlashCounter & 1) == 0) {
+        mRenderer->SetTexBlend(BLEND_SRC_ALPHA, BLEND_ONE);
+    }
 
     // 	if ((mRenderFlags & RENDER_FLAG_SIZE)==RENDER_FLAG_SIZE)
     // 	{
@@ -125,7 +130,9 @@ void JGameObject::Render() {
 
     JSprite::Render();
 
-    if (mFlashing) mRenderer->SetTexBlend(BLEND_SRC_ALPHA, BLEND_ONE_MINUS_SRC_ALPHA);
+    if (mFlashing) {
+        mRenderer->SetTexBlend(BLEND_SRC_ALPHA, BLEND_ONE_MINUS_SRC_ALPHA);
+    }
 }
 
 // void JGameObject::SetPosition(float x, float y)
@@ -153,7 +160,7 @@ void JGameObject::SetBBox(float x, float y, float width, float height) {
     mBBoxHeight = height;
 }
 
-void JGameObject::GetBBox(float x, float y, float* xNow, float* yNow, float* width, float* height) {
+void JGameObject::GetBBox(float x, float y, float* xNow, float* yNow, float* width, float* height) const {
     *xNow   = x + mBBoxX;
     *yNow   = y + mBBoxY;
     *width  = mBBoxWidth;
@@ -163,17 +170,27 @@ void JGameObject::GetBBox(float x, float y, float* xNow, float* yNow, float* wid
 bool JGameObject::Collide(JGameObject* target) {
     if (mUseBoundingBox) {
         // bounding box collision detection
-        if ((target->mX + target->mBBoxX) - (mX + mBBoxX) < -target->mBBoxWidth) return false;
-        if ((target->mX + target->mBBoxX) - (mX + mBBoxX) > mBBoxWidth) return false;
-        if ((target->mY + target->mBBoxY) - (mY + mBBoxY) < -target->mBBoxHeight) return false;
-        if ((target->mY + target->mBBoxY) - (mY + mBBoxY) > mBBoxHeight) return false;
+        if ((target->mX + target->mBBoxX) - (mX + mBBoxX) < -target->mBBoxWidth) {
+            return false;
+        }
+        if ((target->mX + target->mBBoxX) - (mX + mBBoxX) > mBBoxWidth) {
+            return false;
+        }
+        if ((target->mY + target->mBBoxY) - (mY + mBBoxY) < -target->mBBoxHeight) {
+            return false;
+        }
+        if ((target->mY + target->mBBoxY) - (mY + mBBoxY) > mBBoxHeight) {
+            return false;
+        }
 
     } else {
         // Circle-Circle collision detection
-        float dx = (mX + mCenterX) - (target->mX + target->mCenterX);
-        float dy = (mY + mCenterY) - (target->mY + target->mCenterY);
-        float dr = mRadius + target->mRadius;
-        if (dx * dx + dy * dy > dr * dr) return false;
+        const float dx = (mX + mCenterX) - (target->mX + target->mCenterX);
+        const float dy = (mY + mCenterY) - (target->mY + target->mCenterY);
+        const float dr = mRadius + target->mRadius;
+        if (dx * dx + dy * dy > dr * dr) {
+            return false;
+        }
     }
 
     // mCollided = true;
@@ -195,7 +212,7 @@ void JGameObject::SetCollisionTarget(JGameObject* target) {
     mCollisionTarget = target;
 }
 
-int JGameObject::GetHitPoint() { return mHitPoint; }
+int JGameObject::GetHitPoint() const { return mHitPoint; }
 
 void JGameObject::SetHitPoint(int pt) { mHitPoint = pt; }
 
@@ -204,7 +221,7 @@ void JGameObject::SetBlood(int pt) {
     mBlood         = pt;
 }
 
-int JGameObject::GetBlood() { return mBlood; }
+int JGameObject::GetBlood() const { return mBlood; }
 
 void JGameObject::OnCollide() {}
 
@@ -216,7 +233,7 @@ void JGameObject::StartFlashing() {
 
 void JGameObject::StopFlashing() { mFlashing = false; }
 
-bool JGameObject::IsFlashing() { return mFlashing; }
+bool JGameObject::IsFlashing() const { return mFlashing; }
 
 void JGameObject::SetRenderFlags(int flags) { mRenderFlags = flags; }
 

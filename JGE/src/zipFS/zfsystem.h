@@ -43,6 +43,8 @@
 
 #pragma once
 
+#include <utility>
+
 #include "stdafx.h"
 #include "ziphdr.h"   // Zip file header
 #include "zstream.h"  // Zip Stream
@@ -69,9 +71,9 @@ public:
     bool isBeingUsed() const;
     const std::string& FilePath() const;
     const std::string& FullFilePath() const;
-    size_t getUncompSize();
-    size_t getOffset();
-    size_t getCompSize();
+    size_t getUncompSize() const;
+    size_t getOffset() const;
+    size_t getCompSize() const;
 
 protected:
     friend class filesystem;
@@ -97,12 +99,12 @@ public:
     public:
         file_info() : m_PackID(0), m_Offset(0), m_Size(0), m_CompSize(0), m_CompMethod(0), m_Directory(true) {}
         file_info(size_t PackID, size_t Offset, size_t Size, size_t CompSize, short CompMethod, bool Directory)
-            : m_PackID(PackID),
-              m_Offset(Offset),
-              m_Size(Size),
-              m_CompSize(CompSize),
-              m_CompMethod(CompMethod),
-              m_Directory(Directory) {}
+            : m_PackID(PackID)
+            , m_Offset(Offset)
+            , m_Size(Size)
+            , m_CompSize(CompSize)
+            , m_CompMethod(CompMethod)
+            , m_Directory(Directory) {}
 
         size_t m_PackID;
         size_t m_Offset;
@@ -124,7 +126,9 @@ public:
     class pooledBuffer {
     public:
         pooledBuffer(std::string filename, std::string externalFilename)
-            : filename(filename), externalFilename(externalFilename), buffer(NULL) {}
+            : filename(std::move(filename))
+            , externalFilename(std::move(externalFilename))
+            , buffer(nullptr) {}
         ~pooledBuffer() {
             if (buffer) {
                 delete buffer;
@@ -216,16 +220,20 @@ inline izfstream::izfstream(const char* FilePath, filesystem* pFS) : m_pFS(pFS) 
 
 inline void izfstream::setFS(filesystem* pFS) { m_pFS = pFS; }
 
-inline size_t izfstream::getUncompSize() { return m_UncompSize; }
+inline size_t izfstream::getUncompSize() const { return m_UncompSize; }
 
-inline size_t izfstream::getOffset() { return m_Offset; }
+inline size_t izfstream::getOffset() const { return m_Offset; }
 
-inline size_t izfstream::getCompSize() { return m_CompSize; }
+inline size_t izfstream::getCompSize() const { return m_CompSize; }
 
 inline void izfstream::open(const char* FilePath, filesystem* pFS) {
-    if (pFS) m_pFS = pFS;
+    if (pFS) {
+        m_pFS = pFS;
+    }
 
-    if (m_pFS != NULL) m_pFS->Open(*this, FilePath);
+    if (m_pFS != nullptr) {
+        m_pFS->Open(*this, FilePath);
+    }
 }
 
 inline void izfstream::close() {
@@ -238,7 +246,7 @@ inline void izfstream::close() {
     m_UncompSize                = 0;
 }
 
-inline bool izfstream::is_open() const { return static_cast<zbuffer*>(rdbuf())->is_open(); }
+inline bool izfstream::is_open() const { return dynamic_cast<zbuffer*>(rdbuf())->is_open(); }
 
 inline bool izfstream::Zipped() const { return m_Zipped; }
 
@@ -254,11 +262,13 @@ inline const std::string& izfstream::FullFilePath() const { return m_FullFilePat
 
 inline filesystem::~filesystem() {
     // Security mesure with izfile::pDefaultFS
-    if (izfstream::pDefaultFS == this) izfstream::pDefaultFS = NULL;
+    if (izfstream::pDefaultFS == this) {
+        izfstream::pDefaultFS = nullptr;
+    }
 }
 
 inline void filesystem::closeTempFiles() {
-    if (CurrentZipName.size()) {
+    if (!CurrentZipName.empty()) {
         CurrentZipFile.close();
         CurrentZipName = "";
     }

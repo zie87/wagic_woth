@@ -15,20 +15,19 @@
 #include <stdlib.h>
 #include <stdarg.h>
 
-JRenderer* JLBFont::mRenderer = NULL;
+JRenderer* JLBFont::mRenderer = nullptr;
 
-JLBFont::JLBFont(const char* fontname, int lineheight, bool useVideoRAM) {
+JLBFont::JLBFont(const char* fontname, int lineheight, bool useVideoRAM)
+    : mHeight(0)
+    , mBase(0)
+    , mColor(ARGB(255, 255, 255, 255))
+    , mQuad(nullptr)
+    , mScale(1.0f)
+    , mTexture(nullptr)
+    , mTracking(0.0f) {
     mRenderer = JRenderer::GetInstance();
 
-    mHeight   = 0;
-    mScale    = 1.0f;
     mRotation = mSpacing = 0.0f;
-    mTracking            = 0.0f;
-    mColor               = ARGB(255, 255, 255, 255);
-
-    mTexture = NULL;
-    mQuad    = NULL;
-    mBase    = 0;
 
     char filename[256];
     short buffer[1024];
@@ -37,7 +36,9 @@ JLBFont::JLBFont(const char* fontname, int lineheight, bool useVideoRAM) {
 
     // FILE *file;
     JFileSystem* fileSys = JFileSystem::GetInstance();
-    if (!fileSys->OpenFile(filename)) return;
+    if (!fileSys->OpenFile(filename)) {
+        return;
+    }
 
     fileSys->ReadFile((u8*)buffer, 2048);
     fileSys->CloseFile();
@@ -45,19 +46,23 @@ JLBFont::JLBFont(const char* fontname, int lineheight, bool useVideoRAM) {
     sprintf(filename, "%s.png", fontname);
     mTexture = mRenderer->LoadTexture(filename, useVideoRAM);
 
-    if (mTexture == NULL) return;
+    if (mTexture == nullptr) {
+        return;
+    }
 
     mHeight = (float)lineheight;
 
     mQuad = new JQuad(mTexture, 0.0f, 0.0f, 16.0f, mHeight);
 
-    float a, b, c;
+    float a;
+    float b;
+    float c;
 
     float y = 0.0f;
     float x;
 
     // there are 16x16 characters in the texture map.
-    float cellHeight = mTexture->mHeight / 16.0f;
+    const float cellHeight = mTexture->mHeight / 16.0f;
 
     int n = 0;
     for (int i = 0; i < 16; i++) {
@@ -79,42 +84,51 @@ JLBFont::JLBFont(const char* fontname, int lineheight, bool useVideoRAM) {
 }
 
 JLBFont::~JLBFont() {
-    if (mQuad) delete mQuad;
+    if (mQuad) {
+        delete mQuad;
+    }
 
-    if (mTexture) delete mTexture;
+    if (mTexture) {
+        delete mTexture;
+    }
 
     //	JGERelease();
 }
 
-void JLBFont::DrawString(std::string s, float x, float y, int align, float leftOffset, float displayWidth) {
+void JLBFont::DrawString(const std::string& s, float x, float y, int align, float leftOffset, float displayWidth) {
     return DrawString(s.c_str(), x, y, align, leftOffset, displayWidth);
 }
 
 void JLBFont::DrawString(const char* string, float x, float y, int align, float leftOffset, float displayWidth) {
     char* p   = (char*)string;
-    float dx0 = x, dy = y;
+    float dx0 = x;
+    float dy  = y;
 
-    if (mQuad == NULL) return;
+    if (mQuad == nullptr) {
+        return;
+    }
 
-    float width = GetStringWidth(string);
+    const float width = GetStringWidth(string);
 
     if (align == JGETEXT_RIGHT) {
         if (displayWidth) {
             dx0 -= displayWidth;
             leftOffset += width - displayWidth;
-        } else
+        } else {
             dx0 -= width;
+        }
     } else if (align == JGETEXT_CENTER) {
         if (displayWidth) {
             dx0 -= displayWidth / 2;
             leftOffset += width / 2 - displayWidth / 2;
-        } else
+        } else {
             dx0 -= width / 2;
+        }
     }
 
-    float dx = floorf(dx0);
-    dy       = floorf(dy);
-    float x0 = dx;
+    float dx       = floorf(dx0);
+    dy             = floorf(dy);
+    const float x0 = dx;
     int index;
     while (*p) {
         if (*p == '\n') {
@@ -156,7 +170,9 @@ void JLBFont::DrawString(const char* string, float x, float y, int align, float 
         if (displayWidth) {
             // This condiction must be tested indepently in the case leftOffset and displayWidth need a fix at the same
             // time.
-            if (dx > x0 + displayWidth) return;
+            if (dx > x0 + displayWidth) {
+                return;
+            }
             if (dx + delta > x0 + displayWidth) {
                 delta     = x0 + displayWidth - dx;
                 charWidth = (delta / mScale) - mTracking;
@@ -194,7 +210,9 @@ float JLBFont::GetStringWidth(const char* string) const {
     while (*p) {
         ch = *p - 32;
         p++;
-        if (ch < 0) continue;
+        if (ch < 0) {
+            continue;
+        }
         len += mCharWidth[ch + mBase] + mTracking;
     }
     len -= mTracking;

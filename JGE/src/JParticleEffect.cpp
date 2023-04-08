@@ -22,18 +22,14 @@
 
 //-------------------------------------------------------------------------------------
 
-JParticleEffect::JParticleEffect(JResourceManager* mgr) {
-    mResourceManager = mgr;
-
-    mX = 0.0f;
-    mY = 0.0f;
-
-    mEmitterCount = 0;
-}
+JParticleEffect::JParticleEffect(JResourceManager* mgr) : mResourceManager(mgr), mEmitterCount(0), mX(0.0f), mY(0.0f) {}
 
 JParticleEffect::~JParticleEffect() {
-    for (int i = 0; i < mEmitterCount; i++)
-        if (mParticleEmitters[i]) delete (mParticleEmitters[i]);
+    for (int i = 0; i < mEmitterCount; i++) {
+        if (mParticleEmitters[i]) {
+            delete (mParticleEmitters[i]);
+        }
+    }
 }
 
 bool JParticleEffect::Load(const char* filename) {
@@ -43,11 +39,15 @@ bool JParticleEffect::Load(const char* filename) {
     mEmitterCount = 0;
 
     JFileSystem* fileSystem = JFileSystem::GetInstance();
-    if (fileSystem == NULL) return false;
+    if (fileSystem == nullptr) {
+        return false;
+    }
 
-    if (!fileSystem->OpenFile(filename)) return false;
+    if (!fileSystem->OpenFile(filename)) {
+        return false;
+    }
 
-    int size        = fileSystem->GetFileSize();
+    const int size  = fileSystem->GetFileSize();
     char* xmlBuffer = new char[size];
     fileSystem->ReadFile(xmlBuffer, size);
 
@@ -55,12 +55,12 @@ bool JParticleEffect::Load(const char* filename) {
 
     doc.Parse(xmlBuffer);
 
-    TiXmlNode* effect  = 0;
-    TiXmlNode* emitter = 0;
-    TiXmlNode* param   = 0;
-    TiXmlNode* key     = 0;
+    TiXmlNode* effect  = nullptr;
+    TiXmlNode* emitter = nullptr;
+    TiXmlNode* param   = nullptr;
+    TiXmlNode* key     = nullptr;
 
-    TiXmlElement* element = 0;
+    TiXmlElement* element = nullptr;
 
     float keyTime;
     float value;
@@ -104,17 +104,19 @@ bool JParticleEffect::Load(const char* filename) {
             mParticleEmitters[mEmitterCount] = new JParticleEmitter(this);
             element                          = emitter->ToElement();
 
-            if (element->QueryFloatAttribute("life", &value) == TIXML_SUCCESS)
+            if (element->QueryFloatAttribute("life", &value) == TIXML_SUCCESS) {
                 mParticleEmitters[mEmitterCount]->mLife = value;
+            }
 
             for (param = emitter->FirstChild(); param; param = param->NextSibling()) {
                 element = param->ToElement();
 
                 if (strcmp(element->Attribute("name"), "settings") == 0) {
-                    if (strcmp(element->Attribute("blend"), "NORMAL") == 0)
+                    if (strcmp(element->Attribute("blend"), "NORMAL") == 0) {
                         mParticleEmitters[mEmitterCount]->SetBlending(BLEND_SRC_ALPHA, BLEND_ONE_MINUS_SRC_ALPHA);
-                    else if (strcmp(element->Attribute("blend"), "ADDITIVE") == 0)
+                    } else if (strcmp(element->Attribute("blend"), "ADDITIVE") == 0) {
                         mParticleEmitters[mEmitterCount]->SetBlending(BLEND_SRC_ALPHA, BLEND_ONE);
+                    }
 
                     for (unsigned int i = 0; i < sizeof(modeNames) / sizeof(char*); i++) {
                         if (strcmp(element->Attribute("mode"), modeNames[i]) == 0) {
@@ -135,9 +137,11 @@ bool JParticleEffect::Load(const char* filename) {
                         }
                     }
 
-                    std::string quadName = element->Attribute("image");
-                    JQuad* quad          = mResourceManager->GetQuad(quadName);
-                    if (quad != NULL) mParticleEmitters[mEmitterCount]->SetQuad(quad);
+                    std::string const quadName = element->Attribute("image");
+                    JQuad* quad                = mResourceManager->GetQuad(quadName);
+                    if (quad != nullptr) {
+                        mParticleEmitters[mEmitterCount]->SetQuad(quad);
+                    }
 
                     // 					if (element->QueryIntAttribute("image", &int_value) ==
                     // TIXML_SUCCESS)
@@ -201,7 +205,9 @@ bool JParticleEffect::Load(const char* filename) {
 
                                 if (element->QueryFloatAttribute("lifeslice", &keyTime) == TIXML_SUCCESS &&
                                     element->QueryFloatAttribute("value", &value) == TIXML_SUCCESS) {
-                                    if (i == FIELD_ROTATION) value *= DEG2RAD;
+                                    if (i == FIELD_ROTATION) {
+                                        value *= DEG2RAD;
+                                    }
 
                                     mParticleEmitters[mEmitterCount]->mData[i].AddKey(keyTime, value);
                                 }
@@ -231,39 +237,50 @@ void JParticleEffect::SetPosition(float x, float y) {
 
 JParticleSystem* JParticleEffect::GetParticleSystem() { return mParticleSystem; }
 
-float JParticleEffect::GetX() { return mX; }
+float JParticleEffect::GetX() const { return mX; }
 
-float JParticleEffect::GetY() { return mY; }
+float JParticleEffect::GetY() const { return mY; }
 
 void JParticleEffect::Update(float dt) {
     //	mTimer += dt;
 
-    for (int i = 0; i < mEmitterCount; i++) mParticleEmitters[i]->Update(dt);
+    for (int i = 0; i < mEmitterCount; i++) {
+        mParticleEmitters[i]->Update(dt);
+    }
 }
 
 void JParticleEffect::Render() {
-    for (int i = 0; i < mEmitterCount; i++) mParticleEmitters[i]->Render();
+    for (int i = 0; i < mEmitterCount; i++) {
+        mParticleEmitters[i]->Render();
+    }
 }
 
 bool JParticleEffect::Done() {
     bool done = true;
-    for (int i = 0; i < mEmitterCount; i++)
-        if (!mParticleEmitters[i]->Done()) done = false;
+    for (int i = 0; i < mEmitterCount; i++) {
+        if (!mParticleEmitters[i]->Done()) {
+            done = false;
+        }
+    }
 
     return (done);
 }
 
 void JParticleEffect::Start() {
-    for (int i = 0; i < mEmitterCount; i++) mParticleEmitters[i]->Start();
+    for (int i = 0; i < mEmitterCount; i++) {
+        mParticleEmitters[i]->Start();
+    }
 }
 
 void JParticleEffect::Stop() {
-    for (int i = 0; i < mEmitterCount; i++) mParticleEmitters[i]->SetActive(false);
+    for (int i = 0; i < mEmitterCount; i++) {
+        mParticleEmitters[i]->SetActive(false);
+    }
 }
 
 void JParticleEffect::MoveTo(float x, float y) {
-    float dx = x - mX;
-    float dy = y - mY;
+    const float dx = x - mX;
+    const float dy = y - mY;
 
     mX = x;
     mY = y;

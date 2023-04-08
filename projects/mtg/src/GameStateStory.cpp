@@ -6,10 +6,7 @@
 #include "GameApp.h"
 #include <dirent.h>
 
-GameStateStory::GameStateStory(GameApp* parent) : GameState(parent, "story") {
-    flow = NULL;
-    menu = NULL;
-}
+GameStateStory::GameStateStory(GameApp* parent) : GameState(parent, "story"), flow(nullptr), menu(nullptr) {}
 
 GameStateStory::~GameStateStory() { End(); }
 
@@ -19,8 +16,8 @@ void GameStateStory::loadStoriesMenu(const char* root) {
     vector<string> subFolders = JFileSystem::GetInstance()->scanfolder(root);
 
     for (size_t i = 0; i < subFolders.size(); ++i) {
-        string subfolder = ensureFolder(subFolders[i]);
-        string filename  = root + subfolder + "story.xml";
+        string subfolder      = ensureFolder(subFolders[i]);
+        const string filename = root + subfolder + "story.xml";
         if (FileExists(filename)) {
             subfolder.resize(subfolder.length() - 1);  // remove trailing slash
             stories.push_back(subfolder);
@@ -44,8 +41,8 @@ void GameStateStory::loadStoriesMenu(const char* root) {
 }
 
 void GameStateStory::Start() {
-    flow = NULL;
-    menu = NULL;
+    flow = nullptr;
+    menu = nullptr;
     loadStoriesMenu("campaigns/");
 }
 
@@ -57,7 +54,9 @@ void GameStateStory::Update(float dt) {
     }
     if (menu) {
         menu->Update(dt);
-        if (menu->isClosed()) SAFE_DELETE(menu);
+        if (menu->isClosed()) {
+            SAFE_DELETE(menu);
+        }
         // return;
     }
     if (flow) {
@@ -71,8 +70,12 @@ void GameStateStory::Update(float dt) {
 }
 
 void GameStateStory::Render() {
-    if (flow) flow->Render();
-    if (menu) menu->Render();
+    if (flow) {
+        flow->Render();
+    }
+    if (menu) {
+        menu->Render();
+    }
 }
 
 void GameStateStory::End() {

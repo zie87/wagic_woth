@@ -8,8 +8,8 @@
 //
 //-------------------------------------------------------------------------------------
 
-#ifndef _JRENDERER_H_
-#define _JRENDERER_H_
+#ifndef JRENDERER_H
+#define JRENDERER_H
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -524,9 +524,9 @@ public:
 
     inline void SetActualHeight(float inHeight) { mActualHeight = inHeight; }
 
-    inline float GetActualWidth() { return mActualWidth; }
+    inline float GetActualWidth() const { return mActualWidth; }
 
-    inline float GetActualHeight() { return mActualHeight; }
+    inline float GetActualHeight() const { return mActualHeight; }
 
 private:
     struct TextureInfo {

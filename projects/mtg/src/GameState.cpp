@@ -7,7 +7,6 @@
 #include "DeckStats.h"
 #include "DeckMetaData.h"
 #include "DeckManager.h"
-#include "Player.h"
 
 // The purpose of this method is to create a listing of decks to be used for the input menu
 // by default, the list will be sorted by name
@@ -37,7 +36,7 @@ vector<DeckMetaData*> GameState::BuildDeckList(const string& path, const string&
     int found                = 1;
     int nbDecks              = 1;
     DeckManager* deckManager = DeckManager::GetInstance();
-    bool isAI                = path.find("baka") != string::npos;
+    const bool isAI          = path.find("baka") != string::npos;
     while (found && (!maxDecks || nbDecks <= maxDecks)) {
         found = 0;
         std::ostringstream filename;
@@ -83,7 +82,7 @@ vector<DeckMetaData*> GameState::BuildDeckList(const string& path, const string&
 
             nbDecks++;
         }
-        meta = NULL;
+        meta = nullptr;
     }
 
     std::sort(retList.begin(), retList.end(), sortByName);
@@ -93,22 +92,22 @@ vector<DeckMetaData*> GameState::BuildDeckList(const string& path, const string&
 // build a menu with the given deck list and return a vector of the deck ids created.
 void GameState::renderDeckMenu(SimpleMenu* _menu, const vector<DeckMetaData*>& deckMetaDataList) {
     int deckNumber = 1;
-    for (vector<DeckMetaData*>::const_iterator i = deckMetaDataList.begin(); i != deckMetaDataList.end(); i++) {
-        DeckMetaData* deckMetaData = *i;
-        string deckName            = deckMetaData->getName();
-        string deckDescription     = deckMetaData->getDescription();
-        _menu->Add(deckNumber++, deckName.c_str(), deckDescription.c_str());
+    for (auto i = deckMetaDataList.begin(); i != deckMetaDataList.end(); i++) {
+        DeckMetaData* deckMetaData   = *i;
+        const string deckName        = deckMetaData->getName();
+        const string deckDescription = deckMetaData->getDescription();
+        _menu->Add(deckNumber++, deckName.c_str(), deckDescription);
     }
 }
 
 // build a menu with the given deck list and return a vector of the deck ids created.
 void GameState::renderDeckMenu(DeckMenu* _menu, const vector<DeckMetaData*>& deckMetaDataList) {
     int deckNumber = 1;
-    for (vector<DeckMetaData*>::const_iterator i = deckMetaDataList.begin(); i != deckMetaDataList.end(); i++) {
-        DeckMetaData* deckMetaData = *i;
-        string deckName            = deckMetaData->getName();
-        string deckDescription     = deckMetaData->getDescription();
-        _menu->Add(deckNumber++, deckName.c_str(), deckDescription.c_str(), false, deckMetaData);
+    for (auto i = deckMetaDataList.begin(); i != deckMetaDataList.end(); i++) {
+        DeckMetaData* deckMetaData   = *i;
+        const string deckName        = deckMetaData->getName();
+        const string deckDescription = deckMetaData->getDescription();
+        _menu->Add(deckNumber++, deckName.c_str(), deckDescription, false, deckMetaData);
     }
 }
 

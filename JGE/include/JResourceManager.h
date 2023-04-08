@@ -8,8 +8,8 @@
 //
 //-------------------------------------------------------------------------------------
 
-#ifndef _RESOURCE_MANAGER_H_
-#define _RESOURCE_MANAGER_H_
+#ifndef JRESOURCEMANAGER_H
+#define JRESOURCEMANAGER_H
 
 #ifdef WIN32
 #pragma warning(disable : 4786)

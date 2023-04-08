@@ -1,5 +1,5 @@
-#ifndef _AIHINTS_H_
-#define _AIHINTS_H_
+#ifndef AIHINTS_H
+#define AIHINTS_H
 
 #include <string>
 #include <vector>
@@ -25,7 +25,7 @@ class AIHints {
 protected:
     AIPlayerBaka* mPlayer;
     vector<AIHint*> hints;
-    AIHint* getByCondition(string condition);
+    AIHint* getByCondition(const string& condition);
     AIAction* findAbilityRecursive(AIHint* hint, ManaCost* potentialMana);
     vector<MTGAbility*> findAbilities(AIHint* hint);
     RankingContainer findActions(AIHint* hint);
@@ -36,7 +36,7 @@ protected:
 public:
     AIHints(AIPlayerBaka* player);
     AIAction* suggestAbility(ManaCost* potentialMana);
-    bool HintSaysDontAttack(GameObserver* observer, MTGCardInstance* card = NULL);
+    bool HintSaysDontAttack(GameObserver* observer, MTGCardInstance* card = nullptr);
     vector<string> mCastOrder();
     void add(string line);
     ~AIHints();

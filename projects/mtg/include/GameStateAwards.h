@@ -1,5 +1,5 @@
-#ifndef _GAME_STATE_AWARDS_H_
-#define _GAME_STATE_AWARDS_H_
+#ifndef GAMESTATEAWARDS_H
+#define GAMESTATEAWARDS_H
 
 #include <JGE.h>
 #include "GameState.h"
@@ -25,16 +25,16 @@ public:
     GameStateAwards(GameApp* parent);
     bool enterSet(int setid);
     bool enterStats(int option);
-    virtual ~GameStateAwards();
+    ~GameStateAwards() override;
 
-    virtual void Start();
-    virtual void End();
-    virtual void Create();
-    virtual void Destroy();
-    virtual void Update(float dt);
-    virtual void Render();
-    virtual void ButtonPressed(int controllerId, int controlId);
-    virtual void OnScroll(int inXVelocity, int inYVelocity);
+    void Start() override;
+    void End() override;
+    void Create() override;
+    void Destroy() override;
+    void Update(float dt) override;
+    void Render() override;
+    void ButtonPressed(int controllerId, int controlId) override;
+    void OnScroll(int inXVelocity, int inYVelocity) override;
 };
 
 #endif

@@ -52,10 +52,14 @@ void JParticleData::AddKey(float keyTime, float keyValue) {
 void JParticleData::Update(float dt) {
     mCurr += mDelta * dt;
     if (mDelta < 0.0f) {
-        if (mCurr < mTarget) mCurr = mTarget;
+        if (mCurr < mTarget) {
+            mCurr = mTarget;
+        }
 
     } else if (mDelta > 0.0f) {
-        if (mCurr > mTarget) mCurr = mTarget;
+        if (mCurr > mTarget) {
+            mCurr = mTarget;
+        }
     }
 
     mTimer -= dt;
@@ -66,25 +70,28 @@ void JParticleData::Update(float dt) {
             mTarget = mKeyValue[mKeyIndex];
             mDelta  = (mTarget - mCurr) / mTimer;
             mKeyIndex++;
-        } else
+        } else {
             mDelta = 0.0f;
+        }
     }
 }
 
 void JParticleData::SetScale(float scale) { mScale = scale; }
 
-JRenderer* JParticle::mRenderer = NULL;
+JRenderer* JParticle::mRenderer = nullptr;
 
 JParticleData* JParticle::GetField(int index) {
-    if (index < FIELD_COUNT)
+    if (index < FIELD_COUNT) {
         return &mData[index];
-    else
-        return NULL;
+    }
+    return nullptr;
 }
 
 JParticleData* JParticle::GetDataPtr() { return mData; }
 
-JParticle::JParticle()  // JQuad* texture, float x, float y)
+JParticle::JParticle()
+    : mActive(false)
+    , mQuad(nullptr)  // JQuad* texture, float x, float y)
 {
     mRenderer = JRenderer::GetInstance();
 
@@ -92,9 +99,6 @@ JParticle::JParticle()  // JQuad* texture, float x, float y)
     mOrigin   = Vector2D(0.0f, 0.0f);
     mPos      = Vector2D(0.0f, 0.0f);
     mVelocity = Vector2D(0.0f, 0.0f);
-
-    mActive = false;
-    mQuad   = NULL;
 
     //	mNext = NULL;
     //	mPrev = NULL;
@@ -105,7 +109,9 @@ JParticle::~JParticle() {
 }
 
 bool JParticle::Update(float dt) {
-    for (int i = 0; i < FIELD_COUNT; i++) mData[i].Update(dt);
+    for (int i = 0; i < FIELD_COUNT; i++) {
+        mData[i].Update(dt);
+    }
 
     // the radial and tangential acceleration code was taken from HGE's particle source
     Vector2D vecAccel = mPos - mOrigin;  // par->vecLocation-vecLocation;
@@ -115,9 +121,9 @@ bool JParticle::Update(float dt) {
 
     // vecAccel2.Rotate(M_PI_2);
     // the following is faster
-    float ang   = vecAccel2.x;
-    vecAccel2.x = -vecAccel2.y;
-    vecAccel2.y = ang;
+    const float ang = vecAccel2.x;
+    vecAccel2.x     = -vecAccel2.y;
+    vecAccel2.y     = ang;
 
     vecAccel2 *= mData[FIELD_TANGENTIAL_ACCEL].mCurr;  // par->fTangentialAccel;
     mVelocity += (vecAccel + vecAccel2) * dt;          // par->vecVelocity += (vecAccel+vecAccel2)*fDeltaTime;
@@ -140,11 +146,11 @@ bool JParticle::Update(float dt) {
 
 void JParticle::Render() {
     if (mQuad) {
-        int a            = (int)(mData[FIELD_ALPHA].mCurr * 255.0f);
-        int r            = (int)(mData[FIELD_RED].mCurr * 255.0f);
-        int g            = (int)(mData[FIELD_GREEN].mCurr * 255.0f);
-        int b            = (int)(mData[FIELD_BLUE].mCurr * 255.0f);
-        PIXEL_TYPE color = ARGB(a, r, g, b);
+        const int a = (int)(mData[FIELD_ALPHA].mCurr * 255.0f);
+        const int r = (int)(mData[FIELD_RED].mCurr * 255.0f);
+        const int g = (int)(mData[FIELD_GREEN].mCurr * 255.0f);
+        const int b = (int)(mData[FIELD_BLUE].mCurr * 255.0f);
+        auto color  = ARGB(a, r, g, b);
         mQuad->SetColor(color);
 
         mRenderer->RenderQuad(mQuad, mPos.x, mPos.y, mData[FIELD_ROTATION].mCurr, mData[FIELD_SIZE].mCurr * mSize,

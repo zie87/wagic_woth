@@ -1,5 +1,5 @@
-#ifndef _EFFECTS_H_
-#define _EFFECTS_H_
+#ifndef EFFECTS_H
+#define EFFECTS_H
 
 #include <JGui.h>
 
@@ -10,4 +10,4 @@ public:
     Effect() : JGuiObject(++id_counter){};
 };
 
-#endif  // _EFFECTS_H_
+#endif  // EFFECTS_H

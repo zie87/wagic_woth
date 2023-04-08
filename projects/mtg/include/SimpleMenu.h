@@ -1,8 +1,8 @@
 /*
 A class for very simple menus structure
 */
-#ifndef _SIMPLEMENU_H_
-#define _SIMPLEMENU_H_
+#ifndef SIMPLEMENU_H
+#define SIMPLEMENU_H
 
 #include <string>
 #include <JGui.h>
@@ -38,13 +38,13 @@ public:
     bool isMultipleChoice;
     SimpleMenu(JGE*, int id, JGuiListener* listener, int fontId, float x, float y, const char* _title = "",
                int _maxItems = 7, bool centerHorizontal = true, bool centerVertical = true);
-    virtual ~SimpleMenu();
-    virtual void Render();
-    virtual bool CheckUserInput(JButton key);
-    virtual void Update(float dt);
+    ~SimpleMenu() override;
+    void Render() override;
+    bool CheckUserInput(JButton key) override;
+    void Update(float dt) override;
     virtual void Add(int id, const char* Text, string desc = "", bool forceFocus = false);
     int getmCurr() { return mCurr; }
-    float getWidth() { return mWidth; }
+    float getWidth() const { return mWidth; }
     virtual void Close();
 
     void RecenterMenu();

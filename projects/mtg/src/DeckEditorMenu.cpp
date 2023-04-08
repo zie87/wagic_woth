@@ -9,7 +9,9 @@
 
 DeckEditorMenu::DeckEditorMenu(int id, JGuiListener* listener, int fontId, const char* _title,
                                DeckDataWrapper* _selectedDeck, StatsWrapper* stats)
-    : DeckMenu(id, listener, fontId, _title), selectedDeck(_selectedDeck), stw(stats) {
+    : DeckMenu(id, listener, fontId, _title)
+    , selectedDeck(_selectedDeck)
+    , stw(stats) {
     backgroundName     = "DeckEditorMenuBackdrop";
     mShowDetailsScreen = false;
     deckTitle          = selectedDeck ? selectedDeck->parent->meta_name : "";
@@ -35,7 +37,7 @@ DeckEditorMenu::DeckEditorMenu(int id, JGuiListener* listener, int fontId, const
     avatarX = 222;
     avatarY = 8;
 
-    float scrollerWidth = 80;
+    const float scrollerWidth = 80;
     SAFE_DELETE(mScroller);  // need to delete the scroller init in the base class
     mScroller = NEW VerticalTextScroller(Fonts::MAIN_FONT, 40, 230, scrollerWidth, 100);
 }
@@ -45,15 +47,17 @@ void DeckEditorMenu::Render() {
     r->FillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, ARGB(200, 0, 0, 0));
 
     DeckMenu::Render();
-    if (deckTitle.size() > 0) {
-        WFont* mainFont    = WResourceManager::Instance()->GetWFont(Fonts::OPTION_FONT);
-        DWORD currentColor = mainFont->GetColor();
+    if (!deckTitle.empty()) {
+        WFont* mainFont          = WResourceManager::Instance()->GetWFont(Fonts::OPTION_FONT);
+        DWORD const currentColor = mainFont->GetColor();
         mainFont->SetColor(ARGB(255, 255, 255, 255));
         mainFont->DrawString(deckTitle.c_str(), statsX + (statsWidth / 2), statsHeight / 2, JGETEXT_CENTER);
         mainFont->SetColor(currentColor);
     }
 
-    if (stw && selectedDeck) drawDeckStatistics();
+    if (stw && selectedDeck) {
+        drawDeckStatistics();
+    }
 }
 
 void DeckEditorMenu::drawDeckStatistics() {

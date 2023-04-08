@@ -12,16 +12,15 @@
 #include "MTGDefinitions.h"
 #include <JRenderer.h>
 #include <math.h>
+
+#include <utility>
 #include "utils.h"
 
 vector<string> Task::sAIDeckNames;
 
 /*---------------- Task -----------------*/
 
-Task::Task(char _type) {
-    reward    = 0;
-    expiresIn = 1;
-    accepted  = false;
+Task::Task(char _type) : reward(0), accepted(false), expiresIn(1) {
     if (_type == ' ') {
         type = TASK_BASIC;
     } else {
@@ -48,19 +47,19 @@ void Task::storeCommonAttribs() {
     char buff[256];
 
     persistentAttribs.clear();
-    persistentAttribs.push_back(string(1, type));
+    persistentAttribs.emplace_back(1, type);
 
     sprintf(buff, "%i", expiresIn);
-    persistentAttribs.push_back(string(buff));
+    persistentAttribs.emplace_back(buff);
 
     sprintf(buff, "%i", accepted ? 1 : 0);
-    persistentAttribs.push_back(string(buff));
+    persistentAttribs.emplace_back(buff);
 
     sprintf(buff, "%i", opponent);
-    persistentAttribs.push_back(string(buff));
+    persistentAttribs.emplace_back(buff);
 
     sprintf(buff, "%i", reward);
-    persistentAttribs.push_back(string(buff));
+    persistentAttribs.emplace_back(buff);
 
     persistentAttribs.push_back(getDesc());
 
@@ -76,7 +75,7 @@ int Task::restoreCommonAttribs() {
         return -1;
     }
     expiresIn    = atoi(persistentAttribs[1].c_str());
-    accepted     = (persistentAttribs[2].compare("1") == 0);
+    accepted     = (persistentAttribs[2] == "1");
     opponent     = atoi(persistentAttribs[3].c_str());
     reward       = atoi(persistentAttribs[4].c_str());
     description  = persistentAttribs[5];
@@ -93,14 +92,14 @@ void Task::restoreCustomAttribs() {
 }
 
 string Task::getOpponentName() {
-    if (opponentName == "") {
+    if (opponentName.empty()) {
         opponentName = Task::getAIDeckName(opponent);
     }
 
     return opponentName;
 }
 
-string Task::getDesc() { return (description == "") ? (description = createDesc()) : description; }
+string Task::getDesc() { return (description.empty()) ? (description = createDesc()) : description; }
 
 void Task::randomize() {
     opponent     = rand() % getAIDeckCount() + 1;
@@ -109,9 +108,9 @@ void Task::randomize() {
     reward = computeReward();
 }
 
-bool Task::isExpired() { return (expiresIn <= 0); }
+bool Task::isExpired() const { return (expiresIn <= 0); }
 
-int Task::getExpiration() { return expiresIn; }
+int Task::getExpiration() const { return expiresIn; }
 
 void Task::setExpiration(int _expiresIn) { expiresIn = _expiresIn; }
 
@@ -138,7 +137,7 @@ void Task::LoadAIDeckNames() {
                 found = 1;
                 nbDecks++;
                 // TODO: Creating MTGDeck only for getting decks name. Find an easier way.
-                MTGDeck* mtgd = NEW MTGDeck(stream.str().c_str(), NULL, 1);
+                auto* mtgd = NEW MTGDeck(stream.str().c_str(), nullptr, 1);
                 sAIDeckNames.push_back(mtgd->meta_name);
                 delete mtgd;
             }
@@ -159,7 +158,7 @@ string Task::getAIDeckName(int id) {
 // End of AI deck buffering code
 
 // Each child class has to be added to the switch in this function (clumsy..)
-Task* Task::createFromStr(const string params, bool rand) {
+Task* Task::createFromStr(const string& params, bool rand) {
     vector<string> exploded;
     Task* result;
 
@@ -198,7 +197,7 @@ Task* Task::createFromStr(const string params, bool rand) {
 #if defined(WIN32) || defined(LINUX)
         DebugTrace("\nTask::createFromStr: Failed to create task\n");
 #endif
-        return NULL;
+        return nullptr;
     }
 
     result->persistentAttribs = exploded;
@@ -217,21 +216,22 @@ Task* Task::createFromStr(const string params, bool rand) {
 
 /*---------------- TaskList -----------------*/
 
-TaskList::TaskList(string _fileName) {
-    fileName = _fileName;
-    if (fileName == "") {
-        fileName = options.profileFile(PLAYER_TASKS).c_str();
+TaskList::TaskList(string _fileName) : fileName(std::move(_fileName)) {
+    if (fileName.empty()) {
+        fileName = options.profileFile(PLAYER_TASKS);
     }
     load(fileName);
-    for (int i = 0; i < 9; i++) mBg[i] = NULL;
-    mBgTex = NULL;  // We only load the background if we use the task screen.
+    for (int i = 0; i < 9; i++) {
+        mBg[i] = nullptr;
+    }
+    mBgTex = nullptr;  // We only load the background if we use the task screen.
 }
 
-int TaskList::save(string _fileName) {
-    if (_fileName != "") {
+int TaskList::save(const string& _fileName) {
+    if (!_fileName.empty()) {
         fileName = _fileName;
     }
-    if (fileName == "") {
+    if (fileName.empty()) {
 #if defined(WIN32) || defined(LINUX)
         DebugTrace("\nTaskList::save: No filename specified\n");
 #endif
@@ -246,7 +246,7 @@ int TaskList::save(string _fileName) {
 
         file << "# Format: <Type>|<Expiration>|<Accepted>|<Opponent>|<Reward>|<Description>[|Additional attributes]\n";
 
-        for (vector<Task*>::iterator it = tasks.begin(); it != tasks.end(); it++) {
+        for (auto it = tasks.begin(); it != tasks.end(); it++) {
             file << (*it)->toString() << "\n";
         }
         file.close();
@@ -255,12 +255,12 @@ int TaskList::save(string _fileName) {
     return 1;
 }
 
-int TaskList::load(string _fileName) {
+int TaskList::load(const string& _fileName) {
     Task* task;
-    if (_fileName != "") {
+    if (!_fileName.empty()) {
         fileName = _fileName;
     }
-    if (fileName == "") {
+    if (fileName.empty()) {
         DebugTrace("\nTaskList::load: No filename specified\n");
         return -1;
     }
@@ -274,8 +274,12 @@ int TaskList::load(string _fileName) {
     std::stringstream stream(contents);
     std::string s;
     while (std::getline(stream, s)) {
-        if (!s.size()) continue;
-        if (s[s.size() - 1] == '\r') s.erase(s.size() - 1);  // Handle DOS files
+        if (s.empty()) {
+            continue;
+        }
+        if (s[s.size() - 1] == '\r') {
+            s.erase(s.size() - 1);  // Handle DOS files
+        }
         if (s[0] == '#') {
             continue;
         }
@@ -293,7 +297,7 @@ int TaskList::load(string _fileName) {
 
 void TaskList::addTask(Task* task) { tasks.push_back(task); }
 
-void TaskList::addTask(string params, bool rand) { addTask(Task::createFromStr(params, rand)); }
+void TaskList::addTask(const string& params, bool rand) { addTask(Task::createFromStr(std::move(params), rand)); }
 
 void TaskList::removeTask(Task* task) {
     vector<Task*>::iterator it;
@@ -313,12 +317,16 @@ void TaskList::Start() {
     mElapsed = 0;
     mState   = TASKS_IN;
     if (!mBgTex) {
-        mBgTex      = WResourceManager::Instance()->RetrieveTexture("taskboard.png", RETRIEVE_LOCK);
-        float unitH = static_cast<float>(mBgTex->mHeight / 4);
-        float unitW = static_cast<float>(mBgTex->mWidth / 4);
-        if (unitH == 0 || unitW == 0) return;
+        mBgTex     = WResourceManager::Instance()->RetrieveTexture("taskboard.png", RETRIEVE_LOCK);
+        auto unitH = static_cast<float>(mBgTex->mHeight / 4);
+        auto unitW = static_cast<float>(mBgTex->mWidth / 4);
+        if (unitH == 0 || unitW == 0) {
+            return;
+        }
 
-        for (int i = 0; i < 9; i++) SAFE_DELETE(mBg[i]);
+        for (int i = 0; i < 9; i++) {
+            SAFE_DELETE(mBg[i]);
+        }
         if (mBgTex) {
             mBg[0] = NEW JQuad(mBgTex, 0, 0, unitW, unitH);
             mBg[1] = NEW JQuad(mBgTex, unitW, 0, unitW * 2, unitH);
@@ -342,7 +350,7 @@ void TaskList::End() {
 
 void TaskList::passOneDay() {
     // TODO: "You have failed the task" message to the user when accepted task expires
-    for (vector<Task*>::iterator it = tasks.begin(); it != tasks.end();) {
+    for (auto it = tasks.begin(); it != tasks.end();) {
         (*it)->passOneDay();
         if ((*it)->isExpired()) {
             SAFE_DELETE(*it);
@@ -356,14 +364,14 @@ void TaskList::passOneDay() {
 void TaskList::getDoneTasks(GameObserver* observer, GameApp* _app, vector<Task*>* result) {
     result->clear();
     // TODO: Return only accepted tasks
-    for (vector<Task*>::iterator it = tasks.begin(); it != tasks.end(); it++) {
+    for (auto it = tasks.begin(); it != tasks.end(); it++) {
         if ((*it)->isDone(observer, _app)) {
             result->push_back(*it);
         }
     }
 }
 
-int TaskList::getTaskCount() { return tasks.size(); }
+int TaskList::getTaskCount() const { return tasks.size(); }
 
 void TaskList::Update(float dt) {
     mElapsed += dt;
@@ -376,7 +384,9 @@ void TaskList::Update(float dt) {
         }
     } else if (mState == TASKS_OUT && vPos > -SCREEN_HEIGHT) {
         vPos = -(SCREEN_HEIGHT * mElapsed / 0.75f);
-        if (vPos <= -SCREEN_HEIGHT) mState = TASKS_INACTIVE;
+        if (vPos <= -SCREEN_HEIGHT) {
+            mState = TASKS_INACTIVE;
+        }
     }
 }
 
@@ -398,8 +408,8 @@ void TaskList::Render() {
         r->RenderQuad(mBg[8], SCREEN_WIDTH - 64, vPos + SCREEN_HEIGHT - 64, 0, sW, sH);  // BR
 
         // Stretch the sides
-        float stretchV = (144.0f / 128.0f) * sH;
-        float stretchH = (176.0f / 128.0f) * sW;
+        const float stretchV = (144.0f / 128.0f) * sH;
+        const float stretchH = (176.0f / 128.0f) * sW;
         r->RenderQuad(mBg[3], 0, vPos + 64, 0, sW, stretchV);                  // L
         r->RenderQuad(mBg[5], SCREEN_WIDTH - 64, vPos + 64, 0, sW, stretchV);  // R
         r->RenderQuad(mBg[1], 64, vPos, 0, stretchH, sH);                      // T1
@@ -416,19 +426,20 @@ void TaskList::Render() {
         r->FillRect(10, 10 + vPos, SCREEN_WIDTH - 10, SCREEN_HEIGHT - 10, ARGB(128, 0, 0, 0));
     }
 
-    float posX = 40, posY = vPos + 20;
+    const float posX = 40;
+    float posY       = vPos + 20;
     char buffer[300];
-    string title = _("Task Board");
+    const string title = _("Task Board");
 
     f3->DrawString(title.c_str(), static_cast<float>((SCREEN_WIDTH - 20) / 2 - title.length() * 4), posY);
     posY += 30;
 
-    if (0 == tasks.size()) {
+    if (tasks.empty()) {
         f->DrawString(_("There are no tasks that need to be done. Come again tomorrow.").c_str(), posX, posY);
         return;
     }
 
-    for (vector<Task*>::iterator it = tasks.begin(); it != tasks.end(); it++) {
+    for (auto it = tasks.begin(); it != tasks.end(); it++) {
         sprintf(buffer, "%s", (*it)->getShortDesc().c_str());
         f2->DrawString(buffer, posX, posY);
         if (mBgTex) {
@@ -465,8 +476,12 @@ TaskList::~TaskList() {
     for (unsigned int i = 0; i < tasks.size(); i++) {
         SAFE_DELETE(tasks[i]);
     }
-    if (mBgTex) WResourceManager::Instance()->Release(mBgTex);
-    for (int i = 0; i < 9; i++) SAFE_DELETE(mBg[i]);
+    if (mBgTex) {
+        WResourceManager::Instance()->Release(mBgTex);
+    }
+    for (int i = 0; i < 9; i++) {
+        SAFE_DELETE(mBg[i]);
+    }
 }
 
 /*----------------------------------------*/
@@ -503,7 +518,7 @@ string TaskWinAgainst::getShortDesc() {
 }
 
 bool TaskWinAgainst::isDone(GameObserver* observer, GameApp* _app) {
-    AIPlayerBaka* baka = (AIPlayerBaka*)observer->players[1];
+    auto* baka = dynamic_cast<AIPlayerBaka*>(observer->players[1]);
     return ((baka) && (!observer->players[0]->isAI()) && (observer->players[1]->isAI()) &&
             (observer->didWin(observer->players[0]))  // Human player wins
             && (baka->deckId == opponent));
@@ -511,9 +526,8 @@ bool TaskWinAgainst::isDone(GameObserver* observer, GameApp* _app) {
 
 /*----------- TaskSlaughter -------------*/
 
-TaskSlaughter::TaskSlaughter(int _opponent, int _targetLife) : TaskWinAgainst(_opponent) {
-    type       = TASK_SLAUGHTER;
-    targetLife = _targetLife;
+TaskSlaughter::TaskSlaughter(int _opponent, int _targetLife) : TaskWinAgainst(_opponent), targetLife(_targetLife) {
+    type = TASK_SLAUGHTER;
 }
 
 int TaskSlaughter::computeReward() {
@@ -556,7 +570,7 @@ void TaskSlaughter::storeCustomAttribs() {
     char buff[256];
 
     sprintf(buff, "%i", targetLife);
-    persistentAttribs.push_back(buff);
+    persistentAttribs.emplace_back(buff);
 }
 
 void TaskSlaughter::restoreCustomAttribs() { targetLife = atoi(persistentAttribs[COMMON_ATTRIBS_COUNT].c_str()); }
@@ -564,10 +578,8 @@ void TaskSlaughter::restoreCustomAttribs() { targetLife = atoi(persistentAttribs
 /*----------- TaskDelay -------------*/
 // Now serves as both 'Delay' and 'Fast defeat' task.
 
-TaskDelay::TaskDelay(int _opponent, int _turn) : TaskWinAgainst(_opponent) {
-    type      = TASK_DELAY;
-    turn      = _turn;
-    afterTurn = true;
+TaskDelay::TaskDelay(int _opponent, int _turn) : TaskWinAgainst(_opponent), afterTurn(true), turn(_turn) {
+    type = TASK_DELAY;
 }
 
 int TaskDelay::computeReward() {
@@ -626,9 +638,9 @@ void TaskDelay::storeCustomAttribs() {
     char buff[256];
 
     sprintf(buff, "%i", turn);
-    persistentAttribs.push_back(buff);
+    persistentAttribs.emplace_back(buff);
     sprintf(buff, "%i", afterTurn);
-    persistentAttribs.push_back(buff);
+    persistentAttribs.emplace_back(buff);
 }
 
 void TaskDelay::restoreCustomAttribs() {
@@ -640,10 +652,10 @@ void TaskDelay::restoreCustomAttribs() {
 
 /* ------------ TaskImmortal ------------ */
 
-TaskImmortal::TaskImmortal(int _targetLife) : Task(TASK_IMMORTAL) {
-    targetLife = _targetLife;
-    level      = (targetLife < 100) ? 0 : ((targetLife < 1000) ? 1 : 2);
-}
+TaskImmortal::TaskImmortal(int _targetLife)
+    : Task(TASK_IMMORTAL)
+    , level((targetLife < 100) ? 0 : ((targetLife < 1000) ? 1 : 2))
+    , targetLife(_targetLife) {}
 
 int TaskImmortal::computeReward() { return targetLife * 2 + 150 + rand() % 50; }
 
@@ -683,10 +695,10 @@ void TaskImmortal::storeCustomAttribs() {
     char buff[256];
 
     sprintf(buff, "%i", targetLife);
-    persistentAttribs.push_back(buff);
+    persistentAttribs.emplace_back(buff);
 
     sprintf(buff, "%i", level);
-    persistentAttribs.push_back(buff);
+    persistentAttribs.emplace_back(buff);
 }
 
 void TaskImmortal::restoreCustomAttribs() {
@@ -711,9 +723,10 @@ void TaskImmortal::randomize() {
 }
 /* ------------ TaskMassiveBurial ------------ */
 
-TaskMassiveBurial::TaskMassiveBurial(int _color, int _bodyCount) : Task(TASK_MASSIVE_BURIAL) {
-    color     = _color;
-    bodyCount = _bodyCount;
+TaskMassiveBurial::TaskMassiveBurial(int _color, int _bodyCount)
+    : Task(TASK_MASSIVE_BURIAL)
+    , bodyCount(_bodyCount)
+    , color(_color) {
     if ((0 == color) || (0 == bodyCount)) {
         randomize();
     }
@@ -761,7 +774,7 @@ bool TaskMassiveBurial::isDone(GameObserver* observer, GameApp* _app) {
     int countColor                 = 0;
     vector<MTGCardInstance*> cards = observer->players[1]->game->graveyard->cards;
 
-    for (vector<MTGCardInstance*>::iterator it = cards.begin(); it != cards.end(); it++) {
+    for (auto it = cards.begin(); it != cards.end(); it++) {
         if ((*it)->hasColor(color)) {
             countColor++;
         }
@@ -773,10 +786,10 @@ bool TaskMassiveBurial::isDone(GameObserver* observer, GameApp* _app) {
 void TaskMassiveBurial::storeCustomAttribs() {
     char buff[256];
     sprintf(buff, "%i", color);
-    persistentAttribs.push_back(buff);
+    persistentAttribs.emplace_back(buff);
 
     sprintf(buff, "%i", bodyCount);
-    persistentAttribs.push_back(buff);
+    persistentAttribs.emplace_back(buff);
 }
 
 void TaskMassiveBurial::restoreCustomAttribs() {
@@ -792,9 +805,7 @@ void TaskMassiveBurial::randomize() {
 
 /* ------------ TaskWisdom ------------ */
 
-TaskWisdom::TaskWisdom(int _color, int _cardCount) : Task(TASK_WISDOM) {
-    color     = _color;
-    cardCount = _cardCount;
+TaskWisdom::TaskWisdom(int _color, int _cardCount) : Task(TASK_WISDOM), cardCount(_cardCount), color(_color) {
     if ((0 == color) || (0 == cardCount)) {
         randomize();
     }
@@ -840,7 +851,7 @@ bool TaskWisdom::isDone(GameObserver* observer, GameApp* _app) {
     int countColor                 = 0;
     vector<MTGCardInstance*> cards = observer->players[0]->game->hand->cards;
 
-    for (vector<MTGCardInstance*>::iterator it = cards.begin(); it != cards.end(); it++) {
+    for (auto it = cards.begin(); it != cards.end(); it++) {
         if ((*it)->hasColor(color)) {
             countColor++;
         }
@@ -854,10 +865,10 @@ bool TaskWisdom::isDone(GameObserver* observer, GameApp* _app) {
 void TaskWisdom::storeCustomAttribs() {
     char buff[256];
     sprintf(buff, "%i", color);
-    persistentAttribs.push_back(buff);
+    persistentAttribs.emplace_back(buff);
 
     sprintf(buff, "%i", cardCount);
-    persistentAttribs.push_back(buff);
+    persistentAttribs.emplace_back(buff);
 }
 
 void TaskWisdom::restoreCustomAttribs() {
@@ -873,8 +884,7 @@ void TaskWisdom::randomize() {
 
 /* ------------ TaskPacifism ------------ */
 
-TaskPacifism::TaskPacifism(int _lifeSlashCardMin) : Task(TASK_PACIFISM) {
-    lifeSlashCardMin = _lifeSlashCardMin;
+TaskPacifism::TaskPacifism(int _lifeSlashCardMin) : Task(TASK_PACIFISM), lifeSlashCardMin(_lifeSlashCardMin) {
     if (lifeSlashCardMin == 0) {
         randomize();
     }
@@ -917,7 +927,7 @@ void TaskPacifism::storeCustomAttribs() {
     char buff[256];
 
     sprintf(buff, "%i", lifeSlashCardMin);
-    persistentAttribs.push_back(buff);
+    persistentAttribs.emplace_back(buff);
 }
 
 void TaskPacifism::restoreCustomAttribs() { lifeSlashCardMin = atoi(persistentAttribs[COMMON_ATTRIBS_COUNT].c_str()); }

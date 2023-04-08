@@ -1,5 +1,5 @@
-#ifndef _TRANSLATEKEYS_H_
-#define _TRANSLATEKEYS_H_
+#ifndef TRANSLATEKEYS_H
+#define TRANSLATEKEYS_H
 
 #include <utility>
 #include <string>

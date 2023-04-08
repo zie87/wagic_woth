@@ -1,5 +1,5 @@
-#ifndef _GUI_CARDS_CONTROLLER_H_
-#define _GUI_CARDS_CONTROLLER_H_
+#ifndef GUICARDSCONTROLLER_H
+#define GUICARDSCONTROLLER_H
 
 #include "PlayGuiObjectController.h"
 

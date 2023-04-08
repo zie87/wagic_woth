@@ -1,5 +1,5 @@
-#ifndef _TRASH_H_
-#define _TRASH_H_
+#ifndef TRASH_H
+#define TRASH_H
 
 #include <vector>
 #include "Pos.h"
@@ -38,4 +38,4 @@ public:
     void trash(AttackerDamaged* garbage);
 };
 
-#endif  // _TRASH_H_
+#endif  // TRASH_H

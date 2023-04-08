@@ -11,8 +11,8 @@ some graphical effects, what parts of the game are made accessible to the player
 They are accessed through the global variable gModRules, and loaded from rules/modrules.xml
 */
 
-#ifndef _MODRULES_H_
-#define _MODRULES_H_
+#ifndef MODRULES_H
+#define MODRULES_H
 
 #include <string>
 #include <vector>
@@ -43,15 +43,15 @@ enum {
 
 class ModRulesMenuItem {
 protected:
-    static int strToAction(std::string str);
+    static int strToAction(const std::string& str);
 
 public:
     int mActionId;
     std::string mDisplayName;
-    ModRulesMenuItem(std::string actionIdStr, std::string displayName);
+    ModRulesMenuItem(const std::string& actionIdStr, std::string displayName);
     // most actionIds are associated to a game state. e.g. MENUITEM_DECKEDITOR <--> GAME_STATE_DECK_VIEWER
     // This function returns the game state that matches the actionId, if any
-    int getMatchingGameState();
+    int getMatchingGameState() const;
     static int getMatchingGameState(int actionId);
 };
 
@@ -59,14 +59,14 @@ class ModRulesMainMenuItem : public ModRulesMenuItem {
 public:
     int mIconId;
     std::string mParticleFile;
-    ModRulesMainMenuItem(std::string actionIdStr, std::string displayName, int iconId, std::string particleFile);
+    ModRulesMainMenuItem(const std::string& actionIdStr, std::string displayName, int iconId, std::string particleFile);
 };
 
 class ModRulesOtherMenuItem : public ModRulesMenuItem {
 public:
     JButton mKey;
-    ModRulesOtherMenuItem(std::string actionIdStr, std::string displayName, std::string keyStr);
-    static JButton strToJButton(std::string keyStr);
+    ModRulesOtherMenuItem(const std::string& actionIdStr, std::string displayName, const std::string& keyStr);
+    static JButton strToJButton(const std::string& keyStr);
 };
 
 class ModRulesMenu {
@@ -88,8 +88,8 @@ public:
     std::string mDisplayImg;
     std::string mDisplayThumb;
     int mMenuIcon;
-    ModRulesBackGroundCardGuiItem(std::string ColorId, std::string ColorName, std::string DisplayImg,
-                                  std::string DisplayThumb, std::string MenuIcon);
+    ModRulesBackGroundCardGuiItem(const std::string& ColorId, std::string ColorName, std::string DisplayImg,
+                                  std::string DisplayThumb, const std::string& MenuIcon);
 };
 
 class ModRulesRenderCardGuiItem {
@@ -125,8 +125,7 @@ class ModRulesGame {
 public:
     bool mCanInterrupt;
 
-public:
-    bool canInterrupt() { return mCanInterrupt; };
+    bool canInterrupt() const { return mCanInterrupt; };
     ModRulesGame();
     void parse(TiXmlElement* element);
 };
@@ -137,8 +136,8 @@ protected:
     bool mHasShop;
 
 public:
-    bool hasDeckEditor() { return mHasDeckEditor; };
-    bool hasShop() { return mHasShop; };
+    bool hasDeckEditor() const { return mHasDeckEditor; };
+    bool hasShop() const { return mHasShop; };
     ModRulesGeneral();
     void parse(TiXmlElement* element);
 };
@@ -146,7 +145,7 @@ public:
 class ModRulesCards {
 public:
     SimpleCardEffect* activateEffect;
-    static SimpleCardEffect* parseEffect(std::string str);
+    static SimpleCardEffect* parseEffect(const std::string& str);
     ModRulesCards();
     ~ModRulesCards();
     void parse(TiXmlElement* element);
@@ -159,8 +158,8 @@ public:
     ModRulesMenu menu;
     ModRulesGame game;
     ModRulesCardGui cardgui;
-    bool load(std::string filename);
-    static int getValueAsInt(TiXmlElement* element, std::string childName);
+    bool load(const std::string& filename);
+    static int getValueAsInt(TiXmlElement* element, const std::string& childName);
 };
 
 extern ModRules gModRules;

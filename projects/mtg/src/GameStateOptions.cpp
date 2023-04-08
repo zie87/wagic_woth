@@ -16,7 +16,11 @@ const int kReloadID                = 5;
 }  // namespace
 
 GameStateOptions::GameStateOptions(GameApp* parent)
-    : GameState(parent, "options"), mReload(false), grabber(NULL), optionsMenu(NULL), optionsTabs(NULL) {}
+    : GameState(parent, "options")
+    , mReload(false)
+    , grabber(nullptr)
+    , optionsMenu(nullptr)
+    , optionsTabs(nullptr) {}
 GameStateOptions::~GameStateOptions() {}
 
 void GameStateOptions::Start() {
@@ -30,9 +34,10 @@ void GameStateOptions::Start() {
     optionsList = NEW WGuiList("Settings");
 
     optionsList->Add(NEW WGuiHeader("General Options"));
-    if (GameApp::HasMusic)
+    if (GameApp::HasMusic) {
         optionsList->Add(NEW WDecoEnum(NEW OptionInteger(Options::MUSICVOLUME, "Music volume", 100, 10, 100),
                                        OptionVolume::getInstance()));
+    }
     optionsList->Add(
         NEW WDecoEnum(NEW OptionInteger(Options::SFXVOLUME, "SFX volume", 100, 10, 100), OptionVolume::getInstance()));
     if (options[Options::DIFFICULTY_MODE_UNLOCKED].number) {
@@ -61,15 +66,15 @@ void GameStateOptions::Start() {
 
     optionsList = NEW WGuiList("User");
     optionsList->Add(NEW WGuiHeader("User Options"));
-    WDecoConfirm* cPrf    = NEW WDecoConfirm(this, NEW OptionProfile(mParent, this));
-    cPrf->confirm         = "Use this Profile";
-    OptionThemeStyle* ots = NEW OptionThemeStyle("Theme Style");
-    OptionDirectory* od   = NEW OptionTheme(ots);
-    WDecoConfirm* cThm    = NEW WDecoConfirm(this, od);
-    cThm->confirm         = "Use this Theme";
+    auto* cPrf          = NEW WDecoConfirm(this, NEW OptionProfile(mParent, this));
+    cPrf->confirm       = "Use this Profile";
+    auto* ots           = NEW OptionThemeStyle("Theme Style");
+    OptionDirectory* od = NEW OptionTheme(ots);
+    auto* cThm          = NEW WDecoConfirm(this, od);
+    cThm->confirm       = "Use this Theme";
 
-    WDecoConfirm* cStyle = NEW WDecoConfirm(this, ots);
-    cStyle->confirm      = "Use this Style";
+    auto* cStyle    = NEW WDecoConfirm(this, ots);
+    cStyle->confirm = "Use this Style";
 
     optionsList->Add(NEW WGuiSplit(cPrf, cThm));
     optionsList->Add(cStyle);
@@ -83,29 +88,26 @@ void GameStateOptions::Start() {
 
     optionsList = NEW WGuiList("Advanced");
     optionsList->Add(NEW WGuiHeader("Advanced Options"));
-    WDecoStyled* wAdv = NEW WDecoStyled(NEW WGuiHeader("The following options require a restart."));
-    wAdv->mStyle      = WDecoStyled::DS_STYLE_ALERT;
+    auto* wAdv   = NEW WDecoStyled(NEW WGuiHeader("The following options require a restart."));
+    wAdv->mStyle = WDecoStyled::DS_STYLE_ALERT;
     optionsList->Add(wAdv);
-    WDecoConfirm* cLang = NEW WDecoConfirm(this, NEW OptionLanguage("Language"));
-    cLang->confirm      = "Use this Language";
+    auto* cLang    = NEW WDecoConfirm(this, NEW OptionLanguage("Language"));
+    cLang->confirm = "Use this Language";
     optionsList->Add(cLang);
-    WDecoEnum* oGra =
-        NEW WDecoEnum(NEW OptionInteger(Options::MAX_GRADE, "Minimum Card Grade", Constants::GRADE_DANGEROUS, 1,
-                                        Constants::GRADE_BORDERLINE, "", Constants::GRADE_SUPPORTED));
+    auto* oGra = NEW WDecoEnum(NEW OptionInteger(Options::MAX_GRADE, "Minimum Card Grade", Constants::GRADE_DANGEROUS,
+                                                 1, Constants::GRADE_BORDERLINE, "", Constants::GRADE_SUPPORTED));
     optionsList->Add(oGra);
-    WDecoEnum* oASPhases =
-        NEW WDecoEnum(NEW OptionInteger(Options::ASPHASES, "Phase Skip Automation", Constants::ASKIP_FULL, 1,
-                                        Constants::ASKIP_NONE, "", Constants::ASKIP_NONE));
+    auto* oASPhases = NEW WDecoEnum(NEW OptionInteger(Options::ASPHASES, "Phase Skip Automation", Constants::ASKIP_FULL,
+                                                      1, Constants::ASKIP_NONE, "", Constants::ASKIP_NONE));
     optionsList->Add(oASPhases);
     optionsTabs->Add(optionsList);
 
-    WDecoEnum* oFirstPlayer = NEW WDecoEnum(NEW OptionInteger(
-        Options::FIRSTPLAYER, "First Turn Player", Constants::WHO_R, 1, Constants::WHO_P, "", Constants::WHO_P));
+    auto* oFirstPlayer = NEW WDecoEnum(NEW OptionInteger(Options::FIRSTPLAYER, "First Turn Player", Constants::WHO_R, 1,
+                                                         Constants::WHO_P, "", Constants::WHO_P));
     optionsList->Add(oFirstPlayer);
 
-    WDecoEnum* oKickerPay =
-        NEW WDecoEnum(NEW OptionInteger(Options::KICKERPAYMENT, "Kicker Cost", Constants::KICKER_CHOICE, 1,
-                                        Constants::KICKER_ALWAYS, "", Constants::KICKER_ALWAYS));
+    auto* oKickerPay = NEW WDecoEnum(NEW OptionInteger(Options::KICKERPAYMENT, "Kicker Cost", Constants::KICKER_CHOICE,
+                                                       1, Constants::KICKER_ALWAYS, "", Constants::KICKER_ALWAYS));
     optionsList->Add(oKickerPay);
 
     optionsList = NEW WGuiKeyBinder("Key Bindings", this);
@@ -135,16 +137,16 @@ void GameStateOptions::Update(float dt) {
     if (options.keypadActive()) {
         options.keypadUpdate(dt);
 
-        if (newProfile != "") {
+        if (!newProfile.empty()) {
             newProfile = options.keypadFinish();
-            if (newProfile != "") {
+            if (!newProfile.empty()) {
                 options[Options::ACTIVE_PROFILE] = newProfile;
                 options.reloadProfile();
                 optionsTabs->Reload();
             }
             newProfile = "";
         }
-    } else
+    } else {
         switch (mState) {
         default:
         case SAVE:
@@ -167,14 +169,20 @@ void GameStateOptions::Update(float dt) {
         case SHOW_OPTIONS: {
             JGE* j      = JGE::GetInstance();
             JButton key = JGE_BTN_NONE;
-            int x, y;
+            int x;
+            int y;
             if (grabber) {
                 LocalKeySym sym;
-                if (LOCAL_KEY_NONE != (sym = j->ReadLocalKey())) grabber->KeyPressed(sym);
-            } else
-                while ((key = JGE::GetInstance()->ReadButton()) || JGE::GetInstance()->GetLeftClickCoordinates(x, y)) {
-                    if (!optionsTabs->CheckUserInput(key) && key == JGE_BTN_MENU) mState = SHOW_OPTIONS_MENU;
+                if (LOCAL_KEY_NONE != (sym = j->ReadLocalKey())) {
+                    grabber->KeyPressed(sym);
                 }
+            } else {
+                while ((key = JGE::GetInstance()->ReadButton()) || JGE::GetInstance()->GetLeftClickCoordinates(x, y)) {
+                    if (!optionsTabs->CheckUserInput(key) && key == JGE_BTN_MENU) {
+                        mState = SHOW_OPTIONS_MENU;
+                    }
+                }
+            }
             optionsTabs->Update(dt);
             break;
         }
@@ -182,6 +190,7 @@ void GameStateOptions::Update(float dt) {
             optionsMenu->Update(dt);
             break;
         }
+    }
     if (mReload) {
         options.reloadProfile();
         Translator::EndInstance();
@@ -236,9 +245,9 @@ void GameStateOptions::Render() {
     WFont* mFont = WResourceManager::Instance()->GetWFont(Fonts::MAGIC_FONT);
     mFont->SetColor(ARGB(255, 200, 200, 200));
     mFont->SetScale(1.0);
-    float startpos = 272 - timer;
-    float pos      = startpos;
-    int size       = sizeof(CreditsText) / sizeof(CreditsText[0]);
+    const float startpos = 272 - timer;
+    float pos            = startpos;
+    const int size       = sizeof(CreditsText) / sizeof(CreditsText[0]);
 
     for (int i = 0; i < size; i++) {
         pos = startpos + 20 * i;
@@ -247,18 +256,25 @@ void GameStateOptions::Render() {
         }
     }
 
-    if (pos < -20) timer = 0;
+    if (pos < -20) {
+        timer = 0;
+    }
 
     optionsTabs->Render();
 
-    if (mState == SHOW_OPTIONS_MENU) optionsMenu->Render();
+    if (mState == SHOW_OPTIONS_MENU) {
+        optionsMenu->Render();
+    }
 
-    if (options.keypadActive()) options.keypadRender();
+    if (options.keypadActive()) {
+        options.keypadRender();
+    }
 }
 
 void GameStateOptions::ButtonPressed(int controllerId, int controlId) {
     // Exit menu?
-    if (controllerId == -102) switch (controlId) {
+    if (controllerId == -102) {
+        switch (controlId) {
         case kSaveAndBackToMainMenuID:
             mState = SAVE;
             break;
@@ -277,11 +293,14 @@ void GameStateOptions::ButtonPressed(int controllerId, int controlId) {
             mReload = true;
             break;
         }
-    else
+    } else {
         optionsTabs->ButtonPressed(controllerId, controlId);
+    }
 };
 
 void GameStateOptions::GrabKeyboard(KeybGrabber* g) { grabber = g; }
 void GameStateOptions::UngrabKeyboard(const KeybGrabber* g) {
-    if (g == grabber) grabber = NULL;
+    if (g == grabber) {
+        grabber = nullptr;
+    }
 }

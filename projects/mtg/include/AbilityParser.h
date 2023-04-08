@@ -1,5 +1,5 @@
-#ifndef _ABILITY_PARSER_H_
-#define _ABILITY_PARSER_H_
+#ifndef ABILITYPARSER_H
+#define ABILITYPARSER_H
 
 #include <string>
 #include <vector>

@@ -3,6 +3,8 @@
 #include "MTGDefinitions.h"
 #include "CardPrimitive.h"
 
+#include <utility>
+
 #include "MTGDeck.h"
 #include "Subtypes.h"
 #include "Translate.h"
@@ -28,16 +30,21 @@ SUPPORT_OBJECT_ANALYTICS(CardPrimitive)
 CardPrimitive::CardPrimitive() : colors(0) { init(); }
 
 CardPrimitive::CardPrimitive(CardPrimitive* source) {
-    if (!source) return;
+    if (!source) {
+        return;
+    }
     basicAbilities = source->basicAbilities;
 
-    for (size_t i = 0; i < source->types.size(); ++i) types.push_back(source->types[i]);
+    for (size_t i = 0; i < source->types.size(); ++i) {
+        types.push_back(source->types[i]);
+    }
     colors = source->colors;
     manaCost.copy(source->getManaCost());
     // reducedCost.copy(source->getReducedManaCost());
     // increasedCost.copy(source->getIncreasedManaCost());
-    if (source->getManaCost()->alternative)
+    if (source->getManaCost()->alternative) {
         manaCost.alternative->alternativeName = source->getManaCost()->alternative->alternativeName;
+    }
 
     text          = source->text;
     formattedText = source->formattedText;
@@ -45,12 +52,13 @@ CardPrimitive::CardPrimitive(CardPrimitive* source) {
 
     power         = source->power;
     toughness     = source->toughness;
-    restrictions  = source->restrictions ? source->restrictions->clone() : NULL;
+    restrictions  = source->restrictions ? source->restrictions->clone() : nullptr;
     suspendedTime = source->suspendedTime;
 
     magicText = source->magicText;
-    for (map<string, string>::const_iterator it = source->magicTexts.begin(); it != source->magicTexts.end(); ++it)
+    for (auto it = source->magicTexts.begin(); it != source->magicTexts.end(); ++it) {
         magicTexts[it->first] = source->magicTexts[it->first];
+    }
     spellTargetType = source->spellTargetType;
     alias           = source->alias;
 }
@@ -66,7 +74,7 @@ int CardPrimitive::init() {
     magicTexts.clear();
     spellTargetType = "";
     alias           = 0;
-    restrictions    = NULL;
+    restrictions    = nullptr;
     return 1;
 }
 
@@ -77,60 +85,77 @@ bool CardPrimitive::isLand() { return hasSubtype(Subtypes::TYPE_LAND); }
 bool CardPrimitive::isSpell() { return (!isCreature() && !isLand()); }
 
 void CardPrimitive::setRestrictions(string _restriction) {
-    if (!restrictions) restrictions = NEW CastRestrictions();
+    if (!restrictions) {
+        restrictions = NEW CastRestrictions();
+    }
 
-    restrictions->restriction = _restriction;
+    restrictions->restriction = std::move(_restriction);
 }
 
-const string CardPrimitive::getRestrictions() {
-    if (!restrictions) return "";
+string CardPrimitive::getRestrictions() {
+    if (!restrictions) {
+        return "";
+    }
 
     return restrictions->restriction;
 }
 
 void CardPrimitive::setOtherRestrictions(string _restriction) {
-    if (!restrictions) restrictions = NEW CastRestrictions();
+    if (!restrictions) {
+        restrictions = NEW CastRestrictions();
+    }
 
-    restrictions->otherrestriction = _restriction;
+    restrictions->otherrestriction = std::move(_restriction);
 }
 
-const string CardPrimitive::getOtherRestrictions() {
-    if (!restrictions) return "";
+string CardPrimitive::getOtherRestrictions() {
+    if (!restrictions) {
+        return "";
+    }
 
     return restrictions->otherrestriction;
 }
 
 void CardPrimitive::setColor(const string& _color, int removeAllOthers) {
     for (size_t i = 0; i < Constants::MTGColorStrings.size(); i++) {
-        if (_color.compare(Constants::MTGColorStrings[i]) == 0) return setColor(i, removeAllOthers);
+        if (_color == Constants::MTGColorStrings[i]) {
+            return setColor(i, removeAllOthers);
+        }
     }
     // Keep artifact compare, to Remove this we need change all MTG.txt
-    if (_color.compare("artifact") == 0) return setColor(Constants::MTG_COLOR_ARTIFACT, removeAllOthers);
+    if (_color == "artifact") {
+        return setColor(Constants::MTG_COLOR_ARTIFACT, removeAllOthers);
+    }
 }
 
 void CardPrimitive::setColor(int _color, int removeAllOthers) {
-    if (removeAllOthers) colors = 0;
+    if (removeAllOthers) {
+        colors = 0;
+    }
 
     colors |= ConvertColorToBitMask(_color);
 }
 
 void CardPrimitive::removeColor(int _color) {
-    uint8_t mask = ~ConvertColorToBitMask(_color);
+    const uint8_t mask = ~ConvertColorToBitMask(_color);
     colors &= mask;
 }
 
-int CardPrimitive::getColor() {
+int CardPrimitive::getColor() const {
     if (colors) {
-        for (int i = 1; i < Constants::NB_Colors; i++)
-            if (hasColor(i)) return i;
+        for (int i = 1; i < Constants::NB_Colors; i++) {
+            if (hasColor(i)) {
+                return i;
+            }
+        }
     }
 
     return 0;
 }
 
-bool CardPrimitive::hasColor(int inColor) { return (colors & ConvertColorToBitMask(inColor)) > 0; }
+bool CardPrimitive::hasColor(int inColor) const { return (colors & ConvertColorToBitMask(inColor)) > 0; }
 
-int CardPrimitive::countColors() {
+int CardPrimitive::countColors() const {
     uint8_t mask =
         kColorBitMask_Green | kColorBitMask_Blue | kColorBitMask_Red | kColorBitMask_Black | kColorBitMask_White;
     mask &= colors;
@@ -161,7 +186,7 @@ void CardPrimitive::setSubtype(const string& value) {
         }
     }
 
-    int id = MTGAllCards::add(value, parentType);
+    const int id = MTGAllCards::add(value, parentType);
     addType(id);
 }
 
@@ -171,7 +196,7 @@ void CardPrimitive::addType(int id) { types.push_back(id); }
 // CardPrimitive since they represent the Database Removes a type from the types of a given card If removeAll is true,
 // removes all occurences of this type, otherwise only removes the first occurence
 int CardPrimitive::removeType(string value, int removeAll) {
-    int id = MTGAllCards::findType(value);
+    const int id = MTGAllCards::findType(std::move(value));
     return removeType(id, removeAll);
 }
 
@@ -181,7 +206,9 @@ int CardPrimitive::removeType(int id, int removeAll) {
         if (types[i] == id) {
             types.erase(types.begin() + i);
             result++;
-            if (!removeAll) return result;
+            if (!removeAll) {
+                return result;
+            }
         }
     }
     return result;
@@ -198,7 +225,9 @@ void CardPrimitive::setText(const string& value) { text = value; }
  * To avoid memory to blow up, in exchange of the cached result, we erase the original string
  */
 const vector<string>& CardPrimitive::getFormattedText() {
-    if (!text.size()) return formattedText;
+    if (text.empty()) {
+        return formattedText;
+    }
 
     std::string::size_type found = text.find_first_of("{}");
     while (found != string::npos) {
@@ -215,13 +244,17 @@ const vector<string>& CardPrimitive::getFormattedText() {
 
 void CardPrimitive::addMagicText(string value) {
     std::transform(value.begin(), value.end(), value.begin(), ::tolower);
-    if (magicText.size()) magicText.append("\n");
+    if (!magicText.empty()) {
+        magicText.append("\n");
+    }
     magicText.append(value);
 }
 
-void CardPrimitive::addMagicText(string value, string key) {
+void CardPrimitive::addMagicText(string value, const string& key) {
     std::transform(value.begin(), value.end(), value.begin(), ::tolower);
-    if (magicTexts[key].size()) magicTexts[key].append("\n");
+    if (!magicTexts[key].empty()) {
+        magicTexts[key].append("\n");
+    }
     magicTexts[key].append(value);
 }
 
@@ -238,25 +271,28 @@ const string& CardPrimitive::getLCName() const { return lcname; }
 ManaCost* CardPrimitive::getManaCost() { return &manaCost; }
 
 bool CardPrimitive::hasType(int _type) {
-    for (size_t i = 0; i < types.size(); i++)
-        if (types[i] == _type) return true;
+    for (size_t i = 0; i < types.size(); i++) {
+        if (types[i] == _type) {
+            return true;
+        }
+    }
     return false;
 }
 
 bool CardPrimitive::hasSubtype(int _subtype) { return hasType(_subtype); }
 
 bool CardPrimitive::hasType(const char* _type) {
-    int id = MTGAllCards::findType(_type);
+    const int id = MTGAllCards::findType(_type);
     return hasType(id);
 }
 
 bool CardPrimitive::hasSubtype(const char* _subtype) {
-    int id = MTGAllCards::findType(_subtype);
+    const int id = MTGAllCards::findType(_subtype);
     return hasType(id);
 }
 
 bool CardPrimitive::hasSubtype(const string& _subtype) {
-    int id = MTGAllCards::findType(_subtype);
+    const int id = MTGAllCards::findType(_subtype);
     return hasType(id);
 }
 
@@ -267,11 +303,11 @@ int CardPrimitive::has(int basicAbility) { return basicAbilities[basicAbility]; 
 //---------------------------------------------
 void CardPrimitive::setPower(int _power) { power = _power; }
 
-int CardPrimitive::getPower() { return power; }
+int CardPrimitive::getPower() const { return power; }
 
 void CardPrimitive::setToughness(int _toughness) { toughness = _toughness; }
 
-int CardPrimitive::getToughness() { return toughness; }
+int CardPrimitive::getToughness() const { return toughness; }
 
 uint8_t CardPrimitive::ConvertColorToBitMask(int inColor) {
     uint8_t value = 0;

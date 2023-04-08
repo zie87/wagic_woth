@@ -22,30 +22,37 @@ const char FNTCHARTAG[]   = "Char";
 // HGE *hgeFont::hge=0;
 char hgeFont::buffer[256];
 
-hgeFont::hgeFont(const char* szFont, bool bMipmap __attribute__((unused))) {
+hgeFont::hgeFont(const char* szFont, bool bMipmap __attribute__((unused)))
+    : fHeight(0.0f)
+    , dwCol(ARGB(0xFF, 0xFF, 0xFF, 0xFF))
+    , fProportion(1.0f)
+    , fRot(0.0f)
+    , fScale(1.0f)
+    , fSpacing(1.0f)
+    , fTracking(0.0f)
+    , fZ(0.5f)
+    , hTexture(nullptr) {
     // void	*data;
     DWORD size;
-    char *desc, *pdesc;
+    char* desc;
+    char* pdesc;
     char linebuf[256];
-    char buf[512], *pbuf;
+    char buf[512];
+    char* pbuf;
     char chr;
-    int i, x, y, w, h, a, c;
+    int i;
+    int x;
+    int y;
+    int w;
+    int h;
+    int a;
+    int c;
 
     // Setup variables
 
     // hge=hgeCreate(HGE_VERSION);
 
-    fHeight     = 0.0f;
-    fScale      = 1.0f;
-    fProportion = 1.0f;
-    fRot        = 0.0f;
-    fTracking   = 0.0f;
-    fSpacing    = 1.0f;
-    hTexture    = 0;
-
-    fZ = 0.5f;
     // nBlend=BLEND_COLORMUL | BLEND_ALPHABLEND | BLEND_NOZWRITE;
-    dwCol = ARGB(0xFF, 0xFF, 0xFF, 0xFF);
 
     memset(&letters, 0, sizeof(letters));
     memset(&pre, 0, sizeof(letters));
@@ -54,7 +61,9 @@ hgeFont::hgeFont(const char* szFont, bool bMipmap __attribute__((unused))) {
     // Load font description
 
     JFileSystem* fileSys = JFileSystem::GetInstance();
-    if (!fileSys->OpenFile(szFont)) return;
+    if (!fileSys->OpenFile(szFont)) {
+        return;
+    }
 
     // data=hge->Resource_Load(szFont, &size);
     // if(!data) return;
@@ -79,16 +88,21 @@ hgeFont::hgeFont(const char* szFont, bool bMipmap __attribute__((unused))) {
 
     JRenderer* renderer = JRenderer::GetInstance();
 
-    while ((pdesc = _get_line(pdesc, linebuf)) != NULL) {
+    while ((pdesc = _get_line(pdesc, linebuf)) != nullptr) {
         if (!strncmp(linebuf, FNTBITMAPTAG, sizeof(FNTBITMAPTAG) - 1)) {
             strcpy(buf, szFont);
             pbuf = strrchr(buf, '\\');
-            if (!pbuf) pbuf = strrchr(buf, '/');
-            if (!pbuf)
+            if (!pbuf) {
+                pbuf = strrchr(buf, '/');
+            }
+            if (!pbuf) {
                 pbuf = buf;
-            else
+            } else {
                 pbuf++;
-            if (!sscanf(linebuf, "Bitmap = %s", pbuf)) continue;
+            }
+            if (!sscanf(linebuf, "Bitmap = %s", pbuf)) {
+                continue;
+            }
 
             // hTexture=hge->Texture_Load(buf, 0, bMipmap);
             hTexture = renderer->LoadTexture(buf);
@@ -100,9 +114,13 @@ hgeFont::hgeFont(const char* szFont, bool bMipmap __attribute__((unused))) {
 
         else if (!strncmp(linebuf, FNTCHARTAG, sizeof(FNTCHARTAG) - 1)) {
             pbuf = strchr(linebuf, '=');
-            if (!pbuf) continue;
+            if (!pbuf) {
+                continue;
+            }
             pbuf++;
-            while (*pbuf == ' ') pbuf++;
+            while (*pbuf == ' ') {
+                pbuf++;
+            }
             if (*pbuf == '\"') {
                 pbuf++;
                 i = (unsigned char)*pbuf++;
@@ -112,21 +130,31 @@ hgeFont::hgeFont(const char* szFont, bool bMipmap __attribute__((unused))) {
                 while ((*pbuf >= '0' && *pbuf <= '9') || (*pbuf >= 'A' && *pbuf <= 'F') ||
                        (*pbuf >= 'a' && *pbuf <= 'f')) {
                     chr = *pbuf;
-                    if (chr >= 'a') chr -= 'a' - ':';
-                    if (chr >= 'A') chr -= 'A' - ':';
+                    if (chr >= 'a') {
+                        chr -= 'a' - ':';
+                    }
+                    if (chr >= 'A') {
+                        chr -= 'A' - ':';
+                    }
                     chr -= '0';
-                    if (chr > 0xF) chr = 0xF;
+                    if (chr > 0xF) {
+                        chr = 0xF;
+                    }
                     i = (i << 4) | chr;
                     pbuf++;
                 }
-                if (i < 0 || i > 255) continue;
+                if (i < 0 || i > 255) {
+                    continue;
+                }
             }
             sscanf(pbuf, " , %d , %d , %d , %d , %d , %d", &x, &y, &w, &h, &a, &c);
 
             letters[i] = new JQuad(hTexture, (float)x, (float)y, (float)w, (float)h);
             pre[i]     = (float)a;
             post[i]    = (float)c;
-            if (h > fHeight) fHeight = (float)h;
+            if (h > fHeight) {
+                fHeight = (float)h;
+            }
         }
     }
 
@@ -134,9 +162,14 @@ hgeFont::hgeFont(const char* szFont, bool bMipmap __attribute__((unused))) {
 }
 
 hgeFont::~hgeFont() {
-    for (int i = 0; i < 256; i++)
-        if (letters[i]) delete letters[i];
-    if (hTexture) delete hTexture;
+    for (int i = 0; i < 256; i++) {
+        if (letters[i]) {
+            delete letters[i];
+        }
+    }
+    if (hTexture) {
+        delete hTexture;
+    }
     // hge->Release();
 }
 
@@ -147,18 +180,28 @@ void hgeFont::Render(float x, float y, int align, const char* string) {
     JRenderer* renderer = JRenderer::GetInstance();
 
     align &= HGETEXT_HORZMASK;
-    if (align == HGETEXT_RIGHT) fx -= GetStringWidth(string);
-    if (align == HGETEXT_CENTER) fx -= int(GetStringWidth(string) / 2.0f);
+    if (align == HGETEXT_RIGHT) {
+        fx -= GetStringWidth(string);
+    }
+    if (align == HGETEXT_CENTER) {
+        fx -= int(GetStringWidth(string) / 2.0f);
+    }
 
     while (*string) {
         if (*string == '\n') {
             y += int(fHeight * fScale * fSpacing);
             fx = x;
-            if (align == HGETEXT_RIGHT) fx -= GetStringWidth(string + 1);
-            if (align == HGETEXT_CENTER) fx -= int(GetStringWidth(string + 1) / 2.0f);
+            if (align == HGETEXT_RIGHT) {
+                fx -= GetStringWidth(string + 1);
+            }
+            if (align == HGETEXT_CENTER) {
+                fx -= int(GetStringWidth(string + 1) / 2.0f);
+            }
         } else {
             i = (unsigned char)*string;
-            if (!letters[i]) i = '?';
+            if (!letters[i]) {
+                i = '?';
+            }
             if (letters[i]) {
                 fx += pre[i] * fScale * fProportion;
                 // letters[i]->RenderEx(fx, y, fRot, fScale*fProportion, fScale);
@@ -186,9 +229,16 @@ void hgeFont::printf(float x, float y, int align, const char* format, ...) {
 }
 
 void hgeFont::printfb(float x, float y, float w, float h, int align, const char* format, ...) {
-    char chr, *pbuf, *prevword, *linestart;
-    int i, lines = 0;
-    float tx, ty, hh, ww;
+    char chr;
+    char* pbuf;
+    char* prevword;
+    char* linestart;
+    int i;
+    int lines = 0;
+    float tx;
+    float ty;
+    float hh;
+    float ww;
     // char	*pArg=(char *) &format+sizeof(format);
 
     //_vsnprintf(buffer, sizeof(buffer)-1, format, pArg);
@@ -203,11 +253,13 @@ void hgeFont::printfb(float x, float y, float w, float h, int align, const char*
 
     linestart = buffer;
     pbuf      = buffer;
-    prevword  = 0;
+    prevword  = nullptr;
 
     for (;;) {
         i = 0;
-        while (pbuf[i] && pbuf[i] != ' ' && pbuf[i] != '\n') i++;
+        while (pbuf[i] && pbuf[i] != ' ' && pbuf[i] != '\n') {
+            i++;
+        }
 
         chr     = pbuf[i];
         pbuf[i] = 0;
@@ -274,22 +326,31 @@ void hgeFont::printfb(float x, float y, float w, float h, int align, const char*
 
 float hgeFont::GetStringWidth(const char* string) const {
     int i;
-    float linew, w = 0;
+    float linew;
+    float w = 0;
 
     while (*string) {
         linew = 0;
 
         while (*string && *string != '\n') {
             i = (unsigned char)*string;
-            if (!letters[i]) i = '?';
-            if (letters[i]) linew += letters[i]->mWidth + pre[i] + post[i] + fTracking;
+            if (!letters[i]) {
+                i = '?';
+            }
+            if (letters[i]) {
+                linew += letters[i]->mWidth + pre[i] + post[i] + fTracking;
+            }
 
             string++;
         }
 
-        if (linew > w) w = linew;
+        if (linew > w) {
+            w = linew;
+        }
 
-        while (*string == '\n' || *string == '\r') string++;
+        while (*string == '\n' || *string == '\r') {
+            string++;
+        }
     }
 
     return w * fScale * fProportion;
@@ -298,8 +359,11 @@ float hgeFont::GetStringWidth(const char* string) const {
 void hgeFont::SetColor(PIXEL_TYPE col) {
     dwCol = col;
 
-    for (int i = 0; i < 256; i++)
-        if (letters[i]) letters[i]->SetColor(col);
+    for (int i = 0; i < 256; i++) {
+        if (letters[i]) {
+            letters[i]->SetColor(col);
+        }
+    }
 }
 
 void hgeFont::SetZ(float z) {
@@ -321,7 +385,9 @@ void hgeFont::SetBlendMode(int blend) {
 char* hgeFont::_get_line(char* file, char* line) {
     int i = 0;
 
-    if (!file[i]) return 0;
+    if (!file[i]) {
+        return nullptr;
+    }
 
     while (file[i] && file[i] != '\n' && file[i] != '\r') {
         line[i] = file[i];
@@ -329,7 +395,9 @@ char* hgeFont::_get_line(char* file, char* line) {
     }
     line[i] = 0;
 
-    while (file[i] && (file[i] == '\n' || file[i] == '\r')) i++;
+    while (file[i] && (file[i] == '\n' || file[i] == '\r')) {
+        i++;
+    }
 
     return file + i;
 }

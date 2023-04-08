@@ -4,8 +4,8 @@
  *  http://wololo.net/wagic/
  */
 
-#ifndef _ACTIONLAYER_H_
-#define _ACTIONLAYER_H_
+#ifndef ACTIONLAYER_H
+#define ACTIONLAYER_H
 
 #include "GuiLayers.h"
 #include "ActionElement.h"
@@ -26,15 +26,15 @@ public:
     SimpleMenu* abilitiesTriggered;
     MTGCardInstance* currentActionCard;
     int stuffHappened;
-    virtual void Render();
-    virtual void Update(float dt);
-    bool CheckUserInput(JButton key);
+    void Render() override;
+    void Update(float dt) override;
+    bool CheckUserInput(JButton key) override;
     ActionLayer(GameObserver* observer);
-    ~ActionLayer();
+    ~ActionLayer() override;
     int cancelCurrentAction();
     ActionElement* isWaitingForAnswer();
     int isReactingToTargetClick(Targetable* card);
-    int receiveEventPlus(WEvent* event);
+    int receiveEventPlus(WEvent* event) override;
     int reactToTargetClick(Targetable* card);
     int isReactingToClick(MTGCardInstance* card);
     bool getMenuIdFromCardAbility(MTGCardInstance* card, MTGAbility* ability, int& menuId);
@@ -45,13 +45,13 @@ public:
     void setMenuObject(Targetable* object, bool must = false);
     void setCustomMenuObject(Targetable* object, bool must = false,
                              vector<MTGAbility*> abilities = vector<MTGAbility*>());
-    void ButtonPressed(int controllerid, int controlid);
+    void ButtonPressed(int controllerid, int controlid) override;
     void ButtonPressedOnMultipleChoice(int choice = -1);
     void doReactTo(int menuIndex);
     TargetChooser* getCurrentTargetChooser();
     void setCurrentWaitingAction(ActionElement* ae);
     MTGAbility* getAbility(int type);
-    int checkCantCancel() { return cantCancel; };
+    int checkCantCancel() const { return cantCancel; };
 
     // Removes from game but does not move the element to garbage. The caller must take care of deleting the element.
     int removeFromGame(ActionElement* e);

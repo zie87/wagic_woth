@@ -6,9 +6,10 @@
 #include "AllAbilities.h"
 
 #include <sstream>
+#include <utility>
 
 AIHint::AIHint(string _line) {
-    string line = _line;
+    string line = std::move(_line);
     if (!line.length()) {
         DebugTrace("AIHINTS: line is empty");
         return;
@@ -16,10 +17,10 @@ AIHint::AIHint(string _line) {
     std::transform(line.begin(), line.end(), line.begin(), ::tolower);
     vector<string> parameters = split(line, ':');
     mCondition                = (parameters.size() == 1) ? "" : parameters[0];
-    string action             = parameters[parameters.size() - 1];
+    const string action       = parameters[parameters.size() - 1];
 
     vector<string> splitAction = parseBetween(action, "sourceid(", ")");
-    if (splitAction.size()) {
+    if (!splitAction.empty()) {
         mAction   = splitAction[0];
         mSourceId = atoi(splitAction[1].c_str());
     } else {
@@ -28,39 +29,45 @@ AIHint::AIHint(string _line) {
     }
 
     vector<string> splitDontAttack = parseBetween(action, "dontattackwith(", ")");
-    if (splitDontAttack.size()) {
+    if (!splitDontAttack.empty()) {
         mCombatAttackTip = splitDontAttack[1];
     }
 
     vector<string> splitCastOrder = parseBetween(action, "castpriority(", ")");
-    if (splitCastOrder.size()) {
+    if (!splitCastOrder.empty()) {
         castOrder = split(splitCastOrder[1], ',');
     }
 }
 
 AIHints::AIHints(AIPlayerBaka* player) : mPlayer(player) {}
 
-void AIHints::add(string line) { hints.push_back(NEW AIHint(line)); }
+void AIHints::add(string line) { hints.push_back(NEW AIHint(std::move(line))); }
 
 AIHints::~AIHints() {
-    for (size_t i = 0; i < hints.size(); ++i) SAFE_DELETE(hints[i]);
+    for (size_t i = 0; i < hints.size(); ++i) {
+        SAFE_DELETE(hints[i]);
+    }
     hints.clear();
 }
 
-AIHint* AIHints::getByCondition(string condition) {
-    if (!condition.size()) return NULL;
+AIHint* AIHints::getByCondition(const string& condition) {
+    if (condition.empty()) {
+        return nullptr;
+    }
 
     for (size_t i = 0; i < hints.size(); ++i) {
-        if (hints[i]->mCondition.compare(condition) == 0) return hints[i];
+        if (hints[i]->mCondition == condition) {
+            return hints[i];
+        }
     }
-    return NULL;
+    return nullptr;
 }
 
 bool AIHints::HintSaysDontAttack(GameObserver* observer, MTGCardInstance* card) {
     TargetChooserFactory tfc(observer);
-    TargetChooser* hintTc = NULL;
+    TargetChooser* hintTc = nullptr;
     for (unsigned int i = 0; i < hints.size(); i++) {
-        if (hints[i]->mCombatAttackTip.size()) {
+        if (!hints[i]->mCombatAttackTip.empty()) {
             hintTc = tfc.createTargetChooser(hints[i]->mCombatAttackTip, card);
             if (hintTc && hintTc->canTarget(card, true)) {
                 SAFE_DELETE(hintTc);
@@ -74,7 +81,7 @@ bool AIHints::HintSaysDontAttack(GameObserver* observer, MTGCardInstance* card) 
 
 vector<string> AIHints::mCastOrder() {
     for (unsigned int i = 0; i < hints.size(); i++) {
-        if (hints[i]->castOrder.size()) {
+        if (!hints[i]->castOrder.empty()) {
             return hints[i]->castOrder;
         }
     }
@@ -84,7 +91,7 @@ vector<string> AIHints::mCastOrder() {
 // return true if a given ability matches a hint's description
 // Eventually this will look awfully similar to the parser...any way to merge them somehow ?
 bool AIHints::abilityMatches(MTGAbility* ability, AIHint* hint) {
-    string s = hint->mAction;
+    const string s = hint->mAction;
 
     MTGAbility* a = AbilityFactory::getCoreAbility(ability);
 
@@ -92,20 +99,26 @@ bool AIHints::abilityMatches(MTGAbility* ability, AIHint* hint) {
     //  to avoid mistaking the MTGAbility with a similar one.
     // Ideally we would find all cards with this ID, and see if the ability reacts to a click on one of these cards.
     //  This is the poor man's version, based on the fact that most cards are the source of their own abilities
-    if (hint->mSourceId && ((!a->source) || a->source->getMTGId() != hint->mSourceId)) return false;
+    if (hint->mSourceId && ((!a->source) || a->source->getMTGId() != hint->mSourceId)) {
+        return false;
+    }
 
-    if (AACounter* counterAbility = dynamic_cast<AACounter*>(a)) {
+    if (auto* counterAbility = dynamic_cast<AACounter*>(a)) {
         vector<string> splitCounter = parseBetween(s, "counter(", ")");
-        if (!splitCounter.size()) return false;
+        if (splitCounter.empty()) {
+            return false;
+        }
 
         string counterstring = counterAbility->name;
         std::transform(counterstring.begin(), counterstring.end(), counterstring.begin(), ::tolower);
-        return (splitCounter[1].compare(counterstring) == 0);
+        return (splitCounter[1] == counterstring);
     }
 
-    if (ATokenCreator* tokenAbility = dynamic_cast<ATokenCreator*>(a)) {
+    if (auto* tokenAbility = dynamic_cast<ATokenCreator*>(a)) {
         vector<string> splitToken = parseBetween(s, "token(", ")");
-        if (!splitToken.size()) return false;
+        if (splitToken.empty()) {
+            return false;
+        }
         return (tokenAbility->tokenId && tokenAbility->tokenId == atoi(splitToken[1].c_str()));
     }
 
@@ -120,8 +133,10 @@ vector<MTGAbility*> AIHints::findAbilities(AIHint* hint) {
 
     for (size_t i = 1; i < al->mObjects.size(); i++)  // 0 is not a mtgability...hackish
     {
-        MTGAbility* a = ((MTGAbility*)al->mObjects[i]);
-        if (abilityMatches(a, hint)) elems.push_back(a);
+        MTGAbility* a = (dynamic_cast<MTGAbility*>(al->mObjects[i]));
+        if (abilityMatches(a, hint)) {
+            elems.push_back(a);
+        }
     }
     return elems;
 }
@@ -151,7 +166,9 @@ RankingContainer AIHints::findActions(AIHint* hint) {
 bool AIHints::findSource(int sourceId) {
     for (int i = 0; i < mPlayer->game->inPlay->nb_cards; i++) {
         MTGCardInstance* c = mPlayer->game->inPlay->cards[i];
-        if (c->getMTGId() == sourceId) return true;
+        if (c->getMTGId() == sourceId) {
+            return true;
+        }
     }
     return false;
 }
@@ -160,7 +177,7 @@ string AIHints::constraintsNotFulfilled(AIAction* action, AIHint* hint, ManaCost
     std::stringstream out;
 
     if (!action) {
-        if (hint->mCombatAttackTip.size()) {
+        if (!hint->mCombatAttackTip.empty()) {
             out << "to see if this can attack[" << hint->mCombatAttackTip << "]";
             return out.str();
         }
@@ -173,10 +190,14 @@ string AIHints::constraintsNotFulfilled(AIAction* action, AIHint* hint, ManaCost
     }
 
     MTGAbility* a = action->ability;
-    if (!a) return "not supported";
+    if (!a) {
+        return "not supported";
+    }
 
     MTGCardInstance* card = action->click;
-    if (!card) return "not supported";
+    if (!card) {
+        return "not supported";
+    }
 
     // dummy test: would the ability work if we were sure to fulfill its mana requirements?
     if (!a->isReactingToClick(card, a->getCost())) {
@@ -207,20 +228,24 @@ string AIHints::constraintsNotFulfilled(AIAction* action, AIHint* hint, ManaCost
 AIAction* AIHints::findAbilityRecursive(AIHint* hint, ManaCost* potentialMana) {
     RankingContainer ranking = findActions(hint);
 
-    AIAction* a = NULL;
-    if (ranking.size()) {
+    AIAction* a = nullptr;
+    if (!ranking.empty()) {
         a = NEW AIAction(ranking.begin()->first);
     }
 
-    string s = constraintsNotFulfilled(a, hint, potentialMana);
-    if (hint->mCombatAttackTip.size() || hint->castOrder.size()) return NULL;
-    if (s.size()) {
+    const string s = constraintsNotFulfilled(a, hint, potentialMana);
+    if (!hint->mCombatAttackTip.empty() || !hint->castOrder.empty()) {
+        return nullptr;
+    }
+    if (!s.empty()) {
         SAFE_DELETE(a);
         AIHint* nextHint = getByCondition(s);
         DebugTrace("**I Need " << s << ", this can be provided by " << (nextHint ? nextHint->mAction : "NULL")
                                << "\n\n");
-        if (nextHint && nextHint != hint) return findAbilityRecursive(nextHint, potentialMana);
-        return NULL;
+        if (nextHint && nextHint != hint) {
+            return findAbilityRecursive(nextHint, potentialMana);
+        }
+        return nullptr;
     }
 
     return a;
@@ -229,7 +254,9 @@ AIAction* AIHints::findAbilityRecursive(AIHint* hint, ManaCost* potentialMana) {
 AIAction* AIHints::suggestAbility(ManaCost* potentialMana) {
     for (size_t i = 0; i < hints.size(); ++i) {
         // Don't suggest abilities that require a condition, for now
-        if (hints[i]->mCondition.size()) continue;
+        if (!hints[i]->mCondition.empty()) {
+            continue;
+        }
 
         AIAction* a = findAbilityRecursive(hints[i], potentialMana);
         if (a) {
@@ -238,5 +265,5 @@ AIAction* AIHints::suggestAbility(ManaCost* potentialMana) {
             return a;
         }
     }
-    return NULL;
+    return nullptr;
 }

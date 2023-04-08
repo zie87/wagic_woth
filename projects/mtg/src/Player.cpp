@@ -1,6 +1,8 @@
 #include "PrecompiledHeader.h"
 
 #include "Player.h"
+
+#include <utility>
 #include "GameObserver.h"
 #include "DeckStats.h"
 #include "ManaCost.h"
@@ -11,27 +13,29 @@
 #include "TestSuiteAI.h"
 #endif
 
-Player::Player(GameObserver* observer, string file, string fileSmall, MTGDeck* deck)
-    : Damageable(observer, 20), mAvatarName(""), offerInterruptOnPhase(MTG_PHASE_DRAW) {
-    if (deck == NULL && file != "testsuite" && file != "remote" && file != "")
+Player::Player(GameObserver* observer, const string& file, string fileSmall, MTGDeck* deck)
+    : Damageable(observer, 20)
+    , offerInterruptOnPhase(MTG_PHASE_DRAW) {
+    if (deck == nullptr && file != "testsuite" && file != "remote" && !file.empty()) {
         deck = NEW MTGDeck(file.c_str(), MTGCollection());
+    }
 
     premade            = false;
-    game               = NULL;
+    game               = nullptr;
     deckFile           = file;
-    deckFileSmall      = fileSmall;
+    deckFileSmall      = std::move(fileSmall);
     handsize           = 0;
     manaPool           = NEW ManaPool(this);
     nomaxhandsize      = false;
     poisonCount        = 0;
     damageCount        = 0;
     preventable        = 0;
-    mAvatarTex         = NULL;
+    mAvatarTex         = nullptr;
     type_as_damageable = DAMAGEABLE_PLAYER;
     playMode           = MODE_HUMAN;
     skippingTurn       = 0;
     extraTurn          = 0;
-    if (deck != NULL) {
+    if (deck != nullptr) {
         game = NEW MTGPlayerCards(deck);
         // This automatically sets the observer pointer on all the deck cards
         game->setOwner(this);
@@ -55,22 +59,26 @@ void Player::End() { DeckStats::GetInstance()->saveStats(this, opponent(), obser
 Player::~Player() {
     SAFE_DELETE(manaPool);
     SAFE_DELETE(game);
-    if (mAvatarTex && observer->getResourceManager()) observer->getResourceManager()->Release(mAvatarTex);
-    mAvatarTex = NULL;
+    if (mAvatarTex && observer->getResourceManager()) {
+        observer->getResourceManager()->Release(mAvatarTex);
+    }
+    mAvatarTex = nullptr;
     SAFE_DELETE(mDeck);
 }
 
-bool Player::loadAvatar(string file, string resName) {
+bool Player::loadAvatar(const string& file, string resName) {
     WResourceManager* rm = observer->getResourceManager();
-    if (!rm) return false;
+    if (!rm) {
+        return false;
+    }
 
     if (mAvatarTex) {
         rm->Release(mAvatarTex);
-        mAvatarTex = NULL;
+        mAvatarTex = nullptr;
     }
     mAvatarTex = rm->RetrieveTexture(file, RETRIEVE_LOCK, TEXTURE_SUB_AVATAR);
     if (mAvatarTex) {
-        mAvatar = rm->RetrieveQuad(file, 0, 0, 35, 50, resName, RETRIEVE_NORMAL, TEXTURE_SUB_AVATAR);
+        mAvatar = rm->RetrieveQuad(file, 0, 0, 35, 50, std::move(resName), RETRIEVE_NORMAL, TEXTURE_SUB_AVATAR);
         return true;
     }
 
@@ -78,32 +86,40 @@ bool Player::loadAvatar(string file, string resName) {
 }
 
 const string Player::getDisplayName() const {
-    if (this == observer->players[0]) return "Player 1";
+    if (this == observer->players[0]) {
+        return "Player 1";
+    }
     return "Player 2";
 }
 
-MTGInPlay* Player::inPlay() { return game->inPlay; }
+MTGInPlay* Player::inPlay() const { return game->inPlay; }
 
 int Player::getId() {
     for (int i = 0; i < 2; i++) {
-        if (observer->players[i] == this) return i;
+        if (observer->players[i] == this) {
+            return i;
+        }
     }
     return -1;
 }
 
 JQuadPtr Player::getIcon() {
-    if (!mAvatarTex) loadAvatar(mAvatarName);
+    if (!mAvatarTex) {
+        loadAvatar(mAvatarName);
+    }
 
     return mAvatar;
 }
 
 Player* Player::opponent() {
-    if (!observer || (observer->players.size() < 2)) return NULL;
+    if (!observer || (observer->players.size() < 2)) {
+        return nullptr;
+    }
     return this == observer->players[0] ? observer->players[1] : observer->players[0];
 }
 
-HumanPlayer::HumanPlayer(GameObserver* observer, string file, string fileSmall, bool isPremade, MTGDeck* deck)
-    : Player(observer, file, fileSmall, deck) {
+HumanPlayer::HumanPlayer(GameObserver* observer, const string& file, string fileSmall, bool isPremade, MTGDeck* deck)
+    : Player(observer, std::move(file), std::move(fileSmall), deck) {
     mAvatarName = "avatar.jpg";
     playMode    = MODE_HUMAN;
     premade     = isPremade;
@@ -112,13 +128,17 @@ HumanPlayer::HumanPlayer(GameObserver* observer, string file, string fileSmall, 
 ManaPool* Player::getManaPool() { return manaPool; }
 
 int Player::gainOrLoseLife(int value) {
-    if (!value) return 0;  // Don't do anything if there's no actual life change
+    if (!value) {
+        return 0;  // Don't do anything if there's no actual life change
+    }
 
     thatmuch = abs(value);  // the value that much is a variable to be used with triggered abilities.
     // ie:when ever you gain life, draw that many cards. when used in a trigger draw:thatmuch, will return the value
     // that the triggered event stored in the card for "that much".
     life += value;
-    if (value < 0) lifeLostThisTurn += abs(value);
+    if (value < 0) {
+        lifeLostThisTurn += abs(value);
+    }
 
     // Send life event to listeners
     WEvent* lifed = NEW WEventLife(this, value);
@@ -151,65 +171,78 @@ int Player::damaged() { return damageCount; }
 
 int Player::prevented() { return preventable; }
 
-void Player::takeMulligan() {
+void Player::takeMulligan() const {
     MTGPlayerCards* currentPlayerZones = game;
-    int cardsinhand                    = currentPlayerZones->hand->nb_cards;
-    for (int i = 0; i < cardsinhand; i++)  // Discard hand
+    const int cardsinhand              = currentPlayerZones->hand->nb_cards;
+    for (int i = 0; i < cardsinhand; i++) {  // Discard hand
         currentPlayerZones->putInZone(currentPlayerZones->hand->cards[0], currentPlayerZones->hand,
                                       currentPlayerZones->library);
+    }
 
     currentPlayerZones->library->shuffle();  // Shuffle
 
-    for (int i = 0; i < (cardsinhand - 1); i++) game->drawFromLibrary();
+    for (int i = 0; i < (cardsinhand - 1); i++) {
+        game->drawFromLibrary();
+    }
     // Draw hand with 1 less card penalty //almhum
 }
 
 // Cleanup phase at the end of a turn
-void Player::cleanupPhase() {
+void Player::cleanupPhase() const {
     game->inPlay->cleanupPhase();
     game->graveyard->cleanupPhase();
 }
 
-std::string Player::GetCurrentDeckStatsFile() {
+std::string Player::GetCurrentDeckStatsFile() const {
     std::ostringstream filename;
     filename << "stats/" << deckFileSmall << ".txt";
     return options.profileFile(filename.str());
 }
 
 bool Player::parseLine(const string& s) {
-    if (((Damageable*)this)->parseLine(s)) return true;
+    if (((Damageable*)this)->parseLine(s)) {
+        return true;
+    }
 
-    size_t limiter = s.find("=");
-    if (limiter == string::npos) limiter = s.find(":");
+    size_t limiter = s.find('=');
+    if (limiter == string::npos) {
+        limiter = s.find(':');
+    }
     string areaS;
     if (limiter != string::npos) {
         areaS = s.substr(0, limiter);
-        if (areaS.compare("manapool") == 0) {
+        if (areaS == "manapool") {
             SAFE_DELETE(manaPool);
             manaPool = new ManaPool(this);
             ManaCost::parseManaCost(s.substr(limiter + 1), manaPool);
             return true;
-        } else if (areaS.compare("avatar") == 0) {
+        }
+        if (areaS == "avatar") {
             mAvatarName = s.substr(limiter + 1);
             loadAvatar(mAvatarName, "bakaAvatar");
             return true;
-        } else if (areaS.compare("customphasering") == 0) {
+        }
+        if (areaS == "customphasering") {
             phaseRing = s.substr(limiter + 1);
             return true;
-        } else if (areaS.compare("premade") == 0) {
+        }
+        if (areaS == "premade") {
             premade = (atoi(s.substr(limiter + 1).c_str()) == 1);
             return true;
-        } else if (areaS.compare("deckfile") == 0) {
+        }
+        if (areaS == "deckfile") {
             deckFile = s.substr(limiter + 1);
             if (playMode == Player::MODE_AI) {
                 sscanf(deckFile.c_str(), "ai/baka/deck%i.txt", &deckId);
 
                 int deckSetting = EASY;
                 if (opponent()) {
-                    bool isOpponentAI = opponent()->isAI() == 1;
+                    const bool isOpponentAI = opponent()->isAI() == 1;
                     DeckMetaData* meta =
                         observer->getDeckManager()->getDeckMetaDataByFilename(opponent()->deckFile, isOpponentAI);
-                    if (meta && meta->getVictoryPercentage() >= 65) deckSetting = HARD;
+                    if (meta && meta->getVictoryPercentage() >= 65) {
+                        deckSetting = HARD;
+                    }
                 }
 
                 SAFE_DELETE(mDeck);
@@ -221,12 +254,14 @@ bool Player::parseLine(const string& s) {
                 deckName = mDeck->meta_name;
             }
             return true;
-        } else if (areaS.compare("deckfilesmall") == 0) {
+        }
+        if (areaS == "deckfilesmall") {
             deckFileSmall = s.substr(limiter + 1);
             return true;
-        } else if (areaS.compare("offerinterruptonphase") == 0) {
+        }
+        if (areaS == "offerinterruptonphase") {
             for (int i = 0; i < NB_MTG_PHASES; i++) {
-                string phaseStr = Constants::MTGPhaseCodeNames[i];
+                const string phaseStr = Constants::MTGPhaseCodeNames[i];
                 if (s.find(phaseStr) != string::npos) {
                     offerInterruptOnPhase = PhaseRing::phaseStrToInt(phaseStr);
                     return true;
@@ -240,27 +275,40 @@ bool Player::parseLine(const string& s) {
         game->setOwner(this);
     }
 
-    if (game->parseLine(s)) return true;
+    if (game->parseLine(s)) {
+        return true;
+    }
 
     return false;
 }
 
 void HumanPlayer::End() {
-    if (!premade && opponent() && (observer->gameType() == GAME_TYPE_CLASSIC))
+    if (!premade && opponent() && (observer->gameType() == GAME_TYPE_CLASSIC)) {
         DeckStats::GetInstance()->saveStats(this, opponent(), observer);
+    }
 }
 
 std::ostream& operator<<(std::ostream& out, const Player& p) {
     out << "mode=" << p.playMode << std::endl;
     out << *(Damageable*)&p;
-    string manapoolstring = p.manaPool->toString();
-    if (manapoolstring != "") out << "manapool=" << manapoolstring << std::endl;
-    if (p.mAvatarName != "") out << "avatar=" << p.mAvatarName << std::endl;
-    if (p.phaseRing != "") out << "customphasering=" << p.phaseRing << std::endl;
+    const string manapoolstring = p.manaPool->toString();
+    if (!manapoolstring.empty()) {
+        out << "manapool=" << manapoolstring << std::endl;
+    }
+    if (!p.mAvatarName.empty()) {
+        out << "avatar=" << p.mAvatarName << std::endl;
+    }
+    if (!p.phaseRing.empty()) {
+        out << "customphasering=" << p.phaseRing << std::endl;
+    }
     out << "offerinterruptonphase=" << Constants::MTGPhaseCodeNames[p.offerInterruptOnPhase] << std::endl;
     out << "premade=" << p.premade << std::endl;
-    if (p.deckFile != "") out << "deckfile=" << p.deckFile << std::endl;
-    if (p.deckFileSmall != "") out << "deckfilesmall=" << p.deckFileSmall << std::endl;
+    if (!p.deckFile.empty()) {
+        out << "deckfile=" << p.deckFile << std::endl;
+    }
+    if (!p.deckFileSmall.empty()) {
+        out << "deckfilesmall=" << p.deckFileSmall << std::endl;
+    }
 
     if (p.game) {
         out << *(p.game);
@@ -272,23 +320,33 @@ std::ostream& operator<<(std::ostream& out, const Player& p) {
 // Method comparing "this" to "aPlayer", each in their own gameObserver
 bool Player::operator<(Player& aPlayer) {
     // if this is dead and aPlayer is not dead then this < aPlayer
-    if (isDead() && !aPlayer.isDead()) return true;
+    if (isDead() && !aPlayer.isDead()) {
+        return true;
+    }
 
     // heuristics for min-max
 
     // if this is more poisoined than aPlayer then this < aPlayer
-    if (poisonCount > aPlayer.poisonCount) return true;
+    if (poisonCount > aPlayer.poisonCount) {
+        return true;
+    }
 
     // if this has less life than aPlayer then this < aPlayer
-    if (life < aPlayer.life) return true;
+    if (life < aPlayer.life) {
+        return true;
+    }
 
     // if this has less parmanents in game that aPlayer then this < aPlayer
-    if (game->battlefield->cards.size() < aPlayer.game->battlefield->cards.size()) return true;
+    if (game->battlefield->cards.size() < aPlayer.game->battlefield->cards.size()) {
+        return true;
+    }
 
     return false;
 }
 
 bool Player::isDead() {
-    if (observer) return observer->didWin(opponent());
+    if (observer) {
+        return observer->didWin(opponent());
+    }
     return false;
 };

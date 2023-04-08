@@ -7,38 +7,49 @@
  */
 
 DamagerDamaged::DamagerDamaged(MTGCardInstance* card, float x, float y, bool show, Player* damageSelecter)
-    : TransientCardView(card, x, y), show(show), damageSelecter(damageSelecter) {}
+    : TransientCardView(card, x, y)
+    , show(show)
+    , damageSelecter(damageSelecter) {}
 DamagerDamaged::DamagerDamaged(MTGCardInstance* card, const Pos& ref, bool show, Player* damageSelecter)
-    : TransientCardView(card, ref), show(show), damageSelecter(damageSelecter) {}
+    : TransientCardView(card, ref)
+    , show(show)
+    , damageSelecter(damageSelecter) {}
 
 DamagerDamaged::~DamagerDamaged() {}
 
 int DamagerDamaged::sumDamages() {
     int total = 0;
-    for (vector<Damage>::iterator i = damages.begin(); i != damages.end(); ++i) total += i->damage;
+    for (auto i = damages.begin(); i != damages.end(); ++i) {
+        total += i->damage;
+    }
     return total;
 }
 
 bool DamagerDamaged::hasLethalDamage() { return (sumDamages() >= card->life); }
 
 void DamagerDamaged::addDamage(int damage, DamagerDamaged* source) {
-    for (vector<Damage>::iterator i = damages.begin(); i != damages.end(); ++i)
+    for (auto i = damages.begin(); i != damages.end(); ++i) {
         if (i->source == source->card) {
             i->damage += damage;
-            if (0 >= i->damage) damages.erase(i);
+            if (0 >= i->damage) {
+                damages.erase(i);
+            }
             return;
         }
-    if (0 < damage) damages.push_back(Damage(card->getObserver(), source->card, card, damage, DAMAGE_COMBAT));
-    return;
+    }
+    if (0 < damage) {
+        damages.emplace_back(card->getObserver(), source->card, card, damage, DAMAGE_COMBAT);
+    }
 }
 
 int DamagerDamaged::removeDamagesFrom(DamagerDamaged* source) {
-    for (vector<Damage>::iterator i = damages.begin(); i != damages.end(); ++i)
+    for (auto i = damages.begin(); i != damages.end(); ++i) {
         if (i->source == source->card) {
-            int damage = i->damage;
+            const int damage = i->damage;
             damages.erase(i);
             return damage;
         }
+    }
     return 0;
 }
 
@@ -74,5 +85,7 @@ AttackerDamaged::AttackerDamaged(MTGCardInstance* card, const Pos& ref, bool sho
     : DamagerDamaged(card, ref, show, damageSelecter) {}
 
 AttackerDamaged::~AttackerDamaged() {
-    for (vector<DefenserDamaged*>::iterator q = blockers.begin(); q != blockers.end(); ++q) delete (*q);
+    for (auto q = blockers.begin(); q != blockers.end(); ++q) {
+        delete (*q);
+    }
 }

@@ -1,3 +1,8 @@
+#include <utility>
+
+#ifndef MTGPACK_H
+#define MTGPACK_H
+
 #ifndef _MTGPACCK_H_
 #define _MTGPACK_H_
 
@@ -12,26 +17,20 @@ public:
 
 class MTGPackEntryRandom : public MTGPackEntry {
 public:
-    MTGPackEntryRandom() {
-        filter = "";
-        copies = 1;
-    };
-    MTGPackEntryRandom(string f, int c = 1) {
-        filter = f;
-        copies = c;
-    };
-    int addCard(WSrcCards* pool, MTGDeck* to);
+    MTGPackEntryRandom() { copies = 1; };
+    MTGPackEntryRandom(string f, int c = 1) : filter(std::move(f)) { copies = c; };
+    int addCard(WSrcCards* pool, MTGDeck* to) override;
     string filter;
 };
 class MTGPackEntrySpecific : public MTGPackEntry {
 public:
-    int addCard(WSrcCards* pool, MTGDeck* to);
+    int addCard(WSrcCards* pool, MTGDeck* to) override;
     MTGCard* card;
 };
 
 class MTGPackEntryNothing : public MTGPackEntry {
 public:
-    int addCard(WSrcCards* pool, MTGDeck* to) { return 0; };
+    int addCard(WSrcCards* pool, MTGDeck* to) override { return 0; };
 };
 
 class MTGPackSlot {
@@ -51,25 +50,22 @@ public:
     friend class MTGSetInfo;
     bool meetsRequirements();  // Check if pool contains locked cards.
     bool isUnlocked();
-    bool isValid() { return bValid; };
-    void load(string filename);
+    bool isValid() const { return bValid; };
+    void load(const string& filename);
     int assemblePack(MTGDeck* to);
 
-    MTGPack() {
-        bValid       = false;
-        unlockStatus = 0;
-        price        = Constants::PRICE_BOOSTER;
-    };
-    MTGPack(string s) {
-        bValid = false;
-        load(s);
-        unlockStatus = 0;
-    };
+    MTGPack()
+        : bValid(false)
+        , price(Constants::PRICE_BOOSTER)
+        , unlockStatus(0){
+
+          };
+    MTGPack(const string& s) : bValid(false), unlockStatus(0) { load(std::move(s)); };
     ~MTGPack();
     string getName();
     string getSort() { return sort; };
-    int getPrice() { return price; };
-    static WSrcCards* getPool(string poolstr);
+    int getPrice() const { return price; };
+    static WSrcCards* getPool(const string& poolstr);
 
 protected:
     void countCards();
@@ -101,4 +97,6 @@ private:
     static MTGPack defaultBooster;
     vector<MTGPack*> packs;
 };
+#endif
+
 #endif

@@ -131,22 +131,25 @@ const char* Constants::MTGBasicAbilities[] = {
 };
 
 map<string, int> Constants::MTGBasicAbilitiesMap;
-int Constants::GetBasicAbilityIndex(string basicAbllity) {
-    if (Constants::MTGBasicAbilitiesMap.size() == 0) {
+int Constants::GetBasicAbilityIndex(const string& basicAbllity) {
+    if (Constants::MTGBasicAbilitiesMap.empty()) {
         for (int idx = 0; idx < Constants::NB_BASIC_ABILITIES; ++idx) {
-            string ability                = MTGBasicAbilities[idx];
+            const string ability          = MTGBasicAbilities[idx];
             MTGBasicAbilitiesMap[ability] = idx;
         }
     }
-    if (Constants::MTGBasicAbilitiesMap.find(basicAbllity) != Constants::MTGBasicAbilitiesMap.end())
+    if (Constants::MTGBasicAbilitiesMap.find(basicAbllity) != Constants::MTGBasicAbilitiesMap.end()) {
         return Constants::MTGBasicAbilitiesMap[basicAbllity];
+    }
 
     return -1;
 }
 
-int Constants::GetColorStringIndex(string mtgColor) {
+int Constants::GetColorStringIndex(const string& mtgColor) {
     for (int idx = 0; idx < Constants::NB_Colors; ++idx) {
-        if (Constants::MTGColorStrings[idx]) return idx;
+        if (Constants::MTGColorStrings[idx]) {
+            return idx;
+        }
     }
 
     return -1;

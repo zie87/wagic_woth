@@ -8,8 +8,8 @@
 //
 //-------------------------------------------------------------------------------------
 
-#ifndef _JTYPES_H
-#define _JTYPES_H
+#ifndef JTYPES_H
+#define JTYPES_H
 
 #if defined(PSP)
 
@@ -328,6 +328,7 @@ public:
 //////////////////////////////////////////////////////////////////////////
 class JImageFilter {
 public:
+    virtual ~JImageFilter() = default;
     //////////////////////////////////////////////////////////////////////////
     /// Pure virtual function for the custom filter to implement.
     ///
@@ -394,7 +395,7 @@ public:
     /// @return h - Height of the quad.
     ///
     //////////////////////////////////////////////////////////////////////////
-    void GetTextureRect(float* x, float* y, float* w, float* h);
+    void GetTextureRect(float* x, float* y, float* w, float* h) const;
 
     //////////////////////////////////////////////////////////////////////////
     /// Set horizontal flipping.
@@ -471,7 +472,6 @@ public:
     int width;
     int height;
 
-public:
     JRect(int _x, int _y, int _width, int _height) : x(_x), y(_y), width(_width), height(_height) {}
 };
 

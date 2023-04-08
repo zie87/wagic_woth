@@ -1,5 +1,5 @@
-#ifndef _PLAYER_DATA_H_
-#define _PLAYER_DATA_H_
+#ifndef PLAYERDATA_H
+#define PLAYERDATA_H
 
 #include "MTGDeck.h"
 #include "Tasks.h"

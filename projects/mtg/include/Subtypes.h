@@ -1,5 +1,5 @@
-#ifndef _SUBTYPES_H_
-#define _SUBTYPES_H_
+#ifndef SUBTYPES_H
+#define SUBTYPES_H
 
 #include <string>
 #include <map>
@@ -44,7 +44,7 @@ public:
     bool isType(unsigned int type);
     bool isSubType(unsigned int type);
     void sortSubTypes();
-    int add(std::string value, unsigned int parentType);
+    int add(const std::string& value, unsigned int parentType);
     const std::vector<std::string>& getValuesById();
     const std::vector<std::string>& getCreatureValuesById();
     const std::map<std::string, int>& getValuesByMap();

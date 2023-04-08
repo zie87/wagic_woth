@@ -1,5 +1,5 @@
-#ifndef _PHASERING_H_
-#define _PHASERING_H_
+#ifndef PHASERING_H
+#define PHASERING_H
 
 #include <list>
 #include <string>
@@ -48,7 +48,7 @@ public:
     int addPhaseAfter(GamePhase id, Player* player, int after_id);
     int removePhase(int id);
     const char* phaseName(int id);
-    static GamePhase phaseStrToInt(std::string s);
+    static GamePhase phaseStrToInt(const std::string& s);
     static std::string phaseIntToStr(int id);
 };
 

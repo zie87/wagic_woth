@@ -10,23 +10,19 @@
 
 #include "../include/JDistortionMesh.h"
 
-JRenderer* JDistortionMesh::mRenderer = NULL;
+JRenderer* JDistortionMesh::mRenderer = nullptr;
 
-JDistortionMesh::JDistortionMesh(JTexture* tex, float x, float y, float width, float height, int cols, int rows) {
+JDistortionMesh::JDistortionMesh(JTexture* tex, float x, float y, float width, float height, int cols, int rows)
+    : mCols(cols)
+    , mCellHeight(height / (mRows - 1))
+    , mCellWidth(width / (mCols - 1))
+    , mQuad(new JQuad(tex, x, y, mCellWidth, mCellHeight))
+    , mRows(rows)
+    , mTexHeight(height)
+    , mTexWidth(width)
+    , mTexX(x)
+    , mTexY(y) {
     mRenderer = JRenderer::GetInstance();
-
-    mCols = cols;
-    mRows = rows;
-
-    mCellWidth  = width / (mCols - 1);
-    mCellHeight = height / (mRows - 1);
-
-    mTexX      = x;
-    mTexY      = y;
-    mTexWidth  = width;
-    mTexHeight = height;
-
-    mQuad = new JQuad(tex, x, y, mCellWidth, mCellHeight);
 
     mVertices = new Vertex[mCols * mRows];
 

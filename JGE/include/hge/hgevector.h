@@ -6,8 +6,8 @@
 ** hgeVector helper class
 */
 
-#ifndef HGEVECTOR_H
-#define HGEVECTOR_H
+#ifndef HGE_HGEVECTOR_H
+#define HGE_HGEVECTOR_H
 
 // #include "hge.h"
 #include <math.h>
@@ -21,14 +21,8 @@ class hgeVector {
 public:
     float x, y;
 
-    hgeVector(float _x, float _y) {
-        x = _x;
-        y = _y;
-    }
-    hgeVector() {
-        x = 0;
-        y = 0;
-    }
+    hgeVector(float _x, float _y) : x(_x), y(_y) {}
+    hgeVector() : x(0), y(0) {}
 
     hgeVector operator-() const { return hgeVector(-x, -y); }
     hgeVector operator-(const hgeVector& v) const { return hgeVector(x - v.x, y - v.y); }
@@ -56,7 +50,7 @@ public:
 
     float Dot(const hgeVector* v) const { return x * v->x + y * v->y; }
     float Length() const { return sqrtf(Dot(this)); }
-    float Angle(const hgeVector* v = 0) const;
+    float Angle(const hgeVector* v = nullptr) const;
 
     void Clamp(const float max) {
         if (Length() > max) {
@@ -66,7 +60,7 @@ public:
         }
     }
     hgeVector* Normalize() {
-        float rc = InvSqrt(Dot(this));
+        const float rc = InvSqrt(Dot(this));
         x *= rc;
         y *= rc;
         return this;

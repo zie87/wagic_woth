@@ -33,20 +33,25 @@ const float ICONSCALE = 1.5;
 const float CENTER    = SCREEN_HEIGHT_F / 2 + 10;
 
 void DrawGlyph(JQuad* inQuad, int inGlyph, float inY, float inAngle, unsigned int inP, float inScale) {
-    float xPos = static_cast<float>((inP + inGlyph * (int)(kWidth + 1)) % (kPhases * (int)(kWidth + 1)));
+    auto xPos = static_cast<float>((inP + inGlyph * (int)(kWidth + 1)) % (kPhases * (int)(kWidth + 1)));
     inQuad->SetTextureRect(xPos, 0, kWidth, kHeight);
     JRenderer::GetInstance()->RenderQuad(inQuad, 0, inY, 0.0, inScale, inScale);
 }
 }  // namespace
 
 GuiPhaseBar::GuiPhaseBar(GameObserver* observer)
-    : GuiLayer(observer), PlayGuiObject(0, 0, 106, 0, false), phase(NULL), angle(0.0f), zoomFactor(ICONSCALE) {
-    JQuadPtr quad = WResourceManager::Instance()->GetQuad("phasebar");
-    if (quad.get() != NULL) {
+    : GuiLayer(observer)
+    , PlayGuiObject(0, 0, 106, 0, false)
+    , phase(nullptr)
+    , angle(0.0f)
+    , zoomFactor(ICONSCALE) {
+    const JQuadPtr quad = WResourceManager::Instance()->GetQuad("phasebar");
+    if (quad.get() != nullptr) {
         quad->mHeight = kHeight;
         quad->mWidth  = kWidth;
-    } else
+    } else {
         GameApp::systemError = "Error loading phasebar texture : " __FILE__;
+    }
 
     zoom = ICONSCALE;
     observer->getCardSelector()->Add(this);
@@ -55,12 +60,15 @@ GuiPhaseBar::GuiPhaseBar(GameObserver* observer)
 GuiPhaseBar::~GuiPhaseBar() {}
 
 void GuiPhaseBar::Update(float dt) {
-    if (angle > 3 * dt)
+    if (angle > 3 * dt) {
         angle -= 3 * dt;
-    else
+    } else {
         angle = 0;
+    }
 
-    if (dt > 0.05f) dt = 0.05f;
+    if (dt > 0.05f) {
+        dt = 0.05f;
+    }
     if (zoomFactor + 0.05f < zoom) {
         zoomFactor += dt;
     } else if (zoomFactor - 0.05f > zoom) {
@@ -80,14 +88,14 @@ bool GuiPhaseBar::Leaving(JButton key) {
 }
 
 void GuiPhaseBar::Render() {
-    JQuadPtr quad = WResourceManager::Instance()->GetQuad("phasebar");
+    const JQuadPtr quad = WResourceManager::Instance()->GetQuad("phasebar");
     // uncomment to draw a hideous line across hires screens.
     // JRenderer::GetInstance()->DrawLine(0, CENTER, SCREEN_WIDTH, CENTER, ARGB(255, 255, 255, 255));
 
-    unsigned int p        = (phase->id + kPhases - 4) * (int)(kWidth + 1);
-    float centerYPosition = CENTER + (kWidth / 2) * angle * zoomFactor / (M_PI / 6) - zoomFactor * kWidth / 4;
-    float yPos            = centerYPosition;
-    float scale           = 0;
+    const unsigned int p        = (phase->id + kPhases - 4) * (int)(kWidth + 1);
+    const float centerYPosition = CENTER + (kWidth / 2) * angle * zoomFactor / (M_PI / 6) - zoomFactor * kWidth / 4;
+    float yPos                  = centerYPosition;
+    float scale                 = 0;
     for (int glyph = 3; glyph < 6; ++glyph) {
         scale = zoomFactor * sinf(angle + glyph * M_PI / 6) / 2;
         DrawGlyph(quad.get(), glyph, yPos, angle, p, scale);
@@ -104,15 +112,15 @@ void GuiPhaseBar::Render() {
     if (angle > 0) {
         scale = zoomFactor * sinf(angle) / 2;
         yPos -= kWidth * scale;
-        float xPos = static_cast<float>(p % (kPhases * (int)(kWidth + 1)));
+        auto xPos = static_cast<float>(p % (kPhases * (int)(kWidth + 1)));
         quad->SetTextureRect(xPos, kHeight, kWidth, kHeight);
         JRenderer::GetInstance()->RenderQuad(quad.get(), 0, yPos, 0.0, scale, scale);
     }
 
     // print phase name
-    WFont* font      = WResourceManager::Instance()->GetWFont(Fonts::MAIN_FONT);
-    string currentP  = _("your turn");
-    string interrupt = "";
+    WFont* font     = WResourceManager::Instance()->GetWFont(Fonts::MAIN_FONT);
+    string currentP = _("your turn");
+    string interrupt;
     if (observer->currentPlayer == observer->players[1]) {
         currentP = _("opponent's turn");
     }
@@ -135,7 +143,7 @@ void GuiPhaseBar::Render() {
 }
 
 int GuiPhaseBar::receiveEventMinus(WEvent* e) {
-    WEventPhaseChange* event = dynamic_cast<WEventPhaseChange*>(e);
+    auto* event = dynamic_cast<WEventPhaseChange*>(e);
     if (event) {
         angle = M_PI / 6;
         phase = event->to;

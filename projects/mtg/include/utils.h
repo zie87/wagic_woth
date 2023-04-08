@@ -1,5 +1,5 @@
-#ifndef _UTILS_H_
-#define _UTILS_H_
+#ifndef UTILS_H
+#define UTILS_H
 
 #include <JGE.h>
 
@@ -68,7 +68,7 @@ inline std::string trim(const std::string& str) {
     return trim(value);
 }
 
-std::string join(std::vector<std::string>& v, std::string delim = " ");
+std::string join(std::vector<std::string>& v, const std::string& delim = " ");
 
 std::vector<std::string>& split(const std::string& s, char delim, std::vector<std::string>& elems);
 std::vector<std::string> split(const std::string& s,
@@ -82,9 +82,9 @@ std::vector<std::string> split(const std::string& s,
 // If an error occurs, returns an empty vector.
 // if "stopRequired" is set to false, the function will return a vector of 3 strings even if "stop" is not found in the
 // string.
-std::vector<std::string>& parseBetween(const std::string& s, std::string start, std::string stop, bool stopRequired,
-                                       std::vector<std::string>& elems);
-std::vector<std::string> parseBetween(const std::string& s, std::string start, std::string stop,
+std::vector<std::string>& parseBetween(const std::string& s, const std::string& start, const std::string& stop,
+                                       bool stopRequired, std::vector<std::string>& elems);
+std::vector<std::string> parseBetween(const std::string& s, const std::string& start, const std::string& stop,
                                       bool stopRequired = true);
 
 std::string wordWrap(const std::string& s, float width, int fontId);
@@ -110,7 +110,8 @@ public:
     int random();
     template <typename Iter>
     void random_shuffle(Iter first, Iter last) {
-        ptrdiff_t i, n;
+        ptrdiff_t i;
+        ptrdiff_t n;
         n = (last - first);
         for (i = n - 1; i > 0; --i) {
             using std::swap;

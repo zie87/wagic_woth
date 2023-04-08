@@ -8,7 +8,13 @@
 #define ISGBK(c) ((c) > 0x80 || (c) < 0x30 || (c) == '-' || (c) == '/')
 
 static PIXEL_TYPE gencolor(int id, PIXEL_TYPE color) {
-    unsigned int a, r, g, b, r0, g0, b0;
+    unsigned int a;
+    unsigned int r;
+    unsigned int g;
+    unsigned int b;
+    unsigned int r0;
+    unsigned int g0;
+    unsigned int b0;
 #if defined(PSP)
 #if defined(ABGR8888)
     a = (color >> 24) & 0xFF;
@@ -99,26 +105,28 @@ static inline int charWidth(const u8 s) {
 
 //
 
-JRenderer* WFBFont::mRenderer = NULL;
+JRenderer* WFBFont::mRenderer = nullptr;
 
 WLBFont::WLBFont(int inFontID, const char* fontname, int lineheight, bool useVideoRAM) : WFont(inFontID) {
     string path(fontname);
-    if (path.size() > 4)
+    if (path.size() > 4) {
         path = path.substr(0, path.size() - 4);  // some stupid manipulation because of the way Font works in JGE
+    }
     it = NEW JLBFont(path.c_str(), lineheight, useVideoRAM);
 }
 
 void WLBFont::FormatText(string& s, vector<string>& output) {
     // The way of CardPrimitive::formattedText() in r2081.
-    std::string::size_type len = 30;
+    std::string::size_type const len = 30;
     while (s.length() > 0) {
         std::string::size_type cut = s.find_first_of("., \t)", 0);
         if (cut >= len || cut == string::npos) {
             output.push_back(s.substr(0, len));
-            if (s.length() > len)
+            if (s.length() > len) {
                 s = s.substr(len, s.length() - len);
-            else
+            } else {
                 s = "";
+            }
         } else {
             std::string::size_type newcut = cut;
             while (newcut < len && newcut != string::npos) {
@@ -126,23 +134,25 @@ void WLBFont::FormatText(string& s, vector<string>& output) {
                 newcut = s.find_first_of("., \t)", newcut + 1);
             }
             output.push_back(s.substr(0, cut + 1));
-            if (s.length() > cut + 1)
+            if (s.length() > cut + 1) {
                 s = s.substr(cut + 1, s.length() - cut - 1);
-            else
+            } else {
                 s = "";
+            }
         }
     }
 }
 
-WFBFont::WFBFont(int inFontID, const char* fontname, int lineheight, bool useVideoRAM) : WFont(inFontID) {
+WFBFont::WFBFont(int inFontID, const char* fontname, int lineheight, bool useVideoRAM)
+    : WFont(inFontID)
+    , mCharBuffer(nullptr)
+    , mCurr(0)
+    , mGBCode(nullptr)
+    , mSprites(nullptr) {
     mRenderer = JRenderer::GetInstance();
 
-    mCharBuffer = NULL;
-    mSprites    = NULL;
-    mGBCode     = NULL;
-    mCurr       = 0;
-
-    char tmpFileName[32], engFileName[32];
+    char tmpFileName[32];
+    char engFileName[32];
     strcpy(tmpFileName, fontname);
     char* ep = strrchr(tmpFileName, '.');
     *ep      = '\0';
@@ -155,13 +165,17 @@ WFBFont::WFBFont(int inFontID, const char* fontname, int lineheight, bool useVid
         unsigned char height;
     } sizeStr = {0, 0, 0};
 
-    if (!fileSys->OpenFile(engFileName)) return;
+    if (!fileSys->OpenFile(engFileName)) {
+        return;
+    }
     size     = fileSys->GetFileSize();
     mStdFont = NEW u8[size];
     fileSys->ReadFile(mStdFont, size);
     fileSys->CloseFile();
 
-    if (!fileSys->OpenFile(fontname)) return;
+    if (!fileSys->OpenFile(fontname)) {
+        return;
+    }
     fileSys->ReadFile(&sizeStr, 4);  // Works only for little-endian machines (PSP and PC are)
     size       = sizeStr.chars * sizeStr.width * sizeStr.height / 2;
     mExtraFont = NEW u8[size];  // 4 bits for a pixel
@@ -213,16 +227,24 @@ WFBFont::~WFBFont() {
 
     if (mSprites) {
         for (int i = 0; i < mCacheSize; i++) {
-            if (mSprites[i]) delete mSprites[i];
+            if (mSprites[i]) {
+                delete mSprites[i];
+            }
         }
         delete[] mSprites;
     }
 
-    if (NULL != mIndex) delete[] mIndex;
+    if (nullptr != mIndex) {
+        delete[] mIndex;
+    }
 
-    if (mGBCode) delete[] mGBCode;
+    if (mGBCode) {
+        delete[] mGBCode;
+    }
 
-    if (mCharBuffer) delete[] mCharBuffer;
+    if (mCharBuffer) {
+        delete[] mCharBuffer;
+    }
 }
 
 #if defined(PSP)
@@ -247,18 +269,27 @@ int WFBFont::PreCacheChar(const u8* ch) {
     int code;
     int charLength = 1;
     u8* src;
-    unsigned int size, offset;
+    unsigned int size;
+    unsigned int offset;
     u8 gray;
 
     code = this->GetCode(ch, &charLength);
-    if (doubleWidthChar(ch) && mIndex) code = mIndex[code];  // mGBCode[] stores the final code.
+    if (doubleWidthChar(ch) && mIndex) {
+        code = mIndex[code];  // mGBCode[] stores the final code.
+    }
 
-    if (mGBCode[mCurr] != -1)
-        for (int i = 0; i < mCacheSize; i++)
-            if (mGBCode[i] == code) return i;
+    if (mGBCode[mCurr] != -1) {
+        for (int i = 0; i < mCacheSize; i++) {
+            if (mGBCode[i] == code) {
+                return i;
+            }
+        }
+    }
 
-    int index = mCurr++;
-    if (mCurr >= mCacheSize) mCurr = 0;
+    const int index = mCurr++;
+    if (mCurr >= mCacheSize) {
+        mCurr = 0;
+    }
 
 #if defined(PSP)
     u8* pTexture = (u8*)mTexture->mBits;
@@ -304,7 +335,9 @@ int WFBFont::PreCacheChar(const u8* ch) {
             // get out the proper data according to the even or odd quality of the counter
             gray = src[(i * size + j - offset) / 2];
             gray = ((j - offset) & 1) ? (gray & 0xF0) : ((gray & 0x0F) << 4);
-            if (gray) gray |= 0x0F;
+            if (gray) {
+                gray |= 0x0F;
+            }
 #if defined(PSP)
             SwizzlePlot(pTexture, ARGB(gray, 255, 255, 255), x * PIXEL_SIZE, y, mTexture->mTexWidth * PIXEL_SIZE);
 #else
@@ -357,15 +390,17 @@ void WFBFont::DrawString(const char* s, float x, float y, int align, float leftO
         if (width) {
             x -= width;
             leftOffset += GetStringWidth(s) - width;
-        } else
+        } else {
             x -= GetStringWidth(s);
+        }
         break;
     case JGETEXT_CENTER:
         if (width) {
             x -= width / 2;
             leftOffset += GetStringWidth(s) / 2 - width / 2;
-        } else
+        } else {
             x -= GetStringWidth(s) / 2;
+        }
         break;
     case JGETEXT_LEFT:
     default:
@@ -380,11 +415,12 @@ void WFBFont::DrawString(const char* s, float x, float y, int align, float leftO
     int index = 0;
 
     while (*src != 0) {
-        if (yy > SCREEN_HEIGHT_F)  // don't render or count outside the buttom of viewport
+        if (yy > SCREEN_HEIGHT_F) {  // don't render or count outside the buttom of viewport
             return;
-        else if (yy + mFontSize < 0.0f) {  // don't render when outside the top of viewport, but counted
-            if (*src < 0x20) {             // control characters
-                if (*src == 0x0a) {        // NEWLINE
+        }
+        if (yy + mFontSize < 0.0f) {  // don't render when outside the top of viewport, but counted
+            if (*src < 0x20) {        // control characters
+                if (*src == 0x0a) {   // NEWLINE
                     xx = x;
                     yy += (mFontSize * mScale);
                 }
@@ -405,17 +441,20 @@ void WFBFont::DrawString(const char* s, float x, float y, int align, float leftO
                 }
                 src += 1;
             } else {
-                int mana     = this->GetMana(src);
-                bool doubleW = doubleWidthChar(src);
-                index        = PreCacheChar(src);
+                int mana           = this->GetMana(src);
+                const bool doubleW = doubleWidthChar(src);
+                index              = PreCacheChar(src);
                 src += charWidth(*src);
 
                 // fix for leftoffset and width's setting
-                float xPos, yPos, charW, charHeight;
+                float xPos;
+                float yPos;
+                float charW;
+                float charHeight;
                 mSprites[index]->GetTextureRect(&xPos, &yPos, &charW, &charHeight);
-                float xPos0  = xPos;
-                float charW0 = charW;
-                float delta  = doubleW ? (charW * mScale) : (charW * mScale / 2);
+                const float xPos0  = xPos;
+                const float charW0 = charW;
+                float delta        = doubleW ? (charW * mScale) : (charW * mScale / 2);
                 if (leftOffset) {
                     if (leftOffset < 0) {
                         xx -= leftOffset;
@@ -431,7 +470,9 @@ void WFBFont::DrawString(const char* s, float x, float y, int align, float leftO
                     }
                 }
                 if (width) {
-                    if (xx > x + width) return;
+                    if (xx > x + width) {
+                        return;
+                    }
                     if (xx + delta > x + width) {
                         delta = x + width - xx;
                         charW = delta / mScale;
@@ -442,9 +483,9 @@ void WFBFont::DrawString(const char* s, float x, float y, int align, float leftO
                     int mana2 = -1;
                     if (*src == '/' && (mana2 = this->GetMana(src + 1)) >= 0) {  // hybrid mana cost
                         src += 1 + charWidth(*src);
-                        unsigned char t = (JGE::GetInstance()->GetTime() / 3) & 0xFF;
-                        unsigned char v = t + 127;
-                        float scale     = 0.05f * cosf(2 * M_PI * ((float)t) / 256.0f);
+                        const unsigned char t = (JGE::GetInstance()->GetTime() / 3) & 0xFF;
+                        const unsigned char v = t + 127;
+                        const float scale     = 0.05f * cosf(2 * M_PI * ((float)t) / 256.0f);
                         if (scale < 0) {
                             mRenderer->RenderQuad(manaIcons[mana].get(), xx + 3 * sinf(2 * M_PI * ((float)t) / 256.0f),
                                                   yy + 3 * cosf(2 * M_PI * ((float)(t - 35)) / 256.0f), 0,
@@ -461,8 +502,9 @@ void WFBFont::DrawString(const char* s, float x, float y, int align, float leftO
                                                   0.5f * mScale, 0.5f * mScale);
                         }
                         mana = Constants::NB_Colors + 1;  // do not draw colorless cost in hybrid mana cost
-                    } else
+                    } else {
                         mRenderer->RenderQuad(manaIcons[mana].get(), xx, yy, 0, 0.5f * mScale, 0.5f * mScale);
+                    }
                     mRenderer->BindTexture(mTexture);  // manaIcons use different texture, so we need to rebind it.
                 }
 
@@ -505,11 +547,10 @@ float WFBFont::GetStringWidth(const char* s) const {
             src += charWidth(*src);
         }
         return width * mFontSize * mScale / 2;
-    } else {
-        WFont* mFont = WResourceManager::Instance()->GetWFont(mFontID + Fonts::kSingleByteFontOffset);
-        mFont->SetScale(GetScale());
-        return mFont->GetStringWidth(s);
     }
+    WFont* mFont = WResourceManager::Instance()->GetWFont(mFontID + Fonts::kSingleByteFontOffset);
+    mFont->SetScale(GetScale());
+    return mFont->GetStringWidth(s);
 }
 
 void WFBFont::SetScale(float scale) { mScale = scale; }
@@ -521,12 +562,13 @@ float WFBFont::GetHeight() const { return (mFontSize * mScale); }
 WGBKFont::WGBKFont(int inFontID, const char* fontname, int lineheight, bool useVideoRAM) : WFBFont(inFontID) {
     mRenderer = JRenderer::GetInstance();
 
-    mCharBuffer = NULL;
-    mSprites    = NULL;
-    mGBCode     = NULL;
+    mCharBuffer = nullptr;
+    mSprites    = nullptr;
+    mGBCode     = nullptr;
     mCurr       = 0;
 
-    char tmpFileName[32], engFileName[32];
+    char tmpFileName[32];
+    char engFileName[32];
     strcpy(tmpFileName, fontname);
     char* ep = strrchr(tmpFileName, '.');
     *ep      = '\0';
@@ -534,19 +576,23 @@ WGBKFont::WGBKFont(int inFontID, const char* fontname, int lineheight, bool useV
     JFileSystem* fileSys = JFileSystem::GetInstance();
     int size             = 0;
 
-    if (!fileSys->OpenFile(fontname)) return;
+    if (!fileSys->OpenFile(fontname)) {
+        return;
+    }
     size       = fileSys->GetFileSize();
     mExtraFont = NEW u8[size];
     fileSys->ReadFile(mExtraFont, size);
     fileSys->CloseFile();
 
-    if (!fileSys->OpenFile(engFileName)) return;
+    if (!fileSys->OpenFile(engFileName)) {
+        return;
+    }
     size     = fileSys->GetFileSize();
     mStdFont = NEW u8[size];
     fileSys->ReadFile(mStdFont, size);
     fileSys->CloseFile();
 
-    mIndex = 0;
+    mIndex = nullptr;
 
     mColor0   = ARGB(255, 255, 255, 255);
     mColor    = mColor0;
@@ -588,17 +634,24 @@ int WGBKFont::PreCacheChar(const u8* ch) {
     int code;
     int charLength = 1;
     u8* src;
-    unsigned int size, offset;
+    unsigned int size;
+    unsigned int offset;
     u8 gray;
 
     code = this->GetCode(ch, &charLength);
 
-    if (mGBCode[mCurr] != -1)
-        for (int i = 0; i < mCacheSize; i++)
-            if (mGBCode[i] == code) return i;
+    if (mGBCode[mCurr] != -1) {
+        for (int i = 0; i < mCacheSize; i++) {
+            if (mGBCode[i] == code) {
+                return i;
+            }
+        }
+    }
 
-    int index = mCurr++;
-    if (mCurr >= mCacheSize) mCurr = 0;
+    const int index = mCurr++;
+    if (mCurr >= mCacheSize) {
+        mCurr = 0;
+    }
 
 #if defined(PSP)
     u8* pTexture = (u8*)mTexture->mBits;
@@ -610,7 +663,9 @@ int WGBKFont::PreCacheChar(const u8* ch) {
     memset(mCharBuffer, 0, sizeof(u32) * mFontSize * mFontSize);
 #endif
 
-    if (mIndex) code = mIndex[code];
+    if (mIndex) {
+        code = mIndex[code];
+    }
 
     if (GBKDoubleWidthChar(ch)) {
         size   = mFontSize;
@@ -645,7 +700,9 @@ int WGBKFont::PreCacheChar(const u8* ch) {
             // get out the proper data according to the even or odd quality of the counter
             gray = src[(i * size + j - offset) / 2];
             gray = ((j - offset) & 1) ? (gray & 0xF0) : ((gray & 0x0F) << 4);
-            if (gray) gray |= 0x0F;
+            if (gray) {
+                gray |= 0x0F;
+            }
 #if defined(PSP)
             SwizzlePlot(pTexture, ARGB(gray, 255, 255, 255), x * PIXEL_SIZE, y, mTexture->mTexWidth * PIXEL_SIZE);
 #else
@@ -677,7 +734,7 @@ int WGBKFont::PreCacheChar(const u8* ch) {
 }
 
 void WGBKFont::DrawString(const char* s, float x, float y, int align, float leftOffset, float width) {
-    unsigned char c = *(unsigned short*)s & 0xFF;
+    const unsigned char c = *(unsigned short*)s & 0xFF;
     if (ISGBK(c) || (s[1] == ':' && s[2] == ' ')) {
     } else {
         // tricky:  the single byte font is always mFontID + kSingleByteFontOffset!
@@ -699,15 +756,17 @@ void WGBKFont::DrawString(const char* s, float x, float y, int align, float left
         if (width) {
             x -= width;
             leftOffset += GetStringWidth(s) - width;
-        } else
+        } else {
             x -= GetStringWidth(s);
+        }
         break;
     case JGETEXT_CENTER:
         if (width) {
             x -= width / 2;
             leftOffset += GetStringWidth(s) / 2 - width / 2;
-        } else
+        } else {
             x -= GetStringWidth(s) / 2;
+        }
         break;
     case JGETEXT_LEFT:
     default:
@@ -724,20 +783,22 @@ void WGBKFont::DrawString(const char* s, float x, float y, int align, float left
     bool dualByteFont = true;
 
     while (*src != 0) {
-        if (yy > SCREEN_HEIGHT_F)  // don't render or count outside the buttom of viewport
+        if (yy > SCREEN_HEIGHT_F) {  // don't render or count outside the buttom of viewport
             return;
-        else if (yy + mFontSize < 0.0f) {  // don't render when outside the top of viewport, but counted
-            if (*src < 0x20) {             // control characters
-                if (*src == 0x0a) {        // NEWLINE
+        }
+        if (yy + mFontSize < 0.0f) {  // don't render when outside the top of viewport, but counted
+            if (*src < 0x20) {        // control characters
+                if (*src == 0x0a) {   // NEWLINE
                     xx = x;
                     yy += (mFontSize * mScale);
                 }
                 src += 1;
             } else {
-                if (*src > 0x80)  // 2-bytes char
+                if (*src > 0x80) {  // 2-bytes char
                     src += 2;
-                else
+                } else {
                     src += 1;
+                }
 
                 xx += (mFontSize * mScale);
 
@@ -767,11 +828,14 @@ void WGBKFont::DrawString(const char* s, float x, float y, int align, float left
                 }
 
                 // fix for leftoffset and witdth's setting
-                float xPos, yPos, charW, charHeight;
+                float xPos;
+                float yPos;
+                float charW;
+                float charHeight;
                 mSprites[index]->GetTextureRect(&xPos, &yPos, &charW, &charHeight);
-                float xPos0  = xPos;
-                float charW0 = charW;
-                float delta  = (dualByteFont) ? (charW * mScale) : (charW * mScale / 2);
+                const float xPos0  = xPos;
+                const float charW0 = charW;
+                float delta        = (dualByteFont) ? (charW * mScale) : (charW * mScale / 2);
                 if (leftOffset) {
                     if (leftOffset < 0) {
                         xx -= leftOffset;
@@ -787,7 +851,9 @@ void WGBKFont::DrawString(const char* s, float x, float y, int align, float left
                     }
                 }
                 if (width) {
-                    if (xx > x + width) return;
+                    if (xx > x + width) {
+                        return;
+                    }
                     if (xx + delta > x + width) {
                         delta = x + width - xx;
                         charW = delta / mScale;
@@ -798,9 +864,9 @@ void WGBKFont::DrawString(const char* s, float x, float y, int align, float left
                     int mana2 = -1;
                     if (*src == '/' && (mana2 = this->GetMana(src + 1)) >= 0) {  // hybrid mana cost
                         src += 3;
-                        unsigned char t = (JGE::GetInstance()->GetTime() / 3) & 0xFF;
-                        unsigned char v = t + 127;
-                        float scale     = 0.05f * cosf(2 * M_PI * ((float)t) / 256.0f);
+                        const unsigned char t = (JGE::GetInstance()->GetTime() / 3) & 0xFF;
+                        const unsigned char v = t + 127;
+                        const float scale     = 0.05f * cosf(2 * M_PI * ((float)t) / 256.0f);
                         if (scale < 0) {
                             mRenderer->RenderQuad(manaIcons[mana].get(), xx + 3 * sinf(2 * M_PI * ((float)t) / 256.0f),
                                                   yy + 3 * cosf(2 * M_PI * ((float)(t - 35)) / 256.0f), 0,
@@ -817,8 +883,9 @@ void WGBKFont::DrawString(const char* s, float x, float y, int align, float left
                                                   0.5f * mScale, 0.5f * mScale);
                         }
                         mana = Constants::NB_Colors + 1;  // donot draw colorless cost in hybrid mana cost
-                    } else
+                    } else {
                         mRenderer->RenderQuad(manaIcons[mana].get(), xx, yy, 0, 0.5f * mScale, 0.5f * mScale);
+                    }
                     mRenderer->BindTexture(mTexture);  // manaIcons use different texture, so we need to rebind it.
                 }
 
@@ -841,7 +908,7 @@ void WGBKFont::DrawString(const char* s, float x, float y, int align, float left
 }
 
 float WGBKFont::GetStringWidth(const char* s) const {
-    unsigned char c = *(unsigned short*)s & 0xFF;
+    const unsigned char c = *(unsigned short*)s & 0xFF;
 
     if (ISGBK(c)) {
         u8* src           = (u8*)s;
@@ -856,17 +923,17 @@ float WGBKFont::GetStringWidth(const char* s) const {
                 src += 1;
                 dualByteFont = false;
             }
-            if (dualByteFont)
+            if (dualByteFont) {
                 xx += (mFontSize * mScale);
-            else
+            } else {
                 xx += (mFontSize * mScale) / 2;
+            }
         }
         return xx;
-    } else {
-        WFont* mFont = WResourceManager::Instance()->GetWFont(mFontID + Fonts::kSingleByteFontOffset);
-        mFont->SetScale(GetScale());
-        return mFont->GetStringWidth(s);
     }
+    WFont* mFont = WResourceManager::Instance()->GetWFont(mFontID + Fonts::kSingleByteFontOffset);
+    mFont->SetScale(GetScale());
+    return mFont->GetStringWidth(s);
 }
 
 int WGBKFont::GetCode(const u8* ch, int* charLength) const {
@@ -889,7 +956,9 @@ int WGBKFont::GetCode(const u8* ch, int* charLength) const {
 int WGBKFont::GetMana(const u8* ch) const {
     int mana = -1;
 
-    if (*ch != 0xa3) return mana;
+    if (*ch != 0xa3) {
+        return mana;
+    }
     switch (*(ch + 1)) {
     case 0xC7:
         mana = Constants::MTG_COLOR_GREEN;
@@ -912,7 +981,9 @@ int WGBKFont::GetMana(const u8* ch) const {
         mana = Constants::MTG_UNCOLORED;
         break;
     default:
-        if (*(ch + 1) >= 0xB0 && *(ch + 1) <= 0xB9) mana = Constants::MTG_UNCOLORED;
+        if (*(ch + 1) >= 0xB0 && *(ch + 1) <= 0xB9) {
+            mana = Constants::MTG_UNCOLORED;
+        }
     }
     return mana;
 }
@@ -930,37 +1001,47 @@ void WGBKFont::FormatText(string& s, vector<string>& output) {
                 std::string::size_type limit = 24;
                 while (*src != 0) {
                     if (*src > 0x80) {  // Non-ASCII
-                        if (len + 2 > limit && !(((*src & 0xF0) == 0xA0) && ((*(src + 1) & 0xF0) == 0xA0))) break;
+                        if (len + 2 > limit && !(((*src & 0xF0) == 0xA0) && ((*(src + 1) & 0xF0) == 0xA0))) {
+                            break;
+                        }
                         src += 2;
                         len += 2;
                     } else {  // ASCII
-                        if (*src == '/' && (*(src + 1) & 0xF0) == 0xA0) limit += 3;
-                        if (len + 1 > limit && (*src == '+' || *src == '-' || *src == '/')) break;
+                        if (*src == '/' && (*(src + 1) & 0xF0) == 0xA0) {
+                            limit += 3;
+                        }
+                        if (len + 1 > limit && (*src == '+' || *src == '-' || *src == '/')) {
+                            break;
+                        }
                         src += 1;
                         len += 1;
                     }
                 }
             }
             output.push_back(s.substr(0, len));
-            if (s.length() > len)
+            if (s.length() > len) {
                 s = s.substr(len, s.length() - len);
-            else
+            } else {
                 s = "";
+            }
         } else {
             std::string::size_type newcut = cut;
             while (newcut < len && newcut != string::npos) {
                 // neofont use space to separate one line
                 u8* src = (u8*)s.c_str();
                 // if (neofont && *src > 0x80)
-                if (*src > 0x80) break;
+                if (*src > 0x80) {
+                    break;
+                }
                 cut    = newcut;
                 newcut = s.find_first_of("., \t)", newcut + 1);
             }
             output.push_back(s.substr(0, cut + 1));
-            if (s.length() > cut + 1)
+            if (s.length() > cut + 1) {
                 s = s.substr(cut + 1, s.length() - cut - 1);
-            else
+            } else {
                 s = "";
+            }
         }
     }
 }
@@ -1011,7 +1092,9 @@ int WUFont::GetMana(const u8* ch) const {
      return Constants::MTG_UNCOLORED;
      }
      */
-    if (*ch != 0xef || *(ch + 1) != 0xbc) return -1;
+    if (*ch != 0xef || *(ch + 1) != 0xbc) {
+        return -1;
+    }
     ch += 2;
     switch (*ch) {
     case 0xa7:  // Ｇ : 0xefbca7
@@ -1029,14 +1112,16 @@ int WUFont::GetMana(const u8* ch) const {
     case 0xb9:  // Ｙ : 0xefbcb9
         return Constants::MTG_UNCOLORED;
     default:
-        if (*ch >= 0x90 && *ch <= 0x99) return Constants::MTG_UNCOLORED;
+        if (*ch >= 0x90 && *ch <= 0x99) {
+            return Constants::MTG_UNCOLORED;
+        }
     }
     return -1;
 }
 
 void WUFont::FormatText(string& s, vector<string>& output) {
-    std::string::size_type limit = 22;  // 28
-    string delim("., \t)");
+    std::string::size_type const limit = 22;  // 28
+    const string delim("., \t)");
 
     while (s.length() > 0) {
         u8* src                        = (u8*)s.c_str();
@@ -1046,29 +1131,34 @@ void WUFont::FormatText(string& s, vector<string>& output) {
         u8 ch                          = 0;
         while ((ch = src[len]) != 0) {
             ctr += 2;
-            if ((ch & 0xF8) == 0xF0)
+            if ((ch & 0xF8) == 0xF0) {
                 len += 4;
-            else if ((ch & 0xF0) == 0xE0)
+            } else if ((ch & 0xF0) == 0xE0) {
                 len += 3;
-            else if ((ch & 0xE0) == 0xC0)
+            } else if ((ch & 0xE0) == 0xC0) {
                 len += 2;
-            else  // ASCII
+            } else  // ASCII
             {
                 ctr--;
                 len += 1;
-                if (delim.find(ch) != string::npos) lastcut = len;
+                if (delim.find(ch) != string::npos) {
+                    lastcut = len;
+                }
                 if (ctr > limit && lastcut) {
                     len = lastcut;
                     break;
                 }
                 // if (ch == ' ') break; // if we use ' ' to break a line.
             }
-            if (ctr > limit) break;
+            if (ctr > limit) {
+                break;
+            }
         }
         output.push_back(s.substr(0, len));
-        if (s.length() > len)
+        if (s.length() > len) {
             s = s.substr(len, s.length() - len);
-        else
+        } else {
             s = "";
+        }
     }
 }

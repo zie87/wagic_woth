@@ -11,8 +11,11 @@ IndentWidth: 4
 AccessModifierOffset: -4
 UseTab: Never
 PointerAlignment: Left
+QualifierAlignment: Left
 AlwaysBreakTemplateDeclarations: true
 FixNamespaceComments: true
 #ShortNamespaceLines: 0
 SortIncludes: false
 AlignConsecutiveAssignments: true
+PackConstructorInitializers: CurrentLine
+BreakConstructorInitializers: BeforeComma

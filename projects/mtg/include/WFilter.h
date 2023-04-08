@@ -1,5 +1,7 @@
-#ifndef _WFILTER_H_
-#define _WFILTER_H_
+#include <utility>
+
+#ifndef WFILTER_H
+#define WFILTER_H
 /**
   @file WFilter.h
   Includes classes and functionality related to card filtering.
@@ -25,7 +27,7 @@ public:
 private:
     size_t findNext(string src, size_t start, char open = '(', char close = ')');
     WCardFilter* Leaf(string src);
-    WCardFilter* Terminal(string src, string arg);
+    WCardFilter* Terminal(string src, const string& arg);
     static WCFilterFactory* me;
 };
 
@@ -60,16 +62,17 @@ public:
 */
 class WCFBranch : public WCardFilter {
 public:
-    WCFBranch(WCardFilter* a, WCardFilter* b) {
-        lhs = a;
-        rhs = b;
-    };
-    ~WCFBranch() {
+    WCFBranch(WCardFilter* a, WCardFilter* b)
+        : lhs(a)
+        , rhs(b){
+
+          };
+    ~WCFBranch() override {
         SAFE_DELETE(lhs);
         SAFE_DELETE(rhs);
     };
-    virtual bool isMatch(MTGCard* c) = 0;
-    virtual string getCode()         = 0;
+    bool isMatch(MTGCard* c) override = 0;
+    string getCode() override         = 0;
     virtual WCardFilter* Right() { return rhs; };
     virtual WCardFilter* Left() { return lhs; };
 
@@ -84,9 +87,9 @@ protected:
 class WCFilterOR : public WCFBranch {
 public:
     WCFilterOR(WCardFilter* a, WCardFilter* b) : WCFBranch(a, b){};
-    bool isMatch(MTGCard* c);
-    string getCode();
-    float filterFee();
+    bool isMatch(MTGCard* c) override;
+    string getCode() override;
+    float filterFee() override;
 };
 
 /**
@@ -96,9 +99,9 @@ public:
 class WCFilterAND : public WCFBranch {
 public:
     WCFilterAND(WCardFilter* a, WCardFilter* b) : WCFBranch(a, b){};
-    bool isMatch(MTGCard* c) { return (lhs->isMatch(c) && rhs->isMatch(c)); };
-    string getCode();
-    float filterFee();
+    bool isMatch(MTGCard* c) override { return (lhs->isMatch(c) && rhs->isMatch(c)); };
+    string getCode() override;
+    float filterFee() override;
 };
 
 /**
@@ -106,11 +109,11 @@ public:
 */
 class WCFilterGROUP : public WCardFilter {
 public:
-    WCFilterGROUP(WCardFilter* _k) { kid = _k; };
-    ~WCFilterGROUP() { SAFE_DELETE(kid); };
-    bool isMatch(MTGCard* c) { return kid->isMatch(c); };
-    string getCode();
-    float filterFee() { return kid->filterFee(); };
+    WCFilterGROUP(WCardFilter* _k) : kid(_k){};
+    ~WCFilterGROUP() override { SAFE_DELETE(kid); };
+    bool isMatch(MTGCard* c) override { return kid->isMatch(c); };
+    string getCode() override;
+    float filterFee() override { return kid->filterFee(); };
 
 protected:
     WCardFilter* kid;
@@ -121,10 +124,10 @@ protected:
 */
 class WCFilterNOT : public WCardFilter {
 public:
-    WCFilterNOT(WCardFilter* _k) { kid = _k; };
-    ~WCFilterNOT() { SAFE_DELETE(kid); };
-    bool isMatch(MTGCard* c) { return !kid->isMatch(c); };
-    string getCode();
+    WCFilterNOT(WCardFilter* _k) : kid(_k){};
+    ~WCFilterNOT() override { SAFE_DELETE(kid); };
+    bool isMatch(MTGCard* c) override { return !kid->isMatch(c); };
+    string getCode() override;
 
 protected:
     WCardFilter* kid;
@@ -137,8 +140,8 @@ protected:
 class WCFilterNULL : public WCardFilter {
 public:
     WCFilterNULL(){};
-    string getCode() { return "NULL"; };
-    bool isMatch(MTGCard* c) { return true; };
+    string getCode() override { return "NULL"; };
+    bool isMatch(MTGCard* c) override { return true; };
 };
 
 /**
@@ -146,11 +149,11 @@ public:
 */
 class WCFilterSet : public WCardFilter {
 public:
-    WCFilterSet(int _setid = MTGSets::ALL_SETS) { setid = _setid; };
+    WCFilterSet(int _setid = MTGSets::ALL_SETS) : setid(_setid){};
     WCFilterSet(string arg);
-    bool isMatch(MTGCard* c) { return (setid == MTGSets::ALL_SETS || c->setId == setid); };
-    string getCode();
-    float filterFee() { return 0.2f; };
+    bool isMatch(MTGCard* c) override { return (setid == MTGSets::ALL_SETS || c->setId == setid); };
+    string getCode() override;
+    float filterFee() override { return 0.2f; };
 
 protected:
     int setid;
@@ -162,9 +165,9 @@ protected:
 class WCFilterLetter : public WCardFilter {
 public:
     WCFilterLetter(string arg);
-    bool isMatch(MTGCard* c);
-    string getCode();
-    float filterFee() {
+    bool isMatch(MTGCard* c) override;
+    string getCode() override;
+    float filterFee() override {
         return 4.0f;  // Alpha searches are expensive!
     };
 
@@ -177,11 +180,11 @@ protected:
 */
 class WCFilterColor : public WCardFilter {
 public:
-    WCFilterColor(int _c) { color = _c; };
+    WCFilterColor(int _c) : color(_c){};
     WCFilterColor(string arg);
-    bool isMatch(MTGCard* c);
-    string getCode();
-    float filterFee() { return 0.2f; };
+    bool isMatch(MTGCard* c) override;
+    string getCode() override;
+    float filterFee() override { return 0.2f; };
 
 protected:
     int color;
@@ -193,9 +196,9 @@ protected:
 class WCFilterOnlyColor : public WCFilterColor {
 public:
     WCFilterOnlyColor(int _c) : WCFilterColor(_c){};
-    WCFilterOnlyColor(string arg) : WCFilterColor(arg){};
-    bool isMatch(MTGCard* c);
-    string getCode();
+    WCFilterOnlyColor(string arg) : WCFilterColor(std::move(arg)){};
+    bool isMatch(MTGCard* c) override;
+    string getCode() override;
 };
 
 /**
@@ -204,9 +207,9 @@ public:
 class WCFilterProducesColor : public WCFilterColor {
 public:
     WCFilterProducesColor(int _c) : WCFilterColor(_c){};
-    WCFilterProducesColor(string arg) : WCFilterColor(arg){};
-    bool isMatch(MTGCard* c);
-    string getCode();
+    WCFilterProducesColor(string arg) : WCFilterColor(std::move(arg)){};
+    bool isMatch(MTGCard* c) override;
+    string getCode() override;
 };
 
 /**
@@ -214,11 +217,11 @@ public:
 */
 class WCFilterNumeric : public WCardFilter {
 public:
-    WCFilterNumeric(int _num) { number = _num; };
-    WCFilterNumeric(string arg);
-    bool isMatch(MTGCard* c) = 0;
-    string getCode()         = 0;
-    float filterFee()        = 0;
+    WCFilterNumeric(int _num) : number(_num){};
+    WCFilterNumeric(const string& arg);
+    bool isMatch(MTGCard* c) override = 0;
+    string getCode() override         = 0;
+    float filterFee() override        = 0;
 
 protected:
     int number;
@@ -230,10 +233,10 @@ protected:
 class WCFilterCMC : public WCFilterNumeric {
 public:
     WCFilterCMC(int amt) : WCFilterNumeric(amt){};
-    WCFilterCMC(string arg) : WCFilterNumeric(arg){};
-    bool isMatch(MTGCard* c);
-    string getCode();
-    float filterFee() { return number / 20.0f; };
+    WCFilterCMC(const string& arg) : WCFilterNumeric(std::move(arg)){};
+    bool isMatch(MTGCard* c) override;
+    string getCode() override;
+    float filterFee() override { return number / 20.0f; };
 };
 
 /**
@@ -242,10 +245,10 @@ public:
 class WCFilterPower : public WCFilterNumeric {
 public:
     WCFilterPower(int amt) : WCFilterNumeric(amt){};
-    WCFilterPower(string arg) : WCFilterNumeric(arg){};
-    bool isMatch(MTGCard* c);
-    string getCode();
-    float filterFee() { return 2 * number / 12.0f; };
+    WCFilterPower(const string& arg) : WCFilterNumeric(std::move(arg)){};
+    bool isMatch(MTGCard* c) override;
+    string getCode() override;
+    float filterFee() override { return 2 * number / 12.0f; };
 };
 
 /**
@@ -254,10 +257,10 @@ public:
 class WCFilterToughness : public WCFilterNumeric {
 public:
     WCFilterToughness(int amt) : WCFilterNumeric(amt){};
-    WCFilterToughness(string arg) : WCFilterNumeric(arg){};
-    bool isMatch(MTGCard* c);
-    string getCode();
-    float filterFee() { return 2 * number / 12.0f; };
+    WCFilterToughness(const string& arg) : WCFilterNumeric(std::move(arg)){};
+    bool isMatch(MTGCard* c) override;
+    string getCode() override;
+    float filterFee() override { return 2 * number / 12.0f; };
 };
 
 /**
@@ -265,10 +268,10 @@ public:
 */
 class WCFilterType : public WCardFilter {
 public:
-    WCFilterType(string arg) { type = arg; };
-    bool isMatch(MTGCard* c);
-    string getCode();
-    float filterFee() { return 0.4f; };
+    WCFilterType(string arg) : type(std::move(arg)){};
+    bool isMatch(MTGCard* c) override;
+    string getCode() override;
+    float filterFee() override { return 0.4f; };
 
 protected:
     string type;
@@ -279,11 +282,11 @@ protected:
 */
 class WCFilterRarity : public WCardFilter {
 public:
-    WCFilterRarity(char _r) { rarity = _r; };
+    WCFilterRarity(char _r) : rarity(_r){};
     WCFilterRarity(string arg);
-    bool isMatch(MTGCard* c);
-    string getCode();
-    float filterFee();
+    bool isMatch(MTGCard* c) override;
+    string getCode() override;
+    float filterFee() override;
 
 protected:
     char rarity;
@@ -294,11 +297,11 @@ protected:
 */
 class WCFilterAbility : public WCardFilter {
 public:
-    WCFilterAbility(int _a) { ability = _a; };
+    WCFilterAbility(int _a) : ability(_a){};
     WCFilterAbility(string arg);
-    bool isMatch(MTGCard* c);
-    string getCode();
-    float filterFee();
+    bool isMatch(MTGCard* c) override;
+    string getCode() override;
+    float filterFee() override;
 
 protected:
     int ability;
