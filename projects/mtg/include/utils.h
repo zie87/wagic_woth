@@ -27,6 +27,9 @@
 #include <algorithm>
 #include <stdlib.h>
 
+#include <random>
+#include <chrono>
+
 #include "DebugRoutines.h"
 
 namespace wth {
@@ -37,6 +40,18 @@ inline void replace_all(std::string& subject, const std::string& search, const s
         subject.replace(pos, search.length(), replace);
         pos += replace.length();
     }
+}
+
+template <class RandomIt>
+inline void shuffle(RandomIt first, RandomIt last, unsigned seed) {
+    std::shuffle(first, last, std::default_random_engine(seed));
+}
+
+template <class RandomIt>
+inline void shuffle(RandomIt first, RandomIt last) {
+    // TODO: change to jge internal clock!
+    const unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+    shuffle(first, last, seed);
 }
 
 }  // namespace wth
