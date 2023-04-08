@@ -1,7 +1,7 @@
 #include "PrecompiledHeader.h"
 #include "AllAbilities.h"
 #include "Translate.h"
-#include <boost/algorithm/string.hpp>
+#include "utils.h"
 
 // display a text animation, this is not a real ability.
 MTGEventText::MTGEventText(GameObserver* observer, int _id, MTGCardInstance* card, string textToShow)
@@ -3015,7 +3015,7 @@ int ATransformer::destroy() {
             }
         }
         ////in the case that we removed or added types to a card, so that it retains its original name when the effect
-        ///is removed.
+        /// is removed.
         // if(_target->model->data->name.size())//tokens don't have a model name.
         //     _target->setName(_target->model->data->name.c_str());
 
@@ -3869,7 +3869,7 @@ ATutorialMessage::ATutorialMessage(GameObserver* observer, MTGCardInstance* sour
         } else {
             mMessage =
                 _(message);  // translate directly here, remove this and translate at rendering time if it bites us
-            boost::replace_all(mMessage, "\\n", "\n");
+            wth::replace_all(mMessage, "\\n", "\n");
         }
     }
 
