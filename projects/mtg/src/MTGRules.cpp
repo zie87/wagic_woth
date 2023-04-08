@@ -359,7 +359,7 @@ int MTGPutInPlayRule::reactToClick(MTGCardInstance* card) {
     return 1;
 }
 
-ostream& MTGPutInPlayRule::toString(ostream& out) const {
+std::ostream& MTGPutInPlayRule::toString(std::ostream& out) const {
     out << "MTGPutInPlayRule ::: (";
     return MTGAbility::toString(out) << ")";
 }
@@ -463,7 +463,7 @@ int MTGKickerRule::reactToClick(MTGCardInstance* card) {
     return 1;
 }
 
-ostream& MTGKickerRule::toString(ostream& out) const {
+std::ostream& MTGKickerRule::toString(std::ostream& out) const {
     out << "MTGKickerRule ::: (";
     return MTGAbility::toString(out) << ")";
 }
@@ -588,7 +588,7 @@ int MTGAlternativeCostRule::reactToClick(MTGCardInstance* card, ManaCost* altern
     return 1;
 }
 
-ostream& MTGAlternativeCostRule::toString(ostream& out) const {
+std::ostream& MTGAlternativeCostRule::toString(std::ostream& out) const {
     out << "MTGAlternativeCostRule ::: (";
     return MTGAbility::toString(out) << ")";
 }
@@ -622,7 +622,7 @@ int MTGBuyBackRule::reactToClick(MTGCardInstance* card) {
     return MTGAlternativeCostRule::reactToClick(card, alternateCost, ManaCost::MANA_PAID_WITH_BUYBACK);
 }
 
-ostream& MTGBuyBackRule::toString(ostream& out) const {
+std::ostream& MTGBuyBackRule::toString(std::ostream& out) const {
     out << "MTGBuyBackRule ::: (";
     return MTGAbility::toString(out) << ")";
 }
@@ -653,7 +653,7 @@ int MTGFlashBackRule::reactToClick(MTGCardInstance* card) {
     return MTGAlternativeCostRule::reactToClick(card, alternateCost, ManaCost::MANA_PAID_WITH_FLASHBACK);
 }
 
-ostream& MTGFlashBackRule::toString(ostream& out) const {
+std::ostream& MTGFlashBackRule::toString(std::ostream& out) const {
     out << "MTGFlashBackRule ::: (";
     return MTGAbility::toString(out) << ")";
 }
@@ -688,7 +688,7 @@ int MTGRetraceRule::reactToClick(MTGCardInstance* card) {
     return MTGAlternativeCostRule::reactToClick(card, alternateCost, ManaCost::MANA_PAID_WITH_RETRACE);
 }
 
-ostream& MTGRetraceRule::toString(ostream& out) const {
+std::ostream& MTGRetraceRule::toString(std::ostream& out) const {
     out << "MTGRetraceRule ::: (";
     return MTGAbility::toString(out) << ")";
 }
@@ -784,7 +784,7 @@ int MTGSuspendRule::reactToClick(MTGCardInstance* card) {
 
 const char* MTGSuspendRule::getMenuText() { return suspendmenu.c_str(); }
 
-ostream& MTGSuspendRule::toString(ostream& out) const {
+std::ostream& MTGSuspendRule::toString(std::ostream& out) const {
     out << "MTGSuspendRule ::: (";
     return MTGAbility::toString(out) << ")";
 }
@@ -883,7 +883,7 @@ int MTGMorphCostRule::reactToClick(MTGCardInstance* card) {
     return 1;
 }
 
-ostream& MTGMorphCostRule::toString(ostream& out) const {
+std::ostream& MTGMorphCostRule::toString(std::ostream& out) const {
     out << "MTGMorphCostRule ::: (";
     return MTGAbility::toString(out) << ")";
 }
@@ -954,7 +954,7 @@ int MTGAttackRule::reactToClick(MTGCardInstance* card) {
     return 1;
 }
 
-ostream& MTGAttackRule::toString(ostream& out) const {
+std::ostream& MTGAttackRule::toString(std::ostream& out) const {
     out << "MTGAttackRule ::: (";
     return MTGAbility::toString(out) << ")";
 }
@@ -1122,7 +1122,7 @@ int MTGCombatTriggersRule::receiveEvent(WEvent* e) {
     return 0;
 }
 
-ostream& MTGCombatTriggersRule::toString(ostream& out) const {
+std::ostream& MTGCombatTriggersRule::toString(std::ostream& out) const {
     out << "MTGCombatTriggersRule ::: (";
     return MTGAbility::toString(out) << ")";
 }
@@ -1199,8 +1199,8 @@ int MTGBlockRule::reactToClick(MTGCardInstance* card) {
             currentOpponent = game->currentPlayer->game->inPlay->getNextAttacker(currentOpponent);
             canDefend       = card->toggleDefenser(currentOpponent);
 
-            DebugTrace("Defenser Toggle: " << card->getName() << endl
-                                           << "- canDefend: " << (canDefend == 0) << endl
+            DebugTrace("Defenser Toggle: " << card->getName() << std::endl
+                                           << "- canDefend: " << (canDefend == 0) << std::endl
                                            << "- currentOpponent: " << currentOpponent);
             result = (canDefend || currentOpponent == NULL);
         }
@@ -1209,7 +1209,7 @@ int MTGBlockRule::reactToClick(MTGCardInstance* card) {
 
 const char* MTGBlockRule::getMenuText() { return blockmenu.c_str(); }
 
-ostream& MTGBlockRule::toString(ostream& out) const {
+std::ostream& MTGBlockRule::toString(std::ostream& out) const {
     out << "MTGBlockRule ::: (";
     return MTGAbility::toString(out) << ")";
 }
@@ -1328,7 +1328,7 @@ void MTGMomirRule::Render() {
     mFont->DrawString(text.c_str(), SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, JGETEXT_CENTER);
 }
 
-ostream& MTGMomirRule::toString(ostream& out) const {
+std::ostream& MTGMomirRule::toString(std::ostream& out) const {
     out << "MTGMomirRule ::: pool : " << pool << " ; initialized : " << initialized << " ; textAlpha : " << textAlpha
         << " ; text " << text << " ; alreadyplayed : " << alreadyplayed << " ; collection : " << collection << "(";
     return MTGAbility::toString(out) << ")";
@@ -1408,7 +1408,7 @@ int MTGStoneHewerRule::genRandomEquipId(int convertedCost) {
     return pool[convertedCost][start];
 }
 
-ostream& MTGStoneHewerRule::toString(ostream& out) const {
+std::ostream& MTGStoneHewerRule::toString(std::ostream& out) const {
     out << "MTGStoneHewerRule ::: pool : " << pool << " ; initialized : " << initialized
         << " ; collection : " << collection << "(";
     return MTGAbility::toString(out) << ")";
@@ -1451,8 +1451,8 @@ void HUDDisplay::Update(float dt) {
     timestamp += dt;
     popdelay += dt;
     if (events.size()) {
-        list<HUDString*>::iterator it = events.begin();
-        HUDString* hs                 = *it;
+        std::list<HUDString*>::iterator it = events.begin();
+        HUDString* hs                      = *it;
         if (popdelay > 1 && timestamp - hs->timestamp > 2) {
             events.pop_front();
             delete hs;
@@ -1501,7 +1501,7 @@ void HUDDisplay::Render() {
 
     f->SetColor(ARGB(255, 255, 255, 255));
 
-    list<HUDString*>::reverse_iterator it;
+    std::list<HUDString*>::reverse_iterator it;
 
     float x0     = SCREEN_WIDTH - 10 - maxWidth - 10;
     float y0     = 20;
@@ -1524,7 +1524,7 @@ HUDDisplay::HUDDisplay(GameObserver* observer, int _id) : PermanentAbility(obser
 }
 
 HUDDisplay::~HUDDisplay() {
-    list<HUDString*>::iterator it;
+    std::list<HUDString*>::iterator it;
     for (it = events.begin(); it != events.end(); ++it) {
         HUDString* hs = *it;
         delete hs;
@@ -1574,7 +1574,7 @@ int MTGPersistRule::receiveEvent(WEvent* event) {
     return 0;
 }
 
-ostream& MTGPersistRule::toString(ostream& out) const {
+std::ostream& MTGPersistRule::toString(std::ostream& out) const {
     out << "MTGPersistRule ::: (";
     return MTGAbility::toString(out) << ")";
 }
@@ -1625,7 +1625,7 @@ int MTGVampireRule::receiveEvent(WEvent* event) {
     return 0;
 }
 
-ostream& MTGVampireRule::toString(ostream& out) const {
+std::ostream& MTGVampireRule::toString(std::ostream& out) const {
     out << "MTGVampireRule ::: (";
     return MTGAbility::toString(out) << ")";
 }
@@ -1666,7 +1666,7 @@ int MTGUnearthRule::receiveEvent(WEvent* event) {
     return 0;
 }
 
-ostream& MTGUnearthRule::toString(ostream& out) const {
+std::ostream& MTGUnearthRule::toString(std::ostream& out) const {
     out << "MTGUnearthRule ::: (";
     return MTGAbility::toString(out) << ")";
 }
@@ -1720,7 +1720,7 @@ int MTGLegendRule::removed(MTGCardInstance* card) { return 0; }
 
 int MTGLegendRule::testDestroy() { return 0; }
 
-ostream& MTGLegendRule::toString(ostream& out) const { return out << "MTGLegendRule :::"; }
+std::ostream& MTGLegendRule::toString(std::ostream& out) const { return out << "MTGLegendRule :::"; }
 MTGLegendRule* MTGLegendRule::clone() const { return NEW MTGLegendRule(*this); }
 
 /* PlaneWalker Rule */
@@ -1754,7 +1754,7 @@ int MTGPlaneWalkerRule::removed(MTGCardInstance* card) { return 0; }
 
 int MTGPlaneWalkerRule::testDestroy() { return 0; }
 
-ostream& MTGPlaneWalkerRule::toString(ostream& out) const { return out << "MTGLegendRule :::"; }
+std::ostream& MTGPlaneWalkerRule::toString(std::ostream& out) const { return out << "MTGLegendRule :::"; }
 MTGPlaneWalkerRule* MTGPlaneWalkerRule::clone() const { return NEW MTGPlaneWalkerRule(*this); }
 /* planeswalker damage rule */
 MTGPlaneswalkerDamage::MTGPlaneswalkerDamage(GameObserver* observer, int _id) : PermanentAbility(observer, _id){};
@@ -1801,7 +1801,7 @@ int MTGLifelinkRule::receiveEvent(WEvent* event) {
     return 0;
 }
 
-ostream& MTGLifelinkRule::toString(ostream& out) const {
+std::ostream& MTGLifelinkRule::toString(std::ostream& out) const {
     out << "MTGLifelinkRule ::: (";
     return MTGAbility::toString(out) << ")";
 }
@@ -1874,7 +1874,7 @@ int ParentChildRule::receiveEvent(WEvent* event) {
     return 0;
 }
 
-ostream& ParentChildRule::toString(ostream& out) const {
+std::ostream& ParentChildRule::toString(std::ostream& out) const {
     out << "ParentChildRule ::: (";
     return MTGAbility::toString(out) << ")";
 }

@@ -10,4 +10,4 @@ using shared_ptr = std::shared_ptr<T>;
 
 }
 
-#endif // JGE_MEMORY_HPP
+#endif  // JGE_MEMORY_HPP

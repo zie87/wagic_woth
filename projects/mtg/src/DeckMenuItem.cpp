@@ -13,7 +13,7 @@ const int kHorizontalScrollSpeed = 30;  // higher numbers mean faster scrolling
 
 float DeckMenuItem::mYOffset = 0;
 
-DeckMenuItem::DeckMenuItem(DeckMenu* _parent, int id, int fontId, string text, float x, float y, bool hasFocus,
+DeckMenuItem::DeckMenuItem(DeckMenu* _parent, int id, int fontId, std::string text, float x, float y, bool hasFocus,
                            bool autoTranslate, DeckMetaData* deckMetaData)
     : JGuiObject(id), parent(_parent), fontId(fontId), mX(x), mY(y) {
     WFont* mFont      = WResourceManager::Instance()->GetWFont(fontId);
@@ -99,7 +99,7 @@ void DeckMenuItem::RenderWithOffset(float yOffset) {
                 "new.png", 2.0f, 2.0f, tex->mWidth - 4.0f,
                 tex->mHeight - 4.0f);  // avoids weird rectangle aroudn the texture because of bilinear filtering
             quad->SetHotSpot(quad->mWidth / 2.0f, quad->mHeight / 2.0f);
-            float x = mX + min(ITEM_PX_WIDTH - quad->mWidth, getWidth()) / 2 + quad->mWidth / 2;
+            float x = mX + std::min(ITEM_PX_WIDTH - quad->mWidth, getWidth()) / 2 + quad->mWidth / 2;
             if (quad) JRenderer::GetInstance()->RenderQuad(quad.get(), x, mY + yOffset + quad->mHeight / 2, 0.5);
         }
     }
@@ -144,7 +144,7 @@ float DeckMenuItem::getWidth() const {
     return mFont->GetStringWidth(mText.c_str());
 }
 
-string DeckMenuItem::getDeckName() const {
+std::string DeckMenuItem::getDeckName() const {
     if (mMetaData) return mMetaData->getName();
 
     std::string s;
@@ -154,7 +154,7 @@ string DeckMenuItem::getDeckName() const {
     return "[deck" + s + "]";
 }
 
-ostream& DeckMenuItem::toString(ostream& out) const {
+std::ostream& DeckMenuItem::toString(std::ostream& out) const {
     return out << "DeckMenuItem ::: mHasFocus : " << mHasFocus << " ; parent : " << parent << " ; mText : " << mText
                << " ; mX,mY : " << mX << "," << mY;
 }

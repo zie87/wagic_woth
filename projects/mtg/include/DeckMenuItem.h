@@ -17,15 +17,15 @@ private:
 
     DeckMenu* parent;
     int fontId;
-    string mText;
+    std::string mText;
     float mX;
     float mY;
     float mTitleResetWidth;
-    string mDescription;
+    std::string mDescription;
     static float mYOffset;
     float mScrollerOffset;
     DeckMetaData* mMetaData;
-    string mImageFilename;
+    std::string mImageFilename;
     void checkUserClick();
 
 public:
@@ -40,7 +40,7 @@ public:
     virtual void Entering();
     virtual bool Leaving(JButton key);
     virtual bool ButtonPressed();
-    virtual ostream& toString(ostream& out) const;
+    virtual std::ostream& toString(std::ostream& out) const;
 
     virtual bool getTopLeft(float& top, float& left) {
         top  = mY + mYOffset;
@@ -50,18 +50,18 @@ public:
 
     // Accessors
 
-    string getImageFilename() const { return mImageFilename; };
+    std::string getImageFilename() const { return mImageFilename; };
     float getY() const { return mY; };
     float getX() const { return mX; };
-    string getDescription() const { return mDescription; };
-    string getText() const { return mText; };
+    std::string getDescription() const { return mDescription; };
+    std::string getText() const { return mText; };
     bool hasFocus() const { return mHasFocus; };
     bool hasMetaData() const { return mMetaData == NULL ? false : true; };
 
     float getWidth() const;
-    string getDeckName() const;
+    std::string getDeckName() const;
 
-    string getDeckStatsSummary() const {
+    std::string getDeckStatsSummary() const {
         if (mMetaData) return mMetaData->getStatsSummary();
         return "";
     }
@@ -69,7 +69,7 @@ public:
     DeckMetaData* getMetaData() const { return mMetaData; }
 
     // Setters
-    void setDescription(const string description) { mDescription = description; };
+    void setDescription(const std::string description) { mDescription = description; };
 
     ;
 };

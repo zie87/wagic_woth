@@ -4,17 +4,17 @@
 #include "Player.h"
 #include <JRenderer.h>
 
-void DeckManager::updateMetaDataList(vector<DeckMetaData*>* refList, bool isAI) {
+void DeckManager::updateMetaDataList(std::vector<DeckMetaData*>* refList, bool isAI) {
     if (refList) {
-        vector<DeckMetaData*>* inputList = isAI ? &aiDeckOrderList : &playerDeckOrderList;
+        std::vector<DeckMetaData*>* inputList = isAI ? &aiDeckOrderList : &playerDeckOrderList;
         inputList->clear();
         inputList->assign(refList->begin(), refList->end());
     }
 }
 
-vector<DeckMetaData*>* DeckManager::getPlayerDeckOrderList() { return &playerDeckOrderList; }
+std::vector<DeckMetaData*>* DeckManager::getPlayerDeckOrderList() { return &playerDeckOrderList; }
 
-vector<DeckMetaData*>* DeckManager::getAIDeckOrderList() { return &aiDeckOrderList; }
+std::vector<DeckMetaData*>* DeckManager::getAIDeckOrderList() { return &aiDeckOrderList; }
 
 /*
 ** Predicate helper for getDeckMetadataByID()
@@ -35,8 +35,8 @@ DeckMetaData* DeckManager::getDeckMetaDataById(int deckId, bool isAI) {
     if (pos != deckList.end()) {
         deck = *pos;
     } else {
-        ostringstream deckFilename;
-        string filepath;
+        std::ostringstream deckFilename;
+        std::string filepath;
         if (isAI)
             filepath = options.profileFile("ai/baka/");
         else
@@ -60,11 +60,12 @@ struct DeckFilenameMatch {
     std::string mFilename;
 };
 
-DeckMetaData* DeckManager::getDeckMetaDataByFilename(const string& filename, bool isAI) {
+DeckMetaData* DeckManager::getDeckMetaDataByFilename(const std::string& filename, bool isAI) {
     DeckMetaData* deck                   = NULL;
     std::vector<DeckMetaData*>& deckList = isAI ? aiDeckOrderList : playerDeckOrderList;
 
-    std::vector<DeckMetaData*>::iterator pos = find_if(deckList.begin(), deckList.end(), DeckFilenameMatch(filename));
+    std::vector<DeckMetaData*>::iterator pos =
+        std::find_if(deckList.begin(), deckList.end(), DeckFilenameMatch(filename));
     if (pos != deckList.end()) {
         deck = *pos;
     } else {
@@ -79,17 +80,17 @@ DeckMetaData* DeckManager::getDeckMetaDataByFilename(const string& filename, boo
 void DeckManager::AddMetaData(const string& filename, bool isAI) {
     if (isAI) {
         aiDeckOrderList.push_back(NEW DeckMetaData(filename, isAI));
-        aiDeckStatsMap.insert(make_pair(filename.c_str(), new StatsWrapper(aiDeckOrderList.back()->getDeckId())));
+        aiDeckStatsMap.insert(std::make_pair(filename.c_str(), new StatsWrapper(aiDeckOrderList.back()->getDeckId())));
     } else {
         playerDeckOrderList.push_back(NEW DeckMetaData(filename, isAI));
         playerDeckStatsMap.insert(
-            make_pair(filename.c_str(), new StatsWrapper(playerDeckOrderList.back()->getDeckId())));
+            std::make_pair(filename.c_str(), new StatsWrapper(playerDeckOrderList.back()->getDeckId())));
     }
 }
 
 void DeckManager::DeleteMetaData(const string& filename, bool isAI) {
-    map<string, StatsWrapper*>::iterator it;
-    vector<DeckMetaData*>::iterator metaDataIter;
+    std::map<std::string, StatsWrapper*>::iterator it;
+    std::vector<DeckMetaData*>::iterator metaDataIter;
 
     if (isAI) {
         it = aiDeckStatsMap.find(filename);
@@ -127,10 +128,10 @@ void DeckManager::DeleteMetaData(const string& filename, bool isAI) {
 StatsWrapper* DeckManager::getExtendedStatsForDeckId(int deckId, MTGAllCards* collection, bool isAI) {
     DeckMetaData* selectedDeck = getDeckMetaDataById(deckId, isAI);
     if (selectedDeck == NULL) {
-        ostringstream deckName;
+        std::ostringstream deckName;
         deckName << options.profileFile() << "/deck" << deckId << ".txt";
-        map<string, StatsWrapper*>* statsMap = isAI ? &aiDeckStatsMap : &playerDeckStatsMap;
-        StatsWrapper* stats                  = NEW StatsWrapper(deckId);
+        std::map<std::string, StatsWrapper*>* statsMap = isAI ? &aiDeckStatsMap : &playerDeckStatsMap;
+        StatsWrapper* stats                            = NEW StatsWrapper(deckId);
         statsMap->insert(make_pair(deckName.str(), stats));
         return stats;
     }

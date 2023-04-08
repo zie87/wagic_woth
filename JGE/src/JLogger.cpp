@@ -4,8 +4,8 @@
 
 #include <fstream>
 
-string JLogger::lastLog = "";
-int JLogger::lastTime   = 0;
+std::string JLogger::lastLog = "";
+int JLogger::lastTime        = 0;
 
 void JLogger::Log(const char* text) {
 #ifdef DOLOG

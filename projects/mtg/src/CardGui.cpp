@@ -467,30 +467,30 @@ void CardGui::AlternateRender(MTGCard* card, const Pos& pos) {
                                      (float)Carditem->mSizeIcon * 0.4f * pos.actZ);
 
             } else {
-                string formattedfield = Carditem->mFormattedData;
-                size_t found          = Carditem->mName.find("title");  // Write the title
-                if (found != string::npos) {
-                    stringstream st;
+                std::string formattedfield = Carditem->mFormattedData;
+                size_t found               = Carditem->mName.find("title");  // Write the title
+                if (found != std::string::npos) {
+                    std::stringstream st;
                     st << card->data->name;
                     formattedfield = FormattedData(formattedfield, "title", st.str());
                 }
 
                 found = Carditem->mName.find("power");  // Write the strength
-                if (found != string::npos) {
-                    stringstream st;
+                if (found != std::string::npos) {
+                    std::stringstream st;
                     st << card->data->power;
                     formattedfield = FormattedData(formattedfield, "power", st.str());
                 }
                 found = Carditem->mName.find("life");  // Write the toughness
-                if (found != string::npos) {
-                    stringstream st;
+                if (found != std::string::npos) {
+                    std::stringstream st;
                     st << card->data->toughness;
                     formattedfield = FormattedData(formattedfield, "life", st.str());
                 }
 
                 found = Carditem->mName.find("types");  // types
-                if (found != string::npos) {
-                    string s = "";
+                if (found != std::string::npos) {
+                    std::string s = "";
                     for (int i = card->data->types.size() - 1; i > 0; --i) {
                         if (card->data
                                 ->basicAbilities[(int)Constants::CHANGELING]) {  // this avoids drawing the list of
@@ -731,30 +731,30 @@ void CardGui::TinyCropRender(MTGCard* card, const Pos& pos, JQuad* quad) {
                                      (float)Carditem->mSizeIcon * 0.4f * pos.actZ);
 
             } else {
-                string formattedfield = Carditem->mFormattedData;
-                size_t found          = Carditem->mName.find("title");  // Write the title
-                if (found != string::npos) {
-                    stringstream st;
+                std::string formattedfield = Carditem->mFormattedData;
+                size_t found               = Carditem->mName.find("title");  // Write the title
+                if (found != std::string::npos) {
+                    std::stringstream st;
                     st << card->data->name;
                     formattedfield = FormattedData(formattedfield, "title", st.str());
                 }
 
                 found = Carditem->mName.find("power");  // Write the strength
-                if (found != string::npos) {
-                    stringstream st;
+                if (found != std::string::npos) {
+                    std::stringstream st;
                     st << card->data->power;
                     formattedfield = FormattedData(formattedfield, "power", st.str());
                 }
                 found = Carditem->mName.find("life");  // Write the toughness
-                if (found != string::npos) {
-                    stringstream st;
+                if (found != std::string::npos) {
+                    std::stringstream st;
                     st << card->data->toughness;
                     formattedfield = FormattedData(formattedfield, "life", st.str());
                 }
 
                 found = Carditem->mName.find("types");  // types
-                if (found != string::npos) {
-                    string s = "";
+                if (found != std::string::npos) {
+                    std::string s = "";
                     for (int i = card->data->types.size() - 1; i > 0; --i) {
                         if (card->data
                                 ->basicAbilities[(int)Constants::CHANGELING]) {  // this avoids drawing the list of
@@ -1191,11 +1191,11 @@ TransientCardView::TransientCardView(MTGCardInstance* card, float x, float y) : 
 
 TransientCardView::TransientCardView(MTGCardInstance* card, const Pos& ref) : CardGui(card, ref){};
 
-ostream& CardView::toString(ostream& out) const {
+std::ostream& CardView::toString(std::ostream& out) const {
     return (CardGui::toString(out) << " : CardView ::: card : " << card << ";  actX,actY : " << actX << "," << actY
                                    << "; t : " << t << " ; actT : " << actT);
 }
-ostream& CardGui::toString(ostream& out) const { return (out << "CardGui ::: x,y " << x << "," << y); }
+std::ostream& CardGui::toString(std::ostream& out) const { return (out << "CardGui ::: x,y " << x << "," << y); }
 
 SimpleCardEffectRotate::SimpleCardEffectRotate(float rotation) : mRotation(rotation) {}
 

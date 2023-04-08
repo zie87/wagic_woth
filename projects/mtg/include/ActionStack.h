@@ -87,7 +87,7 @@ public:
     int resolve();
     bool extraDamagePhase();
     void Render();
-    virtual ostream& toString(ostream& out) const;
+    virtual std::ostream& toString(std::ostream& out) const;
     virtual const string getDisplayName() const;
     NextGamePhase(GameObserver* observer, int id);
 };
@@ -107,7 +107,7 @@ public:
     void Render();
     bool FullfilledAlternateCost(const int& costType);
     const string getDisplayName() const;
-    virtual ostream& toString(ostream& out) const;
+    virtual std::ostream& toString(std::ostream& out) const;
     MTGCardInstance* getNextCardTarget(MTGCardInstance* previous = 0);
     Player* getNextPlayerTarget(Player* previous = 0);
     Damageable* getNextDamageableTarget(Damageable* previous = 0);
@@ -123,7 +123,7 @@ public:
     MTGAbility* ability;
     int resolve();
     void Render();
-    virtual ostream& toString(ostream& out) const;
+    virtual std::ostream& toString(std::ostream& out) const;
     virtual const string getDisplayName() const;
     StackAbility(GameObserver* observer, int id, MTGAbility* _ability);
 };
@@ -134,7 +134,7 @@ public:
     int removeFromGame;
     int resolve();
     void Render();
-    virtual ostream& toString(ostream& out) const;
+    virtual std::ostream& toString(std::ostream& out) const;
     PutInGraveyard(GameObserver* observer, int id, MTGCardInstance* _card);
 };
 
@@ -144,7 +144,7 @@ public:
     Player* player;
     int resolve();
     void Render();
-    virtual ostream& toString(ostream& out) const;
+    virtual std::ostream& toString(std::ostream& out) const;
     DrawAction(GameObserver* observer, int id, Player* _player, int _nbcards);
 };
 
@@ -155,7 +155,7 @@ public:
     Damageable* target;
     int resolve();
     void Render();
-    virtual ostream& toString(ostream& out) const;
+    virtual std::ostream& toString(std::ostream& out) const;
     LifeAction(GameObserver* observer, int id, Damageable* _target, int amount);
 };
 

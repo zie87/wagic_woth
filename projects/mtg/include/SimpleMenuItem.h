@@ -14,17 +14,17 @@ using std::string;
 
 class SimpleMenuItem : public SimpleButton {
 private:
-    string mDescription;
+    std::string mDescription;
 
 public:
     SimpleMenuItem(int id);
-    SimpleMenuItem(SimpleMenu* _parent, int id, int fontId, string text, float x, float y, bool hasFocus = false,
+    SimpleMenuItem(SimpleMenu* _parent, int id, int fontId, std::string text, float x, float y, bool hasFocus = false,
                    bool autoTranslate = false);
 
     virtual void Entering();
-    virtual void setDescription(const string& desc);
-    virtual string getDescription() const;
-    virtual ostream& toString(ostream& out) const;
+    virtual void setDescription(const std::string& desc);
+    virtual std::string getDescription() const;
+    virtual std::ostream& toString(std::ostream& out) const;
 };
 
 #endif

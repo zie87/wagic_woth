@@ -3,7 +3,6 @@
 
 #include <queue>
 #include "Threading.h"
-using namespace std;
 
 class JSocket {
 public:
@@ -19,7 +18,7 @@ public:
     } SOCKET_STATE;
 
     // Server creation
-    JSocket(string ipAddr);
+    JSocket(std::string ipAddr);
     // Client creation
     JSocket();
     ~JSocket();

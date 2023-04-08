@@ -67,7 +67,7 @@ int MTGAllCards::processConfLine(string& s, MTGCard* card, CardPrimitive* primit
             string value = val;
             // Specific Abilities
             std::transform(value.begin(), value.end(), value.begin(), ::tolower);
-            vector<string> values = split(value, ',');
+            std::vector<string> values = split(value, ',');
             for (size_t values_i = 0; values_i < values.size(); ++values_i) {
                 for (int j = Constants::NB_BASIC_ABILITIES - 1; j >= 0; --j) {
                     if (values[values_i].find(Constants::MTGBasicAbilities[j]) != string::npos) {
@@ -229,7 +229,7 @@ int MTGAllCards::processConfLine(string& s, MTGCard* card, CardPrimitive* primit
 
         } else {
             if (!primitive) primitive = NEW CardPrimitive();
-            vector<string> values = split(val, ' ');
+            std::vector<string> values = split(val, ' ');
             for (size_t values_i = 0; values_i < values.size(); ++values_i) primitive->setSubtype(values[values_i]);
         }
         break;
@@ -238,13 +238,13 @@ int MTGAllCards::processConfLine(string& s, MTGCard* card, CardPrimitive* primit
     case 't':
         if (!primitive) primitive = NEW CardPrimitive();
         if (0 == strcmp("target", key)) {
-            string value = val;
+            std::string value = val;
             std::transform(value.begin(), value.end(), value.begin(), ::tolower);
             primitive->spellTargetType = value;
         } else if (0 == strcmp("text", key))
             primitive->setText(val);
         else if (0 == strcmp("type", key)) {
-            vector<string> values = split(val, ' ');
+            std::vector<string> values = split(val, ' ');
             for (size_t values_i = 0; values_i < values.size(); ++values_i) primitive->setType(values[values_i]);
         } else if (0 == strcmp("toughness", key))
             primitive->setToughness(atoi(val));
@@ -252,11 +252,11 @@ int MTGAllCards::processConfLine(string& s, MTGCard* card, CardPrimitive* primit
 
     default:
         if (primitive) {
-            DebugTrace(endl
+            DebugTrace(std::endl
                        << "MTGDECK Parsing Error: "
                        << " [" << primitive->getName() << "]" << s << std::endl);
         } else {
-            DebugTrace(endl << "MTGDECK Parsing Generic Error: " << s << std::endl);
+            DebugTrace(std::endl << "MTGDECK Parsing Generic Error: " << s << std::endl);
         }
         break;
     }
@@ -914,8 +914,8 @@ int MTGDeck::save(const string& destFileName, bool useExpandedDescriptions, cons
     also save each card by id, to speed up the loading of the deck next time.
 */
 void MTGDeck::printDetailedDeckText(std::ofstream& file) {
-    ostringstream currentCard, creatures, lands, spells, types;
-    map<int, int>::iterator it;
+    std::ostringstream currentCard, creatures, lands, spells, types;
+    std::map<int, int>::iterator it;
     for (it = cards.begin(); it != cards.end(); it++) {
         int cardId    = it->first;
         int nbCards   = it->second;
@@ -923,16 +923,16 @@ void MTGDeck::printDetailedDeckText(std::ofstream& file) {
         if (card == NULL) {
             continue;
         }
-        MTGSetInfo* setInfo = setlist.getInfo(card->setId);
-        string setName      = setInfo->id;
-        string cardName     = card->data->getName();
+        MTGSetInfo* setInfo  = setlist.getInfo(card->setId);
+        std::string setName  = setInfo->id;
+        std::string cardName = card->data->getName();
 
         currentCard << "#" << nbCards << " x " << cardName << " (" << setName << "), ";
 
         if (!card->data->isLand()) currentCard << card->data->getManaCost() << ", ";
 
         // Add the card's types
-        vector<int>::iterator typeIter;
+        std::vector<int>::iterator typeIter;
         for (typeIter = card->data->types.begin(); typeIter != card->data->types.end(); ++typeIter)
             types << MTGAllCards::findType(*typeIter) << " ";
 
@@ -948,11 +948,11 @@ void MTGDeck::printDetailedDeckText(std::ofstream& file) {
         for (size_t x = 0; x < card->data->basicAbilities.size(); ++x) {
             if (card->data->basicAbilities[x] == 1) currentCard << Constants::MTGBasicAbilities[x] << "; ";
         }
-        currentCard << endl;
+        currentCard << std::endl;
 
-        for (int i = 0; i < nbCards; i++) currentCard << cardId << endl;
+        for (int i = 0; i < nbCards; i++) currentCard << cardId << std::endl;
 
-        currentCard << endl;
+        currentCard << std::endl;
         setInfo = NULL;
         if (card->data->isLand())
             lands << currentCard.str();
@@ -962,9 +962,9 @@ void MTGDeck::printDetailedDeckText(std::ofstream& file) {
             spells << currentCard.str();
         currentCard.str("");
     }
-    file << getCardBlockText("Creatures", creatures.str()) << endl;
-    file << getCardBlockText("Spells", spells.str()) << endl;
-    file << getCardBlockText("Lands", lands.str()) << endl;
+    file << getCardBlockText("Creatures", creatures.str()) << std::endl;
+    file << getCardBlockText("Spells", spells.str()) << std::endl;
+    file << getCardBlockText("Lands", lands.str()) << std::endl;
     creatures.str("");
     spells.str("");
     lands.str("");
@@ -973,14 +973,14 @@ void MTGDeck::printDetailedDeckText(std::ofstream& file) {
 /***
  * Convience method to print out blocks of card descriptions
  */
-string MTGDeck::getCardBlockText(const string& title, const string& text) {
-    ostringstream oss;
-    string textBlock(text);
+std::string MTGDeck::getCardBlockText(const std::string& title, const std::string& text) {
+    std::ostringstream oss;
+    std::string textBlock(text);
 
-    oss << setfill('#') << setw(40) << "#" << endl;
-    oss << "#    " << setfill(' ') << setw(34) << left << title << "#" << endl;
-    oss << setfill('#') << setw(40) << "#" << endl;
-    oss << trim(textBlock) << endl;
+    oss << std::setfill('#') << std::setw(40) << "#" << std::endl;
+    oss << "#    " << std::setfill(' ') << std::setw(34) << std::left << title << "#" << std::endl;
+    oss << std::setfill('#') << std::setw(40) << "#" << std::endl;
+    oss << trim(textBlock) << std::endl;
 
     return oss.str();
 }

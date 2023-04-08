@@ -246,7 +246,7 @@ void GameObserver::nextCombatStep() {
 
 void GameObserver::userRequestNextGamePhase(bool allowInterrupt, bool log) {
     if (log) {
-        stringstream stream;
+        std::stringstream stream;
         stream << "next " << allowInterrupt << " " << currentGamePhase;
         logAction(currentPlayer, stream.str());
     }
@@ -311,7 +311,7 @@ int GameObserver::forceShuffleLibraries() {
 }
 
 void GameObserver::resetStartupGame() {
-    stringstream stream;
+    std::stringstream stream;
     startupGameSerialized = "";
     stream << *this;
     startupGameSerialized = stream.str();
@@ -445,7 +445,7 @@ bool GameObserver::operator==(const GameObserver& aGame) {
 
 void GameObserver::dumpAssert(bool val) {
     if (!val) {
-        cerr << *this << endl;
+        std::cerr << *this << std::endl;
         assert(0);
     }
 }
@@ -894,7 +894,7 @@ void GameObserver::ButtonPressed(PlayGuiObject* target) {
 }
 
 void GameObserver::stackObjectClicked(Interruptible* action) {
-    stringstream stream;
+    std::stringstream stream;
     stream << "stack[" << mLayers->stackLayer()->getIndexOf(action) << "]";
     logAction(currentlyActing(), stream.str());
 
@@ -937,7 +937,7 @@ int GameObserver::cardClick(MTGCardInstance* card, MTGAbility* ability) {
     logAction(card, zone, index, result);
 
     if (logChoice) {
-        stringstream stream;
+        std::stringstream stream;
         stream << "choice " << choice;
         logAction(currentActionPlayer, stream.str());
     }
@@ -1176,31 +1176,31 @@ int GameObserver::targetListIsSet(MTGCardInstance* card) {
     return 0;
 }
 
-ostream& operator<<(ostream& out, const GameObserver& g) {
+std::ostream& operator<<(std::ostream& out, const GameObserver& g) {
     if (g.startupGameSerialized == "") {
-        out << "[init]" << endl;
-        out << "player=" << g.currentPlayerId + 1 << endl;
-        if (g.currentGamePhase != -1) out << "phase=" << g.phaseRing->phaseName(g.currentGamePhase) << endl;
-        out << "[player1]" << endl;
-        out << *(g.players[0]) << endl;
-        out << "[player2]" << endl;
-        out << *(g.players[1]) << endl;
+        out << "[init]" << std::endl;
+        out << "player=" << g.currentPlayerId + 1 << std::endl;
+        if (g.currentGamePhase != -1) out << "phase=" << g.phaseRing->phaseName(g.currentGamePhase) << std::endl;
+        out << "[player1]" << std::endl;
+        out << *(g.players[0]) << std::endl;
+        out << "[player2]" << std::endl;
+        out << *(g.players[1]) << std::endl;
         return out;
     } else {
         out << "rvalues:";
         g.randomGenerator.saveUsedRandValues(out);
-        out << endl;
+        out << std::endl;
         out << g.startupGameSerialized;
     }
 
-    out << "[do]" << endl;
-    list<string>::const_iterator it;
+    out << "[do]" << std::endl;
+    std::list<string>::const_iterator it;
 
     for (it = (g.actionsList.begin()); it != (g.actionsList.end()); it++) {
-        out << (*it) << endl;
+        out << (*it) << std::endl;
     }
 
-    out << "[end]" << endl;
+    out << "[end]" << std::endl;
     return out;
 }
 
@@ -1229,7 +1229,7 @@ bool GameObserver::load(const string& ss, bool undo
 ) {
     int state = -1;
     string s;
-    stringstream stream(ss);
+    std::stringstream stream(ss);
 
     DebugTrace("Loading " + ss);
     randomGenerator.loadRandValues("");
@@ -1446,7 +1446,7 @@ void GameObserver::logAction(Player* player, const string& s) {
 }
 
 void GameObserver::logAction(MTGCardInstance* card, MTGGameZone* zone, size_t index, int result) {
-    stringstream stream;
+    std::stringstream stream;
     if (zone == NULL) zone = card->currentZone;
     stream << "p" << ((card->controller() == players[0]) ? "1." : "2.") << zone->getName() << "[" << index << "] "
            << result << card->getLCName();
@@ -1462,7 +1462,7 @@ void GameObserver::logAction(const string& s) {
 };
 
 bool GameObserver::undo() {
-    stringstream stream;
+    std::stringstream stream;
     stream << *this;
     DebugTrace(stream.str());
     return load(stream.str(), true);

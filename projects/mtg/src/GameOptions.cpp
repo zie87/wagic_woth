@@ -357,7 +357,8 @@ GameOption& GameOptions::operator[](string optionName) {
 GameOption* GameOptions::factorNewGameOption(string optionName, string value) {
     GameOption* result =
         (Unlockable::unlockables.find(optionName) != Unlockable::unlockables.end()) ? NEW GameOptionAward()
-                                                                                    : NEW GameOption();
+                                                                                    : NEW
+                                                                                      GameOption();
 
     if (value.size()) result->read(value);
 
@@ -725,7 +726,7 @@ void GameSettings::keypadShutdown() { SAFE_DELETE(keypad); }
 
 // EnumDefinition
 int EnumDefinition::findIndex(int value) {
-    vector<assoc>::iterator it;
+    std::vector<assoc>::iterator it;
     for (it = values.begin(); it != values.end(); it++) {
         if (it->first == value) return it - values.begin();
     }
@@ -734,7 +735,7 @@ int EnumDefinition::findIndex(int value) {
 }
 
 // GameOptionEnum
-string GameOptionEnum::menuStr() {
+std::string GameOptionEnum::menuStr() {
     if (def) {
         int idx = def->findIndex(number);
         if (idx != INVALID_ID) return def->values[idx].second;
@@ -745,22 +746,22 @@ string GameOptionEnum::menuStr() {
     return buf;
 }
 
-bool GameOptionEnum::write(std::ofstream* file, string name) {
+bool GameOptionEnum::write(std::ofstream* file, std::string name) {
     if (!file || !def || number <= 0 || number >= (int)def->values.size()) return false;
 
-    (*file) << name << "=" << menuStr() << endl;
+    (*file) << name << "=" << menuStr() << std::endl;
     return true;
 }
 
-bool GameOptionEnum::read(string input) {
+bool GameOptionEnum::read(std::string input) {
     if (!def) return false;
 
     number = 0;
     std::transform(input.begin(), input.end(), input.begin(), ::tolower);
 
-    vector<EnumDefinition::assoc>::iterator it;
+    std::vector<EnumDefinition::assoc>::iterator it;
     for (it = def->values.begin(); it != def->values.end(); it++) {
-        string v = it->second;
+        std::string v = it->second;
         std::transform(v.begin(), v.end(), v.begin(), ::tolower);
         if (v == input) {
             number = it->first;
@@ -967,12 +968,12 @@ static JButton u32_to_button(u32 b) {
 
 // MARK:  GameOptionKeyBindings
 
-bool GameOptionKeyBindings::read(string input) {
-    istringstream iss(input);
-    vector<pair<LocalKeySym, JButton> > assoc;
+bool GameOptionKeyBindings::read(std::string input) {
+    std::istringstream iss(input);
+    std::vector<std::pair<LocalKeySym, JButton> > assoc;
 
     while (iss.good()) {
-        stringstream s;
+        std::stringstream s;
         iss.get(*(s.rdbuf()), ',');
         iss.get();
 
@@ -981,7 +982,7 @@ bool GameOptionKeyBindings::read(string input) {
         u32 button;
         s >> local >> sep >> button;
         if (':' != sep) return false;
-        assoc.push_back(make_pair(local, u32_to_button(button)));
+        assoc.push_back(std::make_pair(local, u32_to_button(button)));
     }
 
     if (assoc.empty()) return false;
@@ -989,13 +990,13 @@ bool GameOptionKeyBindings::read(string input) {
     JGE* j = JGE::GetInstance();
 
     j->ClearBindings();
-    for (vector<pair<LocalKeySym, JButton> >::const_iterator it = assoc.begin(); it != assoc.end(); ++it)
+    for (std::vector<std::pair<LocalKeySym, JButton> >::const_iterator it = assoc.begin(); it != assoc.end(); ++it)
         j->BindKey(it->first, it->second);
 
     return true;
 }
 
-bool GameOptionKeyBindings::write(std::ofstream* file, string name) {
+bool GameOptionKeyBindings::write(std::ofstream* file, std::string name) {
     JGE* j = JGE::GetInstance();
     *file << name << "=";
     JGE::keybindings_it start = j->KeyBindings_begin(), end = j->KeyBindings_end();
@@ -1004,7 +1005,7 @@ bool GameOptionKeyBindings::write(std::ofstream* file, string name) {
         ++start;
     }
     for (JGE::keybindings_it it = start; it != end; ++it) *file << "," << it->first << ":" << it->second;
-    *file << endl;
+    *file << std::endl;
     return true;
 }
 // MARK:  -

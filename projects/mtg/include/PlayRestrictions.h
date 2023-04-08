@@ -30,7 +30,7 @@ public:
 
 class PlayRestrictions {
 protected:
-    vector<PlayRestriction*> restrictions;
+    std::vector<PlayRestriction*> restrictions;
 
 public:
     MaxPerTurnRestriction* getMaxPerTurnRestrictionByTargetChooser(TargetChooser* tc);

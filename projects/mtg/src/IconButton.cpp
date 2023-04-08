@@ -16,8 +16,8 @@ void IconButtonsController::SetColor(PIXEL_TYPE color) {
         if (mObjects[i]) ((IconButton*)mObjects[i])->SetColor(color);
 }
 
-IconButton::IconButton(int id, IconButtonsController* parent, string texture, float x, float y, float scale, int fontId,
-                       string text, float textRelativeX, float textRelativeY, bool hasFocus)
+IconButton::IconButton(int id, IconButtonsController* parent, std::string texture, float x, float y, float scale,
+                       int fontId, std::string text, float textRelativeX, float textRelativeY, bool hasFocus)
     : JGuiObject(id) {
     mQuad = NULL;
     mTex  = WResourceManager::Instance()->RetrieveTexture(texture, RETRIEVE_LOCK);
@@ -28,14 +28,14 @@ IconButton::IconButton(int id, IconButtonsController* parent, string texture, fl
 }
 
 IconButton::IconButton(int id, IconButtonsController* parent, JQuad* quad, float x, float y, float scale, int fontId,
-                       string text, float textRelativeX, float textRelativeY, bool hasFocus)
+                       std::string text, float textRelativeX, float textRelativeY, bool hasFocus)
     : JGuiObject(id) {
     mTex = NULL;
     init(parent, quad, x, y, scale, fontId, text, textRelativeX, textRelativeY, hasFocus);
 }
 
 void IconButton::init(IconButtonsController* parent, JQuad* quad, float x, float y, float scale, int fontId,
-                      string text, float textRelativeX, float textRelativeY, bool hasFocus) {
+                      std::string text, float textRelativeX, float textRelativeY, bool hasFocus) {
     mParent        = parent;
     mQuad          = quad;
     mX             = x;
@@ -106,4 +106,6 @@ IconButton::~IconButton() {
     }
 }
 
-ostream& IconButton::toString(ostream& out) const { return out << "IconButton ::: mHasFocus : " << mHasFocus; }
+std::ostream& IconButton::toString(std::ostream& out) const {
+    return out << "IconButton ::: mHasFocus : " << mHasFocus;
+}

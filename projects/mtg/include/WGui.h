@@ -550,9 +550,9 @@ protected:
 */
 class WGuiList : public WGuiMenu {
 public:
-    WGuiList(string name, WSyncable* syncme = NULL);
+    WGuiList(std::string name, WSyncable* syncme = NULL);
 
-    string failMsg;
+    std::string failMsg;
 
     virtual void Render();
     virtual void confirmChange(bool confirmed);
@@ -585,7 +585,7 @@ public:
 */
 class WGuiListRow : public WGuiList {
 public:
-    WGuiListRow(string n, WSyncable* s = NULL);
+    WGuiListRow(std::string n, WSyncable* s = NULL);
     virtual void Render();
 };
 
@@ -595,17 +595,17 @@ public:
 class WGuiFilters : public WGuiItem {
 public:
     friend class WGuiFilterItem;
-    WGuiFilters(string header, WSrcCards* src);
+    WGuiFilters(std::string header, WSrcCards* src);
     ~WGuiFilters();
     bool CheckUserInput(JButton key);
-    string getCode();  // For use in filter factory.
+    std::string getCode();  // For use in filter factory.
     void Update(float dt);
     void Render();
     void Entering(JButton key);
     void addColumn();
     void recolorFilter(int color);
     bool isAvailable(int type);
-    bool isAvailableCode(string code);
+    bool isAvailableCode(std::string code);
     bool Finish(bool emptyset = false);  // Returns true if card set reasonably expected to be changed.
     bool isFinished() { return bFinished; };
     void ButtonPressed(int controllerId, int controlId);
@@ -614,8 +614,8 @@ public:
 
 protected:
     void clearArgs();
-    void addArg(string display, string code);
-    vector<pair<string, string> > tempArgs;  // TODO FIXME this is inefficient
+    void addArg(std::string display, std::string code);
+    std::vector<std::pair<std::string, std::string> > tempArgs;  // TODO FIXME this is inefficient
     bool bFinished;
     int recolorTo;
     WSrcCards* source;
@@ -632,7 +632,7 @@ public:
     WGuiFilterItem(WGuiFilters* parent);
     void updateValue();
     void ButtonPressed(int controllerId, int controlId);
-    string getCode();
+    std::string getCode();
     bool isModal();
     enum {
         STATE_UNSET,
@@ -657,7 +657,7 @@ public:
     };
 
 protected:
-    string mCode;
+    std::string mCode;
     int filterType;
     int filterVal;
     int mState;
@@ -671,7 +671,7 @@ protected:
 */
 class WGuiKeyBinder : public WGuiList {
 public:
-    WGuiKeyBinder(string name, GameStateOptions* parent);
+    WGuiKeyBinder(std::string name, GameStateOptions* parent);
     virtual bool isModal();
     virtual bool CheckUserInput(JButton);
     virtual void setData();
@@ -688,8 +688,8 @@ protected:
     CONFIRM_TYPE confirmed;
     LocalKeySym confirmingKey;
     JButton confirmingButton;
-    set<LocalKeySym> confirmedKeys;
-    set<JButton> confirmedButtons;
+    std::set<LocalKeySym> confirmedKeys;
+    std::set<JButton> confirmedButtons;
     string confirmationString;
 };
 
