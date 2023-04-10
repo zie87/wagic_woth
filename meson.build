@@ -5,5 +5,5 @@ project(
     default_options: ['c_std=c11', 'cpp_std=c++20', 'warning_level=3'],
 )
 
-subdir('JGE')
-subdir('projects')
+subdir('libs')
+subdir('woth')

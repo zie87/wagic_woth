@@ -11,7 +11,7 @@
 #ifndef ENCODING_H
 #define ENCODING_H
 
-#include "../../JGE/include/JGE.h"
+#include "JGE.h"
 
 u16 charsets_gbk_to_ucs(const u8* cjk);
 
