@@ -18,11 +18,11 @@
 #include <stdio.h>
 #include <queue>
 
-#include "../../JGE/include/JGE.h"
-#include "../../JGE/include/JApp.h"
-#include "../../JGE/include/JGameLauncher.h"
-#include "../../JGE/include/JRenderer.h"
-#include "../../JGE/include/JLogger.h"
+#include "JGE.h"
+#include "JApp.h"
+#include "JGameLauncher.h"
+#include "JRenderer.h"
+#include "JLogger.h"
 
 #ifndef JGEApp_Title
 #define JGEApp_Title "JGE++"

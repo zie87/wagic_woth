@@ -4,7 +4,7 @@
 #include <string>
 #include <map>
 #include <vector>
-#include "../../../JGE/src/tinyxml/tinyxml.h"
+#include "../../libs/jge/src/tinyxml/tinyxml.h"
 #include <JGui.h>
 class GameObserver;
 class MTGDeck;

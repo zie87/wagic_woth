@@ -124,8 +124,8 @@ jobs:
         lcov --capture --initial --directory . --output-file cov_base.info
     - name: Run tests
       run: |
-        cp ${{runner.workspace}}/wagic_woth/builddir/projects/mtg/tests/testsuite/wagic_testsuite  ${{runner.workspace}}/wagic_woth/projects/mtg/bin
-        cd  ${{runner.workspace}}/wagic_woth/projects/mtg/bin
+        cp ${{runner.workspace}}/wagic_woth/builddir/woth/tests/testsuite/wagic_testsuite  ${{runner.workspace}}/wagic_woth/woth/bin
+        cd  ${{runner.workspace}}/wagic_woth/woth/bin
         ./wagic_testsuite
     - name: Lcov creation
       working-directory: ${{runner.workspace}}

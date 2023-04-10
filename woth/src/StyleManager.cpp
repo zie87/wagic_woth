@@ -7,7 +7,7 @@
 #include "DeckDataWrapper.h"
 #include "WFilter.h"
 #include "StyleManager.h"
-#include "../../../JGE/src/tinyxml/tinyxml.h"
+#include "../../libs/jge/src/tinyxml/tinyxml.h"
 
 void StyleManager::killRules() {
     activeStyle = "";
