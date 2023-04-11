@@ -1,3 +1,5 @@
+#include "woth/string/algorithms.hpp"
+
 #include "PrecompiledHeader.h"
 
 #include "MTGAbility.h"
@@ -802,7 +804,7 @@ MTGAbility* AbilityFactory::getCoreAbility(MTGAbility* a) {
 MTGAbility* AbilityFactory::parseMagicLine(string s, int id, Spell* spell, MTGCardInstance* card, bool activated,
                                            bool forceUEOT, MTGGameZone* dest) {
     size_t found;
-    trim(s);
+    ::woth::trim(s);
     // TODO This block redundant with calling function
     if (!card && spell) {
         card = spell->source;
@@ -2693,7 +2695,7 @@ MTGAbility* AbilityFactory::parsePhaseActionAbility(const string& s, MTGCardInst
     if (!_target) {
         _target = target;
     }
-    return NEW APhaseActionGeneric(observer, id, card, _target, trim(splitActions[2]), restrictions, phase,
+    return NEW APhaseActionGeneric(observer, id, card, _target, ::woth::trim(splitActions[2]), restrictions, phase,
                                    sourceinPlay, next, myturn, opponentturn, once);
 }
 

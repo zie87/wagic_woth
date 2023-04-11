@@ -1,3 +1,5 @@
+#include "woth/string/algorithms.hpp"
+
 #include "PrecompiledHeader.h"
 
 #include "DeckMetaData.h"
@@ -30,8 +32,8 @@ DeckMetaData::DeckMetaData(const string& filename, bool isAI)
 void DeckMetaData::LoadDeck() {
     if (!mDeckLoaded) {
         MTGDeck deck(mFilename.c_str(), nullptr, 1);
-        mName        = trim(deck.meta_name);
-        mDescription = trim(deck.meta_desc);
+        mName        = ::woth::trim(deck.meta_name);
+        mDescription = ::woth::trim(deck.meta_desc);
         mDeckId      = atoi((mFilename.substr(mFilename.find("deck") + 4, mFilename.find(".txt"))).c_str());
 
         std::vector<std::string> requirements = split(deck.meta_unlockRequirements, ',');

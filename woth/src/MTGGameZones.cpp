@@ -1,3 +1,5 @@
+#include "woth/string/algorithms.hpp"
+
 #include "PrecompiledHeader.h"
 
 #include "CardSelector.h"
@@ -1017,10 +1019,10 @@ bool MTGGameZone::parseLine(const string& ss) {
         MTGCard* card        = nullptr;
         string toFind;
         if (limiter != string::npos) {
-            toFind = trim(s.substr(0, limiter));
+            toFind = ::woth::trim(s.substr(0, limiter));
             s      = s.substr(limiter + 1);
         } else {
-            toFind = trim(s);
+            toFind = ::woth::trim(s);
             s      = "";
         }
 

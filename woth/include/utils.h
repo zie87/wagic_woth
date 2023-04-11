@@ -1,6 +1,8 @@
 #ifndef UTILS_H
 #define UTILS_H
 
+#include "woth/string/algorithms.hpp"
+
 #include <JGE.h>
 
 #if defined(PSP)
@@ -57,16 +59,6 @@ inline void shuffle(RandomIt first, RandomIt last) {
 }  // namespace wth
 
 using std::string;
-
-// string manipulation methods
-std::string& trim(std::string& str);
-std::string& ltrim(std::string& str);
-std::string& rtrim(std::string& str);
-
-inline std::string trim(const std::string& str) {
-    std::string value(str);
-    return trim(value);
-}
 
 std::string join(std::vector<std::string>& v, const std::string& delim = " ");
 

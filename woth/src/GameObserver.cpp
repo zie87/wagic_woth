@@ -93,6 +93,13 @@ GameObserver::GameObserver(WResourceManager* output, JGE* input)
 
 {}
 
+WResourceManager* GameObserver::getResourceManager() {
+    if (this) {
+        return mResourceManager;
+    }
+    return nullptr;
+}
+
 GamePhase GameObserver::getCurrentGamePhase() const { return currentGamePhase; }
 
 const char* GameObserver::getCurrentGamePhaseName() const { return phaseRing->phaseName(currentGamePhase); }
