@@ -17,7 +17,7 @@ function mingw_build() {
     meson setup --cross-file ./tools/mingw/x86_64-w64-mingw32.build \
         --buildtype $1 "${BUILD_DIR}" \
         -Denable_testsuite=$2
-    meson compile -v -C "${BUILD_DIR}"
+    meson compile -C "${BUILD_DIR}"
 }
 
 cd ${ROOT_DIR}
