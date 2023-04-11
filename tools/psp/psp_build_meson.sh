@@ -12,7 +12,7 @@ function meson_build() {
     meson setup --cross-file ./tools/psp/mips_psp.build \
         --buildtype $1 "${BUILD_DIR}" \
         -Denable_testsuite=$2
-    meson compile -v -C "${BUILD_DIR}"
+    meson compile -C "${BUILD_DIR}"
 }
 
 cd ${ROOT_DIR}
