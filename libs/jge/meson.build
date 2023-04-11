@@ -72,10 +72,6 @@ jge_srcs = [
     'src/zipFS/zfsystem.cpp',
     'src/zipFS/ziphdr.cpp',
     'src/zipFS/zstream.cpp',
-    'src/tinyxml/tinystr.cpp',
-    'src/tinyxml/tinyxml.cpp',
-    'src/tinyxml/tinyxmlerror.cpp',
-    'src/tinyxml/tinyxmlparser.cpp',
 ]
 
 jge_main_srcs = []
@@ -87,7 +83,7 @@ jge_inc_dirs = [include_directories('./include'), zipfs_inc_dir]
 png_dep = dependency('libpng')
 jpeg_dep = dependency('libjpeg')
 
-jge_dependencies = [hge_dep, png_dep, jpeg_dep]
+jge_dependencies = [tinyxml_dep, hge_dep, png_dep, jpeg_dep]
 
 if host_machine.system() == 'psp'
     freetype_dep = dependency('freetype2')
