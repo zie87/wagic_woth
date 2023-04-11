@@ -178,6 +178,7 @@ jgemain_dep = declare_dependency(
     dependencies: jge_dependencies,
 )
 
+subdir('tests')
 if get_option('build_docs')
     subdir('docs')
 endif
