@@ -11,11 +11,7 @@
 #ifndef VECTOR2D_H
 #define VECTOR2D_H
 
-#ifdef PSP
-#include <fastmath.h>
-#else
-#include <math.h>
-#endif
+#include "jge/math/math.hpp"
 
 struct Vector2D {
     float x, y;
