@@ -4,18 +4,17 @@ hge_srcs = [
     'src/hge/hgecolor.cpp',
     'src/hge/hgeparticle.cpp',
     'src/hge/hgerect.cpp',
-    'src/hge/hgevector.cpp',
     'src/hge/hgedistort.cpp',
     'src/hge/hgefont.cpp',
 ]
 
 hge_c_args = []
 hge_cpp_args = []
-hge_inc_dirs = [zipfs_inc_dir]
+hge_inc_dirs = [include_directories('./include'), zipfs_inc_dir]
 hge_dependencies = []
 
 if host_machine.system() == 'psp'
-    hge_c_args = ['-D_PSP_FW_VERSION=150']
+    hge_c_args = ['-DPSP','-D_PSP_FW_VERSION=150']
     hge_cpp_args = hge_c_args
 else
     sdl2_dep = dependency('sdl2')

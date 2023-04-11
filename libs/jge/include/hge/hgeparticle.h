@@ -11,7 +11,10 @@
 
 // #include "hge.h"
 // #include "hgesprite.h"
-#include "hgevector.h"
+// #include "hgevector.h"
+
+#include "jge/math/vector_2d.hpp"
+
 #include "hgecolor.h"
 #include "hgerect.h"
 
@@ -24,8 +27,8 @@ class JQuad;
 #define MAX_PSYSTEMS 100
 
 struct hgeParticle {
-    hgeVector vecLocation;
-    hgeVector vecVelocity;
+    ::jge::math::vector_2d vecLocation;
+    ::jge::math::vector_2d vecVelocity;
 
     float fGravity;
     float fRadialAccel;
@@ -108,8 +111,8 @@ public:
     int GetParticlesAlive() const { return nParticlesAlive; }
     float GetAge() const { return fAge; }
     void GetPosition(float* x, float* y) const {
-        *x = vecLocation.x;
-        *y = vecLocation.y;
+        *x = vecLocation.x();
+        *y = vecLocation.y();
     }
     void GetTransposition(float* x, float* y) const {
         *x = fTx;
@@ -128,8 +131,8 @@ private:
     float fAge;
     float fEmissionResidue;
 
-    hgeVector vecPrevLocation;
-    hgeVector vecLocation;
+    ::jge::math::vector_2d vecPrevLocation {};
+    ::jge::math::vector_2d vecLocation {};
     float fTx, fTy;
 
     int nParticlesAlive;

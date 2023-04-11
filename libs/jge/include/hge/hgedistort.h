@@ -10,7 +10,7 @@
 #define HGE_HGEDISTORT_H
 
 // #include "hge.h"
-#include "../JTypes.h"
+#include "JTypes.h"
 
 #define HGEDISP_NODE 0
 #define HGEDISP_TOPLEFT 1

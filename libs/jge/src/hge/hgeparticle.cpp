@@ -6,12 +6,12 @@
 ** hgeParticleSystem helper class implementation
 */
 
-#include "../../include/JGE.h"
-#include "../../include/JTypes.h"
-#include "../../include/JRenderer.h"
-#include "../../include/JFileSystem.h"
+#include "JGE.h"
+#include "JTypes.h"
+#include "JRenderer.h"
+#include "JFileSystem.h"
 
-#include "../../include/hge/hgeparticle.h"
+#include "hge/hgeparticle.h"
 
 // HGE	*hgeParticleSystem::hge=0;
 
@@ -75,8 +75,6 @@ hgeParticleSystem::hgeParticleSystem(const char* filename, JQuad* sprite) {
     // 	info.fSpeedMin *= 100;
     // 	info.fSpeedMax *= 100;
 
-    vecLocation.x = vecPrevLocation.x = 0.0f;
-    vecLocation.y = vecPrevLocation.y = 0.0f;
     fTx = fTy = 0;
 
     fEmissionResidue = 0.0f;
@@ -98,8 +96,6 @@ hgeParticleSystem::hgeParticleSystem(hgeParticleSystemInfo* psi)
 
     memcpy(&info, psi, sizeof(hgeParticleSystemInfo));
 
-    vecLocation.x = vecPrevLocation.x = 0.0f;
-    vecLocation.y = vecPrevLocation.y = 0.0f;
     fTx = fTy = 0;
 
     rectBoundingBox.Clear();
@@ -113,8 +109,8 @@ hgeParticleSystem::hgeParticleSystem(const hgeParticleSystem& ps) {
 void hgeParticleSystem::Update(float fDeltaTime) {
     int i;
     float ang;
-    hgeVector vecAccel;
-    hgeVector vecAccel2;
+    ::jge::math::vector_2d vecAccel{};
+    ::jge::math::vector_2d vecAccel2{};
 
     if (fAge >= 0) {
         fAge += fDeltaTime;
@@ -148,19 +144,19 @@ void hgeParticleSystem::Update(float fDeltaTime) {
         }
 
         vecAccel = particle->vecLocation - vecLocation;
-        vecAccel.Normalize();
+        vecAccel.normalize();
         vecAccel2 = vecAccel;
         vecAccel *= particle->fRadialAccel;
 
         // vecAccel2.Rotate(M_PI_2);
         // the following is faster
-        ang         = vecAccel2.x;
-        vecAccel2.x = -vecAccel2.y;
-        vecAccel2.y = ang;
+        ang         = vecAccel2.x();
+        vecAccel2.x() = -vecAccel2.y();
+        vecAccel2.y() = ang;
 
         vecAccel2 *= particle->fTangentialAccel;
         particle->vecVelocity += (vecAccel + vecAccel2) * fDeltaTime;
-        particle->vecVelocity.y += particle->fGravity * fDeltaTime;
+        particle->vecVelocity.y() += particle->fGravity * fDeltaTime;
 
         // par->vecVelocity.y = 0.1f;
         particle->vecLocation += particle->vecVelocity;
@@ -170,7 +166,7 @@ void hgeParticleSystem::Update(float fDeltaTime) {
         particle->colColor += particle->colColorDelta * fDeltaTime;
 
         if (bUpdateBoundingBox) {
-            rectBoundingBox.Encapsulate(particle->vecLocation.x, particle->vecLocation.y);
+            rectBoundingBox.Encapsulate(particle->vecLocation.x(), particle->vecLocation.y());
         }
 
         ++particle;
@@ -193,15 +189,15 @@ void hgeParticleSystem::Update(float fDeltaTime) {
             newParticle.fTerminalAge = Random_Float(info.fParticleLifeMin, info.fParticleLifeMax);
 
             newParticle.vecLocation = vecPrevLocation + (vecLocation - vecPrevLocation) * Random_Float(0.0f, 1.0f);
-            newParticle.vecLocation.x += Random_Float(-2.0f, 2.0f);
-            newParticle.vecLocation.y += Random_Float(-2.0f, 2.0f);
+            newParticle.vecLocation.x() += Random_Float(-2.0f, 2.0f);
+            newParticle.vecLocation.y() += Random_Float(-2.0f, 2.0f);
 
             ang = info.fDirection - M_PI_2 + Random_Float(0, info.fSpread) - info.fSpread / 2.0f;
             if (info.bRelative) {
-                ang += (vecPrevLocation - vecLocation).Angle() + M_PI_2;
+                ang += (vecPrevLocation - vecLocation).angle() + M_PI_2;
             }
-            newParticle.vecVelocity.x = cosf(ang);
-            newParticle.vecVelocity.y = sinf(ang);
+            newParticle.vecVelocity.x() = ::jge::math::cos(ang);
+            newParticle.vecVelocity.y() = ::jge::math::sin(ang);
             newParticle.vecVelocity *= Random_Float(info.fSpeedMin, info.fSpeedMax);
 
             newParticle.fGravity         = Random_Float(info.fGravityMin, info.fGravityMax);
@@ -235,7 +231,7 @@ void hgeParticleSystem::Update(float fDeltaTime) {
             newParticle.colColorDelta.a = (info.colColorEnd.a - newParticle.colColor.a) / newParticle.fTerminalAge;
 
             if (bUpdateBoundingBox) {
-                rectBoundingBox.Encapsulate(newParticle.vecLocation.x, newParticle.vecLocation.y);
+                rectBoundingBox.Encapsulate(newParticle.vecLocation.x(), newParticle.vecLocation.y());
             }
 
             mParticleBuffer.push_back(newParticle);
@@ -251,29 +247,29 @@ void hgeParticleSystem::MoveTo(float x, float y, bool bMoveParticles) {
     float dy;
 
     if (bMoveParticles) {
-        dx = x - vecLocation.x;
-        dy = y - vecLocation.y;
+        dx = x - vecLocation.x();
+        dy = y - vecLocation.y();
 
         auto particle = mParticleBuffer.begin();
         for (; particle != mParticleBuffer.end(); ++particle) {
-            particle->vecLocation.x += dx;
-            particle->vecLocation.y += dy;
+            particle->vecLocation.x() += dx;
+            particle->vecLocation.y() += dy;
         }
 
-        vecPrevLocation.x = vecPrevLocation.x + dx;
-        vecPrevLocation.y = vecPrevLocation.y + dy;
+        vecPrevLocation.x() = vecPrevLocation.x() + dx;
+        vecPrevLocation.y() = vecPrevLocation.y() + dy;
     } else {
         if (fAge == -2.0) {
-            vecPrevLocation.x = x;
-            vecPrevLocation.y = y;
+            vecPrevLocation.x() = x;
+            vecPrevLocation.y() = y;
         } else {
-            vecPrevLocation.x = vecLocation.x;
-            vecPrevLocation.y = vecLocation.y;
+            vecPrevLocation.x() = vecLocation.x();
+            vecPrevLocation.y() = vecLocation.y();
         }
     }
 
-    vecLocation.x = x;
-    vecLocation.y = y;
+    vecLocation.x() = x;
+    vecLocation.y() = y;
 }
 
 void hgeParticleSystem::FireAt(float x, float y) {
@@ -305,7 +301,7 @@ void hgeParticleSystem::Render() {
     auto particle = mParticleBuffer.begin();
     for (; particle != mParticleBuffer.end(); ++particle) {
         info.sprite->SetColor(particle->colColor.GetHWColor());
-        JRenderer::GetInstance()->RenderQuad(info.sprite, particle->vecLocation.x + fTx, particle->vecLocation.y + fTy,
+        JRenderer::GetInstance()->RenderQuad(info.sprite, particle->vecLocation.x() + fTx, particle->vecLocation.y() + fTy,
                                              particle->fSpin * particle->fAge, particle->fSize, particle->fSize);
     }
 }
