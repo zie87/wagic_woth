@@ -9,7 +9,7 @@
 #ifndef HGE_HGEFONT_H
 #define HGE_HGEFONT_H
 
-#include "../JTypes.h"
+#include "JTypes.h"
 // #include "hge.h"
 // #include "hgesprite.h"
 
