@@ -1,3 +1,5 @@
+#include "woth/string/algorithms.hpp"
+
 #include "PrecompiledHeader.h"
 
 #include "GameApp.h"
@@ -162,7 +164,7 @@ Task* Task::createFromStr(const string& params, bool rand) {
     vector<string> exploded;
     Task* result;
 
-    split(params, ITEM_SEPARATOR[0], exploded);
+    ::woth::split(params, ITEM_SEPARATOR[0], exploded);
 
     switch (exploded[0][0]) {
     case TASK_WIN_AGAINST:

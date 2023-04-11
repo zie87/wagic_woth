@@ -105,7 +105,7 @@ PhaseRing::PhaseRing(GameObserver* observer) : observer(observer) {
         std::list<Phase*> turnRing;  // this is temporary;
         if (!observer->players[i]->phaseRing.empty()) {
             addPhase(NEW Phase(MTG_PHASE_BEFORE_BEGIN, observer->players[i]));
-            std::vector<string> customRing = split(observer->players[i]->phaseRing, ',');
+            std::vector<string> customRing = ::woth::split(observer->players[i]->phaseRing, ',');
             for (unsigned int k = 0; k < customRing.size(); k++) {
                 const GamePhase customOrder = phaseStrToInt(customRing[k]);
                 auto* phase                 = NEW Phase(customOrder, observer->players[i]);

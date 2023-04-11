@@ -1,3 +1,5 @@
+#include "woth/string/algorithms.hpp"
+
 #include "PrecompiledHeader.h"
 
 #include "TextScroller.h"
@@ -107,7 +109,7 @@ void VerticalTextScroller::Update(float dt) {
         timer = 0;
         // now readjust mText
         const size_t nbLines                 = 1;
-        std::vector<std::string> displayText = split(mText, '\n');
+        std::vector<std::string> displayText = ::woth::split(mText, '\n');
         std::vector<std::string> newDisplayText;
         for (size_t i = nbLines; i < displayText.size(); ++i) {
             newDisplayText.push_back(displayText[i]);

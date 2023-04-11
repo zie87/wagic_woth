@@ -203,15 +203,6 @@ u32 ramAvailable(void) {
     return size;
 }
 
-std::vector<std::string>& split(const std::string& s, char delim, std::vector<std::string>& elems) {
-    std::stringstream ss(s);
-    std::string item;
-    while (std::getline(ss, item, delim)) {
-        elems.push_back(item);
-    }
-    return elems;
-}
-
 std::string join(vector<string>& v, const string& delim) {
     std::string retVal;
     for (auto it = v.begin(); it != v.end(); ++it) {
@@ -222,12 +213,10 @@ std::string join(vector<string>& v, const string& delim) {
     return retVal;
 }
 
-std::vector<std::string> split(const std::string& s, char delim) {
-    std::vector<std::string> elems;
-    return split(s, delim, elems);
-}
-
-std::vector<std::string>& parseBetween(const std::string& s, const string& start, const string& stop, bool stopRequired,
+std::vector<std::string>& parseBetween(const std::string& s,
+                                       const string& start,
+                                       const string& stop,
+                                       bool stopRequired,
                                        std::vector<std::string>& elems) {
     const size_t found = s.find(start);
     if (found == string::npos) {
@@ -252,7 +241,9 @@ std::vector<std::string>& parseBetween(const std::string& s, const string& start
     return elems;
 }
 
-std::vector<std::string> parseBetween(const std::string& s, const string& start, const string& stop,
+std::vector<std::string> parseBetween(const std::string& s,
+                                      const string& start,
+                                      const string& stop,
                                       bool stopRequired) {
     std::vector<std::string> elems;
     return parseBetween(s, std::move(start), std::move(stop), stopRequired, elems);

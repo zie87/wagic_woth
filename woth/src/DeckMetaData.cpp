@@ -36,7 +36,7 @@ void DeckMetaData::LoadDeck() {
         mDescription = ::woth::trim(deck.meta_desc);
         mDeckId      = atoi((mFilename.substr(mFilename.find("deck") + 4, mFilename.find(".txt"))).c_str());
 
-        std::vector<std::string> requirements = split(deck.meta_unlockRequirements, ',');
+        std::vector<std::string> requirements = ::woth::split(deck.meta_unlockRequirements, ',');
         for (size_t i = 0; i < requirements.size(); ++i) {
             mUnlockRequirements.push_back(Options::getID(requirements[i]));
         }

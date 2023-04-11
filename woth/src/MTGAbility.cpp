@@ -80,7 +80,7 @@ int MTGAbility::allowedToAltCast(MTGCardInstance* card, Player* player) {
 }
 
 int AbilityFactory::parseCastRestrictions(MTGCardInstance* card, Player* player, const string& restrictions) {
-    vector<string> restriction = split(restrictions, ',');
+    vector<string> restriction = ::woth::split(restrictions, ',');
     const AbilityFactory af(observer);
     const int cPhase = observer->getCurrentGamePhase();
     for (unsigned int i = 0; i < restriction.size(); i++) {
@@ -141,7 +141,7 @@ int AbilityFactory::parseCastRestrictions(MTGCardInstance* card, Player* player,
             int secondAmount = 0;
             int mod          = 0;
             string rtc;
-            vector<string> comparasion = split(restriction[i], '~');
+            vector<string> comparasion = ::woth::split(restriction[i], '~');
             if (comparasion.size() != 3) {
                 return 0;  // it was incorrectly coded, user should proofread card code.
             }
@@ -421,8 +421,8 @@ Counter* AbilityFactory::parseCounter(const string& s, MTGCardInstance* target, 
     string maxNbstr = "0";
     string spt;
 
-    vector<string> splitCounter            = split(s, ',');
-    const vector<string> splitCounterCheck = split(s, '.');
+    vector<string> splitCounter            = ::woth::split(s, ',');
+    const vector<string> splitCounterCheck = ::woth::split(s, '.');
     if (splitCounter.size() < splitCounterCheck.size()) {
         splitCounter = splitCounterCheck;  // use the one with the most results.
     }
@@ -474,8 +474,8 @@ Counter* AbilityFactory::parseCounter(const string& s, MTGCardInstance* target, 
 }
 
 int AbilityFactory::parsePowerToughness(const string& s, int* power, int* toughness) {
-    vector<string> splitPT            = split(s, '/');
-    const vector<string> splitPTCheck = split(s, '%');
+    vector<string> splitPT            = ::woth::split(s, '/');
+    const vector<string> splitPTCheck = ::woth::split(s, '%');
     if (splitPT.size() < 2 && splitPT.size() < splitPTCheck.size()) {
         splitPT = splitPTCheck;
     }
@@ -487,7 +487,9 @@ int AbilityFactory::parsePowerToughness(const string& s, int* power, int* toughn
     return 1;
 }
 
-TargetChooser* AbilityFactory::parseSimpleTC(const std::string& s, const std::string& _starter, MTGCardInstance* card,
+TargetChooser* AbilityFactory::parseSimpleTC(const std::string& s,
+                                             const std::string& _starter,
+                                             MTGCardInstance* card,
                                              bool forceNoTarget) {
     string starter = _starter;
     starter.append("(");
@@ -519,8 +521,12 @@ TargetChooser* AbilityFactory::parseSimpleTC(const std::string& s, const std::st
 // evaluate trigger ability
 // ie auto=@attacking(mytgt):destroy target(*)
 // eval only the text between the @ and the first :
-TriggeredAbility* AbilityFactory::parseTrigger(const string& s, const string& magicText, int id, Spell* spell,
-                                               MTGCardInstance* card, Targetable* target) {
+TriggeredAbility* AbilityFactory::parseTrigger(const string& s,
+                                               const string& magicText,
+                                               int id,
+                                               Spell* spell,
+                                               MTGCardInstance* card,
+                                               Targetable* target) {
     size_t found = string::npos;
 
     // restrictions on triggers
@@ -613,7 +619,7 @@ TriggeredAbility* AbilityFactory::parseTrigger(const string& s, const string& ma
         bool notBlockedTrigger             = false;
         bool attackBlockedTrigger          = false;
         bool blockingTrigger               = false;
-        vector<string> combatTriggerVector = split(combatTrigger, ',');
+        vector<string> combatTriggerVector = ::woth::split(combatTrigger, ',');
         for (unsigned int i = 0; i < combatTriggerVector.size(); i++) {
             if (combatTriggerVector[i] == "attacking") {
                 attackingTrigger = true;
@@ -801,8 +807,13 @@ MTGAbility* AbilityFactory::getCoreAbility(MTGAbility* a) {
 // Parses a string and returns the corresponding MTGAbility object
 // Returns NULL if parsing failed
 // Beware, Spell CAN be null when the function is called by the AI trying to analyze the effects of a given card
-MTGAbility* AbilityFactory::parseMagicLine(string s, int id, Spell* spell, MTGCardInstance* card, bool activated,
-                                           bool forceUEOT, MTGGameZone* dest) {
+MTGAbility* AbilityFactory::parseMagicLine(string s,
+                                           int id,
+                                           Spell* spell,
+                                           MTGCardInstance* card,
+                                           bool activated,
+                                           bool forceUEOT,
+                                           MTGGameZone* dest) {
     size_t found;
     ::woth::trim(s);
     // TODO This block redundant with calling function
@@ -1391,7 +1402,7 @@ MTGAbility* AbilityFactory::parseMagicLine(string s, int id, Spell* spell, MTGCa
     found = s.find("&&");
     if (found != string::npos) {
         SAFE_DELETE(tc);
-        vector<string> multiEffects = split(s, '&');
+        vector<string> multiEffects = ::woth::split(s, '&');
         auto* multi                 = NEW MultiAbility(observer, id, card, target, nullptr);
         for (unsigned int i = 0; i < multiEffects.size(); i++) {
             if (!multiEffects[i].empty()) {
@@ -1726,7 +1737,7 @@ MTGAbility* AbilityFactory::parseMagicLine(string s, int id, Spell* spell, MTGCa
         }
 
         const string tokenDesc         = splitToken[1];
-        vector<string> tokenParameters = split(tokenDesc, ',');
+        vector<string> tokenParameters = ::woth::split(tokenDesc, ',');
         if (tokenParameters.size() < 3) {
             DebugTrace("incorrect Parameters for Token" << tokenDesc);
             return nullptr;
@@ -2110,7 +2121,7 @@ MTGAbility* AbilityFactory::parseMagicLine(string s, int id, Spell* spell, MTGCa
     // rampage
     vector<string> splitRampage = parseBetween(s, "rampage(", ")");
     if (!splitRampage.empty()) {
-        vector<string> rampageParameters = split(splitRampage[1], ',');
+        vector<string> rampageParameters = ::woth::split(splitRampage[1], ',');
         int power;
         int toughness;
         if (!parsePowerToughness(rampageParameters[0], &power, &toughness)) {
@@ -2141,7 +2152,7 @@ MTGAbility* AbilityFactory::parseMagicLine(string s, int id, Spell* spell, MTGCa
     if (!splitBushido.empty()) {
         const string power;
         const string toughness;
-        const vector<string> splitPT = split(splitBushido[1], '/');
+        const vector<string> splitPT = ::woth::split(splitBushido[1], '/');
         if (splitPT.empty()) {
             return nullptr;
         }
@@ -2151,7 +2162,7 @@ MTGAbility* AbilityFactory::parseMagicLine(string s, int id, Spell* spell, MTGCa
     if (!splitPhaseAlter.empty()) {
         const string power;
         const string toughness;
-        vector<string> splitPhaseAlter2 = split(splitPhaseAlter[1], ',');
+        vector<string> splitPhaseAlter2 = ::woth::split(splitPhaseAlter[1], ',');
         if (splitPhaseAlter2.size() < 3) {
             return nullptr;
         }
@@ -2246,13 +2257,13 @@ MTGAbility* AbilityFactory::parseMagicLine(string s, int id, Spell* spell, MTGCa
     // Becomes... (animate artifact...: becomes(Creature, manacost/manacost)
     vector<string> splitBecomes = parseBetween(s, "becomes(", ")");
     if (!splitBecomes.empty()) {
-        vector<string> becomesParameters = split(splitBecomes[1], ',');
+        vector<string> becomesParameters = ::woth::split(splitBecomes[1], ',');
         const string stypes              = becomesParameters[0];
         string newPower;
         string newToughness;
         bool ptFound = false;
         if (becomesParameters.size() > 1) {
-            vector<string> pt = split(becomesParameters[1], '/');
+            vector<string> pt = ::woth::split(becomesParameters[1], '/');
             if (pt.size() > 1) {
                 newPower     = pt[0];
                 newToughness = pt[1];
@@ -2316,7 +2327,7 @@ MTGAbility* AbilityFactory::parseMagicLine(string s, int id, Spell* spell, MTGCa
             extraTransforms.append(transformsParamsString.substr(stypesStartIndex, real_end - stypesStartIndex));
             transformsParamsString.erase(stypesStartIndex, real_end - stypesStartIndex);
         }
-        vector<string> effectParameters = split(transformsParamsString, ',');
+        vector<string> effectParameters = ::woth::split(transformsParamsString, ',');
         const string stypes             = effectParameters[0];
 
         const string sabilities = transformsParamsString.substr(stypes.length());
@@ -2324,7 +2335,7 @@ MTGAbility* AbilityFactory::parseMagicLine(string s, int id, Spell* spell, MTGCa
         string newpower;
         bool newtoughnessfound = false;
         string newtoughness;
-        vector<string> abilities = split(sabilities, ',');
+        vector<string> abilities = ::woth::split(sabilities, ',');
         bool newAbilityFound     = false;
         vector<string> newAbilitiesList;
         storedString.erase();
@@ -2370,7 +2381,7 @@ MTGAbility* AbilityFactory::parseMagicLine(string s, int id, Spell* spell, MTGCa
     if (!splitFlipStat.empty()) {
         string flipStats;
         if (!splitFlipStat[1].empty()) {
-            /*vector<string>FlipStats = split(splitFlipStat[1],'%');*/
+            /*vector<string>FlipStats = ::woth::split(splitFlipStat[1],'%');*/
             flipStats = splitFlipStat[1];
         }
         MTGAbility* a = NEW AAFlip(observer, id, card, target, flipStats);
@@ -2618,7 +2629,10 @@ MTGAbility* AbilityFactory::parseMagicLine(string s, int id, Spell* spell, MTGCa
     return nullptr;
 }
 
-MTGAbility* AbilityFactory::parseUpkeepAbility(const string& s, MTGCardInstance* card, Spell* spell, int restrictions,
+MTGAbility* AbilityFactory::parseUpkeepAbility(const string& s,
+                                               MTGCardInstance* card,
+                                               Spell* spell,
+                                               int restrictions,
                                                int id) {
     bool Cumulative         = false;
     const size_t cumulative = s.find("cumulativeupcost");
@@ -2664,8 +2678,12 @@ MTGAbility* AbilityFactory::parseUpkeepAbility(const string& s, MTGCardInstance*
     ;
 }
 
-MTGAbility* AbilityFactory::parsePhaseActionAbility(const string& s, MTGCardInstance* card, Spell* spell,
-                                                    MTGCardInstance* target, int restrictions, int id) {
+MTGAbility* AbilityFactory::parsePhaseActionAbility(const string& s,
+                                                    MTGCardInstance* card,
+                                                    Spell* spell,
+                                                    MTGCardInstance* target,
+                                                    int restrictions,
+                                                    int id) {
     vector<string> splitActions = parseBetween(s, "[", "]");
     if (splitActions.empty()) {
         DebugTrace("MTGABILITY:Parsing Error " << s);
@@ -2699,8 +2717,12 @@ MTGAbility* AbilityFactory::parsePhaseActionAbility(const string& s, MTGCardInst
                                    sourceinPlay, next, myturn, opponentturn, once);
 }
 
-MTGAbility* AbilityFactory::parseChooseActionAbility(const string& s, MTGCardInstance* card, Spell* spell,
-                                                     MTGCardInstance* target, int restrictions, int id) {
+MTGAbility* AbilityFactory::parseChooseActionAbility(const string& s,
+                                                     MTGCardInstance* card,
+                                                     Spell* spell,
+                                                     MTGCardInstance* target,
+                                                     int restrictions,
+                                                     int id) {
     vector<string> splitChooseAColor2 = parseBetween(s, "activatechooseacolor ", " activatechooseend");
     if (!splitChooseAColor2.empty()) {
         const string a1     = splitChooseAColor2[1];
@@ -2818,7 +2840,7 @@ int AbilityFactory::abilityEfficiency(MTGAbility* a, Player* p, int mode, Target
             testDummy->setObserver(targetedPlyr->getObserver());
             testDummy->owner              = targetedPlyr;
             testDummy->storedSourceCard   = atac->source;
-            vector<string> magictextlines = split(atac->sabilities, '_');
+            vector<string> magictextlines = ::woth::split(atac->sabilities, '_');
             if (!magictextlines.empty()) {
                 for (unsigned int i = 0; i < magictextlines.size(); i++) {
                     MTGAbility* ata = parseMagicLine(magictextlines[i], -1, nullptr, testDummy);
@@ -2983,7 +3005,10 @@ int AbilityFactory::computeX(Spell* spell, MTGCardInstance* card) {
     return 0;
 }
 
-int AbilityFactory::getAbilities(vector<MTGAbility*>* v, Spell* spell, MTGCardInstance* card, int id,
+int AbilityFactory::getAbilities(vector<MTGAbility*>* v,
+                                 Spell* spell,
+                                 MTGCardInstance* card,
+                                 int id,
                                  MTGGameZone* dest) {
     if (!card && spell) {
         card = spell->source;
@@ -3109,7 +3134,11 @@ int AbilityFactory::getAbilities(vector<MTGAbility*>* v, Spell* spell, MTGCardIn
  *   - target (if there ie a "target(" in the string, then this is a TargetAbility)
  *   - doTap (a dirty way to know if tapping is included in the cost...
  */
-int AbilityFactory::magicText(int id, Spell* spell, MTGCardInstance* card, int mode, TargetChooser* tc,
+int AbilityFactory::magicText(int id,
+                              Spell* spell,
+                              MTGCardInstance* card,
+                              int mode,
+                              TargetChooser* tc,
                               MTGGameZone* dest) {
     int dryMode = 0;
     if (!spell && !dest) {
@@ -3695,7 +3724,10 @@ void AbilityFactory::addAbilities(int _id, Spell* spell) {
 
 // ManaRedux -> manaredux(colorless,+2)
 //           -> manaredux(green,-2)
-MTGAbility* AbilityFactory::getManaReduxAbility(const string& s, int id, Spell* spell, MTGCardInstance* card,
+MTGAbility* AbilityFactory::getManaReduxAbility(const string& s,
+                                                int id,
+                                                Spell* spell,
+                                                MTGCardInstance* card,
                                                 MTGCardInstance* target) {
     int color             = -1;
     const string manaCost = s.substr(s.find(',') + 1);
@@ -3883,8 +3915,14 @@ NestedAbility::NestedAbility(MTGAbility* _ability) : ability(_ability) {}
 
 //
 
-ActivatedAbility::ActivatedAbility(GameObserver* observer, int id, MTGCardInstance* card, ManaCost* _cost,
-                                   int restrictions, string limit, MTGAbility* sideEffect, string usesBeforeSideEffects,
+ActivatedAbility::ActivatedAbility(GameObserver* observer,
+                                   int id,
+                                   MTGCardInstance* card,
+                                   ManaCost* _cost,
+                                   int restrictions,
+                                   string limit,
+                                   MTGAbility* sideEffect,
+                                   string usesBeforeSideEffects,
                                    string castRestriction)
     : MTGAbility(observer, id, card)
     , abilityCost(nullptr)
@@ -4147,16 +4185,25 @@ std::ostream& ActivatedAbility::toString(std::ostream& out) const {
     return MTGAbility::toString(out) << ")";
 }
 
-TargetAbility::TargetAbility(GameObserver* observer, int id, MTGCardInstance* card, TargetChooser* _tc, ManaCost* _cost,
-                             int _playerturnonly, string castRestriction)
+TargetAbility::TargetAbility(GameObserver* observer,
+                             int id,
+                             MTGCardInstance* card,
+                             TargetChooser* _tc,
+                             ManaCost* _cost,
+                             int _playerturnonly,
+                             string castRestriction)
     : ActivatedAbility(observer, id, card, _cost, _playerturnonly, "", nullptr, "", std::move(castRestriction))
     , NestedAbility(nullptr)  // Todo fix this mess, why do we have to pass "", NULL, "" here before cast restrictions?
 {
     tc = _tc;
 }
 
-TargetAbility::TargetAbility(GameObserver* observer, int id, MTGCardInstance* card, ManaCost* _cost,
-                             int _playerturnonly, string castRestriction)
+TargetAbility::TargetAbility(GameObserver* observer,
+                             int id,
+                             MTGCardInstance* card,
+                             ManaCost* _cost,
+                             int _playerturnonly,
+                             string castRestriction)
     : ActivatedAbility(observer, id, card, _cost, _playerturnonly, "", nullptr, "", std::move(castRestriction))
     , NestedAbility(nullptr)  // Todo fix this mess, why do we have to pass "", NULL, "" here before cast restrictions?
 {
@@ -4507,9 +4554,17 @@ std::ostream& ListMaintainerAbility::toString(std::ostream& out) const {
     return MTGAbility::toString(out) << ")";
 }
 
-TriggerAtPhase::TriggerAtPhase(GameObserver* observer, int id, MTGCardInstance* source, Targetable* target,
-                               int _phaseId, int who, bool sourceUntapped, bool sourceTap, bool lifelost,
-                               int lifeamount, bool once)
+TriggerAtPhase::TriggerAtPhase(GameObserver* observer,
+                               int id,
+                               MTGCardInstance* source,
+                               Targetable* target,
+                               int _phaseId,
+                               int who,
+                               bool sourceUntapped,
+                               bool sourceTap,
+                               bool lifelost,
+                               int lifeamount,
+                               bool once)
     : TriggeredAbility(observer, id, source, target)
     , phaseId(_phaseId)
     , who(who)
@@ -4603,8 +4658,15 @@ int TriggerAtPhase::trigger() {
 
 TriggerAtPhase* TriggerAtPhase::clone() const { return NEW TriggerAtPhase(*this); }
 
-TriggerNextPhase::TriggerNextPhase(GameObserver* observer, int id, MTGCardInstance* source, Targetable* target,
-                                   int _phaseId, int who, bool sourceUntapped, bool sourceTap, bool once)
+TriggerNextPhase::TriggerNextPhase(GameObserver* observer,
+                                   int id,
+                                   MTGCardInstance* source,
+                                   Targetable* target,
+                                   int _phaseId,
+                                   int who,
+                                   bool sourceUntapped,
+                                   bool sourceTap,
+                                   bool once)
     : TriggerAtPhase(observer, id, source, target, _phaseId, who, sourceUntapped, sourceTap, once)
     , activeTrigger(true)
     , destroyActivated(0) {}
@@ -4623,8 +4685,12 @@ int TriggerNextPhase::testDestroy() {
 
 TriggerNextPhase* TriggerNextPhase::clone() const { return NEW TriggerNextPhase(*this); }
 
-GenericTriggeredAbility::GenericTriggeredAbility(GameObserver* observer, int id, MTGCardInstance* _source,
-                                                 TriggeredAbility* _t, MTGAbility* a, MTGAbility* dc,
+GenericTriggeredAbility::GenericTriggeredAbility(GameObserver* observer,
+                                                 int id,
+                                                 MTGCardInstance* _source,
+                                                 TriggeredAbility* _t,
+                                                 MTGAbility* a,
+                                                 MTGAbility* dc,
                                                  Targetable* _target)
     : TriggeredAbility(observer, id, _source, _target)
     , NestedAbility(a) {
@@ -4750,8 +4816,14 @@ GenericTriggeredAbility* GenericTriggeredAbility::clone() const {
  other solutions need to be provided for abilities that add mana (ex: mana flare)
  */
 
-AManaProducer::AManaProducer(GameObserver* observer, int id, MTGCardInstance* card, Targetable* t, ManaCost* _output,
-                             ManaCost* _cost, int who, string producing)
+AManaProducer::AManaProducer(GameObserver* observer,
+                             int id,
+                             MTGCardInstance* card,
+                             Targetable* t,
+                             ManaCost* _output,
+                             ManaCost* _cost,
+                             int who,
+                             string producing)
     : ActivatedAbilityTP(observer, id, card, t, _cost, who)
     , Producing(std::move(producing))
     ,
@@ -4879,8 +4951,12 @@ Targetable* AbilityTP::getTarget() {
     return nullptr;
 }
 
-ActivatedAbilityTP::ActivatedAbilityTP(GameObserver* observer, int id, MTGCardInstance* card, Targetable* _target,
-                                       ManaCost* cost, int who)
+ActivatedAbilityTP::ActivatedAbilityTP(GameObserver* observer,
+                                       int id,
+                                       MTGCardInstance* card,
+                                       Targetable* _target,
+                                       ManaCost* cost,
+                                       int who)
     : ActivatedAbility(observer, id, card, cost, 0)
     , who(who) {
     if (_target) {

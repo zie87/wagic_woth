@@ -1,3 +1,5 @@
+#include "woth/string/algorithms.hpp"
+
 #include "PrecompiledHeader.h"
 
 #include "Credits.h"
@@ -109,7 +111,7 @@ void Unlockable::load() {
             continue;
         }
 
-        vector<string> keyValue = split(s, '=');
+        vector<string> keyValue = ::woth::split(s, '=');
         if (keyValue.size() != 2) {
             continue;
         }

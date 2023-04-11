@@ -41,12 +41,27 @@ MTGEventText* MTGEventText::clone() const { return NEW MTGEventText(*this); }
 // Activated Abilities
 
 // Generic Activated Abilities
-GenericActivatedAbility::GenericActivatedAbility(GameObserver* observer, string newName, string castRestriction,
-                                                 int _id, MTGCardInstance* card, MTGAbility* a, ManaCost* _cost,
-                                                 string limit, MTGAbility* sideEffects, string usesBeforeSideEffects,
-                                                 int restrictions, MTGGameZone* dest)
-    : ActivatedAbility(observer, _id, card, _cost, restrictions, std::move(limit), sideEffects,
-                       std::move(usesBeforeSideEffects), std::move(castRestriction))
+GenericActivatedAbility::GenericActivatedAbility(GameObserver* observer,
+                                                 string newName,
+                                                 string castRestriction,
+                                                 int _id,
+                                                 MTGCardInstance* card,
+                                                 MTGAbility* a,
+                                                 ManaCost* _cost,
+                                                 string limit,
+                                                 MTGAbility* sideEffects,
+                                                 string usesBeforeSideEffects,
+                                                 int restrictions,
+                                                 MTGGameZone* dest)
+    : ActivatedAbility(observer,
+                       _id,
+                       card,
+                       _cost,
+                       restrictions,
+                       std::move(limit),
+                       sideEffects,
+                       std::move(usesBeforeSideEffects),
+                       std::move(castRestriction))
     , NestedAbility(a)
     , activeZone(dest)
     , newName(std::move(newName)) {
@@ -107,8 +122,13 @@ GenericActivatedAbility* GenericActivatedAbility::clone() const {
 GenericActivatedAbility::~GenericActivatedAbility() { SAFE_DELETE(ability); }
 
 // AA Alter Poison
-AAAlterPoison::AAAlterPoison(GameObserver* observer, int _id, MTGCardInstance* _source, Targetable* _target, int poison,
-                             ManaCost* _cost, int who)
+AAAlterPoison::AAAlterPoison(GameObserver* observer,
+                             int _id,
+                             MTGCardInstance* _source,
+                             Targetable* _target,
+                             int poison,
+                             ManaCost* _cost,
+                             int who)
     : ActivatedAbilityTP(observer, _id, _source, _target, _cost, who)
     , poison(poison) {}
 
@@ -130,8 +150,13 @@ AAAlterPoison* AAAlterPoison::clone() const { return NEW AAAlterPoison(*this); }
 AAAlterPoison::~AAAlterPoison() {}
 
 // Damage Prevent
-AADamagePrevent::AADamagePrevent(GameObserver* observer, int _id, MTGCardInstance* _source, Targetable* _target,
-                                 int preventing, ManaCost* _cost, int who)
+AADamagePrevent::AADamagePrevent(GameObserver* observer,
+                                 int _id,
+                                 MTGCardInstance* _source,
+                                 Targetable* _target,
+                                 int preventing,
+                                 ManaCost* _cost,
+                                 int who)
     : ActivatedAbilityTP(observer, _id, _source, _target, _cost, who)
     , preventing(preventing) {
     aType = MTGAbility::STANDARD_PREVENT;
@@ -152,8 +177,13 @@ AADamagePrevent* AADamagePrevent::clone() const { return NEW AADamagePrevent(*th
 AADamagePrevent::~AADamagePrevent() {}
 
 // AADamager
-AADamager::AADamager(GameObserver* observer, int _id, MTGCardInstance* _source, Targetable* _target, string d,
-                     ManaCost* _cost, int who)
+AADamager::AADamager(GameObserver* observer,
+                     int _id,
+                     MTGCardInstance* _source,
+                     Targetable* _target,
+                     string d,
+                     ManaCost* _cost,
+                     int who)
     : ActivatedAbilityTP(observer, _id, _source, _target, _cost, who)
     , d(std::move(d))
     , redirected(false) {
@@ -216,8 +246,13 @@ const char* AADamager::getMenuText() {
 AADamager* AADamager::clone() const { return NEW AADamager(*this); }
 
 // AADepleter
-AADepleter::AADepleter(GameObserver* observer, int _id, MTGCardInstance* card, Targetable* _target, string nbcardsStr,
-                       ManaCost* _cost, int who)
+AADepleter::AADepleter(GameObserver* observer,
+                       int _id,
+                       MTGCardInstance* card,
+                       Targetable* _target,
+                       string nbcardsStr,
+                       ManaCost* _cost,
+                       int who)
     : ActivatedAbilityTP(observer, _id, card, _target, _cost, who)
     , nbcardsStr(std::move(nbcardsStr)) {}
 int AADepleter::resolve() {
@@ -240,8 +275,13 @@ const char* AADepleter::getMenuText() { return "Deplete"; }
 AADepleter* AADepleter::clone() const { return NEW AADepleter(*this); }
 
 // take extra turns or skip turns, values in the negitive will make you skip.
-AAModTurn::AAModTurn(GameObserver* observer, int _id, MTGCardInstance* card, Targetable* _target, string nbTurnStr,
-                     ManaCost* _cost, int who)
+AAModTurn::AAModTurn(GameObserver* observer,
+                     int _id,
+                     MTGCardInstance* card,
+                     Targetable* _target,
+                     string nbTurnStr,
+                     ManaCost* _cost,
+                     int who)
     : ActivatedAbilityTP(observer, _id, card, _target, _cost, who)
     , nbTurnStr(std::move(nbTurnStr)) {}
 int AAModTurn::resolve() {
@@ -268,7 +308,10 @@ const char* AAModTurn::getMenuText() {
 AAModTurn* AAModTurn::clone() const { return NEW AAModTurn(*this); }
 
 // move target to bottom of owners library
-AALibraryBottom::AALibraryBottom(GameObserver* observer, int _id, MTGCardInstance* _source, MTGCardInstance* _target,
+AALibraryBottom::AALibraryBottom(GameObserver* observer,
+                                 int _id,
+                                 MTGCardInstance* _source,
+                                 MTGCardInstance* _target,
                                  ManaCost* _cost)
     : ActivatedAbility(observer, _id, _source, _cost, 0) {
     target = _target;
@@ -318,7 +361,10 @@ const char* AACopier::getMenuText() { return "Copy"; }
 AACopier* AACopier::clone() const { return NEW AACopier(*this); }
 
 // phaser
-AAPhaseOut::AAPhaseOut(GameObserver* observer, int _id, MTGCardInstance* _source, MTGCardInstance* _target,
+AAPhaseOut::AAPhaseOut(GameObserver* observer,
+                       int _id,
+                       MTGCardInstance* _source,
+                       MTGCardInstance* _target,
                        ManaCost* _cost)
     : ActivatedAbility(observer, _id, _source, _cost, 0) {
     target = _target;
@@ -344,8 +390,16 @@ const char* AAPhaseOut::getMenuText() { return "Phase Out"; }
 AAPhaseOut* AAPhaseOut::clone() const { return NEW AAPhaseOut(*this); }
 
 // Counters
-AACounter::AACounter(GameObserver* observer, int id, MTGCardInstance* source, MTGCardInstance* target,
-                     string counterstring, const char* _name, int power, int toughness, int nb, int maxNb,
+AACounter::AACounter(GameObserver* observer,
+                     int id,
+                     MTGCardInstance* source,
+                     MTGCardInstance* target,
+                     string counterstring,
+                     const char* _name,
+                     int power,
+                     int toughness,
+                     int nb,
+                     int maxNb,
                      ManaCost* cost)
     : ActivatedAbility(observer, id, source, cost, 0)
     , counterstring(std::move(counterstring))
@@ -452,8 +506,12 @@ const char* AACounter::getMenuText() {
 AACounter* AACounter::clone() const { return NEW AACounter(*this); }
 
 // shield a card from a certain type of counter.
-ACounterShroud::ACounterShroud(GameObserver* observer, int id, MTGCardInstance* source, MTGCardInstance* target,
-                               TargetChooser* tc, Counter* counter)
+ACounterShroud::ACounterShroud(GameObserver* observer,
+                               int id,
+                               MTGCardInstance* source,
+                               MTGCardInstance* target,
+                               TargetChooser* tc,
+                               Counter* counter)
     : MTGAbility(observer, id, source)
     , csTc(tc)
     , counter(counter)
@@ -487,7 +545,10 @@ ACounterShroud::~ACounterShroud() {
 }
 
 // shield a card from a certain type of counter.
-ACounterTracker::ACounterTracker(GameObserver* observer, int id, MTGCardInstance* source, MTGCardInstance* target,
+ACounterTracker::ACounterTracker(GameObserver* observer,
+                                 int id,
+                                 MTGCardInstance* source,
+                                 MTGCardInstance* target,
                                  string scounter)
     : MTGAbility(observer, id, source, target)
     , scounter(std::move(scounter))
@@ -549,8 +610,16 @@ ACounterTracker* ACounterTracker::clone() const {
 ACounterTracker::~ACounterTracker() {}
 
 // removeall counters of a certain type or all.
-AARemoveAllCounter::AARemoveAllCounter(GameObserver* observer, int id, MTGCardInstance* source, MTGCardInstance* target,
-                                       const char* _name, int power, int toughness, int nb, bool all, ManaCost* cost)
+AARemoveAllCounter::AARemoveAllCounter(GameObserver* observer,
+                                       int id,
+                                       MTGCardInstance* source,
+                                       MTGCardInstance* target,
+                                       const char* _name,
+                                       int power,
+                                       int toughness,
+                                       int nb,
+                                       bool all,
+                                       ManaCost* cost)
     : ActivatedAbility(observer, id, source, cost, 0)
     , nb(nb)
     , power(power)
@@ -621,7 +690,10 @@ const char* AARemoveAllCounter::getMenuText() {
 AARemoveAllCounter* AARemoveAllCounter::clone() const { return NEW AARemoveAllCounter(*this); }
 
 // proliferate a target
-AAProliferate::AAProliferate(GameObserver* observer, int id, MTGCardInstance* source, Targetable* target,
+AAProliferate::AAProliferate(GameObserver* observer,
+                             int id,
+                             MTGCardInstance* source,
+                             Targetable* target,
                              ManaCost* cost)
     : ActivatedAbility(observer, id, source, cost, 0) {
     this->GetId();
@@ -665,8 +737,13 @@ AAProliferate* AAProliferate::clone() const { return NEW AAProliferate(*this); }
 AAProliferate::~AAProliferate() {}
 //
 // choosing a type or color
-GenericChooseTypeColor::GenericChooseTypeColor(GameObserver* observer, int id, MTGCardInstance* source,
-                                               Targetable* target, string _toAdd, bool chooseColor, bool nonwall,
+GenericChooseTypeColor::GenericChooseTypeColor(GameObserver* observer,
+                                               int id,
+                                               MTGCardInstance* source,
+                                               Targetable* target,
+                                               string _toAdd,
+                                               bool chooseColor,
+                                               bool nonwall,
                                                ManaCost* cost)
     : ActivatedAbility(observer, id, source, cost, 0)
     , baseAbility(std::move(_toAdd))
@@ -727,8 +804,12 @@ GenericChooseTypeColor* GenericChooseTypeColor::clone() const {
 GenericChooseTypeColor::~GenericChooseTypeColor() {}
 
 // set color choosen
-AASetColorChosen::AASetColorChosen(GameObserver* observer, int id, MTGCardInstance* source, MTGCardInstance* _target,
-                                   int _color, string toAlter)
+AASetColorChosen::AASetColorChosen(GameObserver* observer,
+                                   int id,
+                                   MTGCardInstance* source,
+                                   MTGCardInstance* _target,
+                                   int _color,
+                                   string toAlter)
     : InstantAbility(observer, id, source)
     , color(_color)
     , abilityToAlter(std::move(toAlter))
@@ -775,8 +856,13 @@ AASetColorChosen* AASetColorChosen::clone() const { return NEW AASetColorChosen(
 AASetColorChosen::~AASetColorChosen() {}
 
 // set type choosen
-AASetTypeChosen::AASetTypeChosen(GameObserver* observer, int id, MTGCardInstance* source, MTGCardInstance* _target,
-                                 int _type, string _menu, string toAlter)
+AASetTypeChosen::AASetTypeChosen(GameObserver* observer,
+                                 int id,
+                                 MTGCardInstance* source,
+                                 MTGCardInstance* _target,
+                                 int _type,
+                                 string _menu,
+                                 string toAlter)
     : InstantAbility(observer, id, source)
     , type(_type)
     , abilityToAlter(std::move(toAlter))
@@ -823,8 +909,12 @@ AASetTypeChosen::~AASetTypeChosen() {}
 
 //
 // choosing a type or color
-GenericFlipACoin::GenericFlipACoin(GameObserver* observer, int id, MTGCardInstance* source, Targetable* target,
-                                   string _toAdd, ManaCost* cost)
+GenericFlipACoin::GenericFlipACoin(GameObserver* observer,
+                                   int id,
+                                   MTGCardInstance* source,
+                                   Targetable* target,
+                                   string _toAdd,
+                                   ManaCost* cost)
     : ActivatedAbility(observer, id, source, cost, 0)
     , baseAbility(std::move(_toAdd))
     , chooseColor(chooseColor)
@@ -864,7 +954,11 @@ GenericFlipACoin* GenericFlipACoin::clone() const {
 GenericFlipACoin::~GenericFlipACoin() {}
 
 // set color choosen
-AASetCoin::AASetCoin(GameObserver* observer, int id, MTGCardInstance* source, MTGCardInstance* _target, int _side,
+AASetCoin::AASetCoin(GameObserver* observer,
+                     int id,
+                     MTGCardInstance* source,
+                     MTGCardInstance* _target,
+                     int _side,
                      string toAlter)
     : InstantAbility(observer, id, source)
     , side(_side)
@@ -938,7 +1032,10 @@ AASetCoin* AASetCoin::clone() const { return NEW AASetCoin(*this); }
 AASetCoin::~AASetCoin() {}
 
 // Reset Damage on creatures
-AAResetDamage::AAResetDamage(GameObserver* observer, int id, MTGCardInstance* source, MTGCardInstance* _target,
+AAResetDamage::AAResetDamage(GameObserver* observer,
+                             int id,
+                             MTGCardInstance* source,
+                             MTGCardInstance* _target,
                              ManaCost* cost)
     : ActivatedAbility(observer, id, source, cost, 0) {
     this->target = _target;
@@ -1151,8 +1248,13 @@ AADiscardCard* AADiscardCard::clone() const {
     return a;
 }
 AADiscardCard::~AADiscardCard() { SAFE_DELETE(andAbility); }
-AADrawer::AADrawer(GameObserver* observer, int _id, MTGCardInstance* card, Targetable* _target, ManaCost* _cost,
-                   string nbcardsStr, int who)
+AADrawer::AADrawer(GameObserver* observer,
+                   int _id,
+                   MTGCardInstance* card,
+                   Targetable* _target,
+                   ManaCost* _cost,
+                   string nbcardsStr,
+                   int who)
     : ActivatedAbilityTP(observer, _id, card, _target, _cost, who)
     , nbcardsStr(std::move(nbcardsStr)) {
     aType = MTGAbility::STANDARD_DRAW;
@@ -1204,7 +1306,11 @@ const char* AAFrozen::getMenuText() { return "Freeze"; }
 AAFrozen* AAFrozen::clone() const { return NEW AAFrozen(*this); }
 
 // chose a new target for an aura or enchantment and equip it note: VERY basic right now.
-AANewTarget::AANewTarget(GameObserver* observer, int id, MTGCardInstance* card, MTGCardInstance* _target, bool retarget,
+AANewTarget::AANewTarget(GameObserver* observer,
+                         int id,
+                         MTGCardInstance* card,
+                         MTGCardInstance* _target,
+                         bool retarget,
                          ManaCost* _cost)
     : ActivatedAbility(observer, id, card, _cost, 0)
     , retarget(retarget) {
@@ -1445,8 +1551,16 @@ AAFlip* AAFlip::clone() const {
     return a;
 }
 // AADYNAMIC: dynamic ability builder
-AADynamic::AADynamic(GameObserver* observer, int id, MTGCardInstance* card, Damageable* _target, int type, int effect,
-                     int who, int amountsource, MTGAbility* storedAbility, ManaCost* _cost)
+AADynamic::AADynamic(GameObserver* observer,
+                     int id,
+                     MTGCardInstance* card,
+                     Damageable* _target,
+                     int type,
+                     int effect,
+                     int who,
+                     int amountsource,
+                     MTGAbility* storedAbility,
+                     ManaCost* _cost)
     : ActivatedAbility(observer, id, card, _cost, 0)
     , type(type)
     , effect(effect)
@@ -1818,8 +1932,13 @@ AADynamic* AADynamic::clone() const {
 AADynamic::~AADynamic() { SAFE_DELETE(storedAbility); }
 
 // AALifer
-AALifer::AALifer(GameObserver* observer, int _id, MTGCardInstance* card, Targetable* _target, string life_s,
-                 ManaCost* _cost, int who)
+AALifer::AALifer(GameObserver* observer,
+                 int _id,
+                 MTGCardInstance* card,
+                 Targetable* _target,
+                 string life_s,
+                 ManaCost* _cost,
+                 int who)
     : ActivatedAbilityTP(observer, _id, card, _target, _cost, who)
     , life_s(std::move(life_s)) {
     aType = MTGAbility::LIFER;
@@ -1856,8 +1975,13 @@ const char* AALifer::getMenuText() {
 AALifer* AALifer::clone() const { return NEW AALifer(*this); }
 
 // players max hand size
-AASetHand::AASetHand(GameObserver* observer, int _id, MTGCardInstance* _source, Targetable* _target, int hand,
-                     ManaCost* _cost, int who)
+AASetHand::AASetHand(GameObserver* observer,
+                     int _id,
+                     MTGCardInstance* _source,
+                     Targetable* _target,
+                     int hand,
+                     ManaCost* _cost,
+                     int who)
     : ActivatedAbilityTP(observer, _id, _source, _target, _cost, who)
     , hand(hand) {}
 
@@ -1879,8 +2003,13 @@ const char* AASetHand::getMenuText() { return "Set Hand Size"; }
 AASetHand* AASetHand::clone() const { return NEW AASetHand(*this); }
 
 // Lifeset
-AALifeSet::AALifeSet(GameObserver* observer, int _id, MTGCardInstance* _source, Targetable* _target, WParsedInt* life,
-                     ManaCost* _cost, int who)
+AALifeSet::AALifeSet(GameObserver* observer,
+                     int _id,
+                     MTGCardInstance* _source,
+                     Targetable* _target,
+                     WParsedInt* life,
+                     ManaCost* _cost,
+                     int who)
     : ActivatedAbilityTP(observer, _id, _source, _target, _cost, who)
     , life(life) {}
 
@@ -1910,8 +2039,14 @@ AALifeSet::~AALifeSet() { SAFE_DELETE(life); }
 
 // AACloner
 // cloning...this makes a token thats a copy of the target.
-AACloner::AACloner(GameObserver* observer, int _id, MTGCardInstance* _source, MTGCardInstance* _target, ManaCost* _cost,
-                   int who, const string& abilitiesStringList, const string& TypesList)
+AACloner::AACloner(GameObserver* observer,
+                   int _id,
+                   MTGCardInstance* _source,
+                   MTGCardInstance* _target,
+                   ManaCost* _cost,
+                   int who,
+                   const string& abilitiesStringList,
+                   const string& TypesList)
     : ActivatedAbility(observer, _id, _source, _cost, 0)
     , who(who) {
     aType  = MTGAbility::CLONING;
@@ -1981,9 +2116,15 @@ AACloner* AACloner::clone() const { return NEW AACloner(*this); }
 AACloner::~AACloner() {}
 
 // Cast/Play Restriction modifier
-ACastRestriction::ACastRestriction(GameObserver* observer, int _id, MTGCardInstance* card, Targetable* _target,
-                                   TargetChooser* _restrictionsScope, WParsedInt* _value, bool _modifyExisting,
-                                   int _zoneId, int who)
+ACastRestriction::ACastRestriction(GameObserver* observer,
+                                   int _id,
+                                   MTGCardInstance* card,
+                                   Targetable* _target,
+                                   TargetChooser* _restrictionsScope,
+                                   WParsedInt* _value,
+                                   bool _modifyExisting,
+                                   int _zoneId,
+                                   int who)
     : AbilityTP(observer, _id, card, _target, who)
     , restrictionsScope(_restrictionsScope)
     , value(_value)
@@ -2054,11 +2195,24 @@ ACastRestriction::~ACastRestriction() {
     SAFE_DELETE(restrictionsScope);
 }
 
-AInstantCastRestrictionUEOT::AInstantCastRestrictionUEOT(GameObserver* observer, int _id, MTGCardInstance* card,
-                                                         Targetable* _target, TargetChooser* _restrictionsScope,
-                                                         WParsedInt* _value, bool _modifyExisting, int _zoneId, int who)
+AInstantCastRestrictionUEOT::AInstantCastRestrictionUEOT(GameObserver* observer,
+                                                         int _id,
+                                                         MTGCardInstance* card,
+                                                         Targetable* _target,
+                                                         TargetChooser* _restrictionsScope,
+                                                         WParsedInt* _value,
+                                                         bool _modifyExisting,
+                                                         int _zoneId,
+                                                         int who)
     : InstantAbilityTP(observer, _id, card, _target, who)
-    , ability(NEW ACastRestriction(observer, _id, card, _target, _restrictionsScope, _value, _modifyExisting, _zoneId,
+    , ability(NEW ACastRestriction(observer,
+                                   _id,
+                                   card,
+                                   _target,
+                                   _restrictionsScope,
+                                   _value,
+                                   _modifyExisting,
+                                   _zoneId,
                                    who)) {}
 
 int AInstantCastRestrictionUEOT::resolve() {
@@ -2078,7 +2232,11 @@ AInstantCastRestrictionUEOT* AInstantCastRestrictionUEOT::clone() const {
 AInstantCastRestrictionUEOT::~AInstantCastRestrictionUEOT() { SAFE_DELETE(ability); }
 
 // AAMover
-AAMover::AAMover(GameObserver* observer, int _id, MTGCardInstance* _source, MTGCardInstance* _target, string dest,
+AAMover::AAMover(GameObserver* observer,
+                 int _id,
+                 MTGCardInstance* _source,
+                 MTGCardInstance* _target,
+                 string dest,
                  ManaCost* _cost)
     : ActivatedAbility(observer, _id, _source, _cost, 0)
     , destination(std::move(dest)) {
@@ -2216,8 +2374,13 @@ AAMover* AAMover::clone() const {
 AAMover::~AAMover() { SAFE_DELETE(andAbility); }
 
 // random movement of a card from zone to zone
-AARandomMover::AARandomMover(GameObserver* observer, int _id, MTGCardInstance* _source, MTGCardInstance* _target,
-                             string _tcs, string _from, string _to)
+AARandomMover::AARandomMover(GameObserver* observer,
+                             int _id,
+                             MTGCardInstance* _source,
+                             MTGCardInstance* _target,
+                             string _tcs,
+                             string _from,
+                             string _to)
     : ActivatedAbility(observer, _id, _source, nullptr, 0)
     , abilityTC(std::move(_tcs))
     , fromZone(std::move(_from))
@@ -2290,8 +2453,13 @@ AARandomMover* AARandomMover::clone() const {
 AARandomMover::~AARandomMover() {}
 
 // Random Discard
-AARandomDiscarder::AARandomDiscarder(GameObserver* observer, int _id, MTGCardInstance* card, Targetable* _target,
-                                     string nbcardsStr, ManaCost* _cost, int who)
+AARandomDiscarder::AARandomDiscarder(GameObserver* observer,
+                                     int _id,
+                                     MTGCardInstance* card,
+                                     Targetable* _target,
+                                     string nbcardsStr,
+                                     ManaCost* _cost,
+                                     int who)
     : ActivatedAbilityTP(observer, _id, card, _target, _cost, who)
     , nbcardsStr(std::move(nbcardsStr)) {}
 
@@ -2313,7 +2481,11 @@ const char* AARandomDiscarder::getMenuText() { return "Discard Random"; }
 AARandomDiscarder* AARandomDiscarder::clone() const { return NEW AARandomDiscarder(*this); }
 
 // Shuffle
-AAShuffle::AAShuffle(GameObserver* observer, int _id, MTGCardInstance* card, Targetable* _target, ManaCost* _cost,
+AAShuffle::AAShuffle(GameObserver* observer,
+                     int _id,
+                     MTGCardInstance* card,
+                     Targetable* _target,
+                     ManaCost* _cost,
                      int who)
     : ActivatedAbilityTP(observer, _id, card, _target, _cost, who) {}
 
@@ -2331,7 +2503,11 @@ const char* AAShuffle::getMenuText() { return "Shuffle"; }
 AAShuffle* AAShuffle::clone() const { return NEW AAShuffle(*this); }
 
 // Remove Mana From ManaPool
-AARemoveMana::AARemoveMana(GameObserver* observer, int _id, MTGCardInstance* card, Targetable* _target, string manaDesc,
+AARemoveMana::AARemoveMana(GameObserver* observer,
+                           int _id,
+                           MTGCardInstance* card,
+                           Targetable* _target,
+                           string manaDesc,
                            int who)
     : ActivatedAbilityTP(observer, _id, card, _target, nullptr, who) {
     if (manaDesc.empty()) {
@@ -2429,7 +2605,11 @@ const char* AAUntapper::getMenuText() { return "Untap"; }
 
 AAUntapper* AAUntapper::clone() const { return NEW AAUntapper(*this); }
 
-AAWhatsMax::AAWhatsMax(GameObserver* observer, int id, MTGCardInstance* card, MTGCardInstance* source, ManaCost* _cost,
+AAWhatsMax::AAWhatsMax(GameObserver* observer,
+                       int id,
+                       MTGCardInstance* card,
+                       MTGCardInstance* source,
+                       ManaCost* _cost,
                        int value)
     : ActivatedAbility(observer, id, card, _cost, 0)
     , value(value) {}
@@ -2445,7 +2625,11 @@ int AAWhatsMax::resolve() {
 AAWhatsMax* AAWhatsMax::clone() const { return NEW AAWhatsMax(*this); }
 
 // Win Game
-AAWinGame::AAWinGame(GameObserver* observer, int _id, MTGCardInstance* card, Targetable* _target, ManaCost* _cost,
+AAWinGame::AAWinGame(GameObserver* observer,
+                     int _id,
+                     MTGCardInstance* card,
+                     Targetable* _target,
+                     ManaCost* _cost,
                      int who)
     : ActivatedAbilityTP(observer, _id, card, _target, _cost, who) {}
 
@@ -2510,8 +2694,13 @@ int ANewAffinity::testDestroy() {
 ANewAffinity* ANewAffinity::clone() const { return NEW ANewAffinity(*this); }
 
 // IfThenEffect
-IfThenAbility::IfThenAbility(GameObserver* observer, int _id, MTGAbility* delayedAbility,
-                             MTGAbility* delayedElseAbility, MTGCardInstance* _source, Targetable* _target, int type,
+IfThenAbility::IfThenAbility(GameObserver* observer,
+                             int _id,
+                             MTGAbility* delayedAbility,
+                             MTGAbility* delayedElseAbility,
+                             MTGCardInstance* _source,
+                             Targetable* _target,
+                             int type,
                              string Cond)
     : InstantAbility(observer, _id, _source)
     , delayedAbility(delayedAbility)
@@ -2660,8 +2849,13 @@ MayAbility::~MayAbility() {
 
 // Menu building ability Abilities
 // this will eventaully handle choosen discards/sacrifices.
-MenuAbility::MenuAbility(GameObserver* observer, int _id, Targetable* mtarget, MTGCardInstance* _source, bool must,
-                         vector<MTGAbility*> abilities, Player* who)
+MenuAbility::MenuAbility(GameObserver* observer,
+                         int _id,
+                         Targetable* mtarget,
+                         MTGCardInstance* _source,
+                         bool must,
+                         vector<MTGAbility*> abilities,
+                         Player* who)
     : MayAbility(observer, _id, nullptr, _source, must)
     , removeMenu(false)
     , triggered(0)
@@ -2869,10 +3063,20 @@ MultiAbility::~MultiAbility() {
     abilities.clear();
 }
 // Generic Target Ability
-GenericTargetAbility::GenericTargetAbility(GameObserver* observer, string newName, string castRestriction, int _id,
-                                           MTGCardInstance* _source, TargetChooser* _tc, MTGAbility* a, ManaCost* _cost,
-                                           string limit, MTGAbility* sideEffects, string usesBeforeSideEffects,
-                                           int restrictions, MTGGameZone* dest, string _tcString)
+GenericTargetAbility::GenericTargetAbility(GameObserver* observer,
+                                           string newName,
+                                           string castRestriction,
+                                           int _id,
+                                           MTGCardInstance* _source,
+                                           TargetChooser* _tc,
+                                           MTGAbility* a,
+                                           ManaCost* _cost,
+                                           string limit,
+                                           MTGAbility* sideEffects,
+                                           string usesBeforeSideEffects,
+                                           int restrictions,
+                                           MTGGameZone* dest,
+                                           string _tcString)
     : TargetAbility(observer, _id, _source, _tc, _cost, restrictions, std::move(castRestriction))
     , limit(std::move(limit))
     , activeZone(dest)
@@ -2975,7 +3179,11 @@ GenericTargetAbility::~GenericTargetAbility() {
 }
 
 // Alter Cost
-AAlterCost::AAlterCost(GameObserver* observer, int id, MTGCardInstance* source, MTGCardInstance* target, int amount,
+AAlterCost::AAlterCost(GameObserver* observer,
+                       int id,
+                       MTGCardInstance* source,
+                       MTGCardInstance* target,
+                       int amount,
                        int type)
     : MTGAbility(observer, id, source, target)
     , manaReducer(source)
@@ -3061,10 +3269,19 @@ AAlterCost* AAlterCost::clone() const { return NEW AAlterCost(*this); }
 AAlterCost::~AAlterCost() {}
 
 // ATransformer
-ATransformer::ATransformer(GameObserver* observer, int id, MTGCardInstance* source, MTGCardInstance* target,
-                           string stypes, const string& sabilities, string newpower, bool newpowerfound,
-                           string newtoughness, bool newtoughnessfound, vector<string> newAbilitiesList,
-                           bool newAbilityFound, bool aForever)
+ATransformer::ATransformer(GameObserver* observer,
+                           int id,
+                           MTGCardInstance* source,
+                           MTGCardInstance* target,
+                           string stypes,
+                           const string& sabilities,
+                           string newpower,
+                           bool newpowerfound,
+                           string newtoughness,
+                           bool newtoughnessfound,
+                           vector<string> newAbilitiesList,
+                           bool newAbilityFound,
+                           bool aForever)
     : MTGAbility(observer, id, source, target)
     , newpower(std::move(newpower))
     , newpowerfound(newpowerfound)
@@ -3337,11 +3554,19 @@ ATransformer* ATransformer::clone() const { return NEW ATransformer(*this); }
 ATransformer::~ATransformer() {}
 
 // ATransformerInstant
-ATransformerInstant::ATransformerInstant(GameObserver* observer, int id, MTGCardInstance* source,
-                                         MTGCardInstance* target, string types, const string& abilities,
-                                         const string& newpower, bool newpowerfound, const string& newtoughness,
-                                         bool newtoughnessfound, const vector<string>& newAbilitiesList,
-                                         bool newAbilityFound, bool aForever)
+ATransformerInstant::ATransformerInstant(GameObserver* observer,
+                                         int id,
+                                         MTGCardInstance* source,
+                                         MTGCardInstance* target,
+                                         string types,
+                                         const string& abilities,
+                                         const string& newpower,
+                                         bool newpowerfound,
+                                         const string& newtoughness,
+                                         bool newtoughnessfound,
+                                         const vector<string>& newAbilitiesList,
+                                         bool newAbilityFound,
+                                         bool aForever)
     : InstantAbility(observer, id, source, target)
     , newpower(newpower)
     , newpowerfound(newpowerfound)
@@ -3373,8 +3598,13 @@ ATransformerInstant* ATransformerInstant::clone() const {
 ATransformerInstant::~ATransformerInstant() { SAFE_DELETE(ability); }
 
 // P/t ueot
-PTInstant::PTInstant(GameObserver* observer, int id, MTGCardInstance* source, MTGCardInstance* target, WParsedPT* wppt,
-                     const string& s, bool nonstatic)
+PTInstant::PTInstant(GameObserver* observer,
+                     int id,
+                     MTGCardInstance* source,
+                     MTGCardInstance* target,
+                     WParsedPT* wppt,
+                     const string& s,
+                     bool nonstatic)
     : InstantAbility(observer, id, source, target)
     , wppt(wppt)
     , s(s)
@@ -3421,8 +3651,12 @@ ASwapPTUEOT* ASwapPTUEOT::clone() const {
 ASwapPTUEOT::~ASwapPTUEOT() { SAFE_DELETE(ability); }
 
 // exhange life with targetchooser
-AAExchangeLife::AAExchangeLife(GameObserver* observer, int _id, MTGCardInstance* _source, Targetable* _target,
-                               ManaCost* _cost, int who)
+AAExchangeLife::AAExchangeLife(GameObserver* observer,
+                               int _id,
+                               MTGCardInstance* _source,
+                               Targetable* _target,
+                               ManaCost* _cost,
+                               int who)
     : ActivatedAbilityTP(observer, _id, _source, _target, _cost, who) {}
 
 int AAExchangeLife::resolve() {
@@ -3557,7 +3791,10 @@ int ALoseAbilities::destroy() {
 ALoseAbilities* ALoseAbilities::clone() const { return NEW ALoseAbilities(*this); }
 
 // ALoseSubtypes
-ALoseSubtypes::ALoseSubtypes(GameObserver* observer, int id, MTGCardInstance* source, MTGCardInstance* _target,
+ALoseSubtypes::ALoseSubtypes(GameObserver* observer,
+                             int id,
+                             MTGCardInstance* source,
+                             MTGCardInstance* _target,
                              int parentType)
     : MTGAbility(observer, id, source)
     , parentType(parentType) {
@@ -3594,8 +3831,12 @@ int ALoseSubtypes::destroy() {
 ALoseSubtypes* ALoseSubtypes::clone() const { return NEW ALoseSubtypes(*this); }
 
 // APreventDamageTypes
-APreventDamageTypes::APreventDamageTypes(GameObserver* observer, int id, MTGCardInstance* source, string to,
-                                         string from, int type)
+APreventDamageTypes::APreventDamageTypes(GameObserver* observer,
+                                         int id,
+                                         MTGCardInstance* source,
+                                         string to,
+                                         string from,
+                                         int type)
     : MTGAbility(observer, id, source)
     , to(std::move(to))
     , from(std::move(from))
@@ -3642,8 +3883,12 @@ APreventDamageTypes* APreventDamageTypes::clone() const {
 APreventDamageTypes::~APreventDamageTypes() { SAFE_DELETE(re); }
 
 // APreventDamageTypesUEOT
-APreventDamageTypesUEOT::APreventDamageTypesUEOT(GameObserver* observer, int id, MTGCardInstance* source, string to,
-                                                 string from, int type)
+APreventDamageTypesUEOT::APreventDamageTypesUEOT(GameObserver* observer,
+                                                 int id,
+                                                 MTGCardInstance* source,
+                                                 string to,
+                                                 string from,
+                                                 int type)
     : InstantAbility(observer, id, source) {
     ability = NEW APreventDamageTypes(observer, id, source, std::move(to), std::move(from), type);
 }
@@ -3674,8 +3919,13 @@ APreventDamageTypesUEOT* APreventDamageTypesUEOT::clone() const {
 APreventDamageTypesUEOT::~APreventDamageTypesUEOT() { SAFE_DELETE(ability); }
 
 // AVanishing creature also fading
-AVanishing::AVanishing(GameObserver* observer, int _id, MTGCardInstance* card, ManaCost* _cost, int restrictions,
-                       int amount, const string& counterName)
+AVanishing::AVanishing(GameObserver* observer,
+                       int _id,
+                       MTGCardInstance* card,
+                       ManaCost* _cost,
+                       int restrictions,
+                       int amount,
+                       const string& counterName)
     : MTGAbility(observer, _id, source, target)
     , amount(amount)
     , counterName(counterName)
@@ -3731,8 +3981,15 @@ AVanishing* AVanishing::clone() const { return NEW AVanishing(*this); }
 AVanishing::~AVanishing() {}
 
 // AUpkeep
-AUpkeep::AUpkeep(GameObserver* observer, int _id, MTGCardInstance* card, MTGAbility* a, ManaCost* _cost,
-                 int restrictions, int _phase, int _once, bool Cumulative)
+AUpkeep::AUpkeep(GameObserver* observer,
+                 int _id,
+                 MTGCardInstance* card,
+                 MTGAbility* a,
+                 ManaCost* _cost,
+                 int restrictions,
+                 int _phase,
+                 int _once,
+                 bool Cumulative)
     : ActivatedAbility(observer, _id, card, _cost, restrictions)
     , NestedAbility(a)
     , paidThisTurn(0)
@@ -3821,9 +4078,18 @@ AUpkeep::~AUpkeep() {
 }
 
 // A Phase based Action
-APhaseAction::APhaseAction(GameObserver* observer, int _id, MTGCardInstance* card, MTGCardInstance* target,
-                           const string& sAbility, int restrictions, int _phase, bool forcedestroy, bool next,
-                           bool myturn, bool opponentturn, bool once)
+APhaseAction::APhaseAction(GameObserver* observer,
+                           int _id,
+                           MTGCardInstance* card,
+                           MTGCardInstance* target,
+                           const string& sAbility,
+                           int restrictions,
+                           int _phase,
+                           bool forcedestroy,
+                           bool next,
+                           bool myturn,
+                           bool opponentturn,
+                           bool once)
     : MTGAbility(observer, _id, card)
     , abilityId(_id)
     ,
@@ -3907,9 +4173,18 @@ APhaseAction* APhaseAction::clone() const {
 APhaseAction::~APhaseAction() {}
 
 // the main ability
-APhaseActionGeneric::APhaseActionGeneric(GameObserver* observer, int _id, MTGCardInstance* card,
-                                         MTGCardInstance* target, const string& sAbility, int restrictions, int _phase,
-                                         bool forcedestroy, bool next, bool myturn, bool opponentturn, bool once)
+APhaseActionGeneric::APhaseActionGeneric(GameObserver* observer,
+                                         int _id,
+                                         MTGCardInstance* card,
+                                         MTGCardInstance* target,
+                                         const string& sAbility,
+                                         int restrictions,
+                                         int _phase,
+                                         bool forcedestroy,
+                                         bool next,
+                                         bool myturn,
+                                         bool opponentturn,
+                                         bool once)
     : InstantAbility(observer, _id, card, target) {
     MTGCardInstance* _target = target;
     ability = NEW APhaseAction(game, _id, card, _target, std::move(sAbility), restrictions, _phase, forcedestroy, next,
@@ -3935,8 +4210,14 @@ APhaseActionGeneric* APhaseActionGeneric::clone() const {
 APhaseActionGeneric::~APhaseActionGeneric() { SAFE_DELETE(ability); }
 
 // a blink
-ABlink::ABlink(GameObserver* observer, int _id, MTGCardInstance* card, MTGCardInstance* _target, bool blinkueot,
-               bool blinkForSource, bool blinkhand, MTGAbility* stored)
+ABlink::ABlink(GameObserver* observer,
+               int _id,
+               MTGCardInstance* card,
+               MTGCardInstance* _target,
+               bool blinkueot,
+               bool blinkForSource,
+               bool blinkhand,
+               MTGAbility* stored)
     : MTGAbility(observer, _id, card)
     , blinkueot(blinkueot)
     , blinkForSource(blinkForSource)
@@ -4114,8 +4395,14 @@ ABlink* ABlink::clone() const {
 };
 ABlink::~ABlink() { SAFE_DELETE(stored); }
 
-ABlinkGeneric::ABlinkGeneric(GameObserver* observer, int _id, MTGCardInstance* card, MTGCardInstance* _target,
-                             bool blinkueot, bool blinkForSource, bool blinkhand, MTGAbility* stored)
+ABlinkGeneric::ABlinkGeneric(GameObserver* observer,
+                             int _id,
+                             MTGCardInstance* card,
+                             MTGCardInstance* _target,
+                             bool blinkueot,
+                             bool blinkForSource,
+                             bool blinkhand,
+                             MTGAbility* stored)
     : InstantAbility(observer, _id, source, _target)
     , ability(NEW ABlink(observer, _id, card, _target, blinkueot, blinkForSource, blinkhand, stored)) {}
 
@@ -4457,7 +4744,7 @@ ATutorialMessage::~ATutorialMessage() {
 
 // Given a delimited string of abilities, add the ones to the list that are "Basic"  MTG abilities
 void PopulateAbilityIndexVector(std::list<int>& abilities, const string& abilityStringList, char delimiter) {
-    vector<string> abilitiesList = split(abilityStringList, delimiter);
+    vector<string> abilitiesList = ::woth::split(abilityStringList, delimiter);
     for (auto iter = abilitiesList.begin(); iter != abilitiesList.end(); ++iter) {
         const int abilityIndex = Constants::GetBasicAbilityIndex(*iter);
 
@@ -4468,7 +4755,7 @@ void PopulateAbilityIndexVector(std::list<int>& abilities, const string& ability
 }
 
 void PopulateColorIndexVector(std::list<int>& colors, const string& colorStringList, char delimiter) {
-    vector<string> abilitiesList = split(colorStringList, delimiter);
+    vector<string> abilitiesList = ::woth::split(colorStringList, delimiter);
     for (auto iter = abilitiesList.begin(); iter != abilitiesList.end(); ++iter) {
         for (int colorIndex = Constants::MTG_COLOR_ARTIFACT; colorIndex < Constants::NB_Colors; ++colorIndex) {
             // if the text is not a basic ability but contains a valid color add it to the color vector
@@ -4481,7 +4768,7 @@ void PopulateColorIndexVector(std::list<int>& colors, const string& colorStringL
 }
 
 void PopulateSubtypesIndexVector(std::list<int>& types, const string& subTypesStringList, char delimiter) {
-    vector<string> subTypesList = split(subTypesStringList, delimiter);
+    vector<string> subTypesList = ::woth::split(subTypesStringList, delimiter);
     for (auto it = subTypesList.begin(); it != subTypesList.end(); ++it) {
         const string subtype = *it;
         size_t id            = MTGAllCards::findType(subtype);

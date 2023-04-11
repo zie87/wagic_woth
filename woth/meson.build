@@ -1,5 +1,6 @@
 
 wth_srcs = [
+    'src/string/algorithms/split.cpp',
     'src/InteractiveButton.cpp',
     'src/AbilityParser.cpp',
     'src/ActionElement.cpp',

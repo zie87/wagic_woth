@@ -82,7 +82,9 @@ int ModRulesMenuItem::getMatchingGameState(int actionId) {
     }
 }
 
-ModRulesMainMenuItem::ModRulesMainMenuItem(const std::string& actionIdStr, std::string displayName, int iconId,
+ModRulesMainMenuItem::ModRulesMainMenuItem(const std::string& actionIdStr,
+                                           std::string displayName,
+                                           int iconId,
                                            std::string particleFile)
     : ModRulesMenuItem(std::move(actionIdStr), std::move(displayName))
     , mIconId(iconId)
@@ -114,7 +116,8 @@ JButton ModRulesOtherMenuItem::strToJButton(const string& str) {
     return JGE_BTN_NEXT;
 }
 
-ModRulesOtherMenuItem::ModRulesOtherMenuItem(const std::string& actionIdStr, std::string displayName,
+ModRulesOtherMenuItem::ModRulesOtherMenuItem(const std::string& actionIdStr,
+                                             std::string displayName,
                                              const std::string& keyStr)
     : ModRulesMenuItem(std::move(actionIdStr), std::move(displayName))
     , mKey(strToJButton(std::move(keyStr))) {}
@@ -211,7 +214,7 @@ SimpleCardEffect* ModRulesCards::parseEffect(const std::string& s) {
     }
 
     if (function == "mask") {
-        std::vector<std::string> argb = split(params, ',');
+        std::vector<std::string> argb = ::woth::split(params, ',');
         if (argb.size() < 4) {
             DebugTrace("not enough params in mask");
             return nullptr;
@@ -241,17 +244,29 @@ void ModRulesCards::parse(TiXmlElement* element) {
 
 ModRulesCards::~ModRulesCards() { SAFE_DELETE(activateEffect); }
 
-ModRulesBackGroundCardGuiItem::ModRulesBackGroundCardGuiItem(const string& ColorId, string ColorName, string DisplayImg,
-                                                             string DisplayThumb, const string& MenuIcon)
+ModRulesBackGroundCardGuiItem::ModRulesBackGroundCardGuiItem(const string& ColorId,
+                                                             string ColorName,
+                                                             string DisplayImg,
+                                                             string DisplayThumb,
+                                                             const string& MenuIcon)
     : mColorId(atoi(ColorId.c_str()))
     , MColorName(std::move(ColorName))
     , mDisplayImg(std::move(DisplayImg))
     , mDisplayThumb(std::move(DisplayThumb))
     , mMenuIcon(atoi(MenuIcon.c_str())) {}
 
-ModRulesRenderCardGuiItem::ModRulesRenderCardGuiItem(string name, int posX, int posY, string formattedData,
-                                                     string filter, bool font, int fontSize, PIXEL_TYPE fontColor,
-                                                     int SizeIcon, int IconPosX, int IconPosY, string FileName)
+ModRulesRenderCardGuiItem::ModRulesRenderCardGuiItem(string name,
+                                                     int posX,
+                                                     int posY,
+                                                     string formattedData,
+                                                     string filter,
+                                                     bool font,
+                                                     int fontSize,
+                                                     PIXEL_TYPE fontColor,
+                                                     int SizeIcon,
+                                                     int IconPosX,
+                                                     int IconPosY,
+                                                     string FileName)
     : mName(std::move(name))
     , mFileName(std::move(FileName))
     , mFilter(std::move(filter))
@@ -326,7 +341,7 @@ void ModRulesCardGui::parse(TiXmlElement* element) {
             if (ChildNode) {
                 _Font                         = true;
                 _FontSize                     = atoi(ChildNode->ToElement()->Attribute("size"));
-                std::vector<std::string> argb = split(ChildNode->ToElement()->Attribute("color"), ',');
+                std::vector<std::string> argb = woth::split(ChildNode->ToElement()->Attribute("color"), ',');
                 _FontColor =
                     ARGB(atoi(argb[0].c_str()), atoi(argb[1].c_str()), atoi(argb[2].c_str()), atoi(argb[3].c_str()));
             }
@@ -386,7 +401,7 @@ void ModRulesCardGui::parse(TiXmlElement* element) {
             if (ChildNode) {
                 _Font                         = true;
                 _FontSize                     = atoi(ChildNode->ToElement()->Attribute("size"));
-                std::vector<std::string> argb = split(ChildNode->ToElement()->Attribute("color"), ',');
+                std::vector<std::string> argb = ::woth::split(ChildNode->ToElement()->Attribute("color"), ',');
                 _FontColor =
                     ARGB(atoi(argb[0].c_str()), atoi(argb[1].c_str()), atoi(argb[2].c_str()), atoi(argb[3].c_str()));
             }
