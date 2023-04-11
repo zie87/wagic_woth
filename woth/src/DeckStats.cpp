@@ -409,7 +409,7 @@ void StatsWrapper::updateStats(DeckDataWrapper* myDeck) {
 
         vector<string> abilitiesVector;
         const string thisstring = current->data->magicText;
-        abilitiesVector         = split(thisstring, '\n');
+        abilitiesVector         = ::woth::split(thisstring, '\n');
 
         for (int v = 0; v < (int)abilitiesVector.size(); v++) {
             string s       = abilitiesVector[v];

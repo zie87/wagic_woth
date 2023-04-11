@@ -81,7 +81,7 @@ int MTGAllCards::processConfLine(string& s, MTGCard* card, CardPrimitive* primit
             string value = val;
             // Specific Abilities
             std::transform(value.begin(), value.end(), value.begin(), ::tolower);
-            std::vector<string> values = split(value, ',');
+            std::vector<string> values = ::woth::split(value, ',');
             for (size_t values_i = 0; values_i < values.size(); ++values_i) {
                 for (int j = Constants::NB_BASIC_ABILITIES - 1; j >= 0; --j) {
                     if (values[values_i].find(Constants::MTGBasicAbilities[j]) != string::npos) {
@@ -111,7 +111,7 @@ int MTGAllCards::processConfLine(string& s, MTGCard* card, CardPrimitive* primit
         {
             string value = val;
             std::transform(value.begin(), value.end(), value.begin(), ::tolower);
-            vector<string> values = split(value, ',');
+            vector<string> values = ::woth::split(value, ',');
             int removeAllOthers   = 1;
             for (size_t values_i = 0; values_i < values.size(); ++values_i) {
                 primitive->setColor(values[values_i], removeAllOthers);
@@ -279,7 +279,7 @@ int MTGAllCards::processConfLine(string& s, MTGCard* card, CardPrimitive* primit
             if (!primitive) {
                 primitive = NEW CardPrimitive();
             }
-            std::vector<string> values = split(val, ' ');
+            std::vector<string> values = ::woth::split(val, ' ');
             for (size_t values_i = 0; values_i < values.size(); ++values_i) {
                 primitive->setSubtype(values[values_i]);
             }
@@ -298,7 +298,7 @@ int MTGAllCards::processConfLine(string& s, MTGCard* card, CardPrimitive* primit
         } else if (0 == strcmp("text", key)) {
             primitive->setText(val);
         } else if (0 == strcmp("type", key)) {
-            std::vector<string> values = split(val, ' ');
+            std::vector<string> values = ::woth::split(val, ' ');
             for (size_t values_i = 0; values_i < values.size(); ++values_i) {
                 primitive->setType(values[values_i]);
             }

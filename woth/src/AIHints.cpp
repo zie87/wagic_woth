@@ -1,3 +1,5 @@
+#include "woth/string/algorithms.hpp"
+
 #include "PrecompiledHeader.h"
 
 #include "AIHints.h"
@@ -15,7 +17,7 @@ AIHint::AIHint(string _line) {
         return;
     }
     std::transform(line.begin(), line.end(), line.begin(), ::tolower);
-    vector<string> parameters = split(line, ':');
+    vector<string> parameters = ::woth::split(line, ':');
     mCondition                = (parameters.size() == 1) ? "" : parameters[0];
     const string action       = parameters[parameters.size() - 1];
 
@@ -35,7 +37,7 @@ AIHint::AIHint(string _line) {
 
     vector<string> splitCastOrder = parseBetween(action, "castpriority(", ")");
     if (!splitCastOrder.empty()) {
-        castOrder = split(splitCastOrder[1], ',');
+        castOrder = ::woth::split(splitCastOrder[1], ',');
     }
 }
 

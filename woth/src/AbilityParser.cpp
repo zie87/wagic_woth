@@ -1,3 +1,5 @@
+#include "woth/string/algorithms.hpp"
+
 #include "PrecompiledHeader.h"
 
 #include "AbilityParser.h"
@@ -29,7 +31,7 @@ void AutoLineMacro::parse(const string& stringMacro) {
         mName                                = s.substr(0, firstParenthesis);
         const size_t firstClosingParenthesis = s.find(')');
         const string params = s.substr(firstParenthesis + 1, firstClosingParenthesis - (firstParenthesis + 1));
-        mParams             = split(params, ',');
+        mParams             = ::woth::split(params, ',');
         mResult             = s.substr(firstClosingParenthesis + 2);
     } else {
         // no params
@@ -62,7 +64,7 @@ string AutoLineMacro::process(const string& s) {
         const size_t paramsStart        = occurence + toFind.length();
         const string params             = temp.substr(paramsStart, closingParenthesis - paramsStart);
 
-        vector<string> vParams = split(params, ',');
+        vector<string> vParams = ::woth::split(params, ',');
         if (vParams.size() != mParams.size()) {
             return s;
         }

@@ -19,3 +19,5 @@ SortIncludes: false
 AlignConsecutiveAssignments: true
 PackConstructorInitializers: CurrentLine
 BreakConstructorInitializers: BeforeComma
+BinPackParameters: false
+AllowAllParametersOfDeclarationOnNextLine: false

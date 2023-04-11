@@ -62,10 +62,6 @@ using std::string;
 
 std::string join(std::vector<std::string>& v, const std::string& delim = " ");
 
-std::vector<std::string>& split(const std::string& s, char delim, std::vector<std::string>& elems);
-std::vector<std::string> split(const std::string& s,
-                               char delim);  // splits a string with "delim" and returns a vector of strings.
-
 // A simple parsing function
 // splits string s by finding the first occurence of start, and the first occurence of stop, and returning
 // a vector of 3 strings. The first string is everything before the first occurence of start, the second string is
@@ -74,9 +70,14 @@ std::vector<std::string> split(const std::string& s,
 // If an error occurs, returns an empty vector.
 // if "stopRequired" is set to false, the function will return a vector of 3 strings even if "stop" is not found in the
 // string.
-std::vector<std::string>& parseBetween(const std::string& s, const std::string& start, const std::string& stop,
-                                       bool stopRequired, std::vector<std::string>& elems);
-std::vector<std::string> parseBetween(const std::string& s, const std::string& start, const std::string& stop,
+std::vector<std::string>& parseBetween(const std::string& s,
+                                       const std::string& start,
+                                       const std::string& stop,
+                                       bool stopRequired,
+                                       std::vector<std::string>& elems);
+std::vector<std::string> parseBetween(const std::string& s,
+                                      const std::string& start,
+                                      const std::string& stop,
                                       bool stopRequired = true);
 
 std::string wordWrap(const std::string& s, float width, int fontId);
