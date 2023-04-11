@@ -9,7 +9,7 @@
 #include "WFilter.h"
 #include "DeckDataWrapper.h"
 #include "MTGPack.h"
-#include "../../libs/jge/src/tinyxml/tinyxml.h"
+#include "tinyxml/tinyxml.h"
 
 MTGPack MTGPacks::defaultBooster;
 

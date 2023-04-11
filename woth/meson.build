@@ -191,13 +191,13 @@ wthlib = static_library(
     override_options: ['warning_level=0'],
     cpp_args: wth_cpp_args,
     link_args: wth_link_args,
-    dependencies: [jge_dep],
+    dependencies: [jge_dep, tinyxml_dep],
 )
 
 wthlib_dep = declare_dependency(
     link_whole: wthlib,
     include_directories: [wth_inc_dir],
-    dependencies: [jge_dep],
+    dependencies: [jge_dep, tinyxml_dep],
     compile_args: wth_cpp_args,
     link_args: wth_link_args,
 )
