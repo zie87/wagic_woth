@@ -203,16 +203,6 @@ u32 ramAvailable(void) {
     return size;
 }
 
-std::string join(vector<string>& v, const string& delim) {
-    std::string retVal;
-    for (auto it = v.begin(); it != v.end(); ++it) {
-        retVal.append(*it);
-        retVal.append(delim);
-    }
-
-    return retVal;
-}
-
 std::vector<std::string>& parseBetween(const std::string& s,
                                        const string& start,
                                        const string& stop,
