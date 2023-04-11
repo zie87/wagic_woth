@@ -1,3 +1,5 @@
+#include "woth/string/algorithms.hpp"
+
 #include "PrecompiledHeader.h"
 
 #include "DeckMenuItem.h"
@@ -19,7 +21,7 @@ DeckMenuItem::DeckMenuItem(DeckMenu* _parent, int id, int fontId, std::string te
     , mIsValidSelection(false)
     , parent(_parent)
     , fontId(fontId)
-    , mText(trim(text))
+    , mText(::woth::trim(text))
     , mX(x)
     , mY(y)
     , mMetaData(deckMetaData) {

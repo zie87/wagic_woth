@@ -3,5 +3,5 @@ if get_option('enable_testsuite')
 endif
 
 if host_machine.system() == 'linux'
-  subdir('unittests')
+    subdir('unittests')
 endif

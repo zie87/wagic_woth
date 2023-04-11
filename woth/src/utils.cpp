@@ -203,23 +203,6 @@ u32 ramAvailable(void) {
     return size;
 }
 
-/* String manipulation functions */
-string& trim(string& str) {
-    str = ltrim(str);
-    str = rtrim(str);
-    return str;
-}
-
-string& ltrim(string& str) {
-    str.erase(0, str.find_first_not_of(" \t"));
-    return str;
-}
-
-string& rtrim(string& str) {
-    str.resize(str.find_last_not_of(" \t") + 1);
-    return str;
-}
-
 std::vector<std::string>& split(const std::string& s, char delim, std::vector<std::string>& elems) {
     std::stringstream ss(s);
     std::string item;

@@ -1,3 +1,5 @@
+#include "woth/string/algorithms.hpp"
+
 #include "PrecompiledHeader.h"
 
 #include "MTGDeck.h"
@@ -695,9 +697,9 @@ MTGCard* MTGAllCards::getCardByName(string nameDescriptor) {
     if (found != string::npos) {
         const size_t end = nameDescriptor.find(')');
         string setName   = nameDescriptor.substr(found + 2, end - found - 2);
-        trim(setName);
+        ::woth::trim(setName);
         name = nameDescriptor.substr(0, found);
-        trim(name);
+        ::woth::trim(name);
         setId = setlist[setName];
 
         // Reconstruct a clean string "name (set)" for cache consistency
@@ -1073,7 +1075,7 @@ void MTGDeck::printDetailedDeckText(std::ofstream& file) {
             types << MTGAllCards::findType(*typeIter) << " ";
         }
 
-        currentCard << trim(types.str()) << ", ";
+        currentCard << ::woth::trim(types.str()) << ", ";
         types.str("");  // reset the buffer.
 
         // Add P/T if a creature
@@ -1125,7 +1127,7 @@ std::string MTGDeck::getCardBlockText(const std::string& title, const std::strin
     oss << std::setfill('#') << std::setw(40) << "#" << std::endl;
     oss << "#    " << std::setfill(' ') << std::setw(34) << std::left << title << "#" << std::endl;
     oss << std::setfill('#') << std::setw(40) << "#" << std::endl;
-    oss << trim(textBlock) << std::endl;
+    oss << ::woth::trim(textBlock) << std::endl;
 
     return oss.str();
 }

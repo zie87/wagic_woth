@@ -1,3 +1,5 @@
+#include "woth/string/algorithms.hpp"
+
 #include "PrecompiledHeader.h"
 
 #include <JGui.h>
@@ -76,7 +78,7 @@ WSrcCards* MTGPack::getPool(const string& poolstr) {
         s          = poolstr.find("unlocked");
         string sub = poolstr;
         if (s != string::npos) {
-            sub = trim(poolstr.substr(s + 8));
+            sub = ::woth::trim(poolstr.substr(s + 8));
         }
         if (!sub.empty()) {
             mySrc->addFilter(ff->Construct(sub));
