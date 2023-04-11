@@ -14,6 +14,7 @@ u8 JGEGetAnalogY() { return 0; }
 
 static void RunAllTests(void) {
     RUN_TEST_GROUP(woth_string_algorithms_trim);
+    RUN_TEST_GROUP(woth_string_algorithms_join);
     RUN_TEST_GROUP(woth_string_algorithms_split);
 }
 

@@ -16,8 +16,6 @@
 #define TASK_PACIFISM 'P'
 #define TASKS_ALL "WSDIMOP"
 
-#define ITEM_SEPARATOR "|"
-
 #define COMMON_ATTRIBS_COUNT 7
 
 class Task {

@@ -60,7 +60,6 @@ inline void shuffle(RandomIt first, RandomIt last) {
 
 using std::string;
 
-std::string join(std::vector<std::string>& v, const std::string& delim = " ");
 
 // A simple parsing function
 // splits string s by finding the first occurence of start, and the first occurence of stop, and returning

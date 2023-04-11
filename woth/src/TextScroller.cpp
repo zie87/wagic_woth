@@ -118,7 +118,7 @@ void VerticalTextScroller::Update(float dt) {
             newDisplayText.push_back(displayText[i]);
         }
 
-        mText = join(newDisplayText, "\n");
+        mText = ::woth::join(newDisplayText, '\n');
         mY    = mOriginalY;
     }
     ++timer;

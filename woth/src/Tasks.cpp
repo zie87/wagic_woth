@@ -18,6 +18,8 @@
 #include <utility>
 #include "utils.h"
 
+static constexpr char ITEM_SEPARATOR = '|';
+
 vector<string> Task::sAIDeckNames;
 
 /*---------------- Task -----------------*/
@@ -41,7 +43,7 @@ int Task::getReward() {
 string Task::toString() {
     storeCommonAttribs();
     storeCustomAttribs();
-    return join(persistentAttribs, ITEM_SEPARATOR);
+    return ::woth::join(persistentAttribs, ITEM_SEPARATOR);
 }
 
 // Store basic attributes to vector, for saving
@@ -164,7 +166,7 @@ Task* Task::createFromStr(const string& params, bool rand) {
     vector<string> exploded;
     Task* result;
 
-    ::woth::split(params, ITEM_SEPARATOR[0], exploded);
+    ::woth::split(params, ITEM_SEPARATOR, exploded);
 
     switch (exploded[0][0]) {
     case TASK_WIN_AGAINST:
