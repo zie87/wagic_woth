@@ -75,8 +75,6 @@ bool JGEToggleFullscreen();
 
 #endif
 
-#include "Vector2D.h"
-
 class JApp;
 class JResourceManager;
 class JFileSystem;

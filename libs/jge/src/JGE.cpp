@@ -13,14 +13,12 @@
 #include <set>
 #include <limits>
 
-#include "../include/JGE.h"
-#include "../include/JApp.h"
-#include "../include/JRenderer.h"
-#include "../include/JSoundSystem.h"
-#include "../include/Vector2D.h"
-#include "../include/JResourceManager.h"
-#include "../include/JFileSystem.h"
-// #include "../include/JParticleSystem.h"
+#include "JGE.h"
+#include "JApp.h"
+#include "JRenderer.h"
+#include "JSoundSystem.h"
+#include "JResourceManager.h"
+#include "JFileSystem.h"
 
 //////////////////////////////////////////////////////////////////////////
 #if defined(WIN32)  // WIN32 specific code
