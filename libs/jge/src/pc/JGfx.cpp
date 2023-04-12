@@ -26,11 +26,13 @@ extern "C" {
 #define png_bytep_NULL (png_bytep) NULL
 #define int_p_NULL (int*)NULL
 
-#include "../../include/JGE.h"
-#include "../../include/JRenderer.h"
-#include "../../include/JResourceManager.h"
-#include "../../include/JFileSystem.h"
-#include "../../include/JAssert.h"
+#include "JGE.h"
+#include "JRenderer.h"
+#include "JResourceManager.h"
+#include "JFileSystem.h"
+#include "JAssert.h"
+
+#include "jge/math/vector_2d.hpp"
 
 #if (defined WIN32) && defined(_MSC_VER)
 #ifndef __attribute__
@@ -839,26 +841,26 @@ void JRenderer::RenderQuad(JQuad* quad, float xo, float yo, float angle, float x
     const float x      = -quad->mHotSpotX;
     const float y      = quad->mHotSpotY;
 
-    Vector2D pt[4];
-    pt[3] = Vector2D(x, y);
-    pt[2] = Vector2D(x + width, y);
-    pt[1] = Vector2D(x + width, y - height);
-    pt[0] = Vector2D(x, y - height);
+    jge::math::vector_2d pt[4];
+    pt[3] = jge::math::vector_2d(x, y);
+    pt[2] = jge::math::vector_2d(x + width, y);
+    pt[1] = jge::math::vector_2d(x + width, y - height);
+    pt[0] = jge::math::vector_2d(x, y - height);
 
-    Vector2D uv[4];
-    uv[0] = Vector2D(quad->mTX0, quad->mTY1);
-    uv[1] = Vector2D(quad->mTX1, quad->mTY1);
-    uv[2] = Vector2D(quad->mTX1, quad->mTY0);
-    uv[3] = Vector2D(quad->mTX0, quad->mTY0);
+    jge::math::vector_2d uv[4];
+    uv[0] = jge::math::vector_2d(quad->mTX0, quad->mTY1);
+    uv[1] = jge::math::vector_2d(quad->mTX1, quad->mTY1);
+    uv[2] = jge::math::vector_2d(quad->mTX1, quad->mTY0);
+    uv[3] = jge::math::vector_2d(quad->mTX0, quad->mTY0);
 
     if (quad->mHFlipped) {
-        Swap(&uv[0].x, &uv[1].x);
-        Swap(&uv[2].x, &uv[3].x);
+        Swap(&uv[0].x(), &uv[1].x());
+        Swap(&uv[2].x(), &uv[3].x());
     }
 
     if (quad->mVFlipped) {
-        Swap(&uv[0].y, &uv[2].y);
-        Swap(&uv[1].y, &uv[3].y);
+        Swap(&uv[0].y(), &uv[2].y());
+        Swap(&uv[1].y(), &uv[3].y());
     }
 
     BindTexture(quad->mTex);
@@ -878,8 +880,8 @@ void JRenderer::RenderQuad(JQuad* quad, float xo, float yo, float angle, float x
     esScale(&mvpMatrix, xScale, yScale, 1.0f);
 
     GLfloat vVertices[] = {
-        pt[0].x, pt[0].y, 0.0f, uv[0].x, uv[0].y, pt[1].x, pt[1].y, 0.0f, uv[1].x, uv[1].y,
-        pt[3].x, pt[3].y, 0.0f, uv[3].x, uv[3].y, pt[2].x, pt[2].y, 0.0f, uv[2].x, uv[2].y,
+        pt[0].x(), pt[0].y(), 0.0f, uv[0].x(), uv[0].y(), pt[1].x(), pt[1].y(), 0.0f, uv[1].x(), uv[1].y(),
+        pt[3].x(), pt[3].y(), 0.0f, uv[3].x(), uv[3].y(), pt[2].x(), pt[2].y(), 0.0f, uv[2].x(), uv[2].y(),
     };
 
     GLubyte colorCoords[] = {
@@ -937,11 +939,11 @@ void JRenderer::RenderQuad(JQuad* quad, float xo, float yo, float angle, float x
     glEnableClientState(GL_COLOR_ARRAY);
 
     GLfloat vertCoords[] = {
-        pt[0].x, pt[0].y, pt[1].x, pt[1].y, pt[3].x, pt[3].y, pt[2].x, pt[2].y,
+        pt[0].x(), pt[0].y(), pt[1].x(), pt[1].y(), pt[3].x(), pt[3].y(), pt[2].x(), pt[2].y(),
     };
 
-    GLfloat texCoords[] = {
-        uv[0].x, uv[0].y, uv[1].x, uv[1].y, uv[3].x, uv[3].y, uv[2].x, uv[2].y,
+    GLfloat t.x() Coords[] = {
+        uv[0].x(), uv[0].y(), uv[1].x(), uv[1].y(), uv[3].x(), uv[3].y(), uv[2].x(), uv[2].y(),
     };
 
     GLubyte colorCoords[] = {
@@ -963,23 +965,23 @@ void JRenderer::RenderQuad(JQuad* quad, float xo, float yo, float angle, float x
     glBegin(GL_QUADS);
 
     glColor4ub(quad->mColor[0].r, quad->mColor[0].g, quad->mColor[0].b, quad->mColor[0].a);
-    glTexCoord2f(uv[0].x, uv[0].y);
-    glVertex2f(pt[0].x, pt[0].y);
+    glTexCoord2f(uv[0].x(), uv[0].y());
+    glVertex2f(pt[0].x(), pt[0].y());
 
     // bottom right corner
     glColor4ub(quad->mColor[1].r, quad->mColor[1].g, quad->mColor[1].b, quad->mColor[1].a);
-    glTexCoord2f(uv[1].x, uv[1].y);
-    glVertex2f(pt[1].x, pt[1].y);
+    glTexCoord2f(uv[1].x(), uv[1].y());
+    glVertex2f(pt[1].x(), pt[1].y());
 
     // top right corner
     glColor4ub(quad->mColor[2].r, quad->mColor[2].g, quad->mColor[2].b, quad->mColor[2].a);
-    glTexCoord2f(uv[2].x, uv[2].y);
-    glVertex2f(pt[2].x, pt[2].y);
+    glTexCoord2f(uv[2].x(), uv[2].y());
+    glVertex2f(pt[2].x(), pt[2].y());
 
     // top left corner
     glColor4ub(quad->mColor[3].r, quad->mColor[3].g, quad->mColor[3].b, quad->mColor[3].a);
-    glTexCoord2f(uv[3].x, uv[3].y);
-    glVertex2f(pt[3].x, pt[3].y);
+    glTexCoord2f(uv[3].x(), uv[3].y());
+    glVertex2f(pt[3].x(), pt[3].y());
 
     glEnd();
 #endif  //(defined GL_ES_VERSION_1_1) || (defined GL_VERSION_1_1)
@@ -999,18 +1001,18 @@ void JRenderer::RenderQuad(JQuad* quad, VertexColor* pt) {
         quad->mColor[i].color = pt[i].color;
     }
 
-    Vector2D uv[4];
-    uv[0] = Vector2D(quad->mTX0, quad->mTY1);
-    uv[1] = Vector2D(quad->mTX1, quad->mTY1);
-    uv[2] = Vector2D(quad->mTX1, quad->mTY0);
-    uv[3] = Vector2D(quad->mTX0, quad->mTY0);
+    jge::math::vector_2d uv[4];
+    uv[0] = jge::math::vector_2d(quad->mTX0, quad->mTY1);
+    uv[1] = jge::math::vector_2d(quad->mTX1, quad->mTY1);
+    uv[2] = jge::math::vector_2d(quad->mTX1, quad->mTY0);
+    uv[3] = jge::math::vector_2d(quad->mTX0, quad->mTY0);
 
     BindTexture(quad->mTex);
 
 #if (defined GL_ES_VERSION_2_0) || (defined GL_VERSION_2_0)
     GLfloat vVertices[] = {
-        pt[0].x, pt[0].y, 0.0f, uv[0].x, uv[0].y, pt[1].x, pt[1].y, 0.0f, uv[1].x, uv[1].y,
-        pt[3].x, pt[3].y, 0.0f, uv[3].x, uv[3].y, pt[2].x, pt[2].y, 0.0f, uv[2].x, uv[2].y,
+        pt[0].x, pt[0].y, 0.0f, uv[0].x(), uv[0].y(), pt[1].x, pt[1].y, 0.0f, uv[1].x(), uv[1].y(),
+        pt[3].x, pt[3].y, 0.0f, uv[3].x(), uv[3].y(), pt[2].x, pt[2].y, 0.0f, uv[2].x(), uv[2].y(),
     };
 
     GLubyte colorCoords[] = {
@@ -1057,7 +1059,7 @@ void JRenderer::RenderQuad(JQuad* quad, VertexColor* pt) {
     };
 
     GLfloat texCoords[] = {
-        uv[0].x, uv[0].y, uv[1].x, uv[1].y, uv[3].x, uv[3].y, uv[2].x, uv[2].y,
+        uv[0].x(), uv[0].y(), uv[1].x(), uv[1].y(), uv[3].x(), uv[3].y(), uv[2].x(), uv[2].y(),
     };
 
     GLubyte colorCoords[] = {
@@ -1084,22 +1086,22 @@ void JRenderer::RenderQuad(JQuad* quad, VertexColor* pt) {
     glBegin(GL_QUADS);
     // bottom left corner
     glColor4ub(quad->mColor[0].r, quad->mColor[0].g, quad->mColor[0].b, quad->mColor[0].a);
-    glTexCoord2f(uv[0].x, uv[0].y);
+    glTexCoord2f(uv[0].x(), uv[0].y());
     glVertex2f(pt[0].x, pt[0].y);
 
     // bottom right corner
     glColor4ub(quad->mColor[1].r, quad->mColor[1].g, quad->mColor[1].b, quad->mColor[1].a);
-    glTexCoord2f(uv[1].x, uv[1].y);
+    glTexCoord2f(uv[1].x(), uv[1].y());
     glVertex2f(pt[1].x, pt[1].y);
 
     // top right corner
     glColor4ub(quad->mColor[2].r, quad->mColor[2].g, quad->mColor[2].b, quad->mColor[2].a);
-    glTexCoord2f(uv[2].x, uv[2].y);
+    glTexCoord2f(uv[2].x(), uv[2].y());
     glVertex2f(pt[2].x, pt[2].y);
 
     // top left corner
     glColor4ub(quad->mColor[3].r, quad->mColor[3].g, quad->mColor[3].b, quad->mColor[3].a);
-    glTexCoord2f(uv[3].x, uv[3].y);
+    glTexCoord2f(uv[3].x(), uv[3].y());
     glVertex2f(pt[3].x, pt[3].y);
     glEnd();
     // default color
@@ -1514,7 +1516,9 @@ static void jpeg_mem_src(j_decompress_ptr cinfo, byte* mem, int len) {
 LoadJPG
 ==============
 */
-void JRenderer::LoadJPG(TextureInfo& textureInfo, const char* filename, int mode __attribute__((unused)),
+void JRenderer::LoadJPG(TextureInfo& textureInfo,
+                        const char* filename,
+                        int mode __attribute__((unused)),
                         int TextureFormat __attribute__((unused))) {
     textureInfo.mBits = nullptr;
 
@@ -1686,7 +1690,9 @@ JTexture* JRenderer::LoadTexture(const char* filename, int mode, int TextureForm
     return tex;
 }
 
-int JRenderer::LoadPNG(TextureInfo& textureInfo, const char* filename, int mode __attribute__((unused)),
+int JRenderer::LoadPNG(TextureInfo& textureInfo,
+                       const char* filename,
+                       int mode __attribute__((unused)),
                        int TextureFormat __attribute__((unused))) {
     textureInfo.mBits = nullptr;
 

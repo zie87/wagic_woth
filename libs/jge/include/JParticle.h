@@ -13,7 +13,8 @@
 
 #include "JApp.h"
 #include "JRenderer.h"
-#include "Vector2D.h"
+
+#include "jge/math/vector_2d.hpp"
 
 #define MAX_KEYS 8
 
@@ -78,9 +79,9 @@ private:
     static JRenderer* mRenderer;
     JQuad* mQuad;
 
-    Vector2D mOrigin;
-    Vector2D mPos;
-    Vector2D mVelocity;
+    jge::math::vector_2d mOrigin {};
+    jge::math::vector_2d mPos {};
+    jge::math::vector_2d mVelocity {};
 
     // float mSpeed;
     float mSize;

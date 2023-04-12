@@ -108,26 +108,21 @@ public:
         base_vector_2d d = (*this - center).rotate(angle);
         return (*this = (center + d));
     }
-    
-    [[nodiscard]] inline auto angle() const noexcept -> value_type {
-        return ::jge::math::atan2(m_y, m_x);
-    }
-    
+
+    [[nodiscard]] inline auto angle() const noexcept -> value_type { return ::jge::math::atan2(m_y, m_x); }
+
     [[nodiscard]] inline auto angle(const base_vector_2d& other) const noexcept -> value_type {
         const auto d = dot(other);
         const auto c = cross(other);
 
         return ::jge::math::atan2(c, d);
     }
-    /*
-    Vector2D Vector2D::Direction(void) const {
-        Vector2D temp(*this);
 
-        temp.Normalize();
-
-        return temp;
+    [[nodiscard]] inline auto direction() const noexcept -> base_vector_2d {
+        base_vector_2d cpy(*this);
+        cpy.normalize();
+        return cpy;
     }
-    */
 
 private:
     value_type m_x{};

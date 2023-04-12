@@ -54,7 +54,6 @@ jge_srcs = [
     'src/JLBFont.cpp',
     'src/JLogger.cpp',
     'src/Encoding.cpp',
-    'src/Vector2D.cpp',
     'src/JGameObject.cpp',
     'src/JSprite.cpp',
     'src/JMD2Model.cpp',

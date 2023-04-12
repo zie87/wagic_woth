@@ -36,7 +36,6 @@
 
 #endif
 
-#include "Vector2D.h"
 
 #define USING_MATH_TABLE
 

@@ -96,9 +96,6 @@ JParticle::JParticle()
     mRenderer = JRenderer::GetInstance();
 
     // mTexture = texture;
-    mOrigin   = Vector2D(0.0f, 0.0f);
-    mPos      = Vector2D(0.0f, 0.0f);
-    mVelocity = Vector2D(0.0f, 0.0f);
 
     //	mNext = NULL;
     //	mPrev = NULL;
@@ -114,20 +111,17 @@ bool JParticle::Update(float dt) {
     }
 
     // the radial and tangential acceleration code was taken from HGE's particle source
-    Vector2D vecAccel = mPos - mOrigin;  // par->vecLocation-vecLocation;
-    vecAccel.Normalize();
-    Vector2D vecAccel2 = vecAccel;
+    jge::math::vector_2d vecAccel = (mPos - mOrigin).normalize();  // par->vecLocation-vecLocation;
+    jge::math::vector_2d vecAccel2 = vecAccel;
     vecAccel *= mData[FIELD_RADIAL_ACCEL].mCurr;  // par->fRadialAccel;
 
     // vecAccel2.Rotate(M_PI_2);
     // the following is faster
-    const float ang = vecAccel2.x;
-    vecAccel2.x     = -vecAccel2.y;
-    vecAccel2.y     = ang;
+    vecAccel2 = jge::math::vector_2d( -vecAccel2.y(), vecAccel2.x() );
 
     vecAccel2 *= mData[FIELD_TANGENTIAL_ACCEL].mCurr;  // par->fTangentialAccel;
     mVelocity += (vecAccel + vecAccel2) * dt;          // par->vecVelocity += (vecAccel+vecAccel2)*fDeltaTime;
-    mVelocity.y += mData[FIELD_GRAVITY].mCurr * dt;    // par->vecVelocity.y += par->fGravity*fDeltaTime;
+    mVelocity.y() += mData[FIELD_GRAVITY].mCurr * dt;    // par->vecVelocity.y += par->fGravity*fDeltaTime;
 
     // par->vecLocation += par->vecVelocity*fDeltaTime;
 
@@ -153,7 +147,7 @@ void JParticle::Render() {
         auto color  = ARGB(a, r, g, b);
         mQuad->SetColor(color);
 
-        mRenderer->RenderQuad(mQuad, mPos.x, mPos.y, mData[FIELD_ROTATION].mCurr, mData[FIELD_SIZE].mCurr * mSize,
+        mRenderer->RenderQuad(mQuad, mPos.x(), mPos.y(), mData[FIELD_ROTATION].mCurr, mData[FIELD_SIZE].mCurr * mSize,
                               mData[FIELD_SIZE].mCurr * mSize);
     }
 }
@@ -170,31 +164,29 @@ void JParticle::Init(float lifeTime) {
 }
 
 void JParticle::InitPosition(float ox, float oy, float xoffset, float yoffset) {
-    mOrigin = Vector2D(ox, oy);
-    mPos    = Vector2D(ox + xoffset, oy + yoffset);
+    mOrigin = jge::math::vector_2d(ox, oy);
+    mPos    = jge::math::vector_2d(ox + xoffset, oy + yoffset);
 }
 
 void JParticle::SetPosition(float x, float y) {
-    mPos    = Vector2D(x, y);
-    mOrigin = Vector2D(x, y);
+    mPos    = jge::math::vector_2d(x, y);
+    mOrigin = jge::math::vector_2d(x, y);
 }
 
 void JParticle::SetQuad(JQuad* quad) { mQuad = quad; }
 
 void JParticle::Move(float x, float y) {
-    mPos.x += x;
-    mPos.y += y;
-
-    mOrigin.x += x;
-    mOrigin.y += y;
+    const jge::math::base_vector_2d move_vec(x, y);
+    mPos += move_vec;
+    mOrigin += move_vec;
 }
 
 // void JParticle::ResetVelocity()
 //{
 //	float xx =  mSpeed * cosf(mAngle);
 //	float yy =  mSpeed * sinf(mAngle);
-//	mVelocity = Vector2D(xx, yy);
+//	mVelocity = jge::math::vector_2d(xx, yy);
 // }
 
-void JParticle::SetVelocity(float x, float y) { mVelocity = Vector2D(x, y); }
+void JParticle::SetVelocity(float x, float y) { mVelocity = jge::math::vector_2d(x, y); }
 void JParticle::SetSize(float size) { mSize = size; }

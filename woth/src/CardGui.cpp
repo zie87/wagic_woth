@@ -13,7 +13,6 @@
 #include "Translate.h"
 #include "MTGDefinitions.h"
 #include "GameObserver.h"
-#include <Vector2D.h>
 #include "Counters.h"
 #include "ModRules.h"
 #include "CardDescriptor.h"
