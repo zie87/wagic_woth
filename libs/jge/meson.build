@@ -14,7 +14,7 @@ hge_inc_dirs = [include_directories('./include'), zipfs_inc_dir]
 hge_dependencies = []
 
 if host_machine.system() == 'psp'
-    hge_c_args = ['-DPSP','-D_PSP_FW_VERSION=150']
+    hge_c_args = ['-DPSP', '-D_PSP_FW_VERSION=150']
     hge_cpp_args = hge_c_args
 else
     sdl2_dep = dependency('sdl2')
@@ -125,6 +125,7 @@ else
     )
 
     sdl2_dep = dependency('sdl2')
+    thread_dep = dependency('threads')
 
     jge_c_args = jge_c_args + ['-DSDL_CONFIG']
 
@@ -137,7 +138,7 @@ else
     endif
 
     jge_cpp_args = jge_c_args
-    jge_dependencies = jge_dependencies + [sdl2_dep]
+    jge_dependencies = jge_dependencies + [sdl2_dep, thread_dep]
 endif
 
 if get_option('buildtype') == 'debug'
