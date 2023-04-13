@@ -14,7 +14,13 @@ readelf     = arch + '-readelf'
 strip       = arch + '-strip'
 gdb         = arch + '-gdb'
 pkgconfig   = arch + '-pkg-config' 
+windres     = arch + '-windres'
 #exe_wrapper = 'wine32'
+
+[built-in options]
+default_library = 'static'
+c_link_args = ['-static-libgcc']
+cpp_link_args = c_link_args + ['-static-libstdc++']
 
 [host_machine]
 system = 'windows'
