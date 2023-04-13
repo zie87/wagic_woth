@@ -169,6 +169,18 @@ else
                 '-lssp',
             ]
         )
+
+        win = import('windows')
+        rc_file = win.compile_resources(
+            join_paths(
+                meson.project_source_root(),
+                'tools',
+                'mingw',
+                'data',
+                'mtg.rc',
+            ),
+        )
+        wth_srcs += rc_file
     endif
 endif
 
