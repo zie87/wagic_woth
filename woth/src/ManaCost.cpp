@@ -15,9 +15,37 @@
 
 SUPPORT_OBJECT_ANALYTICS(ManaCost)
 
+namespace utils::detail {
+[[nodiscard]] ManaCost* copy_or_new(const ManaCost* other) {
+    if (!other) {
+        return NEW ManaCost();
+    }
+    return NEW ManaCost(*other);
+}
+
+}  // namespace utils::detail
+
+namespace {
+
+inline void prepare_cost_array(std::vector<int8_t>& vec) {
+    const std::size_t array_size = Constants::NB_Colors + 1;
+    vec.resize(array_size);
+    std::fill_n(vec.begin(), array_size, 0);
+}
+
+inline void copy_cost(ManaCost*& lhs, const ManaCost* rhs) {
+    SAFE_DELETE(lhs);
+    if (rhs) {
+        lhs = NEW ManaCost();
+        lhs->copy(rhs);
+    }
+}
+
+}  // namespace
+
 ManaCost* ManaCost::parseManaCost(string s, ManaCost* _manaCost, MTGCardInstance* c) {
-    ManaCost* manaCost;
-    GameObserver* g = c ? c->getObserver() : nullptr;
+    ManaCost* manaCost = nullptr;
+    GameObserver* g    = c ? c->getObserver() : nullptr;
     if (_manaCost) {
         manaCost = _manaCost;
     } else {
@@ -223,34 +251,14 @@ ManaCost* ManaCost::parseManaCost(string s, ManaCost* _manaCost, MTGCardInstance
     return manaCost;
 }
 
-namespace utils::detail {
-[[nodiscard]] ManaCost* copy_or_new(const ManaCost* other) {
-    if (!other) {
-        return NEW ManaCost();
-    }
-    return NEW ManaCost(*other);
-}
-
-}  // namespace utils::detail
-
-namespace {
-inline void prepare_cost_array(std::vector<int8_t>& vec) {
-    const std::size_t array_size = Constants::NB_Colors + 1;
-    vec.resize(array_size);
-    std::fill_n(vec.begin(), array_size, 0);
-}
-}  // namespace
-
 ManaCost::ManaCost() { prepare_cost_array(cost); }
 
-ManaCost::ManaCost(vector<int8_t>& _cost, int nb_elems) {
+ManaCost::ManaCost(const vector<int8_t>& _cost, int nb_elems) {
     prepare_cost_array(cost);
     for (int i = 0; i < nb_elems; i++) {
         cost[_cost[i * 2]] = _cost[i * 2 + 1];
     }
 }
-
-// Copy Constructor
 
 ManaCost::ManaCost(const ManaCost& other)
     : cost{other.cost}
@@ -267,7 +275,6 @@ ManaCost::ManaCost(const ManaCost& other)
     , isMulti(other.isMulti)
     , xColor{other.xColor} {}
 
-// operator=
 ManaCost& ManaCost::operator=(const ManaCost& other) {
     ManaCost(other).swap(*this);
     return *this;
@@ -354,19 +361,7 @@ int ManaCost::hasAnotherCost() {
     return result;
 }
 
-void ManaCost::init() { prepare_cost_array(cost); }
 void ManaCost::resetCosts() { *this = ManaCost{}; }
-
-namespace {
-
-inline void copy_cost(ManaCost*& lhs, const ManaCost* rhs) {
-    SAFE_DELETE(lhs);
-    if (rhs) {
-        lhs = NEW ManaCost();
-        lhs->copy(rhs);
-    }
-}
-}  // namespace
 
 void ManaCost::copy(const ManaCost* other) {
     if (!other) {
@@ -681,8 +676,7 @@ ManaCost* ManaCost::Diff(ManaCost* _cost) {
         }
     }
 
-    auto* result = NEW ManaCost(diff, Constants::NB_Colors + 1);
-    return result;
+    return NEW ManaCost(diff, Constants::NB_Colors + 1);
 }
 
 std::string ManaCost::toString() {
@@ -725,7 +719,7 @@ std::ostream& operator<<(std::ostream& out, ManaCost* m) { return out << m->toSt
 std::ostream& operator<<(std::ostream& out, ManaCost m) { return out << m.toString(); }
 
 void ManaPool::Empty() {
-    init();
+    resetCosts();
     WEvent* e = NEW WEventEmptyManaPool(this);
     player->getObserver()->receiveEvent(e);
 }

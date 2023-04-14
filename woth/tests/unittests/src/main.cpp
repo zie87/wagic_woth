@@ -18,6 +18,7 @@ u8 JGEGetAnalogY() { return 0; }
 #endif
 
 static void RunAllTests(void) {
+    RUN_TEST_GROUP(woth_mana_mana_type);
     RUN_TEST_GROUP(woth_string_algorithms_trim);
     RUN_TEST_GROUP(woth_string_algorithms_join);
     RUN_TEST_GROUP(woth_string_algorithms_split);
