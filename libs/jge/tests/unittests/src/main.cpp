@@ -1,5 +1,10 @@
 #include "unity/unity.hpp"
 
+#if defined(SDL_CONFIG)
+#define SDL_MAIN_HANDLED
+#include <SDL.h>
+#endif
+
 // define JGE dummies
 int JGEGetTime() { return 0; }
 bool JGEToggleFullscreen() { return true; }
@@ -17,4 +22,4 @@ static void RunAllTests(void) {
     RUN_TEST_GROUP(jge_math_vector_2d);
 }
 
-int main(int argc, const char* argv[]) { return UnityMain(argc, argv, RunAllTests); }
+int main(int argc, char* argv[]) { return UnityMain(argc, (const char**) argv, RunAllTests); }

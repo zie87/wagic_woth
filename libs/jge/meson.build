@@ -168,6 +168,7 @@ jgemain = static_library(
 jge_dep = declare_dependency(
     link_with: jgetools,
     include_directories: jge_inc_dirs,
+    compile_args: jge_cpp_args,
     dependencies: jge_dependencies,
 )
 

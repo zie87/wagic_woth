@@ -11,6 +11,7 @@ function mingw_build() {
     BUILD_DIR="${BUILD_BASE_DIR}32/$1"
     rm -rf ${BUILD_DIR}
 
+    export WINEARCH=win32
     export WINEPREFIX="${WINE_ROOT_DIR}/wine32" 
     export WINEPATH=/usr/i686-w64-mingw32/sys-root/mingw/bin
 
@@ -18,6 +19,7 @@ function mingw_build() {
         --buildtype $1 "${BUILD_DIR}" \
         -Denable_testsuite=$2
     meson compile -C "${BUILD_DIR}"
+    # meson test -C "${BUILD_DIR}" --print-errorlogs
 }
 
 cd ${ROOT_DIR}

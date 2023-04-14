@@ -1,3 +1,3 @@
-if host_machine.system() == 'linux'
+if host_machine.system() != 'psp'
     subdir('unittests')
 endif

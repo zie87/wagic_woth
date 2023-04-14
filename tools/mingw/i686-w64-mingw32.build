@@ -15,7 +15,7 @@ strip       = arch + '-strip'
 gdb         = arch + '-gdb'
 pkgconfig   = arch + '-pkg-config' 
 windres     = arch + '-windres'
-#exe_wrapper = 'wine32'
+exe_wrapper = 'wine'
 
 [built-in options]
 default_library = 'static'
