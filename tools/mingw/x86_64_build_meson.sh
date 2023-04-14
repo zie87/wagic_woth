@@ -18,6 +18,7 @@ function mingw_build() {
         --buildtype $1 "${BUILD_DIR}" \
         -Denable_testsuite=$2
     meson compile -C "${BUILD_DIR}"
+    meson test -C "${BUILD_DIR}" --print-errorlogs
 }
 
 cd ${ROOT_DIR}
