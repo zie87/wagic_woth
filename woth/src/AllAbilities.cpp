@@ -2556,7 +2556,7 @@ const char* AARemoveMana::getMenuText() {
 
 AARemoveMana* AARemoveMana::clone() const {
     auto* a      = NEW AARemoveMana(*this);
-    a->mManaDesc = mManaDesc ? NEW ManaCost(mManaDesc) : nullptr;
+    a->mManaDesc = mManaDesc ? NEW ManaCost(*mManaDesc) : nullptr;
     return a;
 }
 

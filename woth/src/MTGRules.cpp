@@ -1,3 +1,4 @@
+#include "ManaCost.h"
 #include "PrecompiledHeader.h"
 
 #include "CardSelector.h"
@@ -338,11 +339,11 @@ int MTGPutInPlayRule::reactToClick(MTGCardInstance* card) {
         return 0;
     }
 
-    auto* previousManaPool = NEW ManaCost(player->getManaPool());
+    auto* previousManaPool = utils::detail::copy_or_new(player->getManaPool());
     int payResult          = player->getManaPool()->pay(card->getManaCost());
     if (card->getManaCost()->kicker &&
         (OptionKicker::KICKER_ALWAYS == options[Options::KICKERPAYMENT].number || card->controller()->isAI())) {
-        auto* withKickerCost = NEW ManaCost(card->getManaCost());
+        auto* withKickerCost = utils::detail::copy_or_new(card->getManaCost());
         withKickerCost->add(withKickerCost->kicker);
         if (card->getManaCost()->kicker->isMulti) {
             while (previousManaPool->canAfford(withKickerCost)) {
@@ -421,7 +422,7 @@ int MTGKickerRule::isReactingToClick(MTGCardInstance* card, ManaCost* mana) {
         return 0;
     }
     ManaCost* playerMana = player->getManaPool();
-    auto* withKickerCost = NEW ManaCost(card->getManaCost());
+    auto* withKickerCost = utils::detail::copy_or_new(card->getManaCost());
     withKickerCost->add(withKickerCost->kicker);
     if (!playerMana->canAfford(withKickerCost)) {
         delete withKickerCost;
@@ -438,7 +439,7 @@ int MTGKickerRule::reactToClick(MTGCardInstance* card) {
     }
 
     Player* player       = game->currentlyActing();
-    auto* withKickerCost = NEW ManaCost(card->getManaCost());  // using pointers here alters the real cost of the card.
+    auto* withKickerCost = utils::detail::copy_or_new(card->getManaCost());  // using pointers here alters the real cost of the card.
     if (card->getManaCost()->kicker->isMulti) {
         while (player->getManaPool()->canAfford(withKickerCost)) {
             withKickerCost->add(withKickerCost->kicker);
@@ -464,7 +465,7 @@ int MTGKickerRule::reactToClick(MTGCardInstance* card) {
         return 0;
     }
 
-    auto* previousManaPool = NEW ManaCost(player->getManaPool());
+    auto* previousManaPool = utils::detail::copy_or_new(player->getManaPool());
     player->getManaPool()->pay(withKickerCost);
     withKickerCost->doPayExtra();
     ManaCost* spellCost = previousManaPool->Diff(player->getManaPool());
@@ -605,7 +606,7 @@ int MTGAlternativeCostRule::reactToClick(MTGCardInstance* card, ManaCost* altern
         return 0;
     }
     //------------------------------------------------------------------------
-    auto* previousManaPool = NEW ManaCost(playerMana);
+    auto* previousManaPool = utils::detail::copy_or_new(playerMana);
     playerMana->pay(alternateCost);
     alternateCost->doPayExtra();
     ManaCost* spellCost = previousManaPool->Diff(player->getManaPool());
@@ -822,7 +823,7 @@ int MTGSuspendRule::reactToClick(MTGCardInstance* card) {
     // this handles extra cost payments at the moment a card is played.
     if (playerMana->canAfford(alternateCost)) {
         if (alternateCost->hasX()) {
-            auto* checkXnotZero = NEW ManaCost(alternateCost);  // suspend cards with x cost, x can not be zero.
+            auto* checkXnotZero = utils::detail::copy_or_new(alternateCost);  // suspend cards with x cost, x can not be zero.
             checkXnotZero->add(0, 1);
             if (!playerMana->canAfford(checkXnotZero)) {
                 SAFE_DELETE(checkXnotZero);
@@ -843,8 +844,8 @@ int MTGSuspendRule::reactToClick(MTGCardInstance* card) {
     }
     //------------------------------------------------------------------------
     if (card->getManaCost()->suspend->hasX()) {
-        auto* pMana            = NEW ManaCost(player->getManaPool());
-        auto* suspendCheckMana = NEW ManaCost(card->getManaCost()->suspend);
+        auto* pMana            = utils::detail::copy_or_new(player->getManaPool());
+        auto* suspendCheckMana = utils::detail::copy_or_new(card->getManaCost()->suspend);
         card->suspendedTime    = pMana->getConvertedCost() - suspendCheckMana->getConvertedCost();
         SAFE_DELETE(pMana);
         SAFE_DELETE(suspendCheckMana);
@@ -937,7 +938,7 @@ int MTGMorphCostRule::reactToClick(MTGCardInstance* card) {
         }
     }
     //------------------------------------------------------------------------
-    auto* previousManaPool = NEW ManaCost(player->getManaPool());
+    auto* previousManaPool = utils::detail::copy_or_new(player->getManaPool());
     player->getManaPool()->pay(card->getManaCost()->morph);
     card->getManaCost()->morph->doPayExtra();
     const int payResult = ManaCost::MANA_PAID_WITH_MORPH;
