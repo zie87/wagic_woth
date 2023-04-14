@@ -1,3 +1,5 @@
+#include "woth/memory/clone.hpp"
+
 #include "PrecompiledHeader.h"
 
 #include "MTGDefinitions.h"
@@ -27,17 +29,13 @@ int CountSetBits(int n) {
 
 SUPPORT_OBJECT_ANALYTICS(CardPrimitive)
 
-CardPrimitive::CardPrimitive() : colors(0) { init(); }
-
 CardPrimitive::CardPrimitive(CardPrimitive* source) {
     if (!source) {
         return;
     }
     basicAbilities = source->basicAbilities;
 
-    for (size_t i = 0; i < source->types.size(); ++i) {
-        types.push_back(source->types[i]);
-    }
+    types  = source->types;
     colors = source->colors;
     manaCost.copy(source->getManaCost());
     // reducedCost.copy(source->getReducedManaCost());
@@ -52,31 +50,16 @@ CardPrimitive::CardPrimitive(CardPrimitive* source) {
 
     power         = source->power;
     toughness     = source->toughness;
-    restrictions  = source->restrictions ? source->restrictions->clone() : nullptr;
+    restrictions  = woth::clone(source->restrictions);
     suspendedTime = source->suspendedTime;
 
-    magicText = source->magicText;
-    for (auto it = source->magicTexts.begin(); it != source->magicTexts.end(); ++it) {
-        magicTexts[it->first] = source->magicTexts[it->first];
-    }
+    magicText       = source->magicText;
+    magicTexts      = source->magicTexts;
     spellTargetType = source->spellTargetType;
     alias           = source->alias;
 }
 
 CardPrimitive::~CardPrimitive() { SAFE_DELETE(restrictions); }
-
-int CardPrimitive::init() {
-    basicAbilities.reset();
-
-    types.clear();
-
-    magicText = "";
-    magicTexts.clear();
-    spellTargetType = "";
-    alias           = 0;
-    restrictions    = nullptr;
-    return 1;
-}
 
 bool CardPrimitive::isCreature() { return hasSubtype(Subtypes::TYPE_CREATURE); }
 
