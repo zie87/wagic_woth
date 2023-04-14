@@ -1,3 +1,5 @@
+#include "woth/memory/clone.hpp"
+
 #include "PrecompiledHeader.h"
 
 #include "ManaCost.h"
@@ -221,10 +223,18 @@ ManaCost* ManaCost::parseManaCost(string s, ManaCost* _manaCost, MTGCardInstance
     return manaCost;
 }
 
-ManaCost::ManaCost() { init(); }
+namespace {
+inline void prepare_cost_array(std::vector<int8_t>& vec) {
+    const std::size_t array_size = Constants::NB_Colors + 1;
+    vec.resize(array_size);
+    std::fill_n(vec.begin(), array_size, 0);
+}
+}  // namespace
+
+ManaCost::ManaCost() { prepare_cost_array(cost); }
 
 ManaCost::ManaCost(vector<int8_t>& _cost, int nb_elems) {
-    init();
+    prepare_cost_array(cost);
     for (int i = 0; i < nb_elems; i++) {
         cost[_cost[i * 2]] = _cost[i * 2 + 1];
     }
@@ -232,76 +242,52 @@ ManaCost::ManaCost(vector<int8_t>& _cost, int nb_elems) {
 
 // pointer copy constructor
 
-ManaCost::ManaCost(ManaCost* manaCost) {
-    init();
-    if (!manaCost) {
+ManaCost::ManaCost(const ManaCost* other) {
+    prepare_cost_array(cost);
+    if (!other) {
         return;
     }
-    for (int i = 0; i <= Constants::NB_Colors; i++) {
-        cost[i] = manaCost->getCost(i);
-    }
-    hybrids = manaCost->hybrids;
-
-    kicker = NEW ManaCost(manaCost->kicker);
-    if (kicker) {
-        kicker->isMulti = manaCost->isMulti;
-    }
-    Retrace     = NEW ManaCost(manaCost->Retrace);
-    BuyBack     = NEW ManaCost(manaCost->BuyBack);
-    alternative = NEW ManaCost(manaCost->alternative);
-    FlashBack   = NEW ManaCost(manaCost->FlashBack);
-    morph       = NEW ManaCost(manaCost->morph);
-    suspend     = NEW ManaCost(manaCost->suspend);
-
-    extraCosts = manaCost->extraCosts ? manaCost->extraCosts->clone() : nullptr;
-    xColor     = manaCost->xColor;
+    copy(other);
 }
 
 // Copy Constructor
 
-ManaCost::ManaCost(const ManaCost& manaCost)
-#ifdef TRACK_OBJECT_USAGE
-    : InstanceCounter<ManaCost>(manaCost)
-#endif
-{
-    for (int i = 0; i <= Constants::NB_Colors; i++) {
-        cost.push_back(manaCost.cost[i]);
-    }
-
-    hybrids = manaCost.hybrids;
-
-    // make new copies of the pointers for the deep copy
-    kicker      = NEW ManaCost(manaCost.kicker);
-    Retrace     = NEW ManaCost(manaCost.Retrace);
-    BuyBack     = NEW ManaCost(manaCost.BuyBack);
-    alternative = NEW ManaCost(manaCost.alternative);
-    FlashBack   = NEW ManaCost(manaCost.FlashBack);
-    morph       = NEW ManaCost(manaCost.morph);
-    suspend     = NEW ManaCost(manaCost.suspend);
-
-    extraCosts = manaCost.extraCosts ? manaCost.extraCosts->clone() : nullptr;
-    xColor     = manaCost.xColor;
-}
+ManaCost::ManaCost(const ManaCost& other)
+    : cost{other.cost}
+    , hybrids{other.hybrids}
+    , extraCosts{woth::clone(other.extraCosts)}
+    , kicker{NEW ManaCost(other.kicker)}
+    , alternative{NEW ManaCost(other.alternative)}
+    , BuyBack{NEW ManaCost(other.BuyBack)}
+    , FlashBack{NEW ManaCost(other.FlashBack)}
+    , Retrace{NEW ManaCost(other.Retrace)}
+    , morph{NEW ManaCost(other.morph)}
+    , suspend{NEW ManaCost(other.suspend)}
+    , alternativeName{other.alternativeName}
+    , isMulti(other.isMulti)
+    , xColor{other.xColor} {}
 
 // operator=
-ManaCost& ManaCost::operator=(const ManaCost& manaCost) {
-    if (this != &manaCost) {
-        for (int i = 0; i < Constants::NB_Colors; i++) {
-            cost[i] = manaCost.cost[i];
-        }
-
-        hybrids     = manaCost.hybrids;
-        extraCosts  = manaCost.extraCosts;
-        kicker      = manaCost.kicker;
-        Retrace     = manaCost.Retrace;
-        BuyBack     = manaCost.BuyBack;
-        alternative = manaCost.alternative;
-        FlashBack   = manaCost.FlashBack;
-        morph       = manaCost.morph;
-        suspend     = manaCost.suspend;
-        xColor      = manaCost.xColor;
-    }
+ManaCost& ManaCost::operator=(const ManaCost& other) {
+    ManaCost(other).swap(*this);
     return *this;
+}
+
+void ManaCost::swap(ManaCost& other) noexcept {
+    using std::swap;
+    swap(cost, other.cost);
+    swap(hybrids, other.hybrids);
+    swap(extraCosts, other.extraCosts);
+    swap(kicker, other.kicker);
+    swap(alternative, other.alternative);
+    swap(BuyBack, other.BuyBack);
+    swap(FlashBack, other.FlashBack);
+    swap(Retrace, other.Retrace);
+    swap(morph, other.morph);
+    swap(suspend, other.suspend);
+    swap(alternativeName, other.alternativeName);
+    swap(isMulti, other.isMulti);
+    swap(xColor, other.xColor);
 }
 
 ManaCost::~ManaCost() {
@@ -313,8 +299,6 @@ ManaCost::~ManaCost() {
     SAFE_DELETE(Retrace);
     SAFE_DELETE(morph);
     SAFE_DELETE(suspend);
-
-    cost.erase(cost.begin(), cost.end());
 }
 
 void ManaCost::x() {
@@ -370,100 +354,42 @@ int ManaCost::hasAnotherCost() {
     return result;
 }
 
-void ManaCost::init() {
-    int i;
+void ManaCost::init() { prepare_cost_array(cost); }
+void ManaCost::resetCosts() { *this = ManaCost{}; }
 
-    cost.erase(cost.begin(), cost.end());
+namespace {
 
-    for (i = 0; i <= Constants::NB_Colors; i++) {
-        cost.push_back(0);
+inline void copy_cost(ManaCost*& lhs, const ManaCost* rhs) {
+    SAFE_DELETE(lhs);
+    if (rhs) {
+        lhs = NEW ManaCost();
+        lhs->copy(rhs);
     }
-
-    extraCosts  = nullptr;
-    kicker      = nullptr;
-    alternative = nullptr;
-    BuyBack     = nullptr;
-    FlashBack   = nullptr;
-    Retrace     = nullptr;
-    morph       = nullptr;
-    suspend     = nullptr;
-    isMulti     = false;
 }
+}  // namespace
 
-void ManaCost::resetCosts() {
-    int i;
-
-    cost.erase(cost.begin(), cost.end());
-
-    for (i = 0; i <= Constants::NB_Colors; i++) {
-        cost.push_back(0);
-    }
-
-    SAFE_DELETE(extraCosts);
-    SAFE_DELETE(kicker);
-    SAFE_DELETE(alternative);
-    SAFE_DELETE(BuyBack);
-    SAFE_DELETE(FlashBack);
-    SAFE_DELETE(Retrace);
-    SAFE_DELETE(morph);
-    SAFE_DELETE(suspend);
-}
-
-void ManaCost::copy(ManaCost* _manaCost) {
-    if (!_manaCost) {
+void ManaCost::copy(const ManaCost* other) {
+    if (!other) {
         return;
     }
 
-    cost.erase(cost.begin(), cost.end());
-
-    for (int i = 0; i <= Constants::NB_Colors; i++) {
-        cost.push_back(_manaCost->getCost(i));
-    }
-
-    hybrids = _manaCost->hybrids;
+    cost    = other->cost;
+    hybrids = other->hybrids;
 
     SAFE_DELETE(extraCosts);
-    if (_manaCost->extraCosts) {
-        extraCosts = _manaCost->extraCosts->clone();
-    }
+    extraCosts = woth::clone(other->extraCosts);
 
-    SAFE_DELETE(kicker);
-    if (_manaCost->kicker) {
-        kicker = NEW ManaCost();
-        kicker->copy(_manaCost->kicker);
-        kicker->isMulti = _manaCost->kicker->isMulti;
-    }
-    SAFE_DELETE(alternative);
-    if (_manaCost->alternative) {
-        alternative = NEW ManaCost();
-        alternative->copy(_manaCost->alternative);
-    }
-    SAFE_DELETE(BuyBack);
-    if (_manaCost->BuyBack) {
-        BuyBack = NEW ManaCost();
-        BuyBack->copy(_manaCost->BuyBack);
-    }
-    SAFE_DELETE(FlashBack);
-    if (_manaCost->FlashBack) {
-        FlashBack = NEW ManaCost();
-        FlashBack->copy(_manaCost->FlashBack);
-    }
-    SAFE_DELETE(Retrace);
-    if (_manaCost->Retrace) {
-        Retrace = NEW ManaCost();
-        Retrace->copy(_manaCost->Retrace);
-    }
-    SAFE_DELETE(morph);
-    if (_manaCost->morph) {
-        morph = NEW ManaCost();
-        morph->copy(_manaCost->morph);
-    }
-    SAFE_DELETE(suspend);
-    if (_manaCost->suspend) {
-        suspend = NEW ManaCost();
-        suspend->copy(_manaCost->suspend);
-    }
-    xColor = _manaCost->xColor;
+    copy_cost(kicker, other->kicker);
+    copy_cost(alternative, other->alternative);
+    copy_cost(BuyBack, other->BuyBack);
+    copy_cost(FlashBack, other->FlashBack);
+    copy_cost(Retrace, other->Retrace);
+    copy_cost(morph, other->morph);
+    copy_cost(suspend, other->suspend);
+
+    alternativeName = other->alternativeName;
+    isMulti         = other->isMulti;
+    xColor          = other->xColor;
 }
 
 int ManaCost::getCost(int color) {
