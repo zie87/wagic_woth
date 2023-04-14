@@ -26,8 +26,6 @@ protected:
     std::vector<int8_t> cost            = {};
     std::vector<ManaCostHybrid> hybrids = {};
 
-    virtual void init();
-
 public:
     enum {
         MANA_UNPAID                = 0,
@@ -54,7 +52,7 @@ public:
     int xColor   = 0;
 
     ManaCost();
-    ManaCost(std::vector<int8_t>& _cost, int nb_elems = 1);
+    ManaCost(const std::vector<int8_t>& _cost, int nb_elems = 1);
     ManaCost(const ManaCost& manaCost);
     ManaCost& operator=(const ManaCost& manaCost);
     virtual ~ManaCost();
