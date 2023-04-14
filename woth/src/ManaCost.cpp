@@ -223,6 +223,16 @@ ManaCost* ManaCost::parseManaCost(string s, ManaCost* _manaCost, MTGCardInstance
     return manaCost;
 }
 
+namespace utils::detail {
+[[nodiscard]] ManaCost* copy_or_new(const ManaCost* other) {
+    if (!other) {
+        return NEW ManaCost();
+    }
+    return NEW ManaCost(*other);
+}
+
+}  // namespace utils::detail
+
 namespace {
 inline void prepare_cost_array(std::vector<int8_t>& vec) {
     const std::size_t array_size = Constants::NB_Colors + 1;
@@ -240,29 +250,19 @@ ManaCost::ManaCost(vector<int8_t>& _cost, int nb_elems) {
     }
 }
 
-// pointer copy constructor
-
-ManaCost::ManaCost(const ManaCost* other) {
-    prepare_cost_array(cost);
-    if (!other) {
-        return;
-    }
-    copy(other);
-}
-
 // Copy Constructor
 
 ManaCost::ManaCost(const ManaCost& other)
     : cost{other.cost}
     , hybrids{other.hybrids}
     , extraCosts{woth::clone(other.extraCosts)}
-    , kicker{NEW ManaCost(other.kicker)}
-    , alternative{NEW ManaCost(other.alternative)}
-    , BuyBack{NEW ManaCost(other.BuyBack)}
-    , FlashBack{NEW ManaCost(other.FlashBack)}
-    , Retrace{NEW ManaCost(other.Retrace)}
-    , morph{NEW ManaCost(other.morph)}
-    , suspend{NEW ManaCost(other.suspend)}
+    , kicker{utils::detail::copy_or_new(other.kicker)}
+    , alternative{utils::detail::copy_or_new(other.alternative)}
+    , BuyBack{utils::detail::copy_or_new(other.BuyBack)}
+    , FlashBack{utils::detail::copy_or_new(other.FlashBack)}
+    , Retrace{utils::detail::copy_or_new(other.Retrace)}
+    , morph{utils::detail::copy_or_new(other.morph)}
+    , suspend{utils::detail::copy_or_new(other.suspend)}
     , alternativeName{other.alternativeName}
     , isMulti(other.isMulti)
     , xColor{other.xColor} {}
@@ -732,7 +732,7 @@ void ManaPool::Empty() {
 
 ManaPool::ManaPool(Player* player) : player(player) {}
 
-ManaPool::ManaPool(ManaCost* _manaCost, Player* player) : ManaCost(_manaCost), player(player) {}
+ManaPool::ManaPool(const ManaCost& _manaCost, Player* player) : ManaCost(_manaCost), player(player) {}
 
 int ManaPool::remove(int color, int value) {
     const int result = ManaCost::remove(color, value);

@@ -3764,7 +3764,7 @@ MTGAbility::MTGAbility(const MTGAbility& a) : ActionElement(a) {
     canBeInterrupted = a.canBeInterrupted;
 
     // costs get copied, and will be deleted in the destructor
-    mCost = a.mCost ? NEW ManaCost(a.mCost) : nullptr;
+    mCost = a.mCost ? NEW ManaCost(*a.mCost) : nullptr;
 
     // alternative costs are not deleted in the destructor...who deletes them???
     alternative = a.alternative;  // ? NEW ManaCost(a.alternative) : NULL;
@@ -4077,7 +4077,7 @@ int ActivatedAbility::reactToClick(MTGCardInstance* card) {
             game->mExtraPayment = cost->extraCosts;
             return 0;
         }
-        auto* previousManaPool = NEW ManaCost(player->getManaPool());
+        auto* previousManaPool = utils::detail::copy_or_new(player->getManaPool());
         game->currentlyActing()->getManaPool()->pay(cost);
         cost->doPayExtra();
         SAFE_DELETE(abilityCost);
@@ -4101,7 +4101,7 @@ int ActivatedAbility::reactToTargetClick(Targetable* object) {
             game->mExtraPayment = cost->extraCosts;
             return 0;
         }
-        auto* previousManaPool = NEW ManaCost(player->getManaPool());
+        auto* previousManaPool = utils::detail::copy_or_new(player->getManaPool());
         game->currentlyActing()->getManaPool()->pay(cost);
         cost->doPayExtra();
         SAFE_DELETE(abilityCost);

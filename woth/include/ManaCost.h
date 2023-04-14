@@ -23,7 +23,7 @@ class ManaCost
     friend std::ostream& operator<<(std::ostream& out, ManaCost m);
 
 protected:
-    std::vector<int8_t> cost = {};
+    std::vector<int8_t> cost            = {};
     std::vector<ManaCostHybrid> hybrids = {};
 
     virtual void init();
@@ -42,20 +42,19 @@ public:
     };
 
     ExtraCosts* extraCosts = nullptr;
-    ManaCost* kicker = nullptr;
-    ManaCost* alternative = nullptr;
-    ManaCost* BuyBack = nullptr;
-    ManaCost* FlashBack = nullptr;
-    ManaCost* Retrace = nullptr;
-    ManaCost* morph = nullptr;
-    ManaCost* suspend = nullptr;
-    string alternativeName {};
+    ManaCost* kicker       = nullptr;
+    ManaCost* alternative  = nullptr;
+    ManaCost* BuyBack      = nullptr;
+    ManaCost* FlashBack    = nullptr;
+    ManaCost* Retrace      = nullptr;
+    ManaCost* morph        = nullptr;
+    ManaCost* suspend      = nullptr;
+    string alternativeName{};
     bool isMulti = false;
-    int xColor = 0;
+    int xColor   = 0;
 
     ManaCost();
     ManaCost(std::vector<int8_t>& _cost, int nb_elems = 1);
-    ManaCost(const ManaCost* _manaCost);
     ManaCost(const ManaCost& manaCost);
     ManaCost& operator=(const ManaCost& manaCost);
     virtual ~ManaCost();
@@ -109,6 +108,10 @@ public:
 #endif
 };
 
+namespace utils::detail {
+[[nodiscard]] ManaCost* copy_or_new(const ManaCost* other);
+}  // namespace utils::detail
+
 class ManaPool : public ManaCost {
 protected:
     Player* player;
@@ -117,7 +120,7 @@ public:
     ~ManaPool() override = default;
     void Empty();
     ManaPool(Player* player);
-    ManaPool(ManaCost* _manaCost, Player* player);
+    ManaPool(const ManaCost& _manaCost, Player* player);
     int remove(int color, int value);
     int add(int color, int value, MTGCardInstance* source = nullptr);
     int add(ManaCost* _cost, MTGCardInstance* source = nullptr);

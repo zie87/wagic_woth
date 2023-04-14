@@ -989,7 +989,7 @@ vector<MTGAbility*> AIPlayerBaka::canPayMana(MTGCardInstance* target, ManaCost* 
             }
         }
         if (cost->kicker && !searchingAgain) {
-            auto* withKickerCost = NEW ManaCost(cost->kicker);
+            auto* withKickerCost = utils::detail::copy_or_new(cost->kicker);
             int canKick          = 0;
             vector<MTGAbility*> kickerPayment;
             bool keepLooking = true;
