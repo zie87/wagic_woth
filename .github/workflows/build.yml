@@ -40,7 +40,7 @@ jobs:
     - uses: actions/checkout@v3
       with:
         fetch-depth: 1
-    - uses: actions/setup-python@v2
+    - uses: actions/setup-python@v4
       with:
         python-version: '3.x'
     - run: pip install meson ninja
@@ -108,7 +108,7 @@ jobs:
     - run: |
         sudo apt update 
         sudo apt install lcov git libsdl2-dev libpng-dev libjpeg-dev libfreetype-dev libz-dev 
-    - uses: actions/setup-python@v2
+    - uses: actions/setup-python@v4
       with:
         python-version: '3.x'
     - run: pip install meson ninja
