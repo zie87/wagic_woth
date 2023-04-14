@@ -4,8 +4,8 @@
 #include "utils.h"
 #include "MTGDefinitions.h"
 #include "ObjectAnalytics.h"
+#include "ManaCostHybrid.h"
 
-class ManaCostHybrid;
 class ExtraCosts;
 class ExtraCost;
 class MTGAbility;
@@ -23,8 +23,8 @@ class ManaCost
     friend std::ostream& operator<<(std::ostream& out, ManaCost m);
 
 protected:
-    std::vector<int8_t> cost;
-    std::vector<ManaCostHybrid> hybrids;
+    std::vector<int8_t> cost = {};
+    std::vector<ManaCostHybrid> hybrids = {};
 
     virtual void init();
 
@@ -41,31 +41,35 @@ public:
         MANA_PAID_WITH_SUSPEND     = 8
     };
 
-    ExtraCosts* extraCosts;
-    ManaCost* kicker;
-    ManaCost* alternative;
-    ManaCost* BuyBack;
-    ManaCost* FlashBack;
-    ManaCost* Retrace;
-    ManaCost* morph;
-    ManaCost* suspend;
-    string alternativeName;
-    bool isMulti;
+    ExtraCosts* extraCosts = nullptr;
+    ManaCost* kicker = nullptr;
+    ManaCost* alternative = nullptr;
+    ManaCost* BuyBack = nullptr;
+    ManaCost* FlashBack = nullptr;
+    ManaCost* Retrace = nullptr;
+    ManaCost* morph = nullptr;
+    ManaCost* suspend = nullptr;
+    string alternativeName {};
+    bool isMulti = false;
+    int xColor = 0;
+
+    ManaCost();
+    ManaCost(std::vector<int8_t>& _cost, int nb_elems = 1);
+    ManaCost(const ManaCost* _manaCost);
+    ManaCost(const ManaCost& manaCost);
+    ManaCost& operator=(const ManaCost& manaCost);
+    virtual ~ManaCost();
+
+    void swap(ManaCost& other) noexcept;
+
     static ManaCost* parseManaCost(string value, ManaCost* _manacost = nullptr, MTGCardInstance* c = nullptr);
     virtual void resetCosts();
     void x();
     int hasX();
     void specificX(int color = 0);
     int hasSpecificX();
-    int xColor;
     int hasAnotherCost();
-    ManaCost(std::vector<int8_t>& _cost, int nb_elems = 1);
-    ManaCost();
-    virtual ~ManaCost();
-    ManaCost(ManaCost* _manaCost);
-    ManaCost(const ManaCost& manaCost);
-    ManaCost& operator=(const ManaCost& manaCost);
-    void copy(ManaCost* _manaCost);
+    void copy(const ManaCost* _manaCost);
     int isNull();
     int getConvertedCost();
     string toString();
