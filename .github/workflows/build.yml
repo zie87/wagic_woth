@@ -124,13 +124,8 @@ jobs:
       run : |
         lcov --zerocounters --directory ${{runner.workspace}}/builddir
         lcov --capture --initial --directory . --output-file cov_base.info
-    - name: Run unittests
+    - name: Run tests
       run: meson test -C builddir/ --print-errorlogs
-    - name: Run testsuite
-      run: |
-        cp ${{runner.workspace}}/wagic_woth/builddir/woth/tests/testsuite/wagic_testsuite  ${{runner.workspace}}/wagic_woth/woth/bin
-        cd  ${{runner.workspace}}/wagic_woth/woth/bin
-        ./wagic_testsuite
     - name: Lcov creation
       working-directory: ${{runner.workspace}}
       run : |

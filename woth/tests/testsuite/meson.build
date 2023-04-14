@@ -21,6 +21,14 @@ wth_ts = executable(
     dependencies: [wthlib_dep, jge_dep],
 )
 
+wth_ts_workdir = join_paths(
+    meson.project_source_root(),
+    'woth',
+    'bin',
+)
+
+test('woth testsuite', wth_ts, workdir: wth_ts_workdir)
+
 if host_machine.system() == 'psp'
     post_build = meson.get_external_property('post_build_script')
     post_build_script = '@0@'.format(
