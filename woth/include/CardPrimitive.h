@@ -36,33 +36,9 @@ class CardPrimitive
     : public InstanceCounter<CardPrimitive>
 #endif
 {
-private:
-    CastRestrictions* restrictions;
-
-protected:
-    std::string lcname;
-    ManaCost manaCost;
 
 public:
-    std::vector<std::string> formattedText;
-    std::string text;
-    std::string name;
-    int init();
-
-    uint8_t colors;
-    typedef std::bitset<Constants::NB_BASIC_ABILITIES> BasicAbilitiesSet;
-    BasicAbilitiesSet basicAbilities;
-
-    std::map<std::string, std::string> magicTexts;
-    std::string magicText;
-    int alias;
-    std::string spellTargetType;
-    int power;
-    int toughness;
-    int suspendedTime;
-
-    std::vector<int> types;
-    CardPrimitive();
+    CardPrimitive() noexcept = default;
     CardPrimitive(CardPrimitive* source);
     virtual ~CardPrimitive();
 
@@ -113,6 +89,32 @@ public:
     std::string getRestrictions();
     void setOtherRestrictions(std::string _restriction);
     std::string getOtherRestrictions();
+
+private:
+    CastRestrictions* restrictions = nullptr;
+
+protected:
+    std::string lcname = {};
+    ManaCost manaCost  = {};
+
+public:
+    std::vector<std::string> formattedText = {};
+    std::string text                       = {};
+    std::string name                       = {};
+
+    uint8_t colors = 0;
+    typedef std::bitset<Constants::NB_BASIC_ABILITIES> BasicAbilitiesSet;
+    BasicAbilitiesSet basicAbilities{};
+
+    std::map<std::string, std::string> magicTexts{};
+    std::string magicText{};
+    int alias = -1;
+    std::string spellTargetType{};
+    int power         = 0;
+    int toughness     = 0;
+    int suspendedTime = 0;
+
+    std::vector<int> types = {};
 };
 
 #endif

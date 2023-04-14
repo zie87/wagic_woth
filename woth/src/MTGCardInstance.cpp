@@ -110,7 +110,6 @@ MTGCardInstance::~MTGCardInstance() {
 
 int MTGCardInstance::init() {
     MTGCard::init();
-    CardPrimitive::init();
     data  = this;
     X     = 0;
     castX = 0;

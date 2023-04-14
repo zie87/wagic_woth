@@ -1458,6 +1458,7 @@ int AAFlip::resolve() {
             if (!fcard) {
                 return 0;
             }
+            // TODO: isn't this a simple assignement??
             auto* myFlip  = NEW MTGCardInstance(fcard, _target->controller()->game);
             _target->name = myFlip->name;
             _target->setName(myFlip->name);
