@@ -13,6 +13,8 @@
 #include "Trash.h"
 #include "DuelLayers.h"
 
+#include <algorithm>
+
 void DuelLayers::init(GameObserver* go) {
     observer      = go;
     mCardSelector = NEW CardSelector(go, this);
@@ -196,4 +198,4 @@ int DuelLayers::receiveEvent(WEvent* e) {
     return 1;
 }
 
-float DuelLayers::RightBoundary() { return MIN(hand->LeftBoundary(), avatars->LeftBoundarySelf()); }
+float DuelLayers::RightBoundary() { return std::min(hand->LeftBoundary(), avatars->LeftBoundarySelf()); }

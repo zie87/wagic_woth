@@ -6,16 +6,10 @@
 ** hgeColor*** helper classes implementation
 */
 
-#include "../../include/hge/hgecolor.h"
+#include "hge/hgecolor.h"
 #include <math.h>
 
-#ifndef min
-#define min(x, y) ((x < y) ? x : y)
-#endif
-
-#ifndef max
-#define max(x, y) ((x > y) ? x : y)
-#endif
+#include <algorithm>
 
 void hgeColorHSV::SetHWColor(DWORD col) {
     float r;
@@ -33,8 +27,8 @@ void hgeColorHSV::SetHWColor(DWORD col) {
     g = ((col >> 8) & 0xFF) / 255.0f;
     b = (col & 0xFF) / 255.0f;
 
-    minv  = min(min(r, g), b);
-    maxv  = max(max(r, g), b);
+    minv  = std::min(std::min(r, g), b);
+    maxv  = std::max(std::max(r, g), b);
     delta = maxv - minv;
 
     v = maxv;

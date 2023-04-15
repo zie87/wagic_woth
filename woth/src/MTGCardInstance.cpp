@@ -10,6 +10,8 @@
 #include "MTGCardInstance.h"
 
 #include <utility>
+#include <algorithm>
+
 #include "CardDescriptor.h"
 #include "Counters.h"
 #include "Subtypes.h"
@@ -1050,7 +1052,7 @@ int MTGCardInstance::stepPower(CombatStep step) {
     case FIRST_STRIKE:
     case END_FIRST_STRIKE:
         if (has(Constants::FIRSTSTRIKE) || has(Constants::DOUBLESTRIKE)) {
-            return MAX(0, power);
+            return std::max(0, power);
         } else {
             return 0;
         }
@@ -1060,7 +1062,7 @@ int MTGCardInstance::stepPower(CombatStep step) {
         if (has(Constants::FIRSTSTRIKE) && !has(Constants::DOUBLESTRIKE)) {
             return 0;
         } else {
-            return MAX(0, power);
+            return std::max(0, power);
         }
     }
 }

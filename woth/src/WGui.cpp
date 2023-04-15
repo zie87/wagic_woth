@@ -8,6 +8,7 @@
 #include <hge/hgedistort.h>
 
 #include <utility>
+#include <algorithm>
 
 /**
   Provides an interface to retrieve some standardized colors. The idea here is that a child of WGuiBase
@@ -1424,11 +1425,11 @@ float WGuiImage::getHeight() {
 
     if (imgH == 0) {
         if (source && q.get()) {
-            return MAX(height, q->mHeight + (2 * margin));
+            return std::max(height, q->mHeight + (2 * margin));
         }
     }
 
-    return MAX(height, imgH + (2 * margin));
+    return std::max(height, imgH + (2 * margin));
 }
 
 void WGuiImage::Render() {

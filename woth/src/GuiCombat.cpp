@@ -8,6 +8,8 @@
 #include "CardSelector.h"
 #include "Closest.cpp"
 
+#include <algorithm>
+
 static const float MARGIN   = 70;
 static const float TOP_LINE = 80;
 
@@ -121,7 +123,7 @@ void GuiCombat::autoaffectDamage(AttackerDamaged* attacker, CombatStep step) {
     unsigned damage = attacker->card->stepPower(step);
     for (auto it = attacker->blockers.begin(); it != attacker->blockers.end(); ++it) {
         (*it)->clearDamage();
-        unsigned actual_damage = MIN(damage, (unsigned)MAX((*it)->card->toughness, 0));
+        unsigned actual_damage = std::min(damage, (unsigned)std::max((*it)->card->toughness, 0));
         if (attacker->card->has(Constants::DEATHTOUCH) && actual_damage > 1) {
             actual_damage = 1;
         }

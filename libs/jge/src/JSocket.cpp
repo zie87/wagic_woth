@@ -1,3 +1,17 @@
+#include "../include/JSocket.h"
+
+JSocket::JSocket(const std::string&) {}
+JSocket::JSocket() {}
+JSocket::~JSocket() {}
+JSocket::JSocket(int) {}
+
+JSocket* JSocket::Accept() { return nullptr; }
+int JSocket::Read(char*, int) { return -1; }
+int JSocket::Write(char*, int) { return -1; }
+void JSocket::Disconnect() {}
+
+bool JSocket::SetNonBlocking(int) { return false; }
+
 #if 0
 // need a complete rewrite to comply to the new interface
 #ifdef NETWORK_SUPPORT
