@@ -24,8 +24,8 @@ class TestSuiteGame;
 class Trash;
 class DeckManager;
 
-class GameObserver {
-protected:
+class GameObserver final {
+private:
     GameType mGameType;
     MTGCardInstance* cardWaitingForTargets;
     std::queue<WEvent*> eventsQueue;

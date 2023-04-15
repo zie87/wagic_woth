@@ -16,6 +16,8 @@
 #include <math.h>
 
 #include <utility>
+#include <algorithm>
+
 #include "utils.h"
 
 static constexpr char ITEM_SEPARATOR = '|';
@@ -151,7 +153,7 @@ void Task::LoadAIDeckNames() {
 
 int Task::getAIDeckCount() {
     LoadAIDeckNames();
-    return MIN((size_t)options[Options::AIDECKS_UNLOCKED].number, sAIDeckNames.size());
+    return std::min((size_t)options[Options::AIDECKS_UNLOCKED].number, sAIDeckNames.size());
 }
 
 string Task::getAIDeckName(int id) {

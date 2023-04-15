@@ -27,6 +27,8 @@
 #include <JNetwork.h>
 #endif  // NETWORK_SUPPORT
 
+#include <algorithm>
+
 static const char* GAME_VERSION = "WTH?! " WAGIC_VERSION_STRING " - wololo.net";
 
 enum ENUM_MENU_STATE_MAJOR {
@@ -254,7 +256,7 @@ int GameStateMenu::gamePercentComplete() {
     // unlocked AI decks
     const int currentlyUnlocked = options[Options::AIDECKS_UNLOCKED].number;
     const int totalAIDecks      = AIPlayer::getTotalAIDecks();
-    const int reallyUnlocked    = MIN(currentlyUnlocked, totalAIDecks);
+    const int reallyUnlocked    = std::min(currentlyUnlocked, totalAIDecks);
     total += totalAIDecks / 10;
     done += reallyUnlocked / 10;
 

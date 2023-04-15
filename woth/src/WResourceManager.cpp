@@ -11,6 +11,8 @@
 #endif
 #include "WFont.h"
 
+#include <algorithm>
+
 // #define FORCE_LOW_CACHE_MEMORY
 const unsigned int kConstrainedCacheLimit = 8 * 1024 * 1024;
 
@@ -913,7 +915,7 @@ void ResourceManagerImpl::ResetCacheLimits() {
     if (myNewSize < TEXTURES_CACHE_MINSIZE) {
         DebugTrace("Error, Not enough RAM for Cache: " << myNewSize << " - total Ram: " << ram);
     }
-    textureWCache.Resize(MIN(myNewSize, HUGE_CACHE_LIMIT), MAX_CACHE_OBJECTS);
+    textureWCache.Resize(std::min(myNewSize, static_cast<unsigned>(HUGE_CACHE_LIMIT)), MAX_CACHE_OBJECTS);
 #else
 #ifdef FORCE_LOW_CACHE_MEMORY
     textureWCache.Resize(kConstrainedCacheLimit, MAX_CACHE_OBJECTS);

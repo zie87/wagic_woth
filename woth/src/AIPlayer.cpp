@@ -3,6 +3,8 @@
 #include "AIPlayer.h"
 
 #include <utility>
+#include <algorithm>
+
 #include "GameStateDuel.h"
 #include "DeckManager.h"
 #include "CardSelector.h"
@@ -195,7 +197,7 @@ AIPlayer* AIPlayerFactory::createAIPlayer(GameObserver* observer, MTGAllCards* c
     } else {
         if (!deckid) {
             // random deck
-            const int nbdecks = MIN(AIPlayer::getTotalAIDecks(), options[Options::AIDECKS_UNLOCKED].number);
+            const int nbdecks = std::min(AIPlayer::getTotalAIDecks(), options[Options::AIDECKS_UNLOCKED].number);
             if (!nbdecks) {
                 return nullptr;
             }

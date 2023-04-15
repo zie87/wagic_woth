@@ -23,6 +23,8 @@
 
 #include <map>
 #include <utility>
+#include <algorithm>
+
 using std::map;
 
 //
@@ -243,13 +245,9 @@ private:
         } else if (s == "lifetotal") {
             intValue = target->controller()->life;
         } else if (s == "highestlifetotal") {
-            intValue = target->controller()->life <= target->controller()->opponent()->life
-                           ? target->controller()->opponent()->life
-                           : target->controller()->life;
+            intValue = std::max(target->controller()->life, target->controller()->opponent()->life);
         } else if (s == "lowestlifetotal") {
-            intValue = target->controller()->life <= target->controller()->opponent()->life
-                           ? target->controller()->life
-                           : target->controller()->opponent()->life;
+            intValue = std::min(target->controller()->life, target->controller()->opponent()->life);
         } else if (s == "thatmuch") {
             // the value that much is a variable to be used with triggered abilities.
             // ie:when ever you gain life, draw that many cards. when used in a trigger draw:thatmuch, will return the

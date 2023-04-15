@@ -2,6 +2,8 @@
 #include "AllAbilities.h"
 
 #include <utility>
+#include <algorithm>
+
 #include "Translate.h"
 #include "utils.h"
 
@@ -4668,7 +4670,7 @@ void ATutorialMessage::Render() {
     // Render background board
     if (mBgTex) {
         if (mIsImage) {
-            const int alpha = mUserCloseRequest ? MAX(0, 255 - (int)(mElapsed * 500)) : MIN(255, (int)(mElapsed * 500));
+            const int alpha = mUserCloseRequest ? std::max(0, 255 - (int)(mElapsed * 500)) : std::min(255, (int)(mElapsed * 500));
             if (mUserCloseRequest && alpha == 0) {
                 mDontShow = true;
             }
