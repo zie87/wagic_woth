@@ -78,8 +78,12 @@ float Interruptible::GetVerticalTextOffset() const {
     return kTextVerticalOffset;
 }
 
-void Interruptible::Render(MTGCardInstance* source, JQuad* targetQuad, const string& alt1, const string& alt2,
-                           string action, bool bigQuad) {
+void Interruptible::Render(MTGCardInstance* source,
+                           JQuad* targetQuad,
+                           const string& alt1,
+                           const string& alt2,
+                           string action,
+                           bool bigQuad) {
     WFont* mFont = observer->getResourceManager()->GetWFont(Fonts::MAIN_FONT);
     mFont->SetColor(ARGB(255, 255, 255, 255));
     mFont->SetScale(DEFAULT_MAIN_FONT_SCALE);
@@ -187,7 +191,11 @@ Spell::Spell(GameObserver* observer, MTGCardInstance* _source)
     source->castMethod = Constants::NOT_CAST;
 }
 
-Spell::Spell(GameObserver* observer, int id, MTGCardInstance* _source, TargetChooser* tc, ManaCost* _cost,
+Spell::Spell(GameObserver* observer,
+             int id,
+             MTGCardInstance* _source,
+             TargetChooser* tc,
+             ManaCost* _cost,
              int payResult)
     : Interruptible(observer, id)
     , tc(tc)

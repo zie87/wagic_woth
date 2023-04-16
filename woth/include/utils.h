@@ -61,7 +61,6 @@ inline void shuffle(RandomIt first, RandomIt last) {
 
 using std::string;
 
-
 // A simple parsing function
 // splits string s by finding the first occurence of start, and the first occurence of stop, and returning
 // a vector of 3 strings. The first string is everything before the first occurence of start, the second string is

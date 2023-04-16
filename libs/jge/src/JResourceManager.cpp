@@ -217,8 +217,12 @@ JTexture* JResourceManager::GetTexture(int id) {
     return nullptr;
 }
 
-int JResourceManager::CreateQuad(const std::string& quadName, const std::string& textureName, float x, float y,
-                                 float width, float height) {
+int JResourceManager::CreateQuad(const std::string& quadName,
+                                 const std::string& textureName,
+                                 float x,
+                                 float y,
+                                 float width,
+                                 float height) {
     auto itr = mQuadMap.find(quadName);
 
     if (itr == mQuadMap.end()) {

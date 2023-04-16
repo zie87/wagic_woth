@@ -36,7 +36,12 @@ void OptionInteger::Render() {
     mFont->DrawString(buf, width - 5, y + 3, JGETEXT_RIGHT);
 }
 
-OptionInteger::OptionInteger(int _id, string _displayValue, int _maxValue, int _increment, int _defV, string _sDef,
+OptionInteger::OptionInteger(int _id,
+                             string _displayValue,
+                             int _maxValue,
+                             int _increment,
+                             int _defV,
+                             string _sDef,
                              int _minValue)
     : OptionItem(_id, std::move(_displayValue))
     , defValue(_defV)

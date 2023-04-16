@@ -71,7 +71,11 @@ public:
         , source(nullptr) {}
 
     const string getDisplayName() const override;
-    void Render(MTGCardInstance* source, JQuad* targetQuad, const string& alt1, const string& alt2, string action,
+    void Render(MTGCardInstance* source,
+                JQuad* targetQuad,
+                const string& alt1,
+                const string& alt2,
+                string action,
                 bool bigQuad = false);
 
     virtual int receiveEvent(WEvent* event) { return 0; }

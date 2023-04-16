@@ -28,12 +28,38 @@ private:
     JQuad* mQuad;
 
 public:
-    IconButton(int id, IconButtonsController* parent, const std::string& texture, float x, float y, float scale,
-               int fontId, std::string text, float textRelativeX, float textRelativeY, bool hasFocus = false);
-    IconButton(int id, IconButtonsController* parent, JQuad* quad, float x, float y, float scale, int fontId,
-               std::string text, float textRelativeX, float textRelativeY, bool hasFocus = false);
-    void init(IconButtonsController* parent, JQuad* quad, float x, float y, float scale, int fontId, std::string text,
-              float textRelativeX, float textRelativeY, bool hasFocus);
+    IconButton(int id,
+               IconButtonsController* parent,
+               const std::string& texture,
+               float x,
+               float y,
+               float scale,
+               int fontId,
+               std::string text,
+               float textRelativeX,
+               float textRelativeY,
+               bool hasFocus = false);
+    IconButton(int id,
+               IconButtonsController* parent,
+               JQuad* quad,
+               float x,
+               float y,
+               float scale,
+               int fontId,
+               std::string text,
+               float textRelativeX,
+               float textRelativeY,
+               bool hasFocus = false);
+    void init(IconButtonsController* parent,
+              JQuad* quad,
+              float x,
+              float y,
+              float scale,
+              int fontId,
+              std::string text,
+              float textRelativeX,
+              float textRelativeY,
+              bool hasFocus);
     ~IconButton() override;
     std::ostream& toString(std::ostream& out) const override;
 

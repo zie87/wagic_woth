@@ -828,7 +828,9 @@ vector<MTGAbility*> AIPlayerBaka::canPayMana(MTGCardInstance* target, ManaCost* 
     return canPayMana(target, cost, usedCards);
 }
 
-vector<MTGAbility*> AIPlayerBaka::canPayMana(MTGCardInstance* target, ManaCost* cost, map<MTGCardInstance*, bool>& used,
+vector<MTGAbility*> AIPlayerBaka::canPayMana(MTGCardInstance* target,
+                                             ManaCost* cost,
+                                             map<MTGCardInstance*, bool>& used,
                                              bool searchingAgain) {
     if (!cost->getConvertedCost()) {
         return vector<MTGAbility*>();
@@ -2115,7 +2117,10 @@ int AIPlayerBaka::receiveEvent(WEvent* event) {
     return 0;
 }
 
-AIPlayerBaka::AIPlayerBaka(GameObserver* observer, const string& file, const string& fileSmall, string avatarFile,
+AIPlayerBaka::AIPlayerBaka(GameObserver* observer,
+                           const string& file,
+                           const string& fileSmall,
+                           string avatarFile,
                            MTGDeck* deck)
     : AIPlayer(observer, std::move(file), fileSmall, deck)
     , hints(nullptr)

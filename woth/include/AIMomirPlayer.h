@@ -5,7 +5,10 @@
 
 class AIMomirPlayer : public AIPlayerBaka {
 public:
-    AIMomirPlayer(GameObserver* observer, const string& file, const string& fileSmall, string avatarFile,
+    AIMomirPlayer(GameObserver* observer,
+                  const string& file,
+                  const string& fileSmall,
+                  string avatarFile,
                   MTGDeck* deck = nullptr);
     int getEfficiency(OrderedAIAction* action) override;
     int momir();

@@ -35,8 +35,15 @@ private:
     JButton mActionKey;
 
 public:
-    InteractiveButton(JGuiController* _parent, int id, int fontId, const string& text, float x, float y,
-                      JButton actionKey, bool hasFocus = false, bool autoTranslate = false);
+    InteractiveButton(JGuiController* _parent,
+                      int id,
+                      int fontId,
+                      const string& text,
+                      float x,
+                      float y,
+                      JButton actionKey,
+                      bool hasFocus      = false,
+                      bool autoTranslate = false);
 
     void Entering() override;
     bool ButtonPressed() override;

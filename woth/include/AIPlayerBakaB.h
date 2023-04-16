@@ -34,7 +34,8 @@ protected:
 
     MTGCardInstance* FindCardToPlay(ManaCost* potentialMana, const char* type);
 
-    bool payTheManaCost(ManaCost* cost, MTGCardInstance* card = NULL,
+    bool payTheManaCost(ManaCost* cost,
+                        MTGCardInstance* card          = NULL,
                         vector<MTGAbility*> gotPayment = vector<MTGAbility*>());
     int getCreaturesInfo(Player* player, int neededInfo = INFO_NBCREATURES, int untapMode = 0, int canAttack = 0);
     ManaCost* getPotentialMana(MTGCardInstance* card = NULL);
@@ -44,7 +45,10 @@ protected:
     virtual int getEfficiency(OrderedAIAction* action);
 
 public:
-    AIPlayerBakaB(GameObserver* observer, string deckFile, string deckfileSmall, string avatarFile,
+    AIPlayerBakaB(GameObserver* observer,
+                  string deckFile,
+                  string deckfileSmall,
+                  string avatarFile,
                   MTGDeck* deck = NULL);
     virtual int Act(float dt);
     void initTimer();
@@ -54,8 +58,10 @@ public:
     virtual ~AIPlayerBakaB();
     int affectCombatDamages(CombatStep step);
     int canHandleCost(MTGAbility* ability);
-    int chooseTarget(TargetChooser* tc = NULL, Player* forceTarget = NULL, MTGCardInstance* Choosencard = NULL,
-                     bool checkonly = false);
+    int chooseTarget(TargetChooser* tc            = NULL,
+                     Player* forceTarget          = NULL,
+                     MTGCardInstance* Choosencard = NULL,
+                     bool checkonly               = false);
 
     // used by AIHInts, therefore public instead of private :/
     int createAbilityTargets(MTGAbility* a, MTGCardInstance* c, RankingContainer& ranking);

@@ -63,8 +63,13 @@ public:
     int minValue;       ///< Minimum value of the option.
     int increment;      ///< Amount to increment the option by when clicked.
 
-    OptionInteger(int _id, string _displayValue, int _maxValue = 1, int _increment = 1, int _defV = 0,
-                  string _sDef = "", int _minValue = 0);
+    OptionInteger(int _id,
+                  string _displayValue,
+                  int _maxValue  = 1,
+                  int _increment = 1,
+                  int _defV      = 0,
+                  string _sDef   = "",
+                  int _minValue  = 0);
 
     void Reload() override {
         if (id != INVALID_OPTION) {

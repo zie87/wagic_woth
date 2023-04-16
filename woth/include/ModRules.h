@@ -88,8 +88,11 @@ public:
     std::string mDisplayImg;
     std::string mDisplayThumb;
     int mMenuIcon;
-    ModRulesBackGroundCardGuiItem(const std::string& ColorId, std::string ColorName, std::string DisplayImg,
-                                  std::string DisplayThumb, const std::string& MenuIcon);
+    ModRulesBackGroundCardGuiItem(const std::string& ColorId,
+                                  std::string ColorName,
+                                  std::string DisplayImg,
+                                  std::string DisplayThumb,
+                                  const std::string& MenuIcon);
 };
 
 class ModRulesRenderCardGuiItem {
@@ -107,8 +110,17 @@ public:
     int mIconPosX;
     int mIconPosY;
     std::string mFileName;
-    ModRulesRenderCardGuiItem(std::string name, int posX, int posY, std::string formattedData, std::string filter,
-                              bool font, int fontSize, PIXEL_TYPE fontColor, int SizeIcon, int IconPosX, int IconPosY,
+    ModRulesRenderCardGuiItem(std::string name,
+                              int posX,
+                              int posY,
+                              std::string formattedData,
+                              std::string filter,
+                              bool font,
+                              int fontSize,
+                              PIXEL_TYPE fontColor,
+                              int SizeIcon,
+                              int IconPosX,
+                              int IconPosY,
                               std::string FileName);
 };
 

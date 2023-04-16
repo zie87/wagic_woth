@@ -26,8 +26,12 @@ protected:
     int typeOfDamage;
 
 public:
-    REDamagePrevention(MTGAbility* _source, TargetChooser* _tcSource = nullptr, TargetChooser* _tcTarget = nullptr,
-                       int _damage = -1, bool _oneShot = true, int typeOfDamage = DAMAGE_ALL_TYPES);
+    REDamagePrevention(MTGAbility* _source,
+                       TargetChooser* _tcSource = nullptr,
+                       TargetChooser* _tcTarget = nullptr,
+                       int _damage              = -1,
+                       bool _oneShot            = true,
+                       int typeOfDamage         = DAMAGE_ALL_TYPES);
     WEvent* replace(WEvent* e) override;
     ~REDamagePrevention() override;
 };
@@ -41,9 +45,11 @@ protected:
     Counter* counter;
 
 public:
-    RECountersPrevention(MTGAbility* _source, MTGCardInstance* cardSource = nullptr,
-                         MTGCardInstance* cardTarget = nullptr, TargetChooser* tc = nullptr,
-                         Counter* counter = nullptr);
+    RECountersPrevention(MTGAbility* _source,
+                         MTGCardInstance* cardSource = nullptr,
+                         MTGCardInstance* cardTarget = nullptr,
+                         TargetChooser* tc           = nullptr,
+                         Counter* counter            = nullptr);
     WEvent* replace(WEvent* e) override;
     ~RECountersPrevention() override;
 };

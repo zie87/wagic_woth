@@ -242,7 +242,7 @@ int JNetwork::connect_to_apctl(int config) {
             sprintf(buffer, "  connection state %d of 4", state);
             printf(buffer);
             printf("\n");
-            error = buffer;
+            error     = buffer;
             stateLast = state;
         }
         if (state == 4) {

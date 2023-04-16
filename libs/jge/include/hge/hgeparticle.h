@@ -131,8 +131,8 @@ private:
     float fAge;
     float fEmissionResidue;
 
-    ::jge::math::vector_2d vecPrevLocation {};
-    ::jge::math::vector_2d vecLocation {};
+    ::jge::math::vector_2d vecPrevLocation{};
+    ::jge::math::vector_2d vecLocation{};
     float fTx, fTy;
 
     int nParticlesAlive;

@@ -193,8 +193,13 @@ public:
     int totalPrice();
     MTGDeck(MTGAllCards* _allcards);
     MTGDeck(const char* config_file, MTGAllCards* _allcards, int meta_only = 0, int difficultySetting = 0);
-    int addRandomCards(int howmany, int* setIds = nullptr, int nbSets = 0, int rarity = -1,
-                       const char* subtype = nullptr, int* colors = nullptr, int nbcolors = 0);
+    int addRandomCards(int howmany,
+                       int* setIds         = nullptr,
+                       int nbSets          = 0,
+                       int rarity          = -1,
+                       const char* subtype = nullptr,
+                       int* colors         = nullptr,
+                       int nbcolors        = 0);
     int add(int cardid);
     int add(MTGDeck* deck);  // adds the contents of "deck" into myself
     int complete();
@@ -204,7 +209,9 @@ public:
     int remove(MTGCard* card);
     std::string getFilename();
     int save();
-    int save(const std::string& destFileName, bool useExpandedDescriptions, const std::string& deckTitle,
+    int save(const std::string& destFileName,
+             bool useExpandedDescriptions,
+             const std::string& deckTitle,
              const std::string& deckDesc);
     MTGCard* getCardById(int id) const;
 };

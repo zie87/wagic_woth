@@ -8,7 +8,10 @@
 #include "AIStats.h"
 #include "AllAbilities.h"
 
-AIMomirPlayer::AIMomirPlayer(GameObserver* observer, const string& file, const string& fileSmall, string avatarFile,
+AIMomirPlayer::AIMomirPlayer(GameObserver* observer,
+                             const string& file,
+                             const string& fileSmall,
+                             string avatarFile,
                              MTGDeck* deck)
     : AIPlayerBaka(observer, std::move(file), std::move(fileSmall), std::move(avatarFile), deck)
     , momirAbility(nullptr) {
