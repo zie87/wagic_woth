@@ -46,7 +46,8 @@ public:
 
     string mFilename;
     virtual void Refresh()           = 0;  // Basically calls Attempt(filename) and remaps in situ.
-    virtual bool Attempt(const string& filename, int submode,
+    virtual bool Attempt(const string& filename,
+                         int submode,
                          int& error) = 0;  // Returns true if we've loaded our data and isGood().
 };
 
@@ -69,9 +70,15 @@ public:
     JTexture* Actual();  // Return this texture as is. Does not make a new one.
     JQuadPtr GetQuad(const string& resname);
 
-    JQuadPtr GetQuad(float offX = 0.0f, float offY = 0.0f, float width = 0.0f, float height = 0.0f,
+    JQuadPtr GetQuad(float offX            = 0.0f,
+                     float offY            = 0.0f,
+                     float width           = 0.0f,
+                     float height          = 0.0f,
                      const string& resname = "");
-    JQuadPtr GetCard(float offX = 0.0f, float offY = 0.0f, float width = 0.0f, float height = 0.0f,
+    JQuadPtr GetCard(float offX            = 0.0f,
+                     float offY            = 0.0f,
+                     float width           = 0.0f,
+                     float height          = 0.0f,
                      const string& resname = "");  // Same as above, but centered when new.
 
 protected:

@@ -1033,8 +1033,12 @@ int GameObserver::cardClick(MTGCardInstance* card, int abilityType) {
     return result;
 }
 
-int GameObserver::cardClickLog(bool log, Player* clickedPlayer, MTGGameZone* zone, MTGCardInstance* backup,
-                               size_t index, int toReturn) {
+int GameObserver::cardClickLog(bool log,
+                               Player* clickedPlayer,
+                               MTGGameZone* zone,
+                               MTGCardInstance* backup,
+                               size_t index,
+                               int toReturn) {
     if (log) {
         if (clickedPlayer) {
             this->logAction(clickedPlayer);
@@ -1323,7 +1327,8 @@ bool GameObserver::parseLine(const string& s) {
     return false;
 }
 
-bool GameObserver::load(const string& ss, bool undo
+bool GameObserver::load(const string& ss,
+                        bool undo
 #ifdef TESTSUITE
                         ,
                         TestSuiteGame* testgame

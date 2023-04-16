@@ -88,7 +88,11 @@ public:
     TargetChooser* getCurrentTargetChooser() const;
     void stackObjectClicked(Interruptible* action);
 
-    int cardClickLog(bool log, Player* clickedPlayer, MTGGameZone* zone, MTGCardInstance* backup, size_t index,
+    int cardClickLog(bool log,
+                     Player* clickedPlayer,
+                     MTGGameZone* zone,
+                     MTGCardInstance* backup,
+                     size_t index,
                      int toReturn);
     int cardClick(MTGCardInstance* card, MTGAbility* ability);
     int cardClick(MTGCardInstance* card, int abilityType);
@@ -138,7 +142,8 @@ public:
     void logAction(Player* player, const std::string& s = "");
     void logAction(int playerId, const std::string& s = "") { logAction(players[playerId], s); };
     void logAction(MTGCardInstance* card, MTGGameZone* zone, size_t index, int result);
-    bool load(const std::string& s, bool undo = false
+    bool load(const std::string& s,
+              bool undo = false
 #ifdef TESTSUITE
               ,
               TestSuiteGame* testgame = 0

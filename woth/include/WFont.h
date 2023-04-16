@@ -25,9 +25,17 @@ public:
     // x-leftOffset), display window (x-displayWidth, x) Only when width is NOT zero, characters outside the display
     // window are not rendered.
     //
-    virtual void DrawString(const char* s, float x, float y, int align = JGETEXT_LEFT, float leftOffset = 0,
+    virtual void DrawString(const char* s,
+                            float x,
+                            float y,
+                            int align          = JGETEXT_LEFT,
+                            float leftOffset   = 0,
                             float displayWidth = 0) = 0;
-    virtual void DrawString(std::string s, float x, float y, int align = JGETEXT_LEFT, float leftOffset = 0,
+    virtual void DrawString(std::string s,
+                            float x,
+                            float y,
+                            int align          = JGETEXT_LEFT,
+                            float leftOffset   = 0,
                             float displayWidth = 0) = 0;
     // Set font color.
     virtual void SetColor(PIXEL_TYPE color) = 0;
@@ -56,12 +64,12 @@ public:
     WLBFont(int inFontID, const char* fontname, int lineheight, bool useVideoRAM = false);
     ~WLBFont() override { SAFE_DELETE(it); };
 
-    void DrawString(const char* s, float x, float y, int align = JGETEXT_LEFT, float leftOffset = 0,
-                    float width = 0) override {
+    void DrawString(const char* s, float x, float y, int align = JGETEXT_LEFT, float leftOffset = 0, float width = 0)
+        override {
         it->DrawString(s, x, y, align, leftOffset, width);
     };
-    void DrawString(std::string s, float x, float y, int align = JGETEXT_LEFT, float leftOffset = 0,
-                    float width = 0) override {
+    void DrawString(std::string s, float x, float y, int align = JGETEXT_LEFT, float leftOffset = 0, float width = 0)
+        override {
         it->DrawString(s, x, y, align, leftOffset, width);
     };
     void SetColor(PIXEL_TYPE color) override { it->SetColor(color); };
@@ -84,8 +92,8 @@ public:
     WFBFont(int inFontID) : WFont(inFontID){};  // Legacy : remove it when possible
     ~WFBFont() override;
 
-    void DrawString(std::string s, float x, float y, int align = JGETEXT_LEFT, float leftOffset = 0,
-                    float width = 0) override;
+    void DrawString(std::string s, float x, float y, int align = JGETEXT_LEFT, float leftOffset = 0, float width = 0)
+        override;
     void SetColor(PIXEL_TYPE color) override;
     PIXEL_TYPE GetColor() const override { return mColor0; };
     void SetScale(float scale) override;
@@ -96,8 +104,8 @@ public:
     void SetBase(int base) override{};
     void FormatText(string& s, std::vector<string>& output) override{};
 
-    void DrawString(const char* s, float x, float y, int align = JGETEXT_LEFT, float leftOffset = 0,
-                    float width = 0) override;
+    void DrawString(const char* s, float x, float y, int align = JGETEXT_LEFT, float leftOffset = 0, float width = 0)
+        override;
     virtual int GetCode(const u8* ch, int* charLength) const = 0;
     virtual int GetMana(const u8* ch) const                  = 0;
 
@@ -136,8 +144,8 @@ public:
 
     int PreCacheChar(const u8* ch) override;
     float GetStringWidth(const char* s) const override;
-    void DrawString(const char* s, float x, float y, int align = JGETEXT_LEFT, float leftOffset = 0,
-                    float width = 0) override;
+    void DrawString(const char* s, float x, float y, int align = JGETEXT_LEFT, float leftOffset = 0, float width = 0)
+        override;
     int GetCode(const u8* ch, int* charLength) const override;
     int GetMana(const u8* ch) const override;
     void FormatText(string& s, std::vector<string>& output) override;

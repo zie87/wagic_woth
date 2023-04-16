@@ -34,7 +34,12 @@ std::string kOtherCardsString(": Other cards");
 std::string kCreditsString("Credits: ");
 }  // namespace
 
-BoosterDisplay::BoosterDisplay(int id, GameObserver* game, int x, int y, JGuiListener* listener, TargetChooser* tc,
+BoosterDisplay::BoosterDisplay(int id,
+                               GameObserver* game,
+                               int x,
+                               int y,
+                               JGuiListener* listener,
+                               TargetChooser* tc,
                                int nb_displayed_items)
     : CardDisplay(id, game, x, y, listener, tc, nb_displayed_items) {}
 

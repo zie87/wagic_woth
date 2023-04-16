@@ -37,7 +37,11 @@ hgeParticleSystem* DeckMenu::stars = nullptr;
 //  TODO:
 //    *** Need to make this configurable in a file somewhere to allow for class reuse
 
-DeckMenu::DeckMenu(int id, JGuiListener* listener, int fontId, const string& _title, const int& startIndex,
+DeckMenu::DeckMenu(int id,
+                   JGuiListener* listener,
+                   int fontId,
+                   const string& _title,
+                   const int& startIndex,
                    bool showDetailsOverride)
     : JGuiController(JGE::GetInstance(), id, listener)
     , avatarX(232)

@@ -29,8 +29,15 @@ private:
     void checkUserClick();
 
 public:
-    DeckMenuItem(DeckMenu* _parent, int id, int fontId, string text, float x, float y, bool hasFocus = false,
-                 bool autoTranslate = false, DeckMetaData* meta = nullptr);
+    DeckMenuItem(DeckMenu* _parent,
+                 int id,
+                 int fontId,
+                 string text,
+                 float x,
+                 float y,
+                 bool hasFocus      = false,
+                 bool autoTranslate = false,
+                 DeckMetaData* meta = nullptr);
     ~DeckMenuItem() override;
 
     virtual void Relocate(float x, float y);

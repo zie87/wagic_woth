@@ -268,7 +268,11 @@ int ResourceManagerImpl::AddQuadToManaged(const WManagedQuad& inQuad) {
     return id;
 }
 
-int ResourceManagerImpl::CreateQuad(const string& quadName, const string& textureName, float x, float y, float width,
+int ResourceManagerImpl::CreateQuad(const string& quadName,
+                                    const string& textureName,
+                                    float x,
+                                    float y,
+                                    float width,
                                     float height) {
     if (quadName.empty() || textureName.empty()) {
         return INVALID_ID;
@@ -335,8 +339,15 @@ JQuadPtr ResourceManagerImpl::RetrieveTempQuad(const string& filename, int submo
     return RetrieveQuad(filename, 0, 0, 0, 0, "temporary", RETRIEVE_NORMAL, submode);
 }
 
-JQuadPtr ResourceManagerImpl::RetrieveQuad(const string& filename, float offX, float offY, float width, float height,
-                                           string resname, int style, int submode, int id) {
+JQuadPtr ResourceManagerImpl::RetrieveQuad(const string& filename,
+                                           float offX,
+                                           float offY,
+                                           float width,
+                                           float height,
+                                           string resname,
+                                           int style,
+                                           int submode,
+                                           int id) {
     // Lookup managed resources, but only with a real resname.
     if (!resname.empty() && (style == RETRIEVE_MANAGE || style == RETRIEVE_RESOURCE)) {
         JQuadPtr quad = GetQuad(resname);
@@ -518,7 +529,9 @@ JTexture* ResourceManagerImpl::GetTexture(int id) {
     return jtex;
 }
 
-hgeParticleSystemInfo* ResourceManagerImpl::RetrievePSI(const string& filename, JQuad* texture, int style,
+hgeParticleSystemInfo* ResourceManagerImpl::RetrievePSI(const string& filename,
+                                                        JQuad* texture,
+                                                        int style,
                                                         int submode) {
     if (!texture) {
         return nullptr;

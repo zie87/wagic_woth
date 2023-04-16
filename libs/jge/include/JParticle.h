@@ -79,9 +79,9 @@ private:
     static JRenderer* mRenderer;
     JQuad* mQuad;
 
-    jge::math::vector_2d mOrigin {};
-    jge::math::vector_2d mPos {};
-    jge::math::vector_2d mVelocity {};
+    jge::math::vector_2d mOrigin{};
+    jge::math::vector_2d mPos{};
+    jge::math::vector_2d mVelocity{};
 
     // float mSpeed;
     float mSize;

@@ -7,8 +7,12 @@
 #include <iomanip>
 #include "Translate.h"
 
-DeckEditorMenu::DeckEditorMenu(int id, JGuiListener* listener, int fontId, const char* _title,
-                               DeckDataWrapper* _selectedDeck, StatsWrapper* stats)
+DeckEditorMenu::DeckEditorMenu(int id,
+                               JGuiListener* listener,
+                               int fontId,
+                               const char* _title,
+                               DeckDataWrapper* _selectedDeck,
+                               StatsWrapper* stats)
     : DeckMenu(id, listener, fontId, _title)
     , selectedDeck(_selectedDeck)
     , stw(stats) {

@@ -44,7 +44,12 @@ private:
     float mOriginalY;  // mY initially, used to restore scroller to original position after update
 
 public:
-    VerticalTextScroller(int fontId, float x, float y, float width, float height, float scrollSpeed = 30,
+    VerticalTextScroller(int fontId,
+                         float x,
+                         float y,
+                         float width,
+                         float height,
+                         float scrollSpeed    = 30,
                          size_t _minimumItems = 1);
     void Render() override;
     void Update(float dt) override;

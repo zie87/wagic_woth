@@ -111,17 +111,17 @@ bool JParticle::Update(float dt) {
     }
 
     // the radial and tangential acceleration code was taken from HGE's particle source
-    jge::math::vector_2d vecAccel = (mPos - mOrigin).normalize();  // par->vecLocation-vecLocation;
+    jge::math::vector_2d vecAccel  = (mPos - mOrigin).normalize();  // par->vecLocation-vecLocation;
     jge::math::vector_2d vecAccel2 = vecAccel;
     vecAccel *= mData[FIELD_RADIAL_ACCEL].mCurr;  // par->fRadialAccel;
 
     // vecAccel2.Rotate(M_PI_2);
     // the following is faster
-    vecAccel2 = jge::math::vector_2d( -vecAccel2.y(), vecAccel2.x() );
+    vecAccel2 = jge::math::vector_2d(-vecAccel2.y(), vecAccel2.x());
 
     vecAccel2 *= mData[FIELD_TANGENTIAL_ACCEL].mCurr;  // par->fTangentialAccel;
     mVelocity += (vecAccel + vecAccel2) * dt;          // par->vecVelocity += (vecAccel+vecAccel2)*fDeltaTime;
-    mVelocity.y() += mData[FIELD_GRAVITY].mCurr * dt;    // par->vecVelocity.y += par->fGravity*fDeltaTime;
+    mVelocity.y() += mData[FIELD_GRAVITY].mCurr * dt;  // par->vecVelocity.y += par->fGravity*fDeltaTime;
 
     // par->vecLocation += par->vecVelocity*fDeltaTime;
 

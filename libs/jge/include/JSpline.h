@@ -143,7 +143,9 @@ public:
     /// Render the spline to screen.
     ///
     //////////////////////////////////////////////////////////////////////////
-    void Render(float x, float y, PIXEL_TYPE color = ARGB(255, 255, 255, 255),
+    void Render(float x,
+                float y,
+                PIXEL_TYPE color        = ARGB(255, 255, 255, 255),
                 PIXEL_TYPE controlColor = ARGB(192, 0, 192, 0));
 
 private:

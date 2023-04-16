@@ -85,7 +85,10 @@ public:
 
 class HumanPlayer : public Player {
 public:
-    HumanPlayer(GameObserver* observer, const std::string& deckFile, std::string deckFileSmall, bool premade = false,
+    HumanPlayer(GameObserver* observer,
+                const std::string& deckFile,
+                std::string deckFileSmall,
+                bool premade  = false,
                 MTGDeck* deck = nullptr);
     void End() override;
     friend std::ostream& operator<<(std::ostream&, const HumanPlayer&);

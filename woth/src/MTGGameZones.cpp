@@ -977,7 +977,9 @@ int MTGGameZone::zoneStringToId(const string& zoneName) {
     return 0;
 }
 
-MTGGameZone* MTGGameZone::stringToZone(GameObserver* g, const string& zoneName, MTGCardInstance* source,
+MTGGameZone* MTGGameZone::stringToZone(GameObserver* g,
+                                       const string& zoneName,
+                                       MTGCardInstance* source,
                                        MTGCardInstance* target) {
     return intToZone(g, zoneStringToId(std::move(zoneName)), source, target);
 }

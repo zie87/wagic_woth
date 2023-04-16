@@ -17,10 +17,14 @@
 
 inline void ColorClamp(float& x) {
     if (x < 0.0f) {
-        { x = 0.0f; }
+        {
+            x = 0.0f;
+        }
     }
     if (x > 1.0f) {
-        { x = 1.0f; }
+        {
+            x = 1.0f;
+        }
     }
 }
 

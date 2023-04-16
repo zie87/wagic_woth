@@ -64,8 +64,14 @@ void StoryText::Update(float dt) {
     // Nothing for now
 }
 
-StoryReward::StoryReward(const string& _type, string _value, string text, float _mX, float _mY, const string& _align,
-                         int _font, int id)
+StoryReward::StoryReward(const string& _type,
+                         string _value,
+                         string text,
+                         float _mX,
+                         float _mY,
+                         const string& _align,
+                         int _font,
+                         int id)
     : StoryText(std::move(text), _mX, _mY, std::move(_align), _font, id)
     , type(STORY_REWARD_CREDITS) {
     if (_type == "unlockset") {
@@ -242,7 +248,13 @@ std::ostream& StoryChoice::toString(std::ostream& out) const {
     return out << "StoryChoice ::: mHasFocus : " << mHasFocus;
 }
 
-StoryChoice::StoryChoice(string pageId, string text, int JGOid, float mX, float mY, const string& _align, int _font,
+StoryChoice::StoryChoice(string pageId,
+                         string text,
+                         int JGOid,
+                         float mX,
+                         float mY,
+                         const string& _align,
+                         int _font,
                          bool hasFocus)
     : StoryText(std::move(text), mX, mY, std::move(_align), _font, JGOid)
     , pageId(std::move(pageId))

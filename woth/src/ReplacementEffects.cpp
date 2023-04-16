@@ -5,8 +5,12 @@
 #include "TargetChooser.h"
 #include "AllAbilities.h"
 
-REDamagePrevention::REDamagePrevention(MTGAbility* source, TargetChooser* tcSource, TargetChooser* tcTarget, int damage,
-                                       bool oneShot, int typeOfDamage)
+REDamagePrevention::REDamagePrevention(MTGAbility* source,
+                                       TargetChooser* tcSource,
+                                       TargetChooser* tcTarget,
+                                       int damage,
+                                       bool oneShot,
+                                       int typeOfDamage)
     : source(source)
     , tcSource(tcSource)
     , tcTarget(tcTarget)
@@ -57,8 +61,11 @@ REDamagePrevention::~REDamagePrevention() {
     SAFE_DELETE(tcTarget);
 }
 // counters replacement effect///////////////////
-RECountersPrevention::RECountersPrevention(MTGAbility* source, MTGCardInstance* cardSource, MTGCardInstance* cardTarget,
-                                           TargetChooser* tc, Counter* counter)
+RECountersPrevention::RECountersPrevention(MTGAbility* source,
+                                           MTGCardInstance* cardSource,
+                                           MTGCardInstance* cardTarget,
+                                           TargetChooser* tc,
+                                           Counter* counter)
     : source(source)
     , cardSource(cardSource)
     , cardTarget(cardTarget)

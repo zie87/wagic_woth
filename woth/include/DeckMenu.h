@@ -62,7 +62,11 @@ public:
     JQuadPtr pspIcons[8];
     JTexture* pspIconsTexture;
 
-    DeckMenu(int id, JGuiListener* listener, int fontId, const string& _title = "", const int& startIndex = 0,
+    DeckMenu(int id,
+             JGuiListener* listener,
+             int fontId,
+             const string& _title         = "",
+             const int& startIndex        = 0,
              bool alwaysShowDetailsButton = false);
     ~DeckMenu() override;
 
@@ -74,7 +78,10 @@ public:
 
     void Render() override;
     void Update(float dt) override;
-    virtual void Add(int id, const char* Text, string desc = "", bool forceFocus = false,
+    virtual void Add(int id,
+                     const char* Text,
+                     string desc                = "",
+                     bool forceFocus            = false,
                      DeckMetaData* deckMetaData = nullptr);
     virtual void Close();
     void updateScroller() const;

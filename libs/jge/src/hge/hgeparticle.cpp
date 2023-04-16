@@ -150,7 +150,7 @@ void hgeParticleSystem::Update(float fDeltaTime) {
 
         // vecAccel2.Rotate(M_PI_2);
         // the following is faster
-        ang         = vecAccel2.x();
+        ang           = vecAccel2.x();
         vecAccel2.x() = -vecAccel2.y();
         vecAccel2.y() = ang;
 
@@ -301,7 +301,8 @@ void hgeParticleSystem::Render() {
     auto particle = mParticleBuffer.begin();
     for (; particle != mParticleBuffer.end(); ++particle) {
         info.sprite->SetColor(particle->colColor.GetHWColor());
-        JRenderer::GetInstance()->RenderQuad(info.sprite, particle->vecLocation.x() + fTx, particle->vecLocation.y() + fTy,
-                                             particle->fSpin * particle->fAge, particle->fSize, particle->fSize);
+        JRenderer::GetInstance()->RenderQuad(info.sprite, particle->vecLocation.x() + fTx,
+                                             particle->vecLocation.y() + fTy, particle->fSpin * particle->fAge,
+                                             particle->fSize, particle->fSize);
     }
 }

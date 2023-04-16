@@ -250,9 +250,15 @@ public:
     int uses;
     string castRestriction;
 
-    ActivatedAbility(GameObserver* observer, int id, MTGCardInstance* card, ManaCost* _cost = nullptr,
-                     int _restrictions = NO_RESTRICTION, string limit = "", MTGAbility* sideEffect = nullptr,
-                     string usesBeforeSideEffects = "", string castRestriction = "");
+    ActivatedAbility(GameObserver* observer,
+                     int id,
+                     MTGCardInstance* card,
+                     ManaCost* _cost              = nullptr,
+                     int _restrictions            = NO_RESTRICTION,
+                     string limit                 = "",
+                     MTGAbility* sideEffect       = nullptr,
+                     string usesBeforeSideEffects = "",
+                     string castRestriction       = "");
     ~ActivatedAbility() override;
 
     void Update(float dt) override {
@@ -273,10 +279,19 @@ public:
 
 class TargetAbility : public ActivatedAbility, public NestedAbility {
 public:
-    TargetAbility(GameObserver* observer, int id, MTGCardInstance* card, TargetChooser* _tc, ManaCost* _cost = nullptr,
-                  int _playerturnonly = 0, string castRestriction = "");
-    TargetAbility(GameObserver* observer, int id, MTGCardInstance* card, ManaCost* _cost = nullptr,
-                  int _playerturnonly = 0, string castRestriction = "");
+    TargetAbility(GameObserver* observer,
+                  int id,
+                  MTGCardInstance* card,
+                  TargetChooser* _tc,
+                  ManaCost* _cost        = nullptr,
+                  int _playerturnonly    = 0,
+                  string castRestriction = "");
+    TargetAbility(GameObserver* observer,
+                  int id,
+                  MTGCardInstance* card,
+                  ManaCost* _cost        = nullptr,
+                  int _playerturnonly    = 0,
+                  string castRestriction = "");
     ~TargetAbility() override;
 
     int reactToClick(MTGCardInstance* card) override;
@@ -344,9 +359,17 @@ public:
     bool lifelost;
     int lifeamount;
     bool once, activeTrigger;
-    TriggerAtPhase(GameObserver* observer, int id, MTGCardInstance* source, Targetable* target, int _phaseId,
-                   int who = 0, bool sourceUntapped = false, bool sourceTap = false, bool lifelost = false,
-                   int lifeamount = 0, bool once = false);
+    TriggerAtPhase(GameObserver* observer,
+                   int id,
+                   MTGCardInstance* source,
+                   Targetable* target,
+                   int _phaseId,
+                   int who             = 0,
+                   bool sourceUntapped = false,
+                   bool sourceTap      = false,
+                   bool lifelost       = false,
+                   int lifeamount      = 0,
+                   bool once           = false);
     int trigger() override;
     int resolve() override { return 0; };
     TriggerAtPhase* clone() const override;
@@ -358,8 +381,15 @@ public:
     bool sourceUntapped;
     bool sourceTap;
     bool once, activeTrigger;
-    TriggerNextPhase(GameObserver* observer, int id, MTGCardInstance* source, Targetable* target, int _phaseId,
-                     int who = 0, bool sourceUntapped = false, bool sourceTap = false, bool once = false);
+    TriggerNextPhase(GameObserver* observer,
+                     int id,
+                     MTGCardInstance* source,
+                     Targetable* target,
+                     int _phaseId,
+                     int who             = 0,
+                     bool sourceUntapped = false,
+                     bool sourceTap      = false,
+                     bool once           = false);
     TriggerNextPhase* clone() const override;
     int testDestroy() override;
 };
@@ -369,8 +399,13 @@ public:
     TriggeredAbility* t;
     std::queue<Targetable*> targets;
     MTGAbility* destroyCondition;
-    GenericTriggeredAbility(GameObserver* observer, int id, MTGCardInstance* _source, TriggeredAbility* _t,
-                            MTGAbility* a, MTGAbility* dc = nullptr, Targetable* _target = nullptr);
+    GenericTriggeredAbility(GameObserver* observer,
+                            int id,
+                            MTGCardInstance* _source,
+                            TriggeredAbility* _t,
+                            MTGAbility* a,
+                            MTGAbility* dc      = nullptr,
+                            Targetable* _target = nullptr);
     int trigger() override;
     int triggerOnEvent(WEvent* e) override;
     int resolve() override;
@@ -392,12 +427,21 @@ private:
     std::string storedAbilityString;
     std::string storedAndAbility;
     int countCards(TargetChooser* tc, Player* player = nullptr, int option = 0);
-    TriggeredAbility* parseTrigger(const string& s, const string& magicText, int id, Spell* spell,
-                                   MTGCardInstance* card, Targetable* target);
+    TriggeredAbility* parseTrigger(const string& s,
+                                   const string& magicText,
+                                   int id,
+                                   Spell* spell,
+                                   MTGCardInstance* card,
+                                   Targetable* target);
     MTGAbility* getAlternateCost(string s, int id, Spell* spell, MTGCardInstance* card);
-    MTGAbility* getManaReduxAbility(const string& s, int id, Spell* spell, MTGCardInstance* card,
+    MTGAbility* getManaReduxAbility(const string& s,
+                                    int id,
+                                    Spell* spell,
+                                    MTGCardInstance* card,
                                     MTGCardInstance* target);
-    TargetChooser* parseSimpleTC(const std::string& s, const std::string& starter, MTGCardInstance* card,
+    TargetChooser* parseSimpleTC(const std::string& s,
+                                 const std::string& starter,
+                                 MTGCardInstance* card,
                                  bool forceNoTarget = true);
     GameObserver* observer;
 
@@ -407,14 +451,29 @@ public:
     int parseCastRestrictions(MTGCardInstance* card, Player* player, const string& restrictions);
     Counter* parseCounter(const string& s, MTGCardInstance* target, Spell* spell = nullptr);
     int parsePowerToughness(const string& s, int* power, int* toughness);
-    int getAbilities(vector<MTGAbility*>* v, Spell* spell, MTGCardInstance* card = nullptr, int id = 0,
-                     MTGGameZone* dest = nullptr);
-    MTGAbility* parseMagicLine(string s, int id, Spell* spell, MTGCardInstance* card, bool activated = false,
-                               bool forceUEOT = false, MTGGameZone* dest = nullptr);
-    int abilityEfficiency(MTGAbility* a, Player* p, int mode = MODE_ABILITY, TargetChooser* tc = nullptr,
+    int getAbilities(vector<MTGAbility*>* v,
+                     Spell* spell,
+                     MTGCardInstance* card = nullptr,
+                     int id                = 0,
+                     MTGGameZone* dest     = nullptr);
+    MTGAbility* parseMagicLine(string s,
+                               int id,
+                               Spell* spell,
+                               MTGCardInstance* card,
+                               bool activated    = false,
+                               bool forceUEOT    = false,
+                               MTGGameZone* dest = nullptr);
+    int abilityEfficiency(MTGAbility* a,
+                          Player* p,
+                          int mode           = MODE_ABILITY,
+                          TargetChooser* tc  = nullptr,
                           Targetable* target = nullptr);
-    int magicText(int id, Spell* spell, MTGCardInstance* card = nullptr, int mode = MODE_PUTINTOPLAY,
-                  TargetChooser* tc = nullptr, MTGGameZone* dest = nullptr);
+    int magicText(int id,
+                  Spell* spell,
+                  MTGCardInstance* card = nullptr,
+                  int mode              = MODE_PUTINTOPLAY,
+                  TargetChooser* tc     = nullptr,
+                  MTGGameZone* dest     = nullptr);
     static int computeX(Spell* spell, MTGCardInstance* card);
     static MTGAbility* getCoreAbility(MTGAbility* a);
     int destroyAllInPlay(TargetChooser* tc, int bury = 0);
@@ -423,35 +482,56 @@ public:
     int TapAll(TargetChooser* tc);
     int UntapAll(TargetChooser* tc);
     void addAbilities(int _id, Spell* spell);
-    MTGAbility* parseUpkeepAbility(const string& s = "", MTGCardInstance* card = nullptr, Spell* spell = nullptr,
-                                   int restrictions = 0, int id = -1);
-    MTGAbility* parsePhaseActionAbility(const string& s = "", MTGCardInstance* card = nullptr, Spell* spell = nullptr,
-                                        MTGCardInstance* target = nullptr, int restrictions = 0, int id = -1);
-    MTGAbility* parseChooseActionAbility(const string& s = "", MTGCardInstance* card = nullptr, Spell* spell = nullptr,
-                                         MTGCardInstance* target = nullptr, int restrictions = 0, int id = -1);
+    MTGAbility* parseUpkeepAbility(const string& s       = "",
+                                   MTGCardInstance* card = nullptr,
+                                   Spell* spell          = nullptr,
+                                   int restrictions      = 0,
+                                   int id                = -1);
+    MTGAbility* parsePhaseActionAbility(const string& s         = "",
+                                        MTGCardInstance* card   = nullptr,
+                                        Spell* spell            = nullptr,
+                                        MTGCardInstance* target = nullptr,
+                                        int restrictions        = 0,
+                                        int id                  = -1);
+    MTGAbility* parseChooseActionAbility(const string& s         = "",
+                                         MTGCardInstance* card   = nullptr,
+                                         Spell* spell            = nullptr,
+                                         MTGCardInstance* target = nullptr,
+                                         int restrictions        = 0,
+                                         int id                  = -1);
 };
 
 class ActivatedAbilityTP : public ActivatedAbility {
 public:
     int who;
-    ActivatedAbilityTP(GameObserver* observer, int id, MTGCardInstance* card, Targetable* _target = nullptr,
-                       ManaCost* cost = nullptr, int who = TargetChooser::UNSET);
+    ActivatedAbilityTP(GameObserver* observer,
+                       int id,
+                       MTGCardInstance* card,
+                       Targetable* _target = nullptr,
+                       ManaCost* cost      = nullptr,
+                       int who             = TargetChooser::UNSET);
     Targetable* getTarget();
 };
 
 class InstantAbilityTP : public InstantAbility {
 public:
     int who;
-    InstantAbilityTP(GameObserver* observer, int id, MTGCardInstance* card, Targetable* _target = nullptr,
-                     int who = TargetChooser::UNSET);
+    InstantAbilityTP(GameObserver* observer,
+                     int id,
+                     MTGCardInstance* card,
+                     Targetable* _target = nullptr,
+                     int who             = TargetChooser::UNSET);
     Targetable* getTarget();
 };
 
 class AbilityTP : public MTGAbility {
 public:
     int who;
-    AbilityTP(GameObserver* observer, int id, MTGCardInstance* card, Targetable* _target = nullptr,
-              int who = TargetChooser::UNSET);
+    AbilityTP(GameObserver* observer,
+              int id,
+              MTGCardInstance* card,
+              Targetable* _target = nullptr,
+              int who             = TargetChooser::UNSET);
 
     Targetable* getTarget();
 
@@ -467,8 +547,14 @@ public:
     ManaCost* output;
     int tap;
     string Producing;
-    AManaProducer(GameObserver* observer, int id, MTGCardInstance* card, Targetable* t, ManaCost* _output,
-                  ManaCost* _cost = nullptr, int who = TargetChooser::UNSET, string producing = "");
+    AManaProducer(GameObserver* observer,
+                  int id,
+                  MTGCardInstance* card,
+                  Targetable* t,
+                  ManaCost* _output,
+                  ManaCost* _cost  = nullptr,
+                  int who          = TargetChooser::UNSET,
+                  string producing = "");
     int isReactingToClick(MTGCardInstance* _card, ManaCost* mana = nullptr) override;
     int resolve() override;
     int reactToClick(MTGCardInstance* _card) override;

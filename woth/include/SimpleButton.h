@@ -39,8 +39,14 @@ protected:
 
 public:
     SimpleButton(int id);
-    SimpleButton(JGuiController* _parent, int id, int fontId, const string& text, float x, float y,
-                 bool hasFocus = false, bool autoTranslate = false);
+    SimpleButton(JGuiController* _parent,
+                 int id,
+                 int fontId,
+                 const string& text,
+                 float x,
+                 float y,
+                 bool hasFocus      = false,
+                 bool autoTranslate = false);
 
     virtual float getScale() const;
     virtual float getTargetScale() const;

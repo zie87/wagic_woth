@@ -72,7 +72,12 @@ std::ostream& TextScroller::toString(std::ostream& out) const {
                << " ; currentId : " << currentId << " ; mRandom : " << mRandom;
 }
 
-VerticalTextScroller::VerticalTextScroller(int fontId, float x, float y, float width, float height, float scrollSpeed,
+VerticalTextScroller::VerticalTextScroller(int fontId,
+                                           float x,
+                                           float y,
+                                           float width,
+                                           float height,
+                                           float scrollSpeed,
                                            size_t numItemsShown)
     : TextScroller(fontId, x, y, width, scrollSpeed)
     , mHeight(height)

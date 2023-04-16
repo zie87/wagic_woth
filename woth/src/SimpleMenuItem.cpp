@@ -8,8 +8,14 @@
 
 SimpleMenuItem::SimpleMenuItem(int id) : SimpleButton(id) {}
 
-SimpleMenuItem::SimpleMenuItem(SimpleMenu* _parent, int id, int fontId, const std::string& text, float x, float y,
-                               bool hasFocus, bool autoTranslate)
+SimpleMenuItem::SimpleMenuItem(SimpleMenu* _parent,
+                               int id,
+                               int fontId,
+                               const std::string& text,
+                               float x,
+                               float y,
+                               bool hasFocus,
+                               bool autoTranslate)
     : SimpleButton(_parent, id, fontId, std::move(text), x, y, hasFocus, autoTranslate) {
     parent = (SimpleMenu*)_parent;
 }

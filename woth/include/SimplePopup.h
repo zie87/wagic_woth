@@ -33,8 +33,14 @@ private:
 public:
     bool autoTranslate;
 
-    SimplePopup(int id, JGuiListener* listener, const int fontId, const char* _title = "",
-                DeckMetaData* deckInfo = nullptr, MTGAllCards* collection = nullptr, float x = 364, float y = 235);
+    SimplePopup(int id,
+                JGuiListener* listener,
+                const int fontId,
+                const char* _title      = "",
+                DeckMetaData* deckInfo  = nullptr,
+                MTGAllCards* collection = nullptr,
+                float x                 = 364,
+                float y                 = 235);
     ~SimplePopup(void) override;
     void drawBoundingBox(float x, float y, float width, float height);
     bool isClosed() const { return mClosed; }

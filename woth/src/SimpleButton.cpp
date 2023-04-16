@@ -15,8 +15,14 @@
 
 SimpleButton::SimpleButton(int id) : JGuiObject(id), mIsValidSelection(false) {}
 
-SimpleButton::SimpleButton(JGuiController* _parent, int id, int fontId, const string& text, float x, float y,
-                           bool hasFocus, bool autoTranslate)
+SimpleButton::SimpleButton(JGuiController* _parent,
+                           int id,
+                           int fontId,
+                           const string& text,
+                           float x,
+                           float y,
+                           bool hasFocus,
+                           bool autoTranslate)
     : JGuiObject(id)
     , mX(x)
     , mY(y)

@@ -412,8 +412,7 @@ GameOption& GameOptions::operator[](const string& optionName) {
 GameOption* GameOptions::factorNewGameOption(const string& optionName, const string& value) {
     GameOption* result =
         (Unlockable::unlockables.find(optionName) != Unlockable::unlockables.end()) ? NEW GameOptionAward()
-                                                                                    : NEW
-                                                                                      GameOption();
+                                                                                    : NEW GameOption();
 
     if (!value.empty()) {
         result->read(value);

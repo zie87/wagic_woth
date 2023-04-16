@@ -17,8 +17,12 @@ private:
     StatsWrapper* stw;
 
 public:
-    DeckEditorMenu(int id, JGuiListener* listener = nullptr, int fontId = 1, const char* _title = "",
-                   DeckDataWrapper* selectedDeck = nullptr, StatsWrapper* stats = nullptr);
+    DeckEditorMenu(int id,
+                   JGuiListener* listener        = nullptr,
+                   int fontId                    = 1,
+                   const char* _title            = "",
+                   DeckDataWrapper* selectedDeck = nullptr,
+                   StatsWrapper* stats           = nullptr);
     void Render() override;
     ~DeckEditorMenu() override;
 };

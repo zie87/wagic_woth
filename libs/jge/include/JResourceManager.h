@@ -45,7 +45,11 @@ public:
     virtual JTexture* GetTexture(const std::string& textureName);
     virtual JTexture* GetTexture(int id);
 
-    virtual int CreateQuad(const std::string& quadName, const std::string& textureName, float x, float y, float width,
+    virtual int CreateQuad(const std::string& quadName,
+                           const std::string& textureName,
+                           float x,
+                           float y,
+                           float width,
                            float height);
     virtual JQuad* GetQuad(const std::string& quadName);
     virtual JQuad* GetQuad(int id);

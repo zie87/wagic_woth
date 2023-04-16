@@ -18,7 +18,12 @@ CardDisplay::CardDisplay(GameObserver* game)
     , y(0)
     , zone(nullptr) {}
 
-CardDisplay::CardDisplay(int id, GameObserver* game, int _x, int _y, JGuiListener* _listener, TargetChooser* _tc,
+CardDisplay::CardDisplay(int id,
+                         GameObserver* game,
+                         int _x,
+                         int _y,
+                         JGuiListener* _listener,
+                         TargetChooser* _tc,
                          int _nb_displayed_items)
     : PlayGuiObjectController(game)
     , mId(id)
