@@ -215,7 +215,7 @@ TestSuiteState::~TestSuiteState() {
     }
 };
 
-void TestSuiteState::parsePlayerState(int playerId, string s) { players[playerId]->parseLine(s); }
+void TestSuiteState::parsePlayerState(int playerId, const string& s) { players[playerId]->parseLine(s); }
 
 string TestSuiteGame::getNextAction() {
     currentAction++;

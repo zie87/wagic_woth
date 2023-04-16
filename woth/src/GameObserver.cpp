@@ -1429,7 +1429,9 @@ bool GameObserver::load(const string& ss,
                 phaseRing->goToPhase(currentGamePhase, currentPlayer);
 
 #ifdef TESTSUITE
-                if (testgame) testgame->initGame();
+                if (testgame) {
+                    testgame->initGame();
+                }
 #endif  // TESTSUITE
 
                 processActions(undo
@@ -1625,10 +1627,11 @@ void GameObserver::createPlayer(const string& playerMode
         break;
     case Player::MODE_TEST_SUITE:
 #ifdef TESTSUITE
-        if (players.size())
+        if (!players.empty()) {
             players.push_back(new TestSuiteAI(testgame, 1));
-        else
+        } else {
             players.push_back(new TestSuiteAI(testgame, 0));
+        }
 #endif  // TESTSUITE
         break;
     }

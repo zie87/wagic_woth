@@ -26,7 +26,7 @@ class TestSuiteAI;
 class TestSuiteState {
 public:
     GamePhase phase;
-    void parsePlayerState(int playerId, string s);
+    void parsePlayerState(int playerId, const string& s);
     TestSuiteState();
     ~TestSuiteState();
 
@@ -89,19 +89,21 @@ public:
     unsigned int seed;
     int nbFailed, nbTests, nbAIFailed, nbAITests;
     TestSuite(const char* filename);
-    ~TestSuite();
+    ~TestSuite() override;
     void initGame(GameObserver* g);
     void pregameTests();
     int loadNext();
     string getNextFile() {
-        jge::mutex::scoped_lock lock(mMutex);
-        if (currentfile >= nbfiles) return "";
+        jge::mutex::scoped_lock const lock(mMutex);
+        if (currentfile >= nbfiles) {
+            return "";
+        }
         currentfile++;
         return files[currentfile - 1];
     };
     static void ThreadProc(void* inParam);
     void setRules(Rules* rules) { mRules = rules; };
-    void handleResults(bool wasAI, int error);
+    void handleResults(bool wasAI, int error) override;
 
     size_t run();
 };
@@ -114,8 +116,8 @@ private:
 
 public:
     TestSuiteAI(TestSuiteGame* tsGame, int playerId);
-    virtual int Act(float dt);
-    virtual int displayStack();
+    int Act(float dt) override;
+    int displayStack() override;
     bool summoningSickness() { return (suite->summoningSickness == 1); }
 };
 

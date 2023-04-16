@@ -146,7 +146,7 @@ public:
               bool undo = false
 #ifdef TESTSUITE
               ,
-              TestSuiteGame* testgame = 0
+              TestSuiteGame* testgame = nullptr
 #endif
     );
     bool undo();
