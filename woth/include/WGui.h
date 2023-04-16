@@ -506,7 +506,9 @@ class WGuiMenu : public WGuiItem {
 public:
     friend class WGuiFilters;
     ~WGuiMenu() override;
-    WGuiMenu(JButton next = JGE_BTN_RIGHT, JButton prev = JGE_BTN_LEFT, bool mDPad = false,
+    WGuiMenu(JButton next      = JGE_BTN_RIGHT,
+             JButton prev      = JGE_BTN_LEFT,
+             bool mDPad        = false,
              WSyncable* syncme = nullptr);
 
     bool yieldFocus() override;

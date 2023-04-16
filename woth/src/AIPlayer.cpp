@@ -183,7 +183,9 @@ int AIPlayer::clickSingleTarget(TargetChooser* tc, vector<Targetable*>& potentia
     return 1;
 }
 
-AIPlayer* AIPlayerFactory::createAIPlayer(GameObserver* observer, MTGAllCards* collection, Player* opponent,
+AIPlayer* AIPlayerFactory::createAIPlayer(GameObserver* observer,
+                                          MTGAllCards* collection,
+                                          Player* opponent,
                                           int deckid) {
     char deckFile[512];
     string avatarFilename;  // default imagename
@@ -247,7 +249,9 @@ bool AIPlayer::parseLine(const string& s) {
 }
 
 #ifdef AI_CHANGE_TESTING
-AIPlayer* AIPlayerFactory::createAIPlayerTest(GameObserver* observer, MTGAllCards* collection, Player* opponent,
+AIPlayer* AIPlayerFactory::createAIPlayerTest(GameObserver* observer,
+                                              MTGAllCards* collection,
+                                              Player* opponent,
                                               string _folder) {
     char deckFile[512];
     string avatarFilename;  // default imagename
@@ -290,9 +294,8 @@ AIPlayer* AIPlayerFactory::createAIPlayerTest(GameObserver* observer, MTGAllCard
     // AIPlayerBaka will delete MTGDeck when it's time
     AIPlayerBaka* baka = opponent ? NEW AIPlayerBakaB(observer, deckFile, deckFileSmall, avatarFilename,
                                                       NEW MTGDeck(deckFile, collection, 0, deckSetting))
-                                  : NEW
-                                    AIPlayerBaka(observer, deckFile, deckFileSmall, avatarFilename,
-                                                 NEW MTGDeck(deckFile, collection, 0, deckSetting));
+                                  : NEW AIPlayerBaka(observer, deckFile, deckFileSmall, avatarFilename,
+                                                     NEW MTGDeck(deckFile, collection, 0, deckSetting));
     baka->deckId       = deckid;
     baka->setObserver(observer);
     return baka;

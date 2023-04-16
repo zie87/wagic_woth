@@ -187,8 +187,10 @@ protected:
     const std::string& FindZip(size_t PackID) const;
     void InsertZip(const char* Filename, const size_t PackID);
 
-    static zbuffer* getValidBuffer(const std::string& filename, const std::string& externalFilename,
-                                   std::streamoff Offset = 0, std::streamoff Size = 0);
+    static zbuffer* getValidBuffer(const std::string& filename,
+                                   const std::string& externalFilename,
+                                   std::streamoff Offset = 0,
+                                   std::streamoff Size   = 0);
     static void closeBufferPool();
 
     // New type definitions

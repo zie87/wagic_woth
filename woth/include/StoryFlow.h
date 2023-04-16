@@ -61,8 +61,14 @@ public:
     std::string value;
     int type;
 
-    StoryReward(const std::string& _type, std::string _value, std::string text, float _mX, float _mY,
-                const std::string& align = "center", int font = 0, int id = 0);
+    StoryReward(const std::string& _type,
+                std::string _value,
+                std::string text,
+                float _mX,
+                float _mY,
+                const std::string& align = "center",
+                int font                 = 0,
+                int id                   = 0);
     void Update(float dt) override;
     void Render() override;
 
@@ -78,7 +84,13 @@ public:
     bool mHasFocus;
     float mScale;
     float mTargetScale;
-    StoryChoice(std::string id, std::string text, int JGOid, float mX, float mY, const std::string& _align, int _font,
+    StoryChoice(std::string id,
+                std::string text,
+                int JGOid,
+                float mX,
+                float mY,
+                const std::string& _align,
+                int _font,
                 bool hasFocus);
     void Render() override;
     void Update(float dt) override;

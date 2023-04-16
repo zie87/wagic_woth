@@ -28,8 +28,16 @@ protected:
     hgeParticleSystem* mParticleSys;
 
 public:
-    MenuItem(int id, WFont* font, std::string text, float x, float y, JQuad* _off, JQuad* _on, const char* particle,
-             JQuad* particleQuad, bool hasFocus = false);
+    MenuItem(int id,
+             WFont* font,
+             std::string text,
+             float x,
+             float y,
+             JQuad* _off,
+             JQuad* _on,
+             const char* particle,
+             JQuad* particleQuad,
+             bool hasFocus = false);
     ~MenuItem() override;
     void Render() override;
     void Update(float dt) override;
@@ -52,7 +60,14 @@ private:
     float mTimeIndex;
 
 public:
-    OtherMenuItem(int id, WFont* font, std::string text, float x, float y, JQuad* _off, JQuad* _on, JButton _key,
+    OtherMenuItem(int id,
+                  WFont* font,
+                  std::string text,
+                  float x,
+                  float y,
+                  JQuad* _off,
+                  JQuad* _on,
+                  JButton _key,
                   bool hasFocus = false);
     ~OtherMenuItem() override;
     void Render() override;

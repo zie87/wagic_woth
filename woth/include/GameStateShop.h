@@ -32,8 +32,13 @@ class MTGPacks;
 
 class BoosterDisplay : public CardDisplay {
 public:
-    BoosterDisplay(int id, GameObserver* game, int x, int y, JGuiListener* listener = nullptr,
-                   TargetChooser* tc = nullptr, int nb_displayed_items = 7);
+    BoosterDisplay(int id,
+                   GameObserver* game,
+                   int x,
+                   int y,
+                   JGuiListener* listener = nullptr,
+                   TargetChooser* tc      = nullptr,
+                   int nb_displayed_items = 7);
     bool CheckUserInput(JButton key) override;
 };
 

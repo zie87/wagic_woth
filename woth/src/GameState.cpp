@@ -13,7 +13,9 @@
 // TODO: revise sorting strategy to allow other types of sorting.  Currently, it is hardwired to use
 //    sortByName to do the sorting.  This was done since the menu item display is done in insertion order.
 
-vector<DeckMetaData*> GameState::fillDeckMenu(SimpleMenu* _menu, const string& path, const string& smallDeckPrefix,
+vector<DeckMetaData*> GameState::fillDeckMenu(SimpleMenu* _menu,
+                                              const string& path,
+                                              const string& smallDeckPrefix,
                                               Player* statsPlayer) {
     vector<DeckMetaData*> deckMetaDataVector = BuildDeckList(path, smallDeckPrefix, statsPlayer);
     renderDeckMenu(_menu, deckMetaDataVector);
@@ -21,15 +23,20 @@ vector<DeckMetaData*> GameState::fillDeckMenu(SimpleMenu* _menu, const string& p
     return deckMetaDataVector;
 }
 
-vector<DeckMetaData*> GameState::fillDeckMenu(DeckMenu* _menu, const string& path, const string& smallDeckPrefix,
-                                              Player* statsPlayer, int maxDecks) {
+vector<DeckMetaData*> GameState::fillDeckMenu(DeckMenu* _menu,
+                                              const string& path,
+                                              const string& smallDeckPrefix,
+                                              Player* statsPlayer,
+                                              int maxDecks) {
     vector<DeckMetaData*> deckMetaDataVector = BuildDeckList(path, smallDeckPrefix, statsPlayer, maxDecks);
     renderDeckMenu(_menu, deckMetaDataVector);
 
     return deckMetaDataVector;
 }
 
-vector<DeckMetaData*> GameState::BuildDeckList(const string& path, const string& smallDeckPrefix, Player* statsPlayer,
+vector<DeckMetaData*> GameState::BuildDeckList(const string& path,
+                                               const string& smallDeckPrefix,
+                                               Player* statsPlayer,
                                                int maxDecks) {
     vector<DeckMetaData*> retList;
 

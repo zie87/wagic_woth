@@ -15,8 +15,14 @@
 #include "DeckManager.h"
 #include <iomanip>
 
-SimplePopup::SimplePopup(int id, JGuiListener* listener, const int fontId, const char* _title,
-                         DeckMetaData* deckMetaData, MTGAllCards* collection, float cancelX, float cancelY)
+SimplePopup::SimplePopup(int id,
+                         JGuiListener* listener,
+                         const int fontId,
+                         const char* _title,
+                         DeckMetaData* deckMetaData,
+                         MTGAllCards* collection,
+                         float cancelX,
+                         float cancelY)
     : JGuiController(JGE::GetInstance(), id, listener)
     , mMaxLines(12)
     , mWidth(180.0f)
@@ -153,8 +159,12 @@ void SimplePopup::drawCorner(const string& imageName, bool flipX, bool flipY, fl
     LOG(" Done Drawing a Corner! ");
 }
 
-void SimplePopup::drawHorzPole(const string& imageName, bool flipX = false, bool flipY = false, float x = 0,
-                               float y = 0, float width = SCREEN_WIDTH_F) {
+void SimplePopup::drawHorzPole(const string& imageName,
+                               bool flipX  = false,
+                               bool flipY  = false,
+                               float x     = 0,
+                               float y     = 0,
+                               float width = SCREEN_WIDTH_F) {
     LOG(" Drawing a horizontal border! ");
     JRenderer* r                      = JRenderer::GetInstance();
     const JQuadPtr horizontalBarImage = WResourceManager::Instance()->RetrieveTempQuad(imageName, TEXTURE_SUB_5551);
@@ -169,8 +179,12 @@ void SimplePopup::drawHorzPole(const string& imageName, bool flipX = false, bool
     LOG(" Done Drawing a horizontal border! ");
 }
 
-void SimplePopup::drawVertPole(const string& imageName, bool flipX = false, bool flipY = false, float x = 0,
-                               float y = 0, float height = SCREEN_HEIGHT_F) {
+void SimplePopup::drawVertPole(const string& imageName,
+                               bool flipX   = false,
+                               bool flipY   = false,
+                               float x      = 0,
+                               float y      = 0,
+                               float height = SCREEN_HEIGHT_F) {
     LOG(" Drawing a Vertical border! ");
     JRenderer* r                    = JRenderer::GetInstance();
     const JQuadPtr verticalBarImage = WResourceManager::Instance()->RetrieveTempQuad(imageName, TEXTURE_SUB_5551);

@@ -15,8 +15,15 @@ const int kHorizontalScrollSpeed = 30;  // higher numbers mean faster scrolling
 
 float DeckMenuItem::mYOffset = 0;
 
-DeckMenuItem::DeckMenuItem(DeckMenu* _parent, int id, int fontId, std::string text, float x, float y, bool hasFocus,
-                           bool autoTranslate, DeckMetaData* deckMetaData)
+DeckMenuItem::DeckMenuItem(DeckMenu* _parent,
+                           int id,
+                           int fontId,
+                           std::string text,
+                           float x,
+                           float y,
+                           bool hasFocus,
+                           bool autoTranslate,
+                           DeckMetaData* deckMetaData)
     : JGuiObject(id)
     , mIsValidSelection(false)
     , parent(_parent)

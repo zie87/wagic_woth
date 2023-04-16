@@ -33,7 +33,9 @@ public:
         : AIAction(owner, a, c, std::move(targetCards))
         , efficiency(-1){};
 
-    OrderedAIAction(AIPlayer* owner, MTGAbility* a, Player* p,
+    OrderedAIAction(AIPlayer* owner,
+                    MTGAbility* a,
+                    Player* p,
                     MTGCardInstance* c)  // player targeting through abilities.
         : AIAction(owner, a, p, c)
         , efficiency(-1){};
@@ -78,8 +80,10 @@ protected:
     virtual int selectHintAbility();
 
     virtual vector<MTGAbility*> canPayMana(MTGCardInstance* card = nullptr, ManaCost* mCost = nullptr);
-    virtual vector<MTGAbility*> canPayMana(MTGCardInstance* card, ManaCost* mCost,
-                                           map<MTGCardInstance*, bool>& usedCards, bool searchingAgain = false);
+    virtual vector<MTGAbility*> canPayMana(MTGCardInstance* card,
+                                           ManaCost* mCost,
+                                           map<MTGCardInstance*, bool>& usedCards,
+                                           bool searchingAgain = false);
     virtual vector<MTGAbility*> canPaySunBurst(ManaCost* mCost = nullptr);
 
     virtual MTGCardInstance* chooseCard(TargetChooser* tc, MTGCardInstance* source, int random = 0);
@@ -97,10 +101,13 @@ protected:
     // used by MomirPlayer, hence protected instead of private
     virtual int getEfficiency(OrderedAIAction* action);
     virtual int getEfficiency(MTGAbility* ability);
-    virtual bool payTheManaCost(ManaCost* cost, MTGCardInstance* card = nullptr,
+    virtual bool payTheManaCost(ManaCost* cost,
+                                MTGCardInstance* card          = nullptr,
                                 vector<MTGAbility*> gotPayment = vector<MTGAbility*>());
-    virtual int getCreaturesInfo(Player* player, int neededInfo = INFO_NBCREATURES, int untapMode = 0,
-                                 int canAttack = 0);
+    virtual int getCreaturesInfo(Player* player,
+                                 int neededInfo = INFO_NBCREATURES,
+                                 int untapMode  = 0,
+                                 int canAttack  = 0);
     virtual ManaCost* getPotentialMana(MTGCardInstance* card = nullptr);
     virtual int selectAbility();
 
@@ -114,7 +121,10 @@ public:
     };
 
     vector<MTGAbility*> gotPayments;
-    AIPlayerBaka(GameObserver* observer, const string& deckFile, const string& deckfileSmall, string avatarFile,
+    AIPlayerBaka(GameObserver* observer,
+                 const string& deckFile,
+                 const string& deckfileSmall,
+                 string avatarFile,
                  MTGDeck* deck = nullptr);
     int Act(float dt) override;
     void initTimer();
@@ -124,8 +134,10 @@ public:
     ~AIPlayerBaka() override;
     int affectCombatDamages(CombatStep step) override;
     virtual int canHandleCost(MTGAbility* ability);
-    int chooseTarget(TargetChooser* tc = nullptr, Player* forceTarget = nullptr, MTGCardInstance* Chosencard = nullptr,
-                     bool checkonly = false) override;
+    int chooseTarget(TargetChooser* tc           = nullptr,
+                     Player* forceTarget         = nullptr,
+                     MTGCardInstance* Chosencard = nullptr,
+                     bool checkonly              = false) override;
 
     // used by AIHInts, therefore public instead of private :/
     virtual int createAbilityTargets(MTGAbility* a, MTGCardInstance* c, RankingContainer& ranking);

@@ -438,8 +438,9 @@ int MTGKickerRule::reactToClick(MTGCardInstance* card) {
         return 0;
     }
 
-    Player* player       = game->currentlyActing();
-    auto* withKickerCost = utils::detail::copy_or_new(card->getManaCost());  // using pointers here alters the real cost of the card.
+    Player* player = game->currentlyActing();
+    auto* withKickerCost =
+        utils::detail::copy_or_new(card->getManaCost());  // using pointers here alters the real cost of the card.
     if (card->getManaCost()->kicker->isMulti) {
         while (player->getManaPool()->canAfford(withKickerCost)) {
             withKickerCost->add(withKickerCost->kicker);
@@ -823,7 +824,8 @@ int MTGSuspendRule::reactToClick(MTGCardInstance* card) {
     // this handles extra cost payments at the moment a card is played.
     if (playerMana->canAfford(alternateCost)) {
         if (alternateCost->hasX()) {
-            auto* checkXnotZero = utils::detail::copy_or_new(alternateCost);  // suspend cards with x cost, x can not be zero.
+            auto* checkXnotZero =
+                utils::detail::copy_or_new(alternateCost);  // suspend cards with x cost, x can not be zero.
             checkXnotZero->add(0, 1);
             if (!playerMana->canAfford(checkXnotZero)) {
                 SAFE_DELETE(checkXnotZero);
@@ -1141,7 +1143,9 @@ bool MTGPlaneswalkerAttackRule::select(Target* t) {
 bool MTGPlaneswalkerAttackRule::greyout(Target* t) { return true; }
 
 // setting combat against planeswalker menu handling
-AAPlaneswalkerAttacked::AAPlaneswalkerAttacked(GameObserver* observer, int id, MTGCardInstance* card,
+AAPlaneswalkerAttacked::AAPlaneswalkerAttacked(GameObserver* observer,
+                                               int id,
+                                               MTGCardInstance* card,
                                                MTGCardInstance* _target)
     : InstantAbility(observer, id, source)
     , attacker(card)

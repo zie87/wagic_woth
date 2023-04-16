@@ -7,8 +7,16 @@
 #include "WResourceManager.h"
 #include "ModRules.h"
 
-MenuItem::MenuItem(int id, WFont* font, string text, float x, float y, JQuad* _off, JQuad* _on, const char* particle,
-                   JQuad* particleTex, bool hasFocus)
+MenuItem::MenuItem(int id,
+                   WFont* font,
+                   string text,
+                   float x,
+                   float y,
+                   JQuad* _off,
+                   JQuad* _on,
+                   const char* particle,
+                   JQuad* particleTex,
+                   bool hasFocus)
     : JGuiObject(id)
     , mFont(font)
     , mX(x)
@@ -117,9 +125,24 @@ std::ostream& MenuItem::toString(std::ostream& out) const {
                << " ; onQuad : " << onQuad << " ; offQuad : " << offQuad << " ; mParticleSys : " << mParticleSys;
 }
 
-OtherMenuItem::OtherMenuItem(int id, WFont* font, std::string text, float x, float y, JQuad* _off, JQuad* _on,
-                             JButton _key, bool hasFocus)
-    : MenuItem(id, font, std::move(text), x, y, _off, _on, "", WResourceManager::Instance()->GetQuad("particles").get(),
+OtherMenuItem::OtherMenuItem(int id,
+                             WFont* font,
+                             std::string text,
+                             float x,
+                             float y,
+                             JQuad* _off,
+                             JQuad* _on,
+                             JButton _key,
+                             bool hasFocus)
+    : MenuItem(id,
+               font,
+               std::move(text),
+               x,
+               y,
+               _off,
+               _on,
+               "",
+               WResourceManager::Instance()->GetQuad("particles").get(),
                hasFocus)
     , mKey(_key)
     , mTimeIndex(0) {}

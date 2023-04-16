@@ -24,8 +24,17 @@ void IconButtonsController::SetColor(PIXEL_TYPE color) {
     }
 }
 
-IconButton::IconButton(int id, IconButtonsController* parent, const std::string& texture, float x, float y, float scale,
-                       int fontId, std::string text, float textRelativeX, float textRelativeY, bool hasFocus)
+IconButton::IconButton(int id,
+                       IconButtonsController* parent,
+                       const std::string& texture,
+                       float x,
+                       float y,
+                       float scale,
+                       int fontId,
+                       std::string text,
+                       float textRelativeX,
+                       float textRelativeY,
+                       bool hasFocus)
     : JGuiObject(id)
     , mQuad(nullptr)
     , mTex(WResourceManager::Instance()->RetrieveTexture(texture, RETRIEVE_LOCK)) {
@@ -35,15 +44,32 @@ IconButton::IconButton(int id, IconButtonsController* parent, const std::string&
     init(parent, mQuad, x, y, scale, fontId, std::move(text), textRelativeX, textRelativeY, hasFocus);
 }
 
-IconButton::IconButton(int id, IconButtonsController* parent, JQuad* quad, float x, float y, float scale, int fontId,
-                       std::string text, float textRelativeX, float textRelativeY, bool hasFocus)
+IconButton::IconButton(int id,
+                       IconButtonsController* parent,
+                       JQuad* quad,
+                       float x,
+                       float y,
+                       float scale,
+                       int fontId,
+                       std::string text,
+                       float textRelativeX,
+                       float textRelativeY,
+                       bool hasFocus)
     : JGuiObject(id)
     , mTex(nullptr) {
     init(parent, quad, x, y, scale, fontId, std::move(text), textRelativeX, textRelativeY, hasFocus);
 }
 
-void IconButton::init(IconButtonsController* parent, JQuad* quad, float x, float y, float scale, int fontId,
-                      std::string text, float textRelativeX, float textRelativeY, bool hasFocus) {
+void IconButton::init(IconButtonsController* parent,
+                      JQuad* quad,
+                      float x,
+                      float y,
+                      float scale,
+                      int fontId,
+                      std::string text,
+                      float textRelativeX,
+                      float textRelativeY,
+                      bool hasFocus) {
     mParent        = parent;
     mQuad          = quad;
     mX             = x;

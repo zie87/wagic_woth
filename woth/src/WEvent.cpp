@@ -100,7 +100,8 @@ WEventCreatureBlocker::WEventCreatureBlocker(MTGCardInstance* card, MTGCardInsta
     , before(from)
     , after(to) {}
 
-WEventCreatureBlockerRank::WEventCreatureBlockerRank(MTGCardInstance* card, MTGCardInstance* exchangeWith,
+WEventCreatureBlockerRank::WEventCreatureBlockerRank(MTGCardInstance* card,
+                                                     MTGCardInstance* exchangeWith,
                                                      MTGCardInstance* attacker)
     : WEventCardUpdate(card)
     , exchangeWith(exchangeWith)

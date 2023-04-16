@@ -73,15 +73,25 @@ public:
         }
     };
     virtual JQuadPtr RetrieveCard(MTGCard* card, int style = RETRIEVE_NORMAL, int submode = CACHE_NORMAL) = 0;
-    virtual JSample* RetrieveSample(const std::string& filename, int style = RETRIEVE_NORMAL,
+    virtual JSample* RetrieveSample(const std::string& filename,
+                                    int style   = RETRIEVE_NORMAL,
                                     int submode = CACHE_NORMAL)                                           = 0;
-    virtual JTexture* RetrieveTexture(const std::string& filename, int style = RETRIEVE_NORMAL,
+    virtual JTexture* RetrieveTexture(const std::string& filename,
+                                      int style   = RETRIEVE_NORMAL,
                                       int submode = CACHE_NORMAL)                                         = 0;
-    virtual JQuadPtr RetrieveQuad(const std::string& filename, float offX = 0.0f, float offY = 0.0f, float width = 0.0f,
-                                  float height = 0.0f, std::string resname = "", int style = RETRIEVE_NORMAL,
-                                  int submode = CACHE_NORMAL, int id = 0)                                 = 0;
+    virtual JQuadPtr RetrieveQuad(const std::string& filename,
+                                  float offX          = 0.0f,
+                                  float offY          = 0.0f,
+                                  float width         = 0.0f,
+                                  float height        = 0.0f,
+                                  std::string resname = "",
+                                  int style           = RETRIEVE_NORMAL,
+                                  int submode         = CACHE_NORMAL,
+                                  int id              = 0)                                                             = 0;
     virtual JQuadPtr RetrieveTempQuad(const std::string& filename, int submode = CACHE_NORMAL)            = 0;
-    virtual hgeParticleSystemInfo* RetrievePSI(const std::string& filename, JQuad* texture, int style = RETRIEVE_NORMAL,
+    virtual hgeParticleSystemInfo* RetrievePSI(const std::string& filename,
+                                               JQuad* texture,
+                                               int style   = RETRIEVE_NORMAL,
                                                int submode = CACHE_NORMAL)                                = 0;
     virtual int RetrieveError()                                                                           = 0;
 

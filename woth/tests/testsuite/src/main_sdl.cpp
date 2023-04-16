@@ -15,7 +15,7 @@ void JGECreateDefaultBindings() {}
 
 
 int main(int argc, char* argv[]) {
-    WagicWrapper* wagic_core = new WagicWrapper();
+    auto* wagic_core = new WagicWrapper();
 
     MTGCollection()->loadFolder("sets/primitives/");
     MTGCollection()->loadFolder("sets/", "_cards.dat");

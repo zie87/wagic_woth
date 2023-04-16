@@ -31,8 +31,16 @@ JTexture* SimpleMenu::spadeLTex = nullptr;
 JTexture* SimpleMenu::jewelTex  = nullptr;
 JTexture* SimpleMenu::sideTex   = nullptr;
 
-SimpleMenu::SimpleMenu(JGE* jge, int id, JGuiListener* listener, int fontId, float x, float y, const char* _title,
-                       int _maxItems, bool centerHorizontal, bool centerVertical)
+SimpleMenu::SimpleMenu(JGE* jge,
+                       int id,
+                       JGuiListener* listener,
+                       int fontId,
+                       float x,
+                       float y,
+                       const char* _title,
+                       int _maxItems,
+                       bool centerHorizontal,
+                       bool centerVertical)
     : JGuiController(jge, id, listener)
     , mHeight(2 * kVerticalMargin)
     , mWidth(0)

@@ -85,7 +85,8 @@ protected:
     bool mFastTimerMode;
     queue<AIAction*> clickstream;
     int clickMultiTarget(TargetChooser* tc, vector<Targetable*>& potentialTargets);
-    int clickSingleTarget(TargetChooser* tc, vector<Targetable*>& potentialTargets,
+    int clickSingleTarget(TargetChooser* tc,
+                          vector<Targetable*>& potentialTargets,
                           MTGCardInstance* Choosencard = nullptr);
     RandomGenerator randomGenerator;
 
@@ -102,10 +103,12 @@ public:
     AIPlayer(GameObserver* observer, const string& deckFile, string deckFileSmall, MTGDeck* deck = nullptr);
     ~AIPlayer() override;
 
-    virtual int chooseTarget(TargetChooser* tc = nullptr, Player* forceTarget = nullptr,
-                             MTGCardInstance* Chosencard = nullptr, bool checkonly = false) = 0;
-    virtual int affectCombatDamages(CombatStep)                                             = 0;
-    int Act(float dt) override                                                              = 0;
+    virtual int chooseTarget(TargetChooser* tc           = nullptr,
+                             Player* forceTarget         = nullptr,
+                             MTGCardInstance* Chosencard = nullptr,
+                             bool checkonly              = false) = 0;
+    virtual int affectCombatDamages(CombatStep)      = 0;
+    int Act(float dt) override                       = 0;
 
     int isAI() override { return 1; };
 

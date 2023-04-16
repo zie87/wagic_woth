@@ -18,8 +18,15 @@
 
 const int kButtonHeight = 30;
 
-InteractiveButton::InteractiveButton(JGuiController* _parent, int id, int fontId, const string& text, float x, float y,
-                                     JButton actionKey, bool hasFocus, bool autoTranslate)
+InteractiveButton::InteractiveButton(JGuiController* _parent,
+                                     int id,
+                                     int fontId,
+                                     const string& text,
+                                     float x,
+                                     float y,
+                                     JButton actionKey,
+                                     bool hasFocus,
+                                     bool autoTranslate)
     : SimpleButton(_parent, id, fontId, std::move(text), x, y, hasFocus, autoTranslate)
     , mActionKey(actionKey) {
     setIsSelectionValid(false);  // by default it's turned off since you can't auto select it.

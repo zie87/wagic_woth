@@ -79,6 +79,9 @@ int GameStateDuel::selectedAIDeckId     = 0;
 
 GameStateDuel::GameStateDuel(GameApp* parent)
     : GameState(parent, "duel")
+#ifdef TESTSUITE
+    , testSuite(nullptr)
+#endif
     , credits(nullptr)
     , deckmenu(nullptr)
     , game(nullptr)
@@ -87,9 +90,6 @@ GameStateDuel::GameStateDuel(GameApp* parent)
     , opponentMenu(nullptr)
     , popupScreen(nullptr)
     , premadeDeck(false) {
-#ifdef TESTSUITE
-    testSuite = NULL;
-#endif
 
 #ifdef AI_CHANGE_TESTING
     totalTestGames       = 0;
@@ -196,7 +196,9 @@ void GameStateDuel::initRand(unsigned int seed) {
 
 #ifdef TESTSUITE
 void GameStateDuel::loadTestSuitePlayers() {
-    if (!testSuite) return;
+    if (!testSuite) {
+        return;
+    }
     initRand(testSuite->seed);
     SAFE_DELETE(game);
     game = new GameObserver(WResourceManager::Instance(), JGE::GetInstance());
@@ -590,7 +592,7 @@ void GameStateDuel::Render() {
             char buf[4096];
             mFont->SetColor(ARGB(255, 255, 255, 255));
 
-            int elapsedTime = (testSuite->endTime - testSuite->startTime);
+            const int elapsedTime = (testSuite->endTime - testSuite->startTime);
             sprintf(buf, "Time to run the tests: %is", elapsedTime / 1000);
             mFont->DrawString(buf, 0, SCREEN_HEIGHT / 2 - 20);
 

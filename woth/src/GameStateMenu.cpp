@@ -762,8 +762,9 @@ void GameStateMenu::ButtonPressed(int controllerId, int controlId) {
                 subMenuController->Add(SUBMENUITEM_DEMO, "Demo");
                 subMenuController->Add(SUBMENUITEM_CANCEL, "Cancel");
 #ifdef TESTSUITE
-                if (Rules::getRulesByFilename("testsuite.txt"))
+                if (Rules::getRulesByFilename("testsuite.txt")) {
                     subMenuController->Add(SUBMENUITEM_TESTSUITE, "Test Suite");
+                }
 #endif
 
 #ifdef AI_CHANGE_TESTING

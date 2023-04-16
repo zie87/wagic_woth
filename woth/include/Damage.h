@@ -61,7 +61,10 @@ public:
     int damage;
     void Render() override;
     Damage(GameObserver* observer, MTGCardInstance* source, Damageable* target);
-    Damage(GameObserver* observer, MTGCardInstance* source, Damageable* target, int damage,
+    Damage(GameObserver* observer,
+           MTGCardInstance* source,
+           Damageable* target,
+           int damage,
            int typeOfDamage = DAMAGE_OTHER);
     int resolve() override;
     std::ostream& toString(std::ostream& out) const override;

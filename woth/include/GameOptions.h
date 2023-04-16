@@ -286,15 +286,21 @@ public:
     ~GameSettings();
     int save();
 
-    SimplePad* keypadStart(std::string input, std::string* _dest = nullptr, bool _cancel = true, bool _numpad = false,
-                           float _x = SCREEN_WIDTH_F / 2, float _y = SCREEN_HEIGHT_F / 2);
+    SimplePad* keypadStart(std::string input,
+                           std::string* _dest = nullptr,
+                           bool _cancel       = true,
+                           bool _numpad       = false,
+                           float _x           = SCREEN_WIDTH_F / 2,
+                           float _y           = SCREEN_HEIGHT_F / 2);
     std::string keypadFinish();
     void keypadShutdown();
     void keypadTitle(std::string set);
 
     bool keypadActive() {
         if (keypad) {
-            { return keypad->isActive(); }
+            {
+                return keypad->isActive();
+            }
         }
 
         return false;
@@ -324,13 +330,17 @@ public:
 
     void keypadUpdate(float dt) {
         if (keypad) {
-            { keypad->Update(dt); }
+            {
+                keypad->Update(dt);
+            }
         }
     }
 
     void keypadRender() {
         if (keypad) {
-            { keypad->Render(); }
+            {
+                keypad->Render();
+            }
         }
     }
 
@@ -339,8 +349,9 @@ public:
     // These return a filepath accurate to the current mode/profile/theme, and can
     // optionally fallback to a file within a certain directory.
     // The sanity=false option returns the adjusted path even if the file doesn't exist.
-    std::string profileFile(const std::string& filename = "", const std::string& fallback = "",
-                            bool sanity = false) const;
+    std::string profileFile(const std::string& filename = "",
+                            const std::string& fallback = "",
+                            bool sanity                 = false) const;
 
     void reloadProfile();  // Reloads profile using current options[ACTIVE_PROFILE]
     void checkProfile();   // Confirms that a profile is loaded and contains a collection.

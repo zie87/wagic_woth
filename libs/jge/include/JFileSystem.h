@@ -118,7 +118,8 @@ public:
 
     bool openForRead(izfstream& File, const std::string& FilePath);
     bool readIntoString(const std::string& FilePath, std::string& target);
-    bool openForWrite(std::ofstream& File, const std::string& FilePath,
+    bool openForWrite(std::ofstream& File,
+                      const std::string& FilePath,
                       std::ios_base::openmode mode = std::ios_base::out);
     bool Rename(const std::string& from, const std::string& to);
 

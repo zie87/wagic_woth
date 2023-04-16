@@ -29,7 +29,7 @@ public:
     };
     int type;  // Deprecated, use dynamic casting instead
     WEvent(int type = NOT_SPECIFIED);
-    virtual ~WEvent(){};
+    virtual ~WEvent() = default;
     virtual std::ostream& toString(std::ostream& out) const;
     virtual int getValue() { return 0; };
     virtual Targetable* getTarget(int target) { return nullptr; };

@@ -601,7 +601,10 @@ TargetChooser* TargetChooserFactory::createTargetChooser(MTGCardInstance* card) 
     }
 }
 
-TargetChooser::TargetChooser(GameObserver* observer, MTGCardInstance* card, int _maxtargets, bool _other,
+TargetChooser::TargetChooser(GameObserver* observer,
+                             MTGCardInstance* card,
+                             int _maxtargets,
+                             bool _other,
                              bool _targetMin)
     : forceTargetListReady(0)
     , other(_other)
@@ -773,8 +776,11 @@ bool TargetChooser::equals(TargetChooser* tc) {
 /**
  a specific Card
  **/
-CardTargetChooser::CardTargetChooser(GameObserver* observer, MTGCardInstance* _card, MTGCardInstance* source,
-                                     int* _zones, int _nbzones)
+CardTargetChooser::CardTargetChooser(GameObserver* observer,
+                                     MTGCardInstance* _card,
+                                     MTGCardInstance* source,
+                                     int* _zones,
+                                     int _nbzones)
     : TargetZoneChooser(observer, _zones, _nbzones, source)
     , validTarget(_card) {}
 
@@ -824,8 +830,12 @@ bool CardTargetChooser::equals(TargetChooser* tc) {
 /**
  Choose anything that has a given list of types
  **/
-TypeTargetChooser::TypeTargetChooser(GameObserver* observer, const char* _type, MTGCardInstance* card, int _maxtargets,
-                                     bool other, bool targetMin)
+TypeTargetChooser::TypeTargetChooser(GameObserver* observer,
+                                     const char* _type,
+                                     MTGCardInstance* card,
+                                     int _maxtargets,
+                                     bool other,
+                                     bool targetMin)
     : TargetZoneChooser(observer, card, _maxtargets, other, targetMin)
     , nbtypes(0) {
     const int id = MTGAllCards::findType(_type);
@@ -835,8 +845,14 @@ TypeTargetChooser::TypeTargetChooser(GameObserver* observer, const char* _type, 
     init(default_zones, 2);
 }
 
-TypeTargetChooser::TypeTargetChooser(GameObserver* observer, const char* _type, int* _zones, int nbzones,
-                                     MTGCardInstance* card, int _maxtargets, bool other, bool targetMin)
+TypeTargetChooser::TypeTargetChooser(GameObserver* observer,
+                                     const char* _type,
+                                     int* _zones,
+                                     int nbzones,
+                                     MTGCardInstance* card,
+                                     int _maxtargets,
+                                     bool other,
+                                     bool targetMin)
     : TargetZoneChooser(observer, card, _maxtargets, other, targetMin)
     , nbtypes(0) {
     const int id = MTGAllCards::findType(_type);
@@ -929,16 +945,26 @@ bool TypeTargetChooser ::equals(TargetChooser* tc) {
 /**
  A Target Chooser associated to a Card Descriptor object, for fine tuning of targets description
  **/
-DescriptorTargetChooser::DescriptorTargetChooser(GameObserver* observer, CardDescriptor* _cd, MTGCardInstance* card,
-                                                 int _maxtargets, bool other, bool targetMin)
+DescriptorTargetChooser::DescriptorTargetChooser(GameObserver* observer,
+                                                 CardDescriptor* _cd,
+                                                 MTGCardInstance* card,
+                                                 int _maxtargets,
+                                                 bool other,
+                                                 bool targetMin)
     : TargetZoneChooser(observer, card, _maxtargets, other, targetMin)
     , cd(_cd) {
     int default_zones[] = {MTGGameZone::MY_BATTLEFIELD, MTGGameZone::OPPONENT_BATTLEFIELD};
     init(default_zones, 2);
 }
 
-DescriptorTargetChooser::DescriptorTargetChooser(GameObserver* observer, CardDescriptor* _cd, int* _zones, int nbzones,
-                                                 MTGCardInstance* card, int _maxtargets, bool other, bool targetMin)
+DescriptorTargetChooser::DescriptorTargetChooser(GameObserver* observer,
+                                                 CardDescriptor* _cd,
+                                                 int* _zones,
+                                                 int nbzones,
+                                                 MTGCardInstance* card,
+                                                 int _maxtargets,
+                                                 bool other,
+                                                 bool targetMin)
     : TargetZoneChooser(observer, card, _maxtargets, other, targetMin) {
     if (nbzones == 0) {
         int default_zones[] = {MTGGameZone::MY_BATTLEFIELD, MTGGameZone::OPPONENT_BATTLEFIELD};
@@ -989,14 +1015,22 @@ bool DescriptorTargetChooser::equals(TargetChooser* tc) {
 }
 
 /* TargetzoneChooser targets everything in a given zone */
-TargetZoneChooser::TargetZoneChooser(GameObserver* observer, MTGCardInstance* card, int _maxtargets, bool other,
+TargetZoneChooser::TargetZoneChooser(GameObserver* observer,
+                                     MTGCardInstance* card,
+                                     int _maxtargets,
+                                     bool other,
                                      bool targetMin)
     : TargetChooser(observer, card, _maxtargets, other, targetMin) {
     init(nullptr, 0);
 }
 
-TargetZoneChooser::TargetZoneChooser(GameObserver* observer, int* _zones, int _nbzones, MTGCardInstance* card,
-                                     int _maxtargets, bool other, bool targetMin)
+TargetZoneChooser::TargetZoneChooser(GameObserver* observer,
+                                     int* _zones,
+                                     int _nbzones,
+                                     MTGCardInstance* card,
+                                     int _maxtargets,
+                                     bool other,
+                                     bool targetMin)
     : TargetChooser(observer, card, _maxtargets, other, targetMin) {
     init(_zones, _nbzones);
 }
@@ -1181,8 +1215,12 @@ bool DamageableTargetChooser::equals(TargetChooser* tc) {
 
 /*Spell */
 
-SpellTargetChooser::SpellTargetChooser(GameObserver* observer, MTGCardInstance* card, int _color, int _maxtargets,
-                                       bool other, bool targetMin)
+SpellTargetChooser::SpellTargetChooser(GameObserver* observer,
+                                       MTGCardInstance* card,
+                                       int _color,
+                                       int _maxtargets,
+                                       bool other,
+                                       bool targetMin)
     : TargetChooser(observer, card, _maxtargets, other, targetMin)
     , color(_color) {}
 
@@ -1221,8 +1259,12 @@ bool SpellTargetChooser::equals(TargetChooser* tc) {
 }
 
 /*Spell or Permanent */
-SpellOrPermanentTargetChooser::SpellOrPermanentTargetChooser(GameObserver* observer, MTGCardInstance* card, int _color,
-                                                             int _maxtargets, bool other, bool targetMin)
+SpellOrPermanentTargetChooser::SpellOrPermanentTargetChooser(GameObserver* observer,
+                                                             MTGCardInstance* card,
+                                                             int _color,
+                                                             int _maxtargets,
+                                                             bool other,
+                                                             bool targetMin)
     : TargetZoneChooser(observer, card, _maxtargets, other, targetMin)
     , color(_color) {
     int default_zones[] = {MTGGameZone::MY_BATTLEFIELD, MTGGameZone::OPPONENT_BATTLEFIELD};
@@ -1264,7 +1306,10 @@ bool SpellOrPermanentTargetChooser::equals(TargetChooser* tc) {
 }
 
 /*Damage */
-DamageTargetChooser::DamageTargetChooser(GameObserver* observer, MTGCardInstance* card, int _color, int _maxtargets,
+DamageTargetChooser::DamageTargetChooser(GameObserver* observer,
+                                         MTGCardInstance* card,
+                                         int _color,
+                                         int _maxtargets,
                                          int _state)
     : TargetChooser(observer, card, _maxtargets)
     , color(_color)

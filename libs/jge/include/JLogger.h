@@ -24,7 +24,7 @@ public:
     JLogger(const char* text);
     ~JLogger();
 
-    const char* mText;
+    const char* mText = nullptr;
 
     static std::string lastLog;
     static int lastTime;

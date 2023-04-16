@@ -650,7 +650,7 @@ void MTGAllCards::prefetchCardNameCache() {
         mtgCardByNameCache[cardName] = c;
 
         // Name + set
-        int setId           = c->setId;
+        const int setId     = c->setId;
         MTGSetInfo* setInfo = setlist.getInfo(setId);
         if (setInfo) {
             string setName = setInfo->getName();
@@ -828,7 +828,12 @@ string MTGDeck::getFilename() { return filename; }
 
 MTGCard* MTGDeck::getCardById(int mtgId) const { return database->getCardById(mtgId); }
 
-int MTGDeck::addRandomCards(int howmany, int* setIds, int nbSets, int rarity, const char* _subtype, int* colors,
+int MTGDeck::addRandomCards(int howmany,
+                            int* setIds,
+                            int nbSets,
+                            int rarity,
+                            const char* _subtype,
+                            int* colors,
                             int nbcolors) {
     if (howmany <= 0) {
         return 1;
@@ -993,7 +998,9 @@ int MTGDeck::remove(MTGCard* card) {
 
 int MTGDeck::save() { return save(filename, false, meta_name, meta_desc); }
 
-int MTGDeck::save(const string& destFileName, bool useExpandedDescriptions, const string& deckTitle,
+int MTGDeck::save(const string& destFileName,
+                  bool useExpandedDescriptions,
+                  const string& deckTitle,
                   const string& deckDesc) {
     string tmp = destFileName;
     tmp.append(".tmp");  // not thread safe

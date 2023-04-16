@@ -1033,8 +1033,12 @@ int GameObserver::cardClick(MTGCardInstance* card, int abilityType) {
     return result;
 }
 
-int GameObserver::cardClickLog(bool log, Player* clickedPlayer, MTGGameZone* zone, MTGCardInstance* backup,
-                               size_t index, int toReturn) {
+int GameObserver::cardClickLog(bool log,
+                               Player* clickedPlayer,
+                               MTGGameZone* zone,
+                               MTGCardInstance* backup,
+                               size_t index,
+                               int toReturn) {
     if (log) {
         if (clickedPlayer) {
             this->logAction(clickedPlayer);
@@ -1240,12 +1244,12 @@ int GameObserver::receiveEvent(WEvent* e) {
     int result = 0;
     while (!eventsQueue.empty()) {
         WEvent* ev = eventsQueue.front();
+        eventsQueue.pop();
         result += mLayers->receiveEvent(ev);
         for (int i = 0; i < 2; ++i) {
             result += players[i]->receiveEvent(ev);
         }
         SAFE_DELETE(ev);
-        eventsQueue.pop();
     }
     return result;
 }
@@ -1323,7 +1327,8 @@ bool GameObserver::parseLine(const string& s) {
     return false;
 }
 
-bool GameObserver::load(const string& ss, bool undo
+bool GameObserver::load(const string& ss,
+                        bool undo
 #ifdef TESTSUITE
                         ,
                         TestSuiteGame* testgame
@@ -1424,7 +1429,9 @@ bool GameObserver::load(const string& ss, bool undo
                 phaseRing->goToPhase(currentGamePhase, currentPlayer);
 
 #ifdef TESTSUITE
-                if (testgame) testgame->initGame();
+                if (testgame) {
+                    testgame->initGame();
+                }
 #endif  // TESTSUITE
 
                 processActions(undo
@@ -1524,8 +1531,6 @@ bool GameObserver::processActions(bool undo
         } else if (s.find("choice") != string::npos) {
             const int choice = atoi(s.substr(s.find("choice ") + 7).c_str());
             mLayers->actionLayer()->doReactTo(choice);
-        } else if (s == "p1" || s == "p2") {
-            cardClick(nullptr, p);
         } else if (s.find("mulligan") != string::npos) {
             Mulligan(p);
         } else if (s.find("shufflelib") != string::npos) {
@@ -1567,10 +1572,10 @@ void GameObserver::logAction(Player* player, const string& s) {
 }
 
 void GameObserver::logAction(MTGCardInstance* card, MTGGameZone* zone, size_t index, int result) {
-    std::stringstream stream;
     if (zone == nullptr) {
         zone = card->currentZone;
     }
+    std::stringstream stream;
     stream << "p" << ((card->controller() == players[0]) ? "1." : "2.") << zone->getName() << "[" << index << "] "
            << result << card->getLCName();
     logAction(stream.str());
@@ -1620,10 +1625,11 @@ void GameObserver::createPlayer(const string& playerMode
         break;
     case Player::MODE_TEST_SUITE:
 #ifdef TESTSUITE
-        if (players.size())
+        if (!players.empty()) {
             players.push_back(new TestSuiteAI(testgame, 1));
-        else
+        } else {
             players.push_back(new TestSuiteAI(testgame, 0));
+        }
 #endif  // TESTSUITE
         break;
     }

@@ -18,8 +18,14 @@ private:
 
 public:
     SimpleMenuItem(int id);
-    SimpleMenuItem(SimpleMenu* _parent, int id, int fontId, const std::string& text, float x, float y,
-                   bool hasFocus = false, bool autoTranslate = false);
+    SimpleMenuItem(SimpleMenu* _parent,
+                   int id,
+                   int fontId,
+                   const std::string& text,
+                   float x,
+                   float y,
+                   bool hasFocus      = false,
+                   bool autoTranslate = false);
 
     void Entering() override;
     virtual void setDescription(const std::string& desc);

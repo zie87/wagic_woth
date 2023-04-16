@@ -118,10 +118,14 @@ public:
 
     void setOwner(Player* player);
     MTGCardInstance* lastCardDrawn;
-    static MTGGameZone* stringToZone(GameObserver* g, const string& zoneName, MTGCardInstance* source,
+    static MTGGameZone* stringToZone(GameObserver* g,
+                                     const string& zoneName,
+                                     MTGCardInstance* source,
                                      MTGCardInstance* target);
     static int zoneStringToId(const string& zoneName);
-    static MTGGameZone* intToZone(GameObserver* g, int zoneId, MTGCardInstance* source = nullptr,
+    static MTGGameZone* intToZone(GameObserver* g,
+                                  int zoneId,
+                                  MTGCardInstance* source = nullptr,
                                   MTGCardInstance* target = nullptr);
     static MTGGameZone* intToZone(int zoneId, Player* source, Player* target = nullptr);
     bool needShuffle;

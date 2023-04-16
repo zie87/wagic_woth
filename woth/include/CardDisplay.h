@@ -16,7 +16,12 @@ public:
     TargetChooser* tc;
     JGuiListener* listener;
     CardDisplay(GameObserver* game);
-    CardDisplay(int id, GameObserver* game, int x, int y, JGuiListener* listener = nullptr, TargetChooser* tc = nullptr,
+    CardDisplay(int id,
+                GameObserver* game,
+                int x,
+                int y,
+                JGuiListener* listener = nullptr,
+                TargetChooser* tc      = nullptr,
                 int nb_displayed_items = 7);
     void AddCard(MTGCardInstance* _card);
     void rotateLeft();

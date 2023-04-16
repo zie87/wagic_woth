@@ -39,8 +39,12 @@ public:
     /// @param flipped - Indicate if the frame is horizontally flipped.
     ///
     //////////////////////////////////////////////////////////////////////////
-    JSprite(JTexture* tex = nullptr, float x = 0.0f, float y = 0.0f, float width = 0.0f, float height = 0.0f,
-            bool flipped = false);
+    JSprite(JTexture* tex = nullptr,
+            float x       = 0.0f,
+            float y       = 0.0f,
+            float width   = 0.0f,
+            float height  = 0.0f,
+            bool flipped  = false);
 
     virtual ~JSprite();
 

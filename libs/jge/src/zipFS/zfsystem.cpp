@@ -85,8 +85,10 @@ filesystem::filesystem(const char* BasePath, const char* FileExt, bool DefaultFS
 // File System Member Functions
 //////////////////////////////////////////////////////////////////////
 
-zbuffer* filesystem::getValidBuffer(const std::string& filename, const std::string& externalFilename,
-                                    std::streamoff Offset, std::streamoff Size) {
+zbuffer* filesystem::getValidBuffer(const std::string& filename,
+                                    const std::string& externalFilename,
+                                    std::streamoff Offset,
+                                    std::streamoff Size) {
     // if exists filename in pool and is not in use, return that
     for (size_t i = 0; i < m_Buffers.size(); ++i) {
         if (m_Buffers[i]->filename != filename) {

@@ -50,7 +50,9 @@ public:
     WCache();
     ~WCache();
 
-    cacheItem* Retrieve(int id, const string& filename, int style = RETRIEVE_NORMAL,
+    cacheItem* Retrieve(int id,
+                        const string& filename,
+                        int style   = RETRIEVE_NORMAL,
                         int submode = CACHE_NORMAL);  // Primary interface function.
     bool Release(cacheActual* actual);                // Releases an item, and deletes it if unlocked.
     bool RemoveMiss(int id = 0);                      // Removes a cache miss.
@@ -75,7 +77,9 @@ protected:
     bool UnlinkCache(cacheItem* item);   // Removes an item from our cache, does not delete it. Use with care.
     bool Delete(cacheItem* item);  // SAFE_DELETE and garbage collect. If maxCached == 0, nullify first. (This means you
                                    // have to free that cacheActual later!)
-    cacheItem* Get(int id, const string& filename, int style = RETRIEVE_NORMAL,
+    cacheItem* Get(int id,
+                   const string& filename,
+                   int style   = RETRIEVE_NORMAL,
                    int submode = CACHE_NORMAL);  // Subordinate to Retrieve.
 
     int makeID(int id, const string& filename, int submode);  // Makes an ID appropriate to the submode.
@@ -133,11 +137,19 @@ public:
     JQuadPtr RetrieveCard(MTGCard* card, int style = RETRIEVE_NORMAL, int submode = CACHE_NORMAL) override;
     JSample* RetrieveSample(const string& filename, int style = RETRIEVE_NORMAL, int submode = CACHE_NORMAL) override;
     JTexture* RetrieveTexture(const string& filename, int style = RETRIEVE_NORMAL, int submode = CACHE_NORMAL) override;
-    JQuadPtr RetrieveQuad(const string& filename, float offX = 0.0f, float offY = 0.0f, float width = 0.0f,
-                          float height = 0.0f, string resname = "", int style = RETRIEVE_LOCK,
-                          int submode = CACHE_NORMAL, int id = 0) override;
+    JQuadPtr RetrieveQuad(const string& filename,
+                          float offX     = 0.0f,
+                          float offY     = 0.0f,
+                          float width    = 0.0f,
+                          float height   = 0.0f,
+                          string resname = "",
+                          int style      = RETRIEVE_LOCK,
+                          int submode    = CACHE_NORMAL,
+                          int id         = 0) override;
     JQuadPtr RetrieveTempQuad(const string& filename, int submode = CACHE_NORMAL) override;
-    hgeParticleSystemInfo* RetrievePSI(const string& filename, JQuad* texture, int style = RETRIEVE_NORMAL,
+    hgeParticleSystemInfo* RetrievePSI(const string& filename,
+                                       JQuad* texture,
+                                       int style   = RETRIEVE_NORMAL,
                                        int submode = CACHE_NORMAL) override;
     int RetrieveError() override;
 
