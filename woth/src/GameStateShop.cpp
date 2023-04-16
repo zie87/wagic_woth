@@ -932,36 +932,44 @@ void ShopBooster::addToDeck(MTGDeck* d, WSrcCards* srcCards) {
 #ifdef TESTSUITE
 bool ShopBooster::unitTest() {
     // this tests the default random pack creation.
-    MTGDeck* d = NEW MTGDeck(MTGCollection());
+    auto* d = NEW MTGDeck(MTGCollection());
     char result[1024];
 
     randomStandard();
     MTGPack* mP = MTGPacks::getDefault();
-    if (!altSet && mainSet->mPack) mP = mainSet->mPack;
+    if (!altSet && mainSet->mPack) {
+        mP = mainSet->mPack;
+    }
     char buf[512];
-    if (!altSet)
+    if (!altSet) {
         sprintf(buf, "set:%s;", mainSet->id.c_str());
-    else
+    } else {
         sprintf(buf, "set:%s;|set:%s;", mainSet->id.c_str(), altSet->id.c_str());
+    }
     mP->pool = buf;
     mP->assemblePack(d);  // Use the primary packfile. assemblePack deletes pool.
-    DeckDataWrapper* ddw = NEW DeckDataWrapper(d);
-    bool res             = true;
+    auto* ddw = NEW DeckDataWrapper(d);
+    bool res  = true;
 
-    int u = 0, r = 0, s = 0;
+    int u    = 0;
+    int r    = 0;
+    int s    = 0;
     int card = 0;
     for (int i = 0; i < ddw->Size(true); i++) {
         MTGCard* c = ddw->getCard(i);
-        if (!c) break;
-        if (c->getRarity() == Constants::RARITY_R || c->getRarity() == Constants::RARITY_M)
+        if (!c) {
+            break;
+        }
+        if (c->getRarity() == Constants::RARITY_R || c->getRarity() == Constants::RARITY_M) {
             r += ddw->count(c);
-        else if (c->getRarity() == Constants::RARITY_U)
+        } else if (c->getRarity() == Constants::RARITY_U) {
             u += ddw->count(c);
-        else if (c->getRarity() == Constants::RARITY_S)
+        } else if (c->getRarity() == Constants::RARITY_S) {
             s += ddw->count(c);
+        }
         card++;
     }
-    int count = ddw->getCount();
+    const int count = ddw->getCount();
     SAFE_DELETE(ddw);
     SAFE_DELETE(d);
     // Note: When there are special cards, the count IS going to be messed up, so do not perform the check for Rare and

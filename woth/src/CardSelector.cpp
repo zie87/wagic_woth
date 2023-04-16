@@ -106,7 +106,7 @@ CardSelector::Target* CardSelector::fetchMemory(SelectorMemory& memory) {
     return closest<True>(cards, limitor, memory.x, memory.y);
 }
 
-void CardSelector::Push() { memoryStack.push(SelectorMemory(active)); }
+void CardSelector::Push() { memoryStack.emplace(active); }
 
 void CardSelector::Pop() {
     Target* oldactive = active;
@@ -376,7 +376,7 @@ void CardSelector::PushLimitor() {
     } else {
         owner = CardView::nullZone;
     }
-    limitorStack.push(std::make_pair(limitor, owner));
+    limitorStack.emplace(limitor, owner);
 }
 
 void CardSelector::PopLimitor() {

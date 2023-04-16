@@ -81,7 +81,7 @@ public:
             LOG(stream.str().c_str());
 #endif
             mRequestLookup.insert(inCacheID);
-            mRequestQueue.push(CacheRequest(inFilePath, inSubmode, inCacheID));
+            mRequestQueue.emplace(inFilePath, inSubmode, inCacheID);
 
             // capping the number of queued decodes to 7, as this is
             // the maximum # of cards we display concurrently in the deck editor.

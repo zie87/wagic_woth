@@ -650,7 +650,7 @@ void MTGAllCards::prefetchCardNameCache() {
         mtgCardByNameCache[cardName] = c;
 
         // Name + set
-        int setId           = c->setId;
+        const int setId     = c->setId;
         MTGSetInfo* setInfo = setlist.getInfo(setId);
         if (setInfo) {
             string setName = setInfo->getName();
